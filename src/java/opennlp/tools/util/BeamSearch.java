@@ -152,7 +152,7 @@ public class BeamSearch {
     * @return The top ranked sequence of outcomes.
     */
   public Sequence bestSequence(Object[] sequence, Object[] additionalContext) {
-    return bestSequences(1, sequence, additionalContext,0)[0];
+    return bestSequences(1, sequence, additionalContext,zeroLog)[0];
   }
 
   /** Determines wheter a particular continuation of a sequence is valid.  
