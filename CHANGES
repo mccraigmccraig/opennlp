@@ -1,5 +1,8 @@
-0.8.3
+0.8.4
 -----
+Summary: A fair number of changes in the way various interfaces
+work.
+
 Made the unification stuff work on Objects instead of
 Unifiables. (Jason)
 
