@@ -24,9 +24,10 @@ import java.util.List;
 import opennlp.common.util.Sequence;
 import opennlp.maxent.ContextGenerator;
 
-/**
- * @author tsmorton
- *
+/** Features based on chunking model described in Fei Sha and Fernando Pereira. Shallow 
+ *  parsing with conditional random fields. In Proceedings of HLT-NAACL 2003. Association 
+ *  for Computational Linguistics, 2003.
+ * @author Tom Morton
   */
 public class DefaultChunkerContextGenerator implements ContextGenerator {
 
@@ -36,7 +37,7 @@ public class DefaultChunkerContextGenerator implements ContextGenerator {
   }
 
   public String[] getContext(int i, List toks, List tags, List preds) {
-    return(getContext(i,toks.toArray(),(String[]) tags.toArray(new String[tags.size()]),(String[]) preds.toArray(new String[preds.size()])));
+    return (getContext(i, toks.toArray(), (String[]) tags.toArray(new String[tags.size()]), (String[]) preds.toArray(new String[preds.size()])));
   }
   public String[] getContext(int i, Object[] toks, String[] tags, String[] preds) {
     List features = new ArrayList(45);
@@ -90,46 +91,46 @@ public class DefaultChunkerContextGenerator implements ContextGenerator {
     features.add(w0);
     features.add(w1);
     features.add(w2);
-    features.add(w_1+w0);
-    features.add(w0+w1);
+    features.add(w_1 + w0);
+    features.add(w0 + w1);
     //add tag features
     features.add(t_2);
     features.add(t_1);
     features.add(t0);
     features.add(t1);
     features.add(t2);
-    features.add(t_2+t_1);
-    features.add(t_1+t0);
-    features.add(t0+t1);
-    features.add(t1+t2);
-    features.add(t_2+t_1+t0);
-    features.add(t_1+t0+t1);
-    features.add(t0+t1+t2);
+    features.add(t_2 + t_1);
+    features.add(t_1 + t0);
+    features.add(t0 + t1);
+    features.add(t1 + t2);
+    features.add(t_2 + t_1 + t0);
+    features.add(t_1 + t0 + t1);
+    features.add(t0 + t1 + t2);
     //add pred tags
     features.add(p_2);
     features.add(p_1);
-    features.add(p_2+p_1);
+    features.add(p_2 + p_1);
     //add pred and tag
-    features.add(p_1+t_2);
-    features.add(p_1+t_1);
-    features.add(p_1+t0);
-    features.add(p_1+t1);
-    features.add(p_1+t2);
-    features.add(p_1+t_2+t_1);
-    features.add(p_1+t_1+t0);
-    features.add(p_1+t0+t1);
-    features.add(p_1+t1+t2);
-    features.add(p_1+t_2+t_1+t0);
-    features.add(p_1+t_1+t0+t1);
-    features.add(p_1+t0+t1+t2);
+    features.add(p_1 + t_2);
+    features.add(p_1 + t_1);
+    features.add(p_1 + t0);
+    features.add(p_1 + t1);
+    features.add(p_1 + t2);
+    features.add(p_1 + t_2 + t_1);
+    features.add(p_1 + t_1 + t0);
+    features.add(p_1 + t0 + t1);
+    features.add(p_1 + t1 + t2);
+    features.add(p_1 + t_2 + t_1 + t0);
+    features.add(p_1 + t_1 + t0 + t1);
+    features.add(p_1 + t0 + t1 + t2);
     //add pred and word
-    features.add(p_1+w_2);
-    features.add(p_1+w_1);
-    features.add(p_1+w0);
-    features.add(p_1+w1);
-    features.add(p_1+w2);
-    features.add(p_1+w_1+w0);
-    features.add(p_1+w0+w1);
+    features.add(p_1 + w_2);
+    features.add(p_1 + w_1);
+    features.add(p_1 + w0);
+    features.add(p_1 + w1);
+    features.add(p_1 + w2);
+    features.add(p_1 + w_1 + w0);
+    features.add(p_1 + w0 + w1);
     return ((String[]) features.toArray(new String[features.size()]));
   }
 
