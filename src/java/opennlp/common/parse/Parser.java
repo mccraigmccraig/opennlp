@@ -29,7 +29,7 @@ import java.util.ArrayList;
  * a structured form representing that string.
  *
  * @author      Gann Bierner
- * @version     $Revision: 1.1 $, $Date: 2001/10/23 13:46:24 $
+ * @version     $Revision: 1.2 $, $Date: 2001/11/05 14:42:54 $
  */
 public interface Parser {
     
@@ -39,7 +39,7 @@ public interface Parser {
      * @param _L the lexicon containing the whole vocabulary
      * @param _R the rules saying how to combine lexical items
      */
-    public void setGrammar(Lexicon _L, Rules _R);
+    public void setGrammar(Lexicon _L, RuleGroup _R);
     
     /**
      * Parses a string

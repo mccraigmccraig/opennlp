@@ -26,9 +26,9 @@ import java.util.Iterator;
  * A set of rules that describe how lexical items should be combined
  *
  * @author      Gann Bierner
- * @version     $Revision: 1.1 $, $Date: 2001/10/23 13:46:24 $
+ * @version     $Revision: 1.1 $, $Date: 2001/11/05 14:42:54 $
  */
-public interface Rules {
+public interface RuleGroup {
     /**
      * Performs initialization necessary to attempt to combine
      * a set of lexical items.
@@ -43,7 +43,7 @@ public interface Rules {
      *
      * @return the resulting Constituent
      */
-    public Constituent nextMatch() throws CatParseException;
+    public Constituent nextMatch();
 
     /**
      * Returns a way to iterate through the rules one at a time.  Notice that
@@ -52,9 +52,5 @@ public interface Rules {
      * @return the iterator
      */
     public Iterator iterator();
-    
-    public void startRightMatch(Constituent[] words, Constituent ans);
-    public Constituent nextRightMatch() throws CatParseException;
-    public void startMatchGen(Constituent w);
-    public Constituent[] nextMatchGen(Constituent w) throws CatParseException;
+
 }
