@@ -26,7 +26,6 @@ import opennlp.maxent.ContextGenerator;
 import opennlp.maxent.DataStream;
 import opennlp.maxent.Event;
 import opennlp.maxent.EventStream;
-import opennlp.tools.chunker.DefaultChunkerContextGenerator;
 import opennlp.tools.postag.POSContextGenerator;
 
 public class ParserEventStream implements EventStream {
@@ -46,7 +45,7 @@ public class ParserEventStream implements EventStream {
       this.cg = new CheckContextGenerator();
     }
     else if (etype == EventTypeEnum.CHUNK) {
-      this.cg = new DefaultChunkerContextGenerator();
+      this.cg = new ChunkContextGenerator();
     }
     else if (etype == EventTypeEnum.TAG) {
       this.cg = new POSContextGenerator();
