@@ -23,19 +23,45 @@ import opennlp.common.unify.*;
 
 public class HyloVar extends HyloFormula implements Variable {
     
-    private String _name = "";
-    private int _index = 0;
+    private final String _name;
+    private final int _index;
 
     public HyloVar (String name) {
-	_name = name;
+	this(name, 0);
     }
 
+    protected HyloVar (String name, int index) {
+	_name = name;
+	_index = index;
+    }
+    
     public String name () {
 	return _name;
     }
     
+    public Variable uniqueCopy (int index) {
+	return new HyloVar(_name, index);
+    }
+
+    public boolean occurs (Variable var) {
+	return equals(var);
+    }
+
+    public boolean equals (Object o) {
+	if (o instanceof HyloVar
+	    && _name == ((HyloVar)o)._name
+	    && _index == ((HyloVar)o)._index) {
+	    return true;
+	} else {
+	    return false;
+	}
+    }
+    
     public Object unify (Object o, Substitution sub) throws UnifyFailure {
 	if (o instanceof LF) {
+	    if (((LF)o).occurs(this)) {
+		throw new UnifyFailure();
+	    }
 	    sub.makeSubstitution(this, o);
 	    return o;
 	}
@@ -43,7 +69,7 @@ public class HyloVar extends HyloFormula implements Variable {
 	    throw new UnifyFailure();
 	}
     }
-    
+
     public String toString () {	
 	return _name+_index;
     }

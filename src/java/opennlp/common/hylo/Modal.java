@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////////
-// Copyright (C) 2002 Jason Baldridge
+// Copyright (C) 2001 Jason Baldridge
 // 
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
@@ -21,49 +21,57 @@ package opennlp.common.hylo;
 import opennlp.common.synsem.*;
 import opennlp.common.unify.*;
 import org.jdom.*;
-import java.util.*;
 
-/**
- * A hybrid logic satifaction operator, which tests whether a formula is true
- * a particular point named by a nominal.
- *
- * @author      Jason Baldridge
- * @version     $Revision: 1.3 $, $Date: 2002/01/02 10:44:22 $
- **/
-public class SatOp extends HyloFormula {
-    protected Nominal _nominal;
-    protected LF _arg;
+public class Modal extends HyloFormula {
+    // If true, this Modal is of the diamond variety, if false, it is a box.
+    private final boolean _isDiamond;
 
-    public SatOp (Element e) {
-	List l = e.getChildren();
-	_nominal = new Nominal((Element)l.get(0));
-	_arg = HyloHelper.getLF((Element)l.get(1));
+    // the relation
+    private final String _relation;
+    private LF _arg;
+
+
+    public Modal (Element e) {
+	String type = e.getAttributeValue("type");
+	if (type.equals("d")) {
+	    _isDiamond = true;
+	} else {
+	    _isDiamond = false;
+	}
+	
+	_relation = e.getAttributeValue("rel");
+	_arg = HyloHelper.getLF((Element)e.getChildren().get(0));
     }
 
-    public SatOp (Nominal nom, LF arg) {
-	_nominal = nom;
+    protected Modal (boolean isDiamond, String rel, LF arg) {
+	_isDiamond = isDiamond;
+	_relation = rel;
 	_arg = arg;
     }
     
     public boolean occurs (Variable var) {
-	return (_arg.occurs(var));
+	return _arg.occurs(var);
     }
 
-    public boolean equals (Object o){
-	if (o instanceof SatOp
-	    && _nominal.equals(((SatOp)o)._nominal)
-	    && _arg.equals(((SatOp)o)._arg)) {
+    public boolean equals (Object o) {
+	if (o instanceof Modal
+	    && _isDiamond == ((Modal)o)._isDiamond
+	    && _relation.equals(((Modal)o)._relation)
+	    && _arg.equals(((Modal)o)._arg)) {
 	    return true;
 	} else {
 	    return false;
 	}
     }
-    
+
     public Object unifyCheck (Object o) throws UnifyFailure {
-	if (o instanceof SatOp) {
-	    _nominal.unifyCheck(((SatOp)o)._nominal);
-	    _arg.unifyCheck(((SatOp)o)._arg);
+	if (o instanceof Modal
+	    && _isDiamond == ((Modal)o)._isDiamond
+	    && _relation.equals(((Modal)o)._relation)) {
+
+	    _arg.unifyCheck(((Modal)o)._arg);
 	    return this;
+
 	} else {
 	    throw new UnifyFailure();
 	}
@@ -73,14 +81,27 @@ public class SatOp extends HyloFormula {
 	if (_arg instanceof Variable) {
 	    LF $arg = (LF)sub.getValue((Variable)_arg);
 	    if ($arg != null) {
-		return new SatOp(_nominal, $arg);
+		return new Modal(_isDiamond, _relation, $arg);
 	    }
 	}
-	return new SatOp(_nominal, _arg);
+	return new Modal(_isDiamond, _relation, _arg);
     }
-
-    public String toString () {	
-	return "@_" + _nominal + "(" + _arg + ")";
+    
+    public String toString () {
+	StringBuffer sb = new StringBuffer();
+	if (_isDiamond) {
+	    sb.append('<');
+	} else {
+	    sb.append('[');
+	}
+	sb.append(_relation);
+	if (_isDiamond) {
+	    sb.append('>');
+	} else {
+	    sb.append(']');
+	}
+	sb.append(_arg.toString());
+	return sb.toString();
     }
 
 }

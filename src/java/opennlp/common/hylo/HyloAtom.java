@@ -9,7 +9,7 @@
 // This library is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-// GNU General Public License for more details.
+// GNU Lesser General Public License for more details.
 // 
 // You should have received a copy of the GNU Lesser General Public
 // License along with this program; if not, write to the Free Software
@@ -18,29 +18,29 @@
 
 package opennlp.common.hylo;
 
-import opennlp.common.synsem.*;
+import opennlp.common.unify.*;
 import org.jdom.*;
-import java.util.*;
 
-public class BinaryOp extends Op {
-    private LF arg1, arg2;
+/**
+ * A logical atomic formula.
+ *
+ * @author      Jason Baldridge
+ * @version     $Revision: 1.1 $, $Date: 2002/01/02 10:44:22 $
+ **/
+public class HyloAtom extends HyloFormula {
+    
+    protected final String _name;
 
-    public BinaryOp (String o, String m, LF a1, LF a2) {
-	super(o,m);
-	arg1 = a1;
-	arg2 = a2;
+    public HyloAtom (Element e) {
+	_name = e.getAttributeValue("n");
     }
 
-    public BinaryOp (Element e) {
-	super(e);
-	List argElements = e.getChildren();
-	arg1 = HyloHelper.getLF((Element)argElements.get(0));
-	arg2 = HyloHelper.getLF((Element)argElements.get(1));
+    public boolean occurs (Variable var) {
+	return false;
     }
 
-
-    public String toString () {
-	return "(" + arg1 + super.toString() + arg2 + ")";
+    public String toString () {	
+	return _name;
     }
 
 }

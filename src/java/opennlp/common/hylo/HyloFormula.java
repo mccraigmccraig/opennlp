@@ -21,34 +21,19 @@ package opennlp.common.hylo;
 import opennlp.common.synsem.*;
 import opennlp.common.unify.*;
 
+/**
+ * A parent class to implement reasonable default behavior for classes
+ * representing data structures for hybrid logic.
+ *
+ * @author      Jason Baldridge
+ * @version     $Revision: 1.2 $, $Date: 2002/01/02 10:44:22 $
+ **/
 public abstract class HyloFormula implements LF {
 
     public void reduce () {
 
     }
     
-    /**
-     * Determines if a Variable occurs within this Unifiable
-     *
-     * @param v the Variable to check for
-     * @return whether or not the Variable occurs
-     */
-    public boolean occurs (Variable v) {
-	return false;
-    }
-
-  
-    /**
-     * Tests for equality with the given Object.
-     *
-     * @param o object to test for equality
-     * @return true if this Unifiable is equal to <code>o</code>,
-     * false if not.
-     **/
-    public boolean equals (Object o) {
-	return false;
-    }
-
     
     /**
      * Unify this Unfiable with another Object.

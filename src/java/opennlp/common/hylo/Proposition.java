@@ -9,7 +9,7 @@
 // This library is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-// GNU General Public License for more details.
+// GNU Lesser General Public License for more details.
 // 
 // You should have received a copy of the GNU Lesser General Public
 // License along with this program; if not, write to the Free Software
@@ -18,18 +18,28 @@
 
 package opennlp.common.hylo;
 
+import opennlp.common.unify.*;
 import org.jdom.*;
 
-public class PropSym extends HyloFormula {
-    
-    private String _name;
+/**
+ * A propositional value, such as the predict "sleep".
+ *
+ * @author      Jason Baldridge
+ * @version     $Revision: 1.1 $, $Date: 2002/01/02 10:44:22 $
+ **/
+public class Proposition extends HyloAtom {
 
-    public PropSym (Element e) {
-	_name = e.getAttributeValue("n");
+    public Proposition (Element e) {
+	super(e);
     }
 
-    public String toString () {	
-	return _name;
+    public boolean equals (Object o) {
+	if (o instanceof Proposition
+	    && _name == ((Proposition)o)._name) {
+	    return true;
+	} else {
+	    return false;
+	}
     }
 
 }

@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////////
-// Copyright (C) 2000 Jason Baldridge
+// Copyright (C) 2002 Jason Baldridge
 // 
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
@@ -9,7 +9,7 @@
 // This library is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-// GNU General Public License for more details.
+// GNU Lesser General Public License for more details.
 // 
 // You should have received a copy of the GNU Lesser General Public
 // License along with this program; if not, write to the Free Software
@@ -20,16 +20,26 @@ package opennlp.common.hylo;
 
 import org.jdom.*;
 
-public class Nominal extends HyloFormula {
+/**
+ * A hybrid logic nominal, an atomic formula which holds true at exactly one
+ * point in a model.
+ *
+ * @author      Jason Baldridge
+ * @version     $Revision: 1.3 $, $Date: 2002/01/02 10:44:22 $
+ **/
+public class Nominal extends HyloAtom {
     
-    private String val;
-
     public Nominal (Element e) {
-	val = e.getAttributeValue("val");
+	super(e);
     }
 
-    public String toString () {	
-	return val;
+    public boolean equals (Object o) {
+	if (o instanceof Nominal
+	    && _name == ((Nominal)o)._name) {
+	    return true;
+	} else {
+	    return false;
+	}
     }
 
 }

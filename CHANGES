@@ -1,11 +1,15 @@
 0.6.7
 -----
 
-Jason: simplified the Category, Variable, Parser, and RuleGroup interfaces.
+Simplified the Category, Variable, Parser, and RuleGroup interfaces. (Jason)
 
-Jason: added opennlp.common.synsem.Sign as a replacement for
-Constituent.  The name is more standard, and Constituent had too many
-methods.
+Added opennlp.common.synsem.Sign as a replacement for Constituent.
+The name is more standard, and Constituent had too many
+methods. (Jason)
+
+Improved the hybrid logic subpackage so that its classes implement the
+Unifiable and LF interfaces. The classes also more succinctly capture
+the definition of well-formed formulas of hybrid logic. (Jason)
 
 
 
