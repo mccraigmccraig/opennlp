@@ -49,6 +49,15 @@ public class ProperNounResolver extends MaxentResolver {
     }
     showExclusions = false;
   }
+  
+  public ProperNounResolver(String projectName, ResolverMode m,NonReferentialResolver nonRefResolver) throws IOException {
+    super(projectName,"pnmodel", m, 500,nonRefResolver);
+    if (!acroMapLoaded) {
+      initAcronyms(projectName + "/acronyms.final");
+      acroMapLoaded = true;
+    }
+    showExclusions = false;
+  }
 
   public boolean canResolve(MentionContext mention) {
     return (mention.getHeadTokenTag().startsWith("NNP") || mention.getHeadTokenTag().startsWith("CD"));

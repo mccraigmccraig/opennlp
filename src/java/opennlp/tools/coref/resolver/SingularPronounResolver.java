@@ -42,6 +42,10 @@ public class SingularPronounResolver extends MaxentResolver {
   public SingularPronounResolver(String projectName, ResolverMode m) throws IOException {
     super(projectName, "pmodel", m, 30);
   }
+  
+  public SingularPronounResolver(String projectName, ResolverMode m, NonReferentialResolver nonReferentialResolver) throws IOException {
+    super(projectName, "pmodel", m, 30,nonReferentialResolver);
+  }
 
   public boolean canResolve(MentionContext mention) {
     //System.err.println("MaxentSingularPronounResolver.canResolve: ec= ("+mention.id+") "+ mention.toText());

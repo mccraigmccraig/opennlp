@@ -35,6 +35,14 @@ public class IsAResolver extends MaxentResolver {
     //predicativePattern = Pattern.compile("^(,|am|are|is|was|were|--)$");
     predicativePattern = Pattern.compile("^(,|--)$");
   }
+  
+  public IsAResolver(String projectName, ResolverMode m, NonReferentialResolver nrr) throws IOException {
+    super(projectName, "/imodel", m, 20,nrr);
+    showExclusions = false;
+    //predicativePattern = Pattern.compile("^(,|am|are|is|was|were|--)$");
+    predicativePattern = Pattern.compile("^(,|--)$");
+  }
+
 
   public boolean canResolve(MentionContext ec) {
     if (ec.getHeadTokenTag().startsWith("NN")) {

@@ -31,6 +31,12 @@ public class PluralNounResolver extends MaxentResolver {
     super(projectName,"plmodel", m, 80, true);
     showExclusions = false;
   }
+  
+  public PluralNounResolver(String projectName, ResolverMode m, NonReferentialResolver nrr) throws IOException {
+    super(projectName,"plmodel", m, 80, true,nrr);
+    showExclusions = false;
+  }
+
 
   protected List getFeatures(MentionContext mention, DiscourseEntity entity) {
     List features = new ArrayList();

@@ -31,6 +31,12 @@ public class DefiniteNounResolver extends MaxentResolver {
     super(projectName, "defmodel", m, 80);
     //preferFirstReferent = true;
   }
+  
+  public DefiniteNounResolver(String projectName, ResolverMode m, NonReferentialResolver nrr) throws IOException {
+    super(projectName, "defmodel", m, 80,nrr);
+    //preferFirstReferent = true;
+  }
+
 
   public boolean canResolve(MentionContext mention) {
     Parse[] mtokens = mention.getTokens();

@@ -35,6 +35,12 @@ public class CommonNounResolver extends MaxentResolver {
     showExclusions = false;
     preferFirstReferent = true;
   }
+  
+  public CommonNounResolver(String projectName, ResolverMode m, NonReferentialResolver nrr) throws IOException {
+    super(projectName,"cmodel", m, 80, true,nrr);
+    showExclusions = false;
+    preferFirstReferent = true;
+  }
 
   protected List getFeatures(MentionContext mention, DiscourseEntity entity) {
     List features = new ArrayList();

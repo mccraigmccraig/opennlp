@@ -32,6 +32,10 @@ public class PluralPronounResolver extends MaxentResolver {
   public PluralPronounResolver(String projectName, ResolverMode m) throws IOException {
     super(projectName, "tmodel", m, 30);
   }
+  
+  public PluralPronounResolver(String projectName, ResolverMode m,NonReferentialResolver nrr) throws IOException {
+    super(projectName, "tmodel", m, 30,nrr);
+  }
 
   protected List getFeatures(MentionContext mention, DiscourseEntity entity) {
     List features = new ArrayList();

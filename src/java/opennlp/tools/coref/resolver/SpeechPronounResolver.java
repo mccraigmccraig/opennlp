@@ -34,6 +34,13 @@ public class SpeechPronounResolver extends MaxentResolver {
     showExclusions = false;
     preferFirstReferent = true;
   }
+  
+  public SpeechPronounResolver(String projectName, ResolverMode m, NonReferentialResolver nrr) throws IOException {
+    super(projectName,"fmodel", m, 30,nrr);
+    showExclusions = false;
+    preferFirstReferent = true;
+  }
+
 
   protected List getFeatures(MentionContext mention, DiscourseEntity entity) {
     List features = new ArrayList();
