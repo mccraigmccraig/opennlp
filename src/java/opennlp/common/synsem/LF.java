@@ -24,7 +24,7 @@ import opennlp.common.unify.*;
  * An interface for objects which represent Logical Forms.
  *
  * @author      Jason Baldridge
- * @version     $Revision: 1.4 $, $Date: 2002/02/08 12:17:50 $
+ * @version     $Revision: 1.5 $, $Date: 2002/08/23 10:43:37 $
  */
 
 public interface LF extends Unifiable, Mutable {
@@ -35,4 +35,7 @@ public interface LF extends Unifiable, Mutable {
     public void reduce ();
 
     public LF copy ();
+
+    public String hashString ();
+
 }
