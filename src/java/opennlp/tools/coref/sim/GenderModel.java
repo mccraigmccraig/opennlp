@@ -90,6 +90,7 @@ public class GenderModel implements TestGenderModel, TrainSimilarityModel {
       features.add("mw=" + np1.getTokens()[ti].toString());
     }
     features.add("hw=" + np1.getHeadToken());
+    features.add("n="+np1.getNameType());
     for (Iterator si = np1.getSynsets().iterator(); si.hasNext();) {
       features.add("ss=" + si.next().toString());
     }
