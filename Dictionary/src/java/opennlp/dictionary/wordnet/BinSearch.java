@@ -14,7 +14,7 @@ import java.util.Map;
  * @author     Mike Atkinson
  * @since      0.1.0
  * @created    20 March 2002
- * @version    $Id: BinSearch.java,v 1.3 2002/03/26 19:07:50 mratkinson Exp $
+ * @version    $Id: BinSearch.java,v 1.4 2002/03/26 19:34:04 mratkinson Exp $
  */
 public class BinSearch {
 
@@ -25,7 +25,7 @@ public class BinSearch {
     private String NULL_DATA = "NULL_DATA";
 
     private long offset;
-    private static String Id = "$Id: BinSearch.java,v 1.3 2002/03/26 19:07:50 mratkinson Exp $";
+    private static String Id = "$Id: BinSearch.java,v 1.4 2002/03/26 19:34:04 mratkinson Exp $";
     private final static int LINE_LEN = 1024;
 
 
@@ -126,7 +126,6 @@ public class BinSearch {
                             line = "";
                             key = "";
                         }
-                        //System.out.println(line);
                         binSearchCache.put(new BinSearchKey2(mid, fp), new BinSearchData(line, key, lastBinSearchOffset));
                     } else {
                         line = r.data;
@@ -137,7 +136,6 @@ public class BinSearch {
                     }
                 } else {
                     fp.seek(mid - 1);
-                    //lastBinSearchOffset = fp.getFilePointer();
                     lastBinSearchOffset = mid - 1;
                     size = Search.fgets(fp, lineBuf);
                     line = new String(lineBuf, 0, 0, size);
@@ -145,9 +143,6 @@ public class BinSearch {
                     key = line.substring(0, length);
                 }
                 if (size > 0) {
-                    //line = new String(lineBuf, 0, 0, size);
-                    //int length = line.indexOf(' ');
-                    //key = line.substring(0, length);
                     if (key.compareTo(searchKey) < 0) {
                         top = mid;
                         diff = (bot - top) >> 1;
