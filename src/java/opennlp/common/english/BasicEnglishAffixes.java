@@ -17,94 +17,55 @@
 //////////////////////////////////////////////////////////////////////////////   
 package opennlp.common.english;
 
-import gnu.regexp.*;
 import java.util.*;
 
 /**
  * A helper class for doing very *basic* English morphological analysis.
  *
  * @author      Jason Baldridge
- * @version     $Revision: 1.2 $, $Date: 2002/02/08 12:17:50 $
+ * @version     $Revision: 1.3 $, $Date: 2002/04/08 14:41:10 $
  */
-
-
 public final class BasicEnglishAffixes {
 
     private static byte MIN_WORD_LENGTH = 4;
-    
-    private static RE endsWith2, endsWith3, endsWith4, endsWith5;    
-    
-    static {
-	try {
-	    endsWith2 =
-		new RE("(ad|al|an|ar|cy|ed|ee|en|er|es|et|eth|ey|fy"
-		       +"|ia|ic|ie|id|in|ly|mo|ol|on|or|ry|st|th|ty|yl)$");
-	}
-	catch (REException e) {
-	    System.out.println("Problem with 2 letter suffix RE:\n" + e);
-	}
 
-	try {
-	    endsWith3 =
-		new RE("("
-		       +"ade|age|ana|and|ane|ant|ard|art|ary|ase|ate"
-		       +"|cal|cle"
-		       +"|dom"
-		       +"|ean|eer|eme|ene|ent|ery|ese|ess|est"
-		       +"|fer|fic|fid|ful"
-		       +"|gen|gon"
-		       +"|ial|ian|ide|ier|ify|ile|ine|ign|ing|ion"
-		       +"|ise|ish|ism|ist|ite|ity|ium|ive|ize"
-		       +"|kin|let|lex|log|mas|mer|nik"
-		       +"|ock|ode|oid|ole|oma|ome|one|ory|ose|our|ous"
-		       +"|ped|ple|pod|sis"
-		       +"|ule|ure|ute|yne|zoa"
-		       +")$");
-	}
-	catch (REException e) {
-	    System.out.println("Problem with 3 letter suffix RE:\n" + e);
-	}
-	
-	try {
-	    endsWith4 =
-		new RE("(able|acea|ales|ance|ancy|arch|asis|atic|ator"
-		       +"|cade|carp|cele|cene|cide|crat|cule|cyst|cyte|derm"
-		       +"|emia|ence|ency|eous|ette|fold|form|free|fuge"
-		       +"|gamy|gene|geny|gony|gram|hood"
-		       +"|iana|ible|ical|idae|iest|ieth|inae|ious|itis|itol"
-		       +"|less|like|ling|lite|lith|logy|lyte"
-		       +"|ment|mere|most|naut|ness|nomy"
-		       +"|ogue|onym|opia|osis|otic"
-		       +"|saur|sect|ship|some|stat|ster"
-		       +"|taxy|tion|tome|tomy|tory|trix|tron|tude|type"
-		       +"|uret|urgy|uria|ward|ways|wise|zoon"
-		       +")$");
-	}
-	catch (REException e) {
-	    System.out.println("Problem with 4 letter suffix RE:\n" + e);
-	}
-	
-	try {
-	    endsWith5 =
-		new RE("(andry|archy|arian|aster|ation|ative|atory"
-		       +"|clase|cline|cracy|diene|escent|esque"
-		       +"|genic|graph|hemia|iasis|ician|istic"
-		       +"|latry|lepsy|logue|lysis|lytic"
-		       +"|mancy|mania|meter|metry|morph"
-		       +"|nasty|odont|oidea|opsis"
-		       +"|path|pathy|pede|petal|phage|phagy|phane|phany|phile"
-		       +"|phobe|phone|phony|phore|phyll|phyte|plasm|plast"
-		       +"|ploid|prone|proof"
-		       +"|rhoea|scape|scope|scopy|sophy|stome|stomy"
-		       +"|taxis|trope|ulent|ville|wards"
-		       +")$");
+    private static String[] twoCharSuffixes =
+        { "ad","al","an","ar","cy","ed","ee","en","er","es",
+	  "et","eth","ey","fy","ia","ic","ie","id","in","ly",
+	  "mo","ol","on","or","ry","st","th","ty","yl" };
 
-	}
-	catch (REException e) {
-	    System.out.println("Problem with 5 letter suffix RE:\n" + e);
-	}
-	
-    }
+    private static String[] threeCharSuffixes =
+        { "ade","age","ana","and","ane","ant","ard","art","ary","ase","ate",
+	  "cal","cle","dom","ean","eer","eme","ene","ent","ery","ese","ess",
+	  "est","fer","fic","fid","ful","gen","gon","ial","ian","ide","ier",
+	  "ify","ile","ine","ign","ing","ion","ise","ish","ism","ist","ite",
+	  "ity","ium","ive","ize","kin","let","lex","log","mas","mer","nik",
+	  "ock","ode","oid","ole","oma","ome","one","ory","ose","our","ous",
+	  "ped","ple","pod","sis","ule","ure","ute","yne","zoa" };
+
+    private static String[] fourCharSuffixes =
+        { "able","acea","ales","ance","ancy","arch","asis","atic","ator",
+	  "cade","carp","cele","cene","cide","crat","cule","cyst","cyte",
+	  "derm","emia","ence","ency","eous","ette","fold","form","free",
+	  "fuge","gamy","gene","geny","gony","gram","hood","iana","ible",
+	  "ical","idae","iest","ieth","inae","ious","itis","itol","less",
+	  "like","ling","lite","lith","logy","lyte","ment","mere","most",
+	  "naut","ness","nomy","ogue","onym","opia","osis","otic","saur",
+	  "sect","ship","some","stat","ster","taxy","tion","tome","tomy",
+	  "tory","trix","tron","tude","type","uret","urgy","uria","ward",
+	  "ways","wise","zoon" };
+
+    private static String[] fiveCharSuffixes =
+        { "andry","archy","arian","aster","ation","ative","atory","clase",
+	  "cline","cracy","diene","escent","esque","genic","graph","hemia",
+	  "iasis","ician","istic","latry","lepsy","logue","lysis","lytic",
+	  "mancy","mania","meter","metry","morph","nasty","odont","oidea",
+	  "opsis","path","pathy","pede","petal","phage","phagy","phane",
+	  "phany","phile","phobe","phone","phony","phore","phyll","phyte",
+	  "plasm","plast","ploid","prone","proof","rhoea","scape","scope",
+	  "scopy","sophy","stome","stomy","taxis","trope","ulent","ville",
+	  "wards" };
+
 
     public static String[] getSuffixes(String word) {
 	ArrayList suffs = new ArrayList();
@@ -136,25 +97,34 @@ public final class BasicEnglishAffixes {
 
     
     public static int nextSuffix(String word) {
-	REMatch match = null;
-	short wlen = (short)word.length();
+	int index = 0;
+	short wordLength = (short)word.length();
 	
-	if (wlen < 2+MIN_WORD_LENGTH)
+	String end = word.substring(MIN_WORD_LENGTH);
+	short len = (short)end.length();
+	if (len < 2) {
 	    return 0;
-	
-	if (wlen >= 5+MIN_WORD_LENGTH)
-	    match = endsWith5.getMatch(word);
-	if (match == null && wlen >= 4+MIN_WORD_LENGTH)
-	    match = endsWith4.getMatch(word);
-	if (match == null && wlen >= 3+MIN_WORD_LENGTH)
-	    match = endsWith3.getMatch(word);
-	if (match == null && wlen >= 2+MIN_WORD_LENGTH)
-	    match = endsWith2.getMatch(word);
-
-	if (match != null) return match.getStartIndex();
+	} else if (len>4 && contains(fiveCharSuffixes, end.substring(len-5))) {
+	    return wordLength - 5;
+	} else if (len>3 && contains(fourCharSuffixes, end.substring(len-4))) {
+	    return wordLength - 5;
+	} else if (len>2 && contains(threeCharSuffixes, end.substring(len-3))) {
+	    return wordLength - 5;
+	} else if (len>1 && contains(twoCharSuffixes, end.substring(len-2))) {
+	    return wordLength - 2;
+	}
 	else return 0;
     }
 
+    public static boolean contains (String[] suffixes, String suffix) {
+	for (int i=0; i<suffixes.length; i++) {
+	    if (suffix.equals(suffixes[i])) {
+		return true;
+	    }
+	}
+	return false;
+    }
+    
     public static void main(String[] args) {
 	String[] suffs = getSuffixes(args[0]);
 	//System.out.println(nextSuffix(args[0]));

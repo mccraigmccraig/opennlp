@@ -1,6 +1,9 @@
 0.8.3
 -----
 
+Removed dependency on gnu-regexp (finally) by getting rid of regexps
+in the BasicEnglishAffixes class. (Jason)
+
 Removed xSpan methods from Category interface. (Jason)
 
 Added Rule interface to opennlp.common.parse package. (Jason)
