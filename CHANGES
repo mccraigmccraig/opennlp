@@ -1,3 +1,14 @@
+0.6.7
+-----
+
+Jason: simplified the Category, Variable, Parser, and RuleGroup interfaces.
+
+Jason: added opennlp.common.synsem.Sign as a replacement for
+Constituent.  The name is more standard, and Constituent had too many
+methods.
+
+
+
 0.6.6
 -----
 Summary: Lots of improvements in the way XML is handled.  The
