@@ -21,7 +21,7 @@ package opennlp.common.hylo;
 import opennlp.common.synsem.*;
 import opennlp.common.unify.*;
 
-public class HyloVar extends HyloFormula implements Variable {
+public class HyloVar extends HyloFormula implements Variable, Indexed {
     
     private final String _name;
     private int _index;
@@ -51,6 +51,10 @@ public class HyloVar extends HyloFormula implements Variable {
 	return new HyloVar(_name, _index);
     }
     
+    public int getIndex () {
+	return _index;
+    }
+
     public void setIndex (int index) {
 	_hashCode += index - _index;
 	_index = index;

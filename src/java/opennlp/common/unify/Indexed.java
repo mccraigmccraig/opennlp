@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////////
-// Copyright (C) 2000 Jason Baldridge and Gann Bierner
+// Copyright (C) 2002 Jason Baldridge
 // 
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
@@ -15,22 +15,29 @@
 // License along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 //////////////////////////////////////////////////////////////////////////////
-
 package opennlp.common.unify;
 
 /**
- * A variable that can stand for some class of Unifiable objects.
+ * An object which can be indexed.
  *
- * @author      Gann Bierner
- * @version     $Revision: 1.5 $, $Date: 2002/01/07 15:33:25 $
+ * @author      Jason Baldridge
+ * @version     $Revision: 1.1 $, $Date: 2002/01/07 15:33:45 $
  **/
-public interface Variable extends Unifiable {
+public interface Indexed {
 
     /**
-     * Returns the name of this variable.
+     * Gets the index of this Indexed object.
      *
-     * @return the variable's name
-     **/        
-    public String name ();
+     * @return the index 
+     **/
+    public int getIndex ();
 
+
+    /**
+     * Sets the index of this Indexed object.
+     *
+     * @param index An int which provides a unique index
+     **/
+    public void setIndex (int index);
+    
 }
