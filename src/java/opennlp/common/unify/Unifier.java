@@ -23,14 +23,18 @@ package opennlp.common.unify;
  * Variables will be handled properly.
  *
  * @author      Jason Baldridge
- * @version     $Revision: 1.2 $, $Date: 2001/11/22 15:04:50 $
- **/
-
+ * @version     $Revision: 1.3 $, $Date: 2001/11/23 10:40:28 $
+ *
+*/
 public class Unifier {
    
     public static final Object unify (Object o1, Object o2) 
 	throws UnifyFailure {
-	return unify(o1, o2, new SimpleSubstitution());
+	Substitution sub = new SimpleSubstitution();
+	Object unified =  unify(o1, o2, sub);
+	if (unified instanceof Unifiable)
+	    ((Unifiable)unified).fill(sub);
+	return unified;
     }
 
 
