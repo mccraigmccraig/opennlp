@@ -39,14 +39,14 @@ import opennlp.tools.postag.POSTaggerME;
 
 public class EnglishTreebankParser {
 
-  public static ParserME getParser(String dataDir, boolean useTagDictionary, boolean useCaseSensitiveTagDictionary) throws IOException {
+  public static ParserME getParser(String dataDir, boolean useTagDictionary, boolean useCaseSensitiveTagDictionary, int beamSize, double advancePercentage) throws IOException {
     if (useTagDictionary) {
       return new ParserME(
         new SuffixSensitiveGISModelReader(new File(dataDir + "/build.bin.gz")).getModel(),
         new SuffixSensitiveGISModelReader(new File(dataDir + "/check.bin.gz")).getModel(),
         new EnglishTreebankPOSTagger(dataDir + "/tag.bin.gz", dataDir + "/tagdict", useCaseSensitiveTagDictionary),
         new EnglishTreebankChunker(dataDir + "/chunk.bin.gz"),
-        new EnglishHeadRules(dataDir + "/head_rules"));
+        new EnglishHeadRules(dataDir + "/head_rules"),beamSize,advancePercentage);
     }
     else {
       return new ParserME(
@@ -54,7 +54,7 @@ public class EnglishTreebankParser {
         new SuffixSensitiveGISModelReader(new File(dataDir + "/check.bin.gz")).getModel(),
         new EnglishTreebankPOSTagger(dataDir + "/tag.bin.gz"),
         new EnglishTreebankChunker(dataDir + "/chunk.bin.gz"),
-        new EnglishHeadRules(dataDir + "/head_rules"));
+        new EnglishHeadRules(dataDir + "/head_rules"),beamSize,advancePercentage);
     }
   }
 
@@ -171,6 +171,8 @@ public class EnglishTreebankParser {
     System.err.println("dataDirectory: Directory containing parser models.");
     System.err.println("-d: Use tag dictionary.");
     System.err.println("-i: Case insensitive tag dictionary.");
+    System.err.println("-bs 20: Use a beam size of 20.");
+    System.err.println("-ap 0.95: Advance outcomes in with at least 95% of the probability mass.");
     System.exit(1);
   }
 
@@ -181,29 +183,60 @@ public class EnglishTreebankParser {
     boolean useTagDictionary = false;
     boolean caseInsensitiveTagDictionary = false;
     int ai = 0;
+    int beamSize = ParserME.defaultBeamSize;
+    double advancePercentage = ParserME.defaultAdvancePercentage;
     while (args[ai].startsWith("-")) {
       if (args[ai].equals("-d")) {
         useTagDictionary = true;
-        ai++;
       }
-      if (args[ai].equals("-i")) {
+      else if (args[ai].equals("-i")) {
         caseInsensitiveTagDictionary = true;
-        ai++;
       }
-      if (args[ai].equals("--")) {
-        ai++;
+      else if (args[ai].equals("-bs")) {
+      	if (args.length > ai+1) {
+          try {
+            beamSize=Integer.parseInt(args[ai+1]);
+            ai++;
+          }
+          catch(NumberFormatException nfe) {
+            System.err.println(nfe);
+            usage();
+          }
+      	}
+      	else {
+      	  usage();
+      	}
+      }
+      else if (args[ai].equals("-ap")) {
+        if (args.length > ai+1) {
+          try {
+            advancePercentage=Double.parseDouble(args[ai+1]);
+            ai++;
+          }
+          catch(NumberFormatException nfe) {
+            System.err.println(nfe);
+            usage();
+          }
+      	}
+      	else {
+      	  usage();
+      	}
+      }
+      else if (args[ai].equals("--")) {
+      	ai++;
         break;
       }
+      ai++;
     }
     ParserME parser;
     if (caseInsensitiveTagDictionary) {
-      parser = EnglishTreebankParser.getParser(args[ai++], true, false);
+      parser = EnglishTreebankParser.getParser(args[ai++], true, false,beamSize,advancePercentage);
     }
     else if (useTagDictionary) {
-      parser = EnglishTreebankParser.getParser(args[ai++], true, true);
+      parser = EnglishTreebankParser.getParser(args[ai++], true, true,beamSize,advancePercentage);
     }
     else {
-      parser = EnglishTreebankParser.getParser(args[ai++], false, false);
+      parser = EnglishTreebankParser.getParser(args[ai++], false, false,beamSize,advancePercentage);
     }
     BufferedReader in;
     if (ai == args.length) {

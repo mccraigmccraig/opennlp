@@ -35,14 +35,23 @@ import opennlp.tools.util.Span;
  * Class for a shift reduce style parser based on Adwait Ratnaparki's 1998 thesis. 
  */
 public class ParserME {
-  private static int M = 20;
-  private static int K = 20;
-  private static double Q = 0.95;
 
+  /** The maximum number of parses advanced from all preceeding parses at each derivation step. */
+  private int M;
+  /** The maximum number of parses to advance from a single preceeding parse. */
+  private int K;
+  /** The minimum total probability mass of advanced outcomes.*/
+  private double Q;
+  /** The default beam size used if no beam size is given. */
+  public static final int defaultBeamSize = 20;
+  /** The default amount of probability mass required of advanced outcomes. */
+  public static final double defaultAdvancePercentage = 0.95;
+
+  /** Completed parses. */
   private SortedSet parses;
-  /** Old derivations heap. */
+  /** Incomplete parses which will be advanced. */
   private SortedSet odh;
-  /** New derivations heap. */
+  /** Incomplete parses which have been advanced. */
   private SortedSet ndh;
   private ParserTagger tagger; //POS tagger
   private ParserChunker chunker; //Basal Chunker
@@ -79,12 +88,43 @@ public class ParserME {
   private int topStartIndex;
   private Map startTypeMap;
   private Map contTypeMap;
-
+  
+  private int completeIndex;
+  private int incompleteIndex;
+  
+  private boolean createDerivationString = false;
+  
+  /**
+   * Creates a new parser using the specified models and head rules.
+   * @param buildModel The model to assign constituent labels.
+   * @param checkModel The model to determine a constituent is complete.
+   * @param tagger The model to assign pos-tags.
+   * @param chunker The model to assign flat constituent labels.
+   * @param headRules The head rules for head word perculation.
+   */
   public ParserME(MaxentModel buildModel, MaxentModel checkModel, ParserTagger tagger, ParserChunker chunker, HeadRules headRules) {
+  	this(buildModel,checkModel,tagger,chunker,headRules,defaultBeamSize,defaultAdvancePercentage);
+  }
+
+  /**
+   * Creates a new parser using the specified models and head rules using the specified beam size and advance percentage.
+   * @param buildModel The model to assign constituent labels.
+   * @param checkModel The model to determine a constituent is complete.
+   * @param tagger The model to assign pos-tags.
+   * @param chunker The model to assign flat constituent labels.
+   * @param headRules The head rules for head word perculation.
+   * @param beamSize The number of different parses kept during parsing. 
+   * @param advancePercentage The minimal amount of probability mass which advanced outcomes must represent.  
+   * Only outcomes which contribute to the top "advancePercentage" will be explored.    
+   */
+  public ParserME(MaxentModel buildModel, MaxentModel checkModel, ParserTagger tagger, ParserChunker chunker, HeadRules headRules, int beamSize, double advancePercentage) {
     this.tagger = tagger; 
     this.chunker = chunker;
     this.buildModel = buildModel;
     this.checkModel = checkModel;
+    this.M = beamSize;
+    this.K = beamSize;
+    this.Q = advancePercentage;
     bprobs = new double[buildModel.getNumOutcomes()];
     cprobs = new double[checkModel.getNumOutcomes()];
     this.buildContextGenerator = new BuildContextGenerator();
@@ -107,6 +147,8 @@ public class ParserME {
       }
     }
     topStartIndex = buildModel.getIndex(TOP_START);
+    completeIndex = checkModel.getIndex(COMPLETE);
+    incompleteIndex = checkModel.getIndex(INCOMPLETE);
   }
 
   /**
@@ -115,7 +157,7 @@ public class ParserME {
    * @return A full parse of the specified tokens or the flat chunks of the tokens if a fullparse could not be found.
    */
   public Parse parse(Parse p) {
-    p.derivation = new StringBuffer(100);
+  	if (createDerivationString) p.derivation = new StringBuffer(100);
     odh.clear();
     ndh.clear();
     parses.clear();
@@ -130,7 +172,7 @@ public class ParserME {
         int j = 0;
         for (Iterator pi = odh.iterator(); pi.hasNext() && j < K; j++) { // foearch derivation
           Parse tp = (Parse) pi.next();
-          if (tp.prob < bestComplete) {
+          if (tp.prob < bestComplete) { //this parse will never win, don't advance.
             break;
           }
           if (guess == null && i == 2) {
@@ -197,7 +239,7 @@ public class ParserME {
     buildModel.eval(buildContextGenerator.getContext(new Object[] { p.getChildren(), ZERO }), bprobs);
     p.prob += Math.log(bprobs[topStartIndex]);
     checkModel.eval(checkContextGenerator.getContext(new Object[] { p.getChildren(), TOP_NODE, ZERO, ZERO }), cprobs);
-    p.prob += Math.log(cprobs[checkModel.getIndex(COMPLETE)]);
+    p.prob += Math.log(cprobs[completeIndex]);
     p.setType(TOP_NODE);
   }
 
@@ -217,7 +259,7 @@ public class ParserME {
         String[] tags = (String[]) ts[i].getOutcomes().toArray(new String[words.length]);
         ts[i].getProbs(probs);
         newParses[i] = (Parse) p.clone(); //copies top level
-        newParses[i].derivation.append(i).append(".");
+        if (createDerivationString) newParses[i].derivation.append(i).append(".");
         for (int j = 0; j < words.length; j++) {
           Parse word = (Parse) p.getChildren().get(j);
           //System.err.println("inserting tag "+tags[j]);
@@ -243,7 +285,7 @@ public class ParserME {
       newParses = new Parse[cs.length];
       for (int si = 0, sl = cs.length; si < sl; si++) {
         newParses[si] = (Parse) p.clone(); //copies top level
-        newParses[si].derivation.append(si).append(".");
+        if (createDerivationString) newParses[si].derivation.append(si).append(".");
         String[] tags = (String[]) cs[si].getOutcomes().toArray(new String[words.length]);
         cs[si].getProbs(probs);
         int start = -1;
@@ -334,18 +376,18 @@ public class ParserME {
               }
             }
             Parse newParse1 = (Parse) p.clone(); //clone parse
-            newParse1.derivation.append(max).append("-");
+            if (createDerivationString) newParse1.derivation.append(max).append("-");
             Parse pc = (Parse) part.clone(); //clone constituent being labeled
             newParse1.getChildren().set(i, pc); //replace constituent labeled
             pc.setLabel(tag);
             newParse1.prob += Math.log(bprob);
             //check
             checkModel.eval(checkContextGenerator.getContext(new Object[] { newParse1.getChildren(), lst, new Integer(lsi), new Integer(i)}), cprobs);
-            //System.out.println("check "+cprobs[0]+" "+cprobs[1]);
+            //System.out.println("check "+cprobs[completeIndex]+" "+cprobs[incompleteIndex]);
             Parse newParse2 = newParse1;
-            if (cprobs[1] > q) { //make sure a reduce is likely
+            if (cprobs[completeIndex] > q) { //make sure a reduce is likely
               newParse2 = (Parse) newParse1.clone();
-              newParse2.derivation.append(1).append(".");
+              if (createDerivationString) newParse2.derivation.append(1).append(".");
               newParse2.prob += Math.log(cprobs[1]);
               Parse[] cons = new Parse[i - lsi + 1];
               boolean flat = true;
@@ -371,8 +413,8 @@ public class ParserME {
                 newParsesList.add(newParse2);
               }
             }
-            if (cprobs[0] > q) { //make sure a shift is likly
-              newParse1.derivation.append(0).append(".");
+            if (cprobs[incompleteIndex] > q) { //make sure a shift is likly
+              if (createDerivationString) newParse1.derivation.append(0).append(".");
               if (i != psize - 1) { //can't shift last element
                 newParse1.prob += Math.log(cprobs[0]);
                 newParsesList.add(newParse1);
