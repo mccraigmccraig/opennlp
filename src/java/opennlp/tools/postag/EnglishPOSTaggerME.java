@@ -32,10 +32,14 @@ import opennlp.maxent.io.SuffixSensitiveGISModelReader;
  * achieved >96% accuracy on unseen data.
  *
  * @author      Gann Bierner
- * @version     $Revision: 1.5 $, $Date: 2004/01/26 14:14:38 $
+ * @version     $Revision: 1.6 $, $Date: 2004/03/16 22:58:32 $
  */
 
 public class EnglishPOSTaggerME extends POSTaggerME {
+
+  public EnglishPOSTaggerME(String modelFile, POSDictionary dict) {
+      super(getModel(modelFile), new DefaultPOSContextGenerator(),dict);
+  }
 
   public EnglishPOSTaggerME(String modelFile) {
     super(getModel(modelFile), new DefaultPOSContextGenerator());
@@ -59,17 +63,30 @@ public class EnglishPOSTaggerME extends POSTaggerME {
    */
   public static void main(String[] args) throws IOException {
     if (args.length == 0) {
-      System.err.println("Usage: EnglishPOSTTaggerME model < sentences");
+      System.err.println("Usage: EnglishPOSTTaggerME -td tagdict model < sentences");
       System.err.println("       EnglishPOSTTaggerME -test model \"sentence\"");
       System.exit(1);
     }
     int ai=0;
     boolean test = false;
-    if (args[ai].equals("-test")) {
-      ai++;
-      test=true;
+    String tagdict = null;
+    while(args[ai].startsWith("-")) {
+      if (args[ai].equals("-test")) {
+        ai++;
+        test=true;
+      }
+      else if (args[ai].equals("-td")) {
+        tagdict = args[ai+1];
+        ai+=2;
+      }
     }
-    POSTaggerME tagger = new EnglishPOSTaggerME(args[ai++]);
+    POSTaggerME tagger;
+    if (tagdict != null) {
+      tagger = new EnglishPOSTaggerME(args[ai++],new POSDictionary(tagdict));
+    }
+    else {
+      tagger = new EnglishPOSTaggerME(args[ai++]);
+    }
     if (test) {
       System.out.println(tagger.tag(args[ai]));
     }
