@@ -34,18 +34,17 @@ public class Extent implements Comparable {
   /** Represents the character offsets of the the head of this extent. */
   private Span headSpan;
   /** The parse node that this extent is based on. */
-  private Parse baseParse;
+  private Parse parse;
   
   /** A string representing the name type for this extent. */
   private String nameType;
     
-  public Extent(Span span, Span headSpan, int entityId, Parse baseParse, String extentType) {
+  public Extent(Span span, Span headSpan, int entityId, Parse parse, String extentType) {
     this.span=span;
     this.headSpan=headSpan;
     this.id=entityId;
     this.type=extentType;
-    this.baseParse = baseParse;
-    //System.err.println("Extent.init: span="+s+" entitiy_id="+i);
+    this.parse = parse;
   }
 
   /**
@@ -68,8 +67,8 @@ public class Extent implements Comparable {
    * Returns the parse node that this extent is based on.
    * @return The parse node that this extent is based on or null if the extent is newly created.
    */
-  public Parse getBaseParse() {
-    return baseParse;
+  public Parse getParse() {
+    return parse;
   }
   
   public String getType() {
@@ -82,7 +81,7 @@ public class Extent implements Comparable {
   }
   
   public void setParse(Parse parse) {
-    baseParse = parse;
+    this.parse = parse;
   }
 
   public String getNameType() {
@@ -102,7 +101,7 @@ public class Extent implements Comparable {
   }
 
   public String toString() {
-    return("extent(span="+span+",hs="+headSpan+", type="+type+", id="+id+")"); 
+    return("extent(span="+span+",hs="+headSpan+", type="+type+", id="+id+" "+parse+" )"); 
   }
 
 }
