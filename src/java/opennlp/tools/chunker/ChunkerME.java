@@ -33,11 +33,11 @@ import opennlp.tools.util.Sequence;
  */
 public class ChunkerME implements Chunker {
 
-  protected MaxentModel model;
-  protected ChunkerContextGenerator _contextGen;
-  private int beamSize;
+  /** The beam used to search for sequences of chunk tag assignments. */
   protected BeamSearch beam;
   private Sequence bestSequence;
+  /** The model used to assign chunk tags to a sequence of tokens. */
+  protected MaxentModel model;
 
   /**
    * Creates a chunker using the specified model.
@@ -64,11 +64,8 @@ public class ChunkerME implements Chunker {
    * @param beamSize The size of the beam that should be used when decoding sequences.
    */
   public ChunkerME(MaxentModel mod, ChunkerContextGenerator cg, int beamSize) {
-    model = mod;
-    _contextGen = cg;
-    this.beamSize = beamSize;
     beam = new ChunkBeamSearch(beamSize, cg, mod);
-    
+    this.model = mod;
   }
 
   /* inherieted javadoc */
@@ -153,12 +150,20 @@ public class ChunkerME implements Chunker {
     return opennlp.maxent.GIS.trainModel(iterations, new TwoPassDataIndexer(es, cut));
   }
 
+  /**
+   * Trains the chunker using the specified parameters. <br>
+   * Usage: ChunkerME trainingFile modelFile. <br>
+   * Training file should be one word per line where each line consists of a 
+   * space-delimited triple of "word pos outcome".  Sentence breaks are indicated by blank lines.
+   * @param args The training file and the model file.
+   * @throws java.io.IOException When the specifed files can not be read.
+   */
   public static void main(String[] args) throws java.io.IOException {
     if (args.length == 0) {
       System.err.println("Usage: ChunkerME trainingFile modelFile");
       System.err.println();
       System.err.println("Training file should be one word per line where each line consists of a ");
-      System.err.println("space-delimited triple of \"word pos outome\".  Sentence breaks are indicated by blank lines.");
+      System.err.println("space-delimited triple of \"word pos outcome\".  Sentence breaks are indicated by blank lines.");
       System.exit(1);
     }
     java.io.File inFile = new java.io.File(args[0]);
