@@ -49,11 +49,11 @@ public class TokSpanEventStream implements EventStream {
       int start = tokens[0].getStart();
       int end = tokens[tokens.length - 1].getEnd();
       String sent = text.substring(start, end);
-      List candTokens = TokenizerME.split(sent);
+      Span[] candTokens = TokenizerME.split(sent);
       int firstTrainingToken = -1;
       int lastTrainingToken = -1;
-      for (int ci = 0; ci < candTokens.size(); ci++) {
-        Span cSpan = (Span) candTokens.get(ci);
+      for (int ci = 0; ci < candTokens.length; ci++) {
+        Span cSpan = candTokens[ci];
         String ctok = sent.substring(cSpan.getStart(), cSpan.getEnd());
         //adjust cSpan to text offsets
         cSpan = new Span(cSpan.getStart() + start, cSpan.getEnd() + start);
