@@ -29,6 +29,7 @@ import opennlp.maxent.EventCollectorAsStream;
 import opennlp.maxent.ContextGenerator;
 import opennlp.maxent.GIS;
 import opennlp.maxent.GISModel;
+import opennlp.maxent.TwoPassDataIndexer;
 import opennlp.maxent.io.SuffixSensitiveGISModelWriter;
 import opennlp.tools.util.ObjectIntPair;
 import opennlp.tools.util.Span;
@@ -45,7 +46,7 @@ import java.util.regex.Pattern;
  * homepage: <http://www.cis.upenn.edu/~jcreynar>.
  *
  * @author      Tom Morton
- * @version $Revision: 1.4 $, $Date: 2004/04/08 03:07:16 $
+ * @version $Revision: 1.5 $, $Date: 2004/06/11 20:58:08 $
  */
 
 public class TokenizerME implements Tokenizer {
@@ -210,8 +211,8 @@ public class TokenizerME implements Tokenizer {
   }
 
   public static void train(EventStream evc, File output) throws IOException {
-    GISModel tokMod = GIS.trainModel(evc, 100, 10);
-    new SuffixSensitiveGISModelWriter(tokMod, output).persist();
+    GISModel tokModel = opennlp.maxent.GIS.trainModel(100, new TwoPassDataIndexer(evc, 10));
+    new SuffixSensitiveGISModelWriter(tokModel, output).persist();
   }
 
   public static void train(String[] args) throws IOException {
