@@ -16,14 +16,14 @@
 // Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 //////////////////////////////////////////////////////////////////////////////
 
-package opennlp.common.util;
+package opennlp.common.unify;
 
 /**
  * Interface for objects which might contain recursive structure and are
  * mutable.
  *
  * @author      Jason Baldridge
- * @version     $Revision: 1.1 $, $Date: 2002/01/03 11:12:51 $
+ * @version     $Revision: 1.1 $, $Date: 2002/01/05 14:38:58 $
  */
 public interface Mutable {
 
