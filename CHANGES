@@ -1,8 +1,18 @@
 0.6.7
 -----
 
+Removed the discourse and structure packages and most of the classes
+inside them. Moved Category and CategoryFcn to the synsem package.
+Category now extends Mutable. (Jason)
+
+Removed CategorySubstitution, CatVar, Synner, and Denoter. (Jason)
+
+Added Mutable and ModFcn for objects which can be recursively
+modified. This acts as a generalization of the deepMap() method of the
+Category interface. (Jason)
+
 Fixed a bug in the getParagraphs method of PerlHelp: newlines were not
-being added when they did not indicate a paragra ph boundary. (Jason)
+being added when they did not indicate a paragraph boundary. (Jason)
 
 Added Pipeline and PipelineException classes (orginally part of
 Grok). (Jason)

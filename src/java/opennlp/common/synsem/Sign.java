@@ -18,13 +18,11 @@
 
 package opennlp.common.synsem;
 
-import opennlp.common.structure.Category;
-
 /**
  * A linguistic sign.
  *
  * @author      Jason Baldridge
- * @version     $Revision: 1.1 $, $Date: 2001/12/11 22:24:42 $
+ * @version     $Revision: 1.2 $, $Date: 2002/01/05 16:12:05 $
  */
 public interface Sign {
     

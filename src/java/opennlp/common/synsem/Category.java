@@ -9,14 +9,14 @@
 // This library is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-// GNU General Public License for more details.
+// GNU Lesser General Public License for more details.
 // 
 // You should have received a copy of the GNU Lesser General Public
 // License along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 //////////////////////////////////////////////////////////////////////////////
 
-package opennlp.common.structure;
+package opennlp.common.synsem;
 
 import opennlp.common.unify.*;
 import opennlp.common.util.*;
@@ -29,10 +29,9 @@ import opennlp.common.util.*;
  * trees or whatnot), they should not feel inhibited by the name category.
  *
  * @author      Gann Bierner
- * @version     $Revision: 1.3 $, $Date: 2001/12/11 11:58:42 $
+ * @version     $Revision: 1.1 $, $Date: 2002/01/05 16:12:05 $
  */
-public interface Category
-    extends opennlp.common.unify.Unifiable, java.io.Serializable {
+public interface Category extends Unifiable, Mutable, java.io.Serializable {
 
     /**
      * Determines if this category is  equal to another on the top level.
@@ -43,14 +42,6 @@ public interface Category
      */
     public boolean shallowEquals (Object o);
 
-    /**
-     * Determines if this category is equal to another.
-     *
-     * @param o object to check for equality
-     * @return whether or not this is equal to object
-     */
-    public boolean equals (Object o);
-
 
     /**
      * Deep copies this category.
@@ -60,16 +51,7 @@ public interface Category
     public Category copy ();
 
 
-    /**
-     * Iterates through this Category applying a function to this category
-     * and every subcategory, creating a new category.
-     *
-     * @param f a function to be applied
-     * @return a copy of this category where every category has been
-     *         changed to be the result of the category function.
-     */    
-    public Category deepMap (CategoryFcn f); //to ls
-    
+   
     /**
      * Iterates through this Category applying a function to this category
      * and every subcategory.

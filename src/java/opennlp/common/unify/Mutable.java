@@ -23,16 +23,16 @@ package opennlp.common.unify;
  * mutable.
  *
  * @author      Jason Baldridge
- * @version     $Revision: 1.1 $, $Date: 2002/01/05 14:38:58 $
+ * @version     $Revision: 1.2 $, $Date: 2002/01/05 16:12:05 $
  */
 public interface Mutable {
 
     /**
-     * Applies a MutationFcn to this Mutable and then applies it to all fields
+     * Applies a ModFcn to this Mutable and then applies it to all fields
      * which are themselves Mutables.
      *
      * @param mf a function to be applied
      **/
-    public void deepMap (MutationFcn mf);
+    public void deepMap (ModFcn mf);
 
 }

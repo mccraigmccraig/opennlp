@@ -19,30 +19,38 @@
 package opennlp.common.synsem;
 
 /**
- * Abstraction represents a semantic expression that has abstracted over a
- * portion of it's body.  It is made up of a variable and a body where the
- * variable takes scope over the body.  In the lambda calculus, this may look
- * something like <i> lambda x. like(mary, x) </i>.  An abstraction only
- * supports a single variable at a time and that variable is not required to
- * appear in the body (although this wouldn't make a lot of sense).
+ * A set of functions that can be applied to Categories.  This is a way of
+ * getting around the fact that Java doesn't have 1st class functions.
+ * Thus, if a method is needed that takes a function that works on Categories,
+ * pass one of these instead.
  *
  * @author      Gann Bierner
- * @version     $Revision: 1.1 $, $Date: 2001/10/23 13:46:24 $
+ * @version     $Revision: 1.1 $, $Date: 2002/01/05 16:12:05 $
  */
-public interface Abstraction extends Denoter {
+public interface CategoryFcn {
     /**
-     * Access function for scoping variable.
+     * Converts a category to a different category
      *
-     * @return The variable that represents the portion of the body that has
-     *         been abstracted away.
+     * @param c the category to change
+     * @return the transformed category
      */
-    public Denoter getParameter();
-
+    public Category fcn(Category c);
+    
     /**
-     * Access function for the semantic form that has been abstracted over.
+     * Converts a category to a different category with some additional
+     * information about its context.
      *
-     * @return The semantic form that has been abstracted over.  It is not
-     *         required to contain the parameter, but this would be strange.
+     * @param a The logical form in which the category appears
+     * @param c The category to convert
+     * @param i The position of the category in the logical form
+     * @return the transformed category
      */
-    public Denoter getBody();
+    public void fcn(Category a, Category c, int i);
+    
+    /**
+     * Performs some destructive operation given a category
+     *
+     * @param c The category used for whatever purpose
+     */
+    public void forall(Category c);
 }

@@ -9,7 +9,7 @@
 // This library is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-// GNU General Public License for more details.
+// GNU Lesser General Public License for more details.
 // 
 // You should have received a copy of the GNU Lesser General Public
 // License along with this program; if not, write to the Free Software
@@ -17,20 +17,22 @@
 //////////////////////////////////////////////////////////////////////////////
 package opennlp.common.parse;
 
-import opennlp.common.structure.*;
-import java.util.ArrayList;
-import java.util.Iterator;
+import opennlp.common.synsem.*;
     
 /**
  * A RuleGroup which can be used to generate sentences in addition to
  * being usable for processing.
  *
  * @author      Gann Bierner
- * @version $Revision: 1.1 $, $Date: 2001/11/05 14:42:54 $ 
+ * @version $Revision: 1.2 $, $Date: 2002/01/05 16:12:04 $ 
 */
 public interface ReversibleRuleGroup extends RuleGroup {
-    public void startRightMatch(Constituent[] words, Constituent ans);
-    public Constituent nextRightMatch();
-    public void startMatchGen(Constituent w);
-    public Constituent[] nextMatchGen(Constituent w);
+
+    public void startRightMatch (Sign[] words, Sign ans);
+
+    public Sign nextRightMatch();
+
+    public void startMatchGen (Sign  w);
+
+    public Sign[] nextMatchGen (Sign w);
 }

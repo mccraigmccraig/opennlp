@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////////
-// Copyright (C) 2000 Jason Baldridge and Gann Bierner
+// Copyright (C) 2002 Jason Baldridge
 // 
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
@@ -9,7 +9,7 @@
 // This library is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-// GNU General Public License for more details.
+// GNU Lesser General Public License for more details.
 // 
 // You should have received a copy of the GNU Lesser General Public
 // License along with this program; if not, write to the Free Software
@@ -18,14 +18,19 @@
 
 package opennlp.common.unify;
 
-import opennlp.common.synsem.*;
-
 /**
- * A variable that can stand for any category.
+ * Interface for functions which modify Mutable objects.
  *
- * @author      Gann Bierner
- * @version     $Revision: 1.1 $, $Date: 2001/10/23 13:46:24 $
+ * @author      Jason Baldridge
+ * @version     $Revision: 1.1 $, $Date: 2002/01/05 16:12:05 $
  */
-public interface CatVar extends Denoter, Synner, Variable {
+public interface ModFcn {
+
+    /**
+     * Changes a Mutable object in some way.
+     *
+     * @param mf a function to be applied
+     **/
+    public void modify (Mutable m);
 
 }

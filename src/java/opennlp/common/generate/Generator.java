@@ -9,7 +9,7 @@
 // This library is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-// GNU General Public License for more details.
+// GNU Lesser General Public License for more details.
 // 
 // You should have received a copy of the GNU Lesser General Public
 // License along with this program; if not, write to the Free Software
@@ -19,6 +19,7 @@
 package opennlp.common.generate;
 
 import opennlp.common.structure.*;
+import opennlp.common.synsem.*;
 import java.util.Collection;
 
 /**
@@ -26,7 +27,7 @@ import java.util.Collection;
  * be capable of converting a semantic/syntactic information into a string.
  *
  * @author      Gann Bierner
- * @version     $Revision: 1.1 $, $Date: 2001/10/23 13:46:24 $
+ * @version     $Revision: 1.2 $, $Date: 2002/01/05 16:12:04 $
  */
 public interface Generator {
 
@@ -35,32 +36,13 @@ public interface Generator {
      *
      * @param c the category describing the desired result.  This should
      *          contain both semantic and syntactic information if
-     *          the syntax is desired.  The <code> Bundle </code>
-     *          category in opennlp.grok can do this.
+     *          the syntax is desired.
      * @param cgoals the set of communicative goals that the generator
      *               should try to incorporate into the final result.
-     *               These should be Denoters.
-     * @param kb the knowledge base in which to look for information in
-     *           how to generate entities and kinds if they are contained
-     *           in the semantics
-     * @return the lexical string contained in a <code> Constituent </code>.
-     *         This way you can also include derivations and so forth.
+     *               These should be <code>opennlp.common.synsem.LFs</code>.
+     * @return the lexical string contained in a <code> Sign </code>.
      */
-    public Constituent generate(Category c, Collection cgoals, KB kb);
+    public Sign generate (Category c, Collection cgoals);
 
-    /**
-     * Performs NL generation.
-     *
-     * @param c the category describing the desired result.  This should
-     *          contain both semantic and syntactic information if
-     *          the syntax is desired.  The <code> Bundle </code>
-     *          category in opennlp.grok can do this.
-     * @param kb the knowledge base in which to look for information in
-     *           how to generate entities and kinds if they are contained
-     *           in the semantics
-     * @return the lexical string contained in a <code> Constituent </code>.
-     *         This way you can also include derivations and so forth.
-     */
-    public Constituent generate(Category c, KB kb);
     
 }
