@@ -18,16 +18,17 @@
 
 package opennlp.common.xml;
 
-import java.io.*;
-import org.xml.sax.*;
-import com.sun.xml.tree.*;
+
+// import java.io.*;
+// import org.xml.sax.*;
+// import com.sun.xml.tree.*;
 
 /**
  * A document which contains the various kinds of markup for the preprocessing
  * steps. 
  *
  * @author      Jason Baldridge
- * @version     $Revision: 1.1 $, $Date: 2001/10/23 13:46:24 $
+ * @version     $Revision: 1.2 $, $Date: 2001/11/09 12:17:56 $
  */
 
 public class PreProcessDocument extends NLPDocument {
@@ -50,9 +51,9 @@ public class PreProcessDocument extends NLPDocument {
 	
     
     public PreProcessDocument(String text) {
-	super("<PAR><SENT><TOK><LEX><![CDATA["
-	      + text
-	      +"]]></LEX></TOK></SENT></PAR>");
+	  super("<PAR><SENT><TOK><LEX><![CDATA["
+		+ text
+		+"]]></LEX></TOK></SENT></PAR>");
     }
 
     public String getDTD() { return dtd; }

@@ -19,48 +19,53 @@
 package opennlp.common.xml;
 
 import java.io.*;
-import com.sun.xml.tree.*;
-import org.xml.sax.*;
+import org.jdom.*;
+import org.jdom.input.*;
+import org.jdom.output.*;
 
 /**
  * A class which wraps an XmlDocument inside and ensures that it fits OpenNLP
  * specifications.
  *
  * @author      Jason Baldridge
- * @version     $Revision: 1.1 $, $Date: 2001/10/23 13:46:24 $
+ * @version     $Revision: 1.2 $, $Date: 2001/11/09 12:17:56 $
  */
 
 public abstract class NLPDocument {
-    protected XmlDocument nlpdoc;
-
+    protected Document nlpdoc;
     abstract String getDTD();
     
     public NLPDocument(String text) {
 	String doc = getDTD() + "<NLPDOC>\n" +
 	    "<TEXT>\n" + text + "</TEXT>\n" + "</NLPDOC>\n";
 
-	InputSource is = new InputSource(new StringReader(doc));
-
 	try {
-	    nlpdoc = XmlDocument.createXmlDocument(is, true);
+            nlpdoc = new SAXBuilder(true).build(new StringReader(doc));
 	} catch (Exception e) {
 	    System.out.println("Invalid XML Document.");
+	    System.out.println(e.toString());
 	}
 	
     }
 
-    public XmlDocument getNLPDoc() { return nlpdoc; }
+    public Document getNLPDoc() { return nlpdoc; }
     
     public String toString() {
 	StringWriter sw = new StringWriter();
-
-	try { nlpdoc.write(sw); }
-	catch (Exception e) {
-	    System.out.println("Unable to print document.");
-	    System.out.println(e);
-	} 
+         
+	  try { 
+	      new XMLOutputter("  ", true).output(nlpdoc, sw);
+	  }
+	  catch (Exception e) {
+	      System.out.println("Unable to print document.");
+	      System.out.println(e);
+	  } 
 	
 	return sw.toString();
     }
     
+    public static void main (String[] args) {
+	NLPDocument doc = new PreProcessDocument("Here is a sentence");
+	System.out.println(doc.toString());
+    }
 }

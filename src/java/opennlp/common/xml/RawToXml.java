@@ -24,7 +24,7 @@ import java.io.*;
  * A class for going from plain text to a roughly marked-up NLPDocument.
  *
  * @author      Jason Baldridge
- * @version     $Revision: 1.2 $, $Date: 2001/10/30 11:16:17 $
+ * @version     $Revision: 1.3 $, $Date: 2001/11/09 12:17:56 $
  */
 
 public class RawToXml {
@@ -75,12 +75,6 @@ public class RawToXml {
 
     public static PreProcessDocument process(String s) {
 	return new PreProcessDocument(s);
-    }
-
-    public static void main(String[] args){
-	PreProcessDocument ppd = process(new File(args[0]));
-	// PreProcessDocument ppd = process(args[0]);
-	System.out.println(ppd.toString());
     }
 
 }
