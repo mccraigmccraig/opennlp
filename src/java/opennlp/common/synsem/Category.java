@@ -29,7 +29,7 @@ import opennlp.common.util.*;
  * trees or whatnot), they should not feel inhibited by the name category.
  *
  * @author      Gann Bierner
- * @version     $Revision: 1.2 $, $Date: 2002/02/08 12:17:50 $
+ * @version     $Revision: 1.3 $, $Date: 2002/02/20 12:46:21 $
  */
 public interface Category extends Unifiable, Mutable, java.io.Serializable {
 
@@ -83,33 +83,4 @@ public interface Category extends Unifiable, Mutable, java.io.Serializable {
      */
     public String hashString ();
 
-    /**
-     * Returns the string position of the constituent.  Starts with 0.
-     *
-     * @return Pair containing first and last indices (inclusive)
-     */
-    public Pair getSpan();
-
-    /**
-     * Returns the start string position of the constituent.  Starts with 0.
-     *
-     * @return first index (inclusive)
-     */
-    public int getSpanStart();
-
-    /**
-     * Returns the end string position of the constituent.  Starts with 0.
-     *
-     * @return last index (inclusive)
-     */
-    public int getSpanEnd();
-
-    /**
-     * Sets the string position of the constituent.  Starts with 0.
-     *
-     * @param a the first lex item included in constitutent
-     * @param b the last lex item included in constitutent
-     */
-    public void setSpan(int a, int b);
-    
 }
