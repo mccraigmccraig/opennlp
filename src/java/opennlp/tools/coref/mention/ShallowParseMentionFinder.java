@@ -17,9 +17,6 @@
 //////////////////////////////////////////////////////////////////////////////
 package opennlp.tools.coref.mention;
 
-import java.util.List;
-import java.util.ArrayList;
-
 public class ShallowParseMentionFinder extends AbstractMentionFinder {
   
   private static ShallowParseMentionFinder instance;
@@ -40,6 +37,7 @@ public class ShallowParseMentionFinder extends AbstractMentionFinder {
     return(instance);
   }
 
+  /*
   protected final List getNounPhrases(Parse p) {
     List nps = p.getNounPhrases();
     List basals = new ArrayList();
@@ -62,13 +60,10 @@ public class ShallowParseMentionFinder extends AbstractMentionFinder {
       }
       else {
         //System.err.println("big np");
-	basals.addAll(getNounPhrases(np));
+        basals.addAll(getNounPhrases(np));
       }
     }
     return(basals);
   }
-
-  protected List getNamedEntities(Parse p) {
-    return p.getNamedEntities();
-  }
+  */
 }
