@@ -157,17 +157,19 @@ public class EnglishTreebankParser extends ParserME {
           tokens.add(tok);
           sb.append(tok).append(" ");
         }
-        String text = sb.substring(0,sb.length()-1).toString();
-        Parse p = new Parse(text, new Span(0,text.length()), "INC", 1, null);
-        int start = 0;
-        for (Iterator ti=tokens.iterator();ti.hasNext();) {
-          String tok = (String) ti.next();
-          p.insert(new Parse(text, new Span(start, start + tok.length()), ParserME.TOK_NODE, 0));
-          start += tok.length() + 1;
+        if (sb.length() != 0) {
+          String text = sb.substring(0,sb.length()-1).toString();
+          Parse p = new Parse(text, new Span(0,text.length()), "INC", 1, null);
+          int start = 0;
+          for (Iterator ti=tokens.iterator();ti.hasNext();) {
+            String tok = (String) ti.next();
+            p.insert(new Parse(text, new Span(start, start + tok.length()), ParserME.TOK_NODE, 0));
+            start += tok.length() + 1;
+          }
+          p = parser.parse(p);
+          //System.out.print(p.getProb()+" ");
+          p.show();
         }
-        p = parser.parse(p);
-        //System.out.print(p.getProb()+" ");
-        p.show();
         System.out.println();
       }
     }
