@@ -28,7 +28,7 @@ import org.jdom.output.*;
  * specifications.
  *
  * @author      Jason Baldridge
- * @version     $Revision: 1.2 $, $Date: 2001/11/09 12:17:56 $
+ * @version     $Revision: 1.3 $, $Date: 2001/11/16 14:18:47 $
  */
 
 public abstract class NLPDocument {
@@ -63,7 +63,44 @@ public abstract class NLPDocument {
 	
 	return sw.toString();
     }
+
     
+    /**
+     * Create a SENT element for an NLP Document.
+     * 
+     * @param sent the string of text associated with this sentence.
+     */
+    public static Element createSENT(String sent) {
+        int l = sent.length();
+        Element sentEl = new Element("SENT");
+        if (l>0) {
+            char delim = sent.charAt(l-1);
+            if(delim == '.' || delim == '?' || delim == '!') {
+                sentEl.addContent(createTOK(sent.substring(0,l-1)));
+                sentEl.addContent(createTOK(""+delim));
+            }
+	    else {
+                sentEl.addContent(createTOK(sent));
+	    }
+        }
+	return sentEl;
+    }
+
+
+    /**
+     * Create a TOK element for an NLP Document.
+     * 
+     * @param tok the string of text associated with this token.
+     */
+    public static Element createTOK(String tok) {
+        Element tokEl = new Element("TOK");
+        Element lexEl = new Element("LEX");
+	lexEl.setText(tok);
+        tokEl.addContent(lexEl);
+        return tokEl;
+    }
+
+
     public static void main (String[] args) {
 	NLPDocument doc = new PreProcessDocument("Here is a sentence");
 	System.out.println(doc.toString());
