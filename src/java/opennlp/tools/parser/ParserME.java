@@ -353,9 +353,9 @@ public class ParserME {
                 max = pi;
               }
             }
-            //if (bprobs[max] == 0) {
-            //  break;
-            //}
+            if (bprobs[max] == 0) {
+              break;
+            }
             double bprob = bprobs[max];
             bprobSum += bprobs[max];
             bprobs[max] = 0; //zero out so new max can be found
