@@ -92,12 +92,7 @@ public class ChunkerME implements Chunker {
     }
 
     public double[] probs() {
-      List dlist = bestSequence.getProbs();
-      double[] probs = new double[dlist.size()];
-      for (int pi = 0; pi < probs.length; pi++) {
-        probs[pi] = 0;((Double) dlist.get(pi)).doubleValue();
-      }
-      return (probs);
+      return bestSequence.getProbs();
     }
   
   public static GISModel train(opennlp.maxent.EventStream es, int iterations, int cut) throws java.io.IOException {

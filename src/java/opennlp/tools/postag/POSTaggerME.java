@@ -35,7 +35,7 @@ import opennlp.maxent.io.*;
  * surrounding context.
  *
  * @author      Gann Bierner
- * @version $Revision: 1.4 $, $Date: 2003/12/06 18:25:37 $
+ * @version $Revision: 1.5 $, $Date: 2003/12/23 16:50:25 $
  */
 public class POSTaggerME implements Evalable, POSTagger {
 
@@ -103,19 +103,11 @@ public class POSTaggerME implements Evalable, POSTagger {
   }
 
   public void probs(double[] probs) {
-    List dlist = bestSequence.getProbs();
-    for (int pi = 0; pi < probs.length; pi++) {
-      probs[pi] = ((Double) dlist.get(pi)).doubleValue();
-    }
+    bestSequence.getProbs(probs);
   }
 
   public double[] probs() {
-    List dlist = bestSequence.getProbs();
-    double[] probs = new double[dlist.size()];
-    for (int pi = 0; pi < probs.length; pi++) {
-      probs[pi] = ((Double) dlist.get(pi)).doubleValue();
-    }
-    return (probs);
+    return bestSequence.getProbs();
   }
 
   public String tag(String sentence) {

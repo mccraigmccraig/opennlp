@@ -186,13 +186,13 @@ public class ParserME {
       newParses = new Parse[ts.length];
       for (int i = 0; i < ts.length; i++) {
         String[] tags = (String[]) ts[i].getOutcomes().toArray(new String[words.length]);
-        List probs = ts[i].getProbs();
+        double[] probs = ts[i].getProbs();
         newParses[i] = (Parse) p.clone(); //copies top level
         newParses[i].derivation.append(i).append(".");
         for (int j = 0; j < words.length; j++) {
           Parse word = (Parse) p.getChildren().get(j);
           //System.err.println("inserting tag "+tags[j]);
-          double prob = ((Double) probs.get(j)).doubleValue();
+          double prob = probs[j];
           newParses[i].insert(new Parse(word.getText(), word.getSpan(), tags[j], prob));
           newParses[i].prob += Math.log(prob);
           //newParses[i].show();
@@ -215,7 +215,7 @@ public class ParserME {
         newParses[si] = (Parse) p.clone(); //copies top level
         newParses[si].derivation.append(si).append(".");
         String[] tags = (String[]) cs[si].getOutcomes().toArray(new String[words.length]);
-        List probs = cs[si].getProbs();
+        double[] probs = cs[si].getProbs();
         int start = -1;
         int end = 0;
         String type = null;
@@ -223,7 +223,7 @@ public class ParserME {
         for (int j = 0; j <= tags.length; j++) {
           //if (j != tags.length) {System.err.println(words[j]+" "+ptags[j]+" "+tags[j]+" "+probs.get(j));}
           if (j != tags.length) {
-            newParses[si].prob += Math.log(((Double) probs.get(j)).doubleValue());
+            newParses[si].prob += Math.log(probs[j]);
           }
           if (j != tags.length && tags[j].startsWith(CONT)) {
             end = j;

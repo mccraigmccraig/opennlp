@@ -17,6 +17,7 @@
 //////////////////////////////////////////////////////////////////////////////
 package opennlp.common.util;
 
+import gnu.trove.*;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -24,20 +25,19 @@ import java.util.List;
 public class Sequence implements Comparable {
   private double score = 0;
   private List outcomes;
-  private List probs;
-  private static final Double ONE = new Double(1);
+  private TDoubleArrayList probs;
 
   /** Creates a new sequence of outcomes. */
   public Sequence() {
     outcomes = new ArrayList();
-    probs = new ArrayList();
+    probs = new TDoubleArrayList();
   }
 
   public Sequence(List outcomes) {
     this.outcomes = outcomes;
-    this.probs = new ArrayList(outcomes.size());
+    this.probs = new TDoubleArrayList(outcomes.size());
     for (int oi=0,ol=outcomes.size();oi<ol;oi++) {
-      probs.add(ONE);
+      probs.add(1.0);
     }
   }
 
@@ -57,7 +57,7 @@ public class Sequence implements Comparable {
   public Sequence copy() {
     Sequence s = new Sequence();
     s.outcomes.addAll(outcomes);
-    s.probs.addAll(probs);
+    s.probs.add(probs.toNativeArray());
     s.score = score;
     return s;
   }
@@ -68,7 +68,7 @@ public class Sequence implements Comparable {
    */
   public void add(String outcome, double p) {
     outcomes.add(outcome);
-    probs.add(new Double(p));
+    probs.add(p);
     score += Math.log(p);
   }
 
@@ -79,11 +79,18 @@ public class Sequence implements Comparable {
     return (outcomes);
   }
 
-  /** Returns a list of probabilities associated with the outcomes of this sequence.
-   * @return a list of probabilities.
+  /** Returns an array of probabilities associated with the outcomes of this sequence.
+   * @return an array of probabilities.
    */
-  public List getProbs() {
-    return (probs);
+  public double[] getProbs() {
+    return (probs.toNativeArray());
+  }
+  
+  /** Populates  an array with the probabilities associated with the outcomes of this sequece.
+   * @param p a pre-allocated array to use to hold the values of the probabilities of the outcomes for this sequence.
+   */
+  public void getProbs(double[] p) {
+    probs.toNativeArray(p,0,p.length);
   }
 
   public String toString() {
