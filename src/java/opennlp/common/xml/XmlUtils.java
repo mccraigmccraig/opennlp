@@ -25,7 +25,7 @@ import java.util.*;
  * Utilities for manipulating XML based objects.
  *
  * @author      Jason Baldridge
- * @version     $Revision: 1.13 $, $Date: 2002/02/11 09:44:24 $
+ * @version     $Revision: 1.14 $, $Date: 2002/02/11 12:16:40 $
  */
 
 public class XmlUtils {
@@ -122,28 +122,6 @@ public class XmlUtils {
 	    }
 	    else {
 		$children.add($_);
-	    }
-	}
-	parent.removeChildren();
-	parent.setChildren($children);
-    }
-
-    /**
-     * Insert a new element after a specified one.
-     *
-     * @param old The Element that should directly precede the inserted
-     *            Element.
-     * @param toInsert The Element to insert.
-     */ 
-    public static void insertAfter (Element old, Element toInsert) {
-	Element parent = old.getParent();
-        List children = parent.getChildren();
-	List $children = new ArrayList(children.size()+1);
-	for (ListIterator i=children.listIterator(); i.hasNext();) {
-	    Object $_ = i.next();
-	    $children.add($_);
-	    if ($_ == old) {
-		$children.add(toInsert);
 	    }
 	}
 	parent.removeChildren();
