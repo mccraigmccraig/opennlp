@@ -22,10 +22,10 @@ package opennlp.common.util;
  * A an object holding an Object and an int.
  *
  * @author      Jason Baldridge
- * @version     $Revision: 1.1 $, $Date: 2002/01/03 15:55:05 $
+ * @version     $Revision: 1.2 $, $Date: 2002/02/28 13:11:43 $
  */
 
-public class ObjectIntPair {
+public final class ObjectIntPair {
     public final Object a;
     public final int b;
 

@@ -22,11 +22,11 @@ package opennlp.common.util;
  * Dinky class to package pairs of things
  *
  * @author      Gann Bierner
- * @version     $Revision: 1.2 $, $Date: 2002/02/08 12:17:50 $
+ * @version     $Revision: 1.3 $, $Date: 2002/02/28 13:11:43 $
  */
 
-public class Pair {
-    public Object a,b;
+public final class Pair {
+    public final Object a,b;
 
     public Pair(Object _a, Object _b) {
 	a=_a; b=_b;
