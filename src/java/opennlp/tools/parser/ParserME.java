@@ -226,15 +226,15 @@ public class ParserME {
           if (j != tags.length) {
             newParses[si].prob += Math.log(probs[j]);
           }
-          if (j != tags.length && tags[j].startsWith(CONT)) {
+          if (j != tags.length && tags[j].startsWith(CONT)) { // if continue just update end
             end = j;
           }
-          else {
+          else { //make previous constituent if it exists
             if (type != null) {
               //System.err.println("inserting tag "+tags[j]);
               Parse p1 = (Parse) p.getChildren().get(start);
               Parse p2 = (Parse) p.getChildren().get(end);
-              //System.err.println("Putting "+type+" at "+start+","+end);
+              //System.err.println("Putting "+type+" at "+start+","+end+" "+newParses[si].prob);
               Parse[] cons = new Parse[end - start + 1];
               cons[0] = p1;
               //cons[0].label="Start-"+type;
@@ -248,13 +248,13 @@ public class ParserME {
               }
               newParses[si].insert(new Parse(p1.getText(), new Span(p1.getSpan().getStart(), p2.getSpan().getEnd()), type, 1, headRules.getHead(cons, type)));
             }
-            if (j != tags.length) {
+            if (j != tags.length) { //update for new constituent
               if (tags[j].startsWith(START)) {
                 type = tags[j].substring(START.length());
                 start = j;
                 end = j;
               }
-              else {
+              else { // other 
                 type = null;
               }
             }
