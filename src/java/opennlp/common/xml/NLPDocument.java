@@ -31,7 +31,7 @@ import java.util.*;
  * specifications.
  *
  * @author      Jason Baldridge
- * @version     $Revision: 1.7 $, $Date: 2001/11/29 14:23:32 $
+ * @version     $Revision: 1.8 $, $Date: 2001/11/29 14:32:07 $
  **/
 public class NLPDocument extends Document {
     public static final String WORD_LABEL = "w";
@@ -113,13 +113,6 @@ public class NLPDocument extends Document {
 	return pars;
     }
 
-    /**
-     * Return an iterator over the paragraph Elements in the document.
-     **/
-    public Iterator paragraphIterator (Element e) {
-	return getParagraphElements().iterator();
-    }
-    
     
     /**
      * Grabs all paragraph elements in this document.
@@ -128,7 +121,15 @@ public class NLPDocument extends Document {
 	return XmlUtils.getChildrenNested(_root, PARAGRAPH_LABEL);
     }
 
+
+    /**
+     * Return an iterator over all the paragraph Elements in the document.
+     **/
+    public Iterator paragraphIterator () {
+	return getParagraphElements().iterator();
+    }
     
+
     /**
      * Grabs all sentence elements in this document.
      **/
@@ -164,13 +165,6 @@ public class NLPDocument extends Document {
 
     
     /**
-     * Return an iterator over the sentence Elements below the given element.
-     **/
-    public Iterator sentenceIterator (Element e) {
-	return getSentenceElements(e).iterator();
-    }
-    
-    /**
      * Grabs all sentence elements below the given element.
      **/
     public List getSentenceElements (Element e) {
@@ -183,14 +177,23 @@ public class NLPDocument extends Document {
     public List getSentenceElements () {
 	return getSentenceElements(_root);
     }
-    
+
     /**
-     * Return an iterator over the token Elements below the given element.
+     * Return an iterator over the all sentence Elements.
      **/
-    public Iterator tokenIterator (Element e) {
-	return getTokenElements(e).iterator();
+    public Iterator sentenceIterator () {
+	return getSentenceElements().iterator();
     }
     
+    
+    /**
+     * Return an iterator over the sentence Elements below the given element.
+     **/
+    public Iterator sentenceIterator (Element e) {
+	return getSentenceElements(e).iterator();
+    }
+    
+        
     /**
      * Grabs all token elements below the given element;
      **/
@@ -206,12 +209,19 @@ public class NLPDocument extends Document {
     }
 
     /**
-     * Return an iterator over the word Elements below the given element.
+     * Return an iterator over the all the token Elements.
      **/
-    public Iterator wordIterator (Element e) {
-	return getWordElements(e).iterator();
+    public Iterator tokenIterator () {
+	return getTokenElements().iterator();
     }
-    
+
+    /**
+     * Return an iterator over the token Elements below the given element.
+     **/
+    public Iterator tokenIterator (Element e) {
+	return getTokenElements(e).iterator();
+    }
+
     /**
      * Grabs all word elements below the given element;
      **/
@@ -226,6 +236,21 @@ public class NLPDocument extends Document {
 	return getWordElements(_root);
     }
     
+    /**
+     * Return an iterator over the word Elements below the given element.
+     **/
+    public Iterator wordIterator (Element e) {
+	return getWordElements(e).iterator();
+    }
+    
+    /**
+     * Return an iterator over all the word Elements.
+     **/
+    public Iterator wordIterator () {
+	return getWordElements().iterator();
+    }
+    
+
     /**
      * Creates a nicely indented String showing the XML content of this
      * NLPDocument.
