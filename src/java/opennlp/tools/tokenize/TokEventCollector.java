@@ -28,10 +28,11 @@ import java.io.Reader;
 import java.util.ArrayList;
 
 /**
- * Generate event contexts for maxent decisions for sentence detection.
+ * Generate event contexts for maxent decisions for tokenization detection.
+ * This procedure isn't currrently used for tokenization event creation.
  *
  * @author      Jason Baldridge
- * @version     $Revision: 1.3 $, $Date: 2004/04/08 03:07:16 $
+ * @version     $Revision: 1.4 $, $Date: 2004/11/29 02:52:11 $
  */
 
 public class TokEventCollector implements EventCollector {
@@ -46,37 +47,38 @@ public class TokEventCollector implements EventCollector {
     }
 
     
-    /** 
-     * Builds up the list of features using the Reader as input.  For now, this
+    /**
+     * Builds up the list of features using the Reader as input. For now, this
      * should only be used to create training data.
      */
-    public Event[] getEvents() {
-	ArrayList elist = new ArrayList();
+  public Event[] getEvents() {
+    ArrayList elist = new ArrayList();
 
-	try {
-	    String s = br.readLine();
-	    while (s != null) {
-		String[] spaceToks = s.split(" ");
-		for (int tok=0; tok<spaceToks.length; tok++) {
-		    StringBuffer sb = new StringBuffer(spaceToks[tok]);
-		    if (TokenizerME.alphaNumeric.matcher(spaceToks[tok]).matches()) {
-			int lastIndex = sb.length()-1;
-			for (int id=0; id<sb.length(); id++) {
-			    String[] context =
-				cg.getContext(new ObjectIntPair(sb, id));
-			    if (id == lastIndex) {
-				elist.add(new Event("T", context));
-			    } else {
-				elist.add(new Event("F", context));
-			    }
-			}
-		    }
-		}
-		s = br. readLine();
-	    }
-	} catch (Exception e) {
-	    e.printStackTrace();
-	}
+    try {
+      String s = br.readLine();
+      while (s != null) {
+        String[] spaceToks = s.split(" ");
+        for (int tok = 0; tok < spaceToks.length; tok++) {
+          StringBuffer sb = new StringBuffer(spaceToks[tok]);
+          if (TokenizerME.alphaNumeric.matcher(spaceToks[tok]).matches()) {
+            int lastIndex = sb.length() - 1;
+            for (int id = 0; id < sb.length(); id++) {
+              String[] context = cg.getContext(new ObjectIntPair(sb, id));
+              if (id == lastIndex) {
+                elist.add(new Event("T", context));
+              }
+              else {
+                elist.add(new Event("F", context));
+              }
+            }
+          }
+        }
+        s = br.readLine();
+      }
+    }
+    catch (Exception e) {
+      e.printStackTrace();
+    }
 
 	Event[] events = new Event[elist.size()];
 	elist.toArray(events);
