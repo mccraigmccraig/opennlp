@@ -23,26 +23,25 @@ import opennlp.common.unify.*;
 import org.jdom.*;
 
 /**
- * A hybrid logic nominal, an atomic formula which holds true at exactly one
- * point in a model.
+ * A modality label.
  *
  * @author      Jason Baldridge
- * @version     $Revision: 1.3 $, $Date: 2002/02/05 11:50:29 $
+ * @version     $Revision: 1.1 $, $Date: 2002/02/05 11:50:29 $
  **/
-public class NominalAtom extends HyloAtom implements Nominal {
+public final class ModeLabel extends HyloAtom implements Mode {
 
     protected int _index = 0;
     
-    public NominalAtom (String n) {
+    public ModeLabel (String n) {
 	super(n);
     }
 
-    public NominalAtom (String n, int index) {
+    public ModeLabel (String n, int index) {
 	this(n);
 	setIndex(index);
     }
 
-    public NominalAtom (Element e) {
+    public ModeLabel (Element e) {
 	super(e);
     }
 
@@ -52,18 +51,17 @@ public class NominalAtom extends HyloAtom implements Nominal {
 
     public void setIndex (int index) {
 	_index = index;
-	_name += index;
     }
 
     public LF copy () {
-	return new NominalAtom(_name);
+	return new ModeLabel(_name);
     }
 
     public Unifiable unify (Unifiable u, Substitution sub)
 	throws UnifyFailure {
 
 	if (u instanceof HyloFormula) {
-	    if (u instanceof NominalAtom && equals(u)) {
+	    if (u instanceof ModeLabel && equals(u)) {
 		return copy();
 	    }
 	    return super.unify(u,sub);
@@ -73,9 +71,9 @@ public class NominalAtom extends HyloAtom implements Nominal {
     }
     
     public boolean equals (Object o) {
-	if (o instanceof NominalAtom
-	    && _name.equals(((NominalAtom)o)._name) 
-	    && _index == ((NominalAtom)o)._index) {
+	if (o instanceof ModeLabel
+	    && _name.equals(((ModeLabel)o)._name) 
+	    && _index == ((ModeLabel)o)._index) {
 	    return true;
 	} else {
 	    return false;

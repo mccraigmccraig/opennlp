@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////////
-// Copyright (C) 2001 Jason Baldridge
+// Copyright (C) 2002 Jason Baldridge
 // 
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
@@ -19,36 +19,14 @@
 package opennlp.common.hylo;
 
 import opennlp.common.synsem.*;
+import opennlp.common.unify.*;
 import org.jdom.*;
-import java.util.*;
 
-public class HyloHelper {
-
-    public static LF getLF (Element e) {
-	String type = e.getName();
-	if (type.equals("op")) {
-	    return new Op(e);
-	} else if (type.equals("var")) {
-	    return new HyloVar(e.getAttributeValue("n"));
-	} else if (type.equals("nomvar")) {
-	    return new NominalVar(e.getAttributeValue("n"));
-	} else if (type.equals("nom")) {
-	    return new NominalAtom(e);
-	} else if (type.equals("prop")) {
-	    return new Proposition(e);
-	} else if (type.equals("satop")) {
-	    return new SatOp(e);
-	} else if (type.equals("b")) {
-	    return new Box(e);
-	} else if (type.equals("d")) {
-	    return new Diamond(e);
-	} else if (type.equals("modlabel")) {
-	    return new ModeLabel(e);
-	} else if (type.equals("lf")) {
-	    return getLF((Element)e.getChildren().get(0));
-	}
-	System.out.println("Invalid hybrid logic LF type: " + type);
-	return null;
-    }
-
-}
+/**
+ * A interface for hybrid logic nominals, to allow polymorphism for
+ * both Modality labels and variables over Modality labels.
+ *
+ * @author      Jason Baldridge
+ * @version     $Revision: 1.1 $, $Date: 2002/02/05 11:50:29 $
+ **/
+public interface Mode extends LF, Indexed {}

@@ -19,36 +19,45 @@
 package opennlp.common.hylo;
 
 import opennlp.common.synsem.*;
+import opennlp.common.unify.*;
 import org.jdom.*;
-import java.util.*;
 
-public class HyloHelper {
+public final class Box extends ModalOp {
 
-    public static LF getLF (Element e) {
-	String type = e.getName();
-	if (type.equals("op")) {
-	    return new Op(e);
-	} else if (type.equals("var")) {
-	    return new HyloVar(e.getAttributeValue("n"));
-	} else if (type.equals("nomvar")) {
-	    return new NominalVar(e.getAttributeValue("n"));
-	} else if (type.equals("nom")) {
-	    return new NominalAtom(e);
-	} else if (type.equals("prop")) {
-	    return new Proposition(e);
-	} else if (type.equals("satop")) {
-	    return new SatOp(e);
-	} else if (type.equals("b")) {
-	    return new Box(e);
-	} else if (type.equals("d")) {
-	    return new Diamond(e);
-	} else if (type.equals("modlabel")) {
-	    return new ModeLabel(e);
-	} else if (type.equals("lf")) {
-	    return getLF((Element)e.getChildren().get(0));
+    public Box (Element e) {
+	super(e);
+    }
+
+    private Box (Mode mode, LF arg) {
+	super(mode, arg);
+    }
+
+    public LF copy () {
+	return new Box ((Mode)_mode.copy(), _arg.copy());
+    }
+    
+    public boolean equals (Object o) {
+	if (o instanceof Box) {
+	    return super.equals((Box)o);
+	} else {
+	    return false;
 	}
-	System.out.println("Invalid hybrid logic LF type: " + type);
-	return null;
+    }
+
+    public void unifyCheck (Unifiable u) throws UnifyFailure {
+	if (u instanceof Box) {
+	    super.unifyCheck((Box)u);
+	} else {
+	    throw new UnifyFailure();
+	}
+    }
+
+    public Unifiable fill (Substitution sub) throws UnifyFailure {
+	return new Box((Mode)_mode.fill(sub), (LF)_arg.fill(sub));
+    }
+    
+    public String toString () {
+	return new StringBuffer().append('[').append(_mode.toString()).append(']').append(_arg.toString()).toString();
     }
 
 }
