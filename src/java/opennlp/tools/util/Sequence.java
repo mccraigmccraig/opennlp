@@ -30,8 +30,8 @@ public class Sequence implements Comparable {
 
   /** Creates a new sequence of outcomes. */
   public Sequence() {
-    outcomes = new ArrayList();
-    probs = new ArrayList();
+    outcomes = new ArrayList(1);
+    probs = new ArrayList(1);
     score = 0;
   }
 
@@ -62,10 +62,9 @@ public class Sequence implements Comparable {
     Sequence s = (Sequence) o;
     if (score < s.score)
       return 1;
-    else if (score == s.score)
-      return 0;
-    else
+    if (score > s.score)
       return -1;
+    return 0;
   }
 
   /** Adds an outcome and probability to this sequence. 
@@ -104,6 +103,6 @@ public class Sequence implements Comparable {
   }
 
   public String toString() {
-    return super.toString() + " " + score;
+    return score + " "+outcomes;
   }
 }
