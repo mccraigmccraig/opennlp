@@ -29,12 +29,16 @@ import java.net.*;
  * A pipeline of components that process NLPDocuments.
  *
  * @author      Gann Bierner
- * @version     $Revision: 1.1 $, $Date: 2002/01/02 15:24:38 $
+ * @version     $Revision: 1.2 $, $Date: 2002/01/02 16:33:48 $
  **/
 public class Pipeline {
 
     Pipelink[] links;
 
+    public Pipeline () {
+	links = new Pipelink[0];
+    }
+    
     public Pipeline (Pipelink[] l) throws PipelineException {
 	links = l;
 	verify();

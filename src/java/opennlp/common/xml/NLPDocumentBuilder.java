@@ -22,7 +22,7 @@ import java.io.*;
 
 public class NLPDocumentBuilder {
    /**
-    * creates a NLPDocument from a string
+    * Creates an NLPDocument from a String.
     **/
     public NLPDocument build (String text) {
 	NLPDocument doc = new NLPDocument(text);
@@ -30,7 +30,7 @@ public class NLPDocumentBuilder {
     }
 
    /**
-    * creates a NLPDocument from a file
+    * Creates an NLPDocument from a File.
     **/
     public NLPDocument build (File input) {
 	try {
@@ -42,7 +42,7 @@ public class NLPDocumentBuilder {
     }
 
    /**
-    * creates a NLPDocument from a reader
+    * Creates an NLPDocument from a Reader.
     **/
     public NLPDocument build (Reader input) {
 	StringBuffer text = new StringBuffer();
@@ -50,14 +50,13 @@ public class NLPDocumentBuilder {
             BufferedReader br = new BufferedReader(input);
             String read = br.readLine();
             while (read != null) {                                
-                while (read != null) {
-                    text.append(read);
-                    read = br.readLine();
-                }
+		text.append(read).append('\n');
+		read = br.readLine();
 	    }
         } catch (Exception e) {
             System.out.println(e);
 	}
+	System.out.println(text.toString());
 	return build(text.toString());
     }
 }

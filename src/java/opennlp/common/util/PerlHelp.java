@@ -28,7 +28,7 @@ import java.util.*;
  * gnu.regexp.
  *
  * @author      Jason Baldridge
- * @version     $Revision: 1.5 $, $Date: 2001/11/29 11:11:03 $
+ * @version     $Revision: 1.6 $, $Date: 2002/01/02 16:33:48 $
  */
 public final class PerlHelp {
 
@@ -61,17 +61,18 @@ public final class PerlHelp {
 	boolean prevWasReturn = false;
 	while (st.hasMoreTokens()) {
 	    String s = st.nextToken();
-	    if (s.equals("\n") && !prevWasReturn) {
-		prevWasReturn = true;
-	    }
-	    else if (prevWasReturn) {
+	    if (s.equals("\n")) {
+		if (prevWasReturn) {
+		    prevWasReturn = false;
+		    pars.add(nextPar.toString());
+		    nextPar = new StringBuffer();
+		} else {
+		    prevWasReturn = true;
+		}
+	    } else {
 		prevWasReturn = false;
-		pars.add(nextPar.toString());
-		nextPar = new StringBuffer(s.trim());
 	    }
-	    else {
-		nextPar.append(s.trim());
-	    }
+	    nextPar.append(s);
 	}
 	pars.add(nextPar.toString());
 	String[] parsArray = new String[pars.size()];
