@@ -32,13 +32,13 @@ import opennlp.maxent.io.SuffixSensitiveGISModelReader;
  * achieved >96% accuracy on unseen data.
  *
  * @author      Gann Bierner
- * @version     $Revision: 1.4 $, $Date: 2003/12/17 19:39:21 $
+ * @version     $Revision: 1.5 $, $Date: 2004/01/26 14:14:38 $
  */
 
 public class EnglishPOSTaggerME extends POSTaggerME {
 
   public EnglishPOSTaggerME(String modelFile) {
-    super(getModel(modelFile), new POSContextGenerator());
+    super(getModel(modelFile), new DefaultPOSContextGenerator());
   }
 
   private static MaxentModel getModel(String name) {

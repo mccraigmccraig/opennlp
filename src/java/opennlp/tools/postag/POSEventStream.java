@@ -37,11 +37,15 @@ public class POSEventStream implements EventStream {
   DataStream data;
   Event[] events;
   int ei;
-  
 
   public POSEventStream(DataStream d) {
-    this(d,new POSContextGenerator());
-    int ei=0;
+    this(d, new DefaultPOSContextGenerator());
+  }
+
+  public POSEventStream(DataStream d, ContextGenerator cg) {
+    this.cg = cg;
+    data = d;
+    int ei = 0;
     if (d.hasNext()) {
       addNewEvents((String) d.nextToken());
     }
@@ -50,26 +54,21 @@ public class POSEventStream implements EventStream {
     }
   }
 
-  public POSEventStream(DataStream d, ContextGenerator cg) {
-    this.cg=cg;
-    data = d;
-  }
-
   public boolean hasNext() {
-    return(ei < events.length || data.hasNext());
+    return (ei < events.length || data.hasNext());
   }
 
-  public Event nextEvent () {
+  public Event nextEvent() {
     if (ei == events.length) {
       addNewEvents((String) data.nextToken());
-      ei=0;
+      ei = 0;
     }
-    return((Event) events[ei++]);
+    return ((Event) events[ei++]);
   }
-  
+
   private void addNewEvents(String sentence) {
     //String sentence = "the_DT stories_NNS about_IN well-heeled_JJ communities_NNS and_CC developers_NNS";
-    EventCollector ec = new POSEventCollector(new StringReader(sentence),cg);
+    EventCollector ec = new POSEventCollector(new StringReader(sentence), cg);
     events = ec.getEvents();
   }
 

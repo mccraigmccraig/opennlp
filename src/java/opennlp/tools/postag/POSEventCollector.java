@@ -19,8 +19,8 @@
 package opennlp.tools.postag;
 
 import opennlp.maxent.*;
+import opennlp.tools.util.Pair;
 
-import opennlp.common.util.Pair;
 
 import java.io.*;
 
@@ -36,7 +36,7 @@ import java.util.StringTokenizer;
  * An event generator for the maxent POS Tagger.
  *
  * @author      Gann Bierner
- * @version     $Revision: 1.1 $, $Date: 2003/11/05 03:31:04 $
+ * @version     $Revision: 1.2 $, $Date: 2004/01/26 14:14:38 $
  */
 
 public class POSEventCollector implements EventCollector {
@@ -158,7 +158,7 @@ public class POSEventCollector implements EventCollector {
     public static void main(String[] args) {
 	String data = "the_DT stories_NNS about_IN well-heeled_JJ communities_NNS and_CC developers_NNS";
 	EventCollector ec = new POSEventCollector(new StringReader(data),
-						  new POSContextGenerator());
+						  new DefaultPOSContextGenerator());
 	Event[] events = ec.getEvents();
 	for(int i=0; i<events.length; i++)
 	    System.out.println(events[i].getOutcome());

@@ -18,16 +18,28 @@
 
 package opennlp.tools.postag;
 
-import java.io.*;
-import java.util.*;
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileReader;
+import java.io.IOException;
+import java.io.Reader;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Iterator;
+import java.util.List;
+import java.util.StringTokenizer;
 
-import opennlp.common.util.BeamSearch;
-import opennlp.common.util.FilterFcn;
-import opennlp.common.util.Pair;
-import opennlp.common.util.Sequence;
-
-import opennlp.maxent.*;
-import opennlp.maxent.io.*;
+import opennlp.maxent.Evalable;
+import opennlp.maxent.EventCollector;
+import opennlp.maxent.EventStream;
+import opennlp.maxent.GIS;
+import opennlp.maxent.GISModel;
+import opennlp.maxent.MaxentModel;
+import opennlp.maxent.PlainTextByLineDataStream;
+import opennlp.maxent.io.SuffixSensitiveGISModelWriter;
+import opennlp.tools.util.BeamSearch;
+import opennlp.tools.util.Pair;
+import opennlp.tools.util.Sequence;
 
 /**
  * A part-of-speech tagger that uses maximum entropy.  Trys to predict whether
@@ -35,7 +47,7 @@ import opennlp.maxent.io.*;
  * surrounding context.
  *
  * @author      Gann Bierner
- * @version $Revision: 1.6 $, $Date: 2004/01/09 15:22:17 $
+ * @version $Revision: 1.7 $, $Date: 2004/01/26 14:14:38 $
  */
 public class POSTaggerME implements Evalable, POSTagger {
 
@@ -47,12 +59,8 @@ public class POSTaggerME implements Evalable, POSTagger {
   /**
    * The feature context generator.
    */
-  protected ContextGenerator _contextGen = new POSContextGenerator();
+  protected POSContextGenerator _contextGen = new DefaultPOSContextGenerator();
 
-  /**
-   * Decides whether a word can be assigned a particular closed class tag.
-   */
-  protected FilterFcn _closedClassTagsFilter;
 
   /**
    * Says whether a filter should be used to check whether a tag assignment
@@ -70,14 +78,14 @@ public class POSTaggerME implements Evalable, POSTagger {
   protected  BeamSearch beam;
 
   public POSTaggerME(MaxentModel mod) {
-    this(mod, new POSContextGenerator());
+    this(mod, new DefaultPOSContextGenerator());
   }
   
-  public POSTaggerME(MaxentModel mod, ContextGenerator cg) {
+  public POSTaggerME(MaxentModel mod, POSContextGenerator cg) {
     this(DEFAULT_BEAM_SIZE,mod,cg);
   }
 
-  public POSTaggerME(int beamSize, MaxentModel mod, ContextGenerator cg) {
+  public POSTaggerME(int beamSize, MaxentModel mod, POSContextGenerator cg) {
     size = beamSize;
     _posModel = mod;
     _contextGen = cg;
@@ -161,14 +169,11 @@ public class POSTaggerME implements Evalable, POSTagger {
 
   private class PosBeamSearch extends BeamSearch {
 
-    public PosBeamSearch(int size, ContextGenerator cg, MaxentModel model) {
+    public PosBeamSearch(int size, POSContextGenerator cg, MaxentModel model) {
       super(size, cg, model);
     }
 
     protected boolean validSequence(int i, List inputSequence, Sequence outcomesSequence, String outcome) {
-      if (_useClosedClassTagsFilter) {
-        return (_closedClassTagsFilter.filter((String) inputSequence.get(i), outcome));
-      }
       return true;
     }
   }
