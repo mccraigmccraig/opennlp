@@ -1,4 +1,4 @@
-<!-- $Id: build.xml,v 1.1 2002/03/20 20:23:23 mratkinson Exp $ -->
+<!-- $Id: build.xml,v 1.2 2002/03/20 21:08:41 mratkinson Exp $ -->
 <!-- This build file based on the JDOM build.xml file. -->
 
 <project name="Dictionary" default="package" basedir=".">
@@ -105,7 +105,8 @@
   <!-- =================================================================== -->
   <target name="package" depends="compile">
     <jar jarfile="${build.dir}/${name}-${version}.jar"
-         basedir="${build.dest}" />
+         basedir="${build.dest}"
+         manifest="${src.dir}/../../META-INF/Manifest.mf"/>
   </target>
 
 
