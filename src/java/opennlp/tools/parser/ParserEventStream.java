@@ -132,7 +132,6 @@ public class ParserEventStream implements EventStream {
 
   private void addParseEvents(List events, List chunks) {
     int ci = 0;
-    Event e;
     while (ci < chunks.size()) {
       Parse c = (Parse) chunks.get(ci);
       Parse parent = c.getParent();
@@ -164,7 +163,9 @@ public class ParserEventStream implements EventStream {
             chunks.remove(ci);
             ci--;
           }
-          chunks.add(ci + 1, parent);
+          if (!type.equals(ParserME.TOP_NODE)) {
+            chunks.add(ci + 1, parent);
+          }
         }
         else {
           if (etype == EventTypeEnum.CHECK) {
@@ -234,6 +235,10 @@ public class ParserEventStream implements EventStream {
   }
 
   public static void main(String[] args) throws java.io.IOException {
+    if (args.length == 0) {
+      System.err.println("Usage ParserEventStream -[tag|chunk|build|check] head_rules < parses");
+      System.exit(1);
+    }
     EventTypeEnum etype = null;
     int ai = 0;
     if (args[ai].equals("-build")) {
