@@ -21,6 +21,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+
 public final class PTBHeadFinder implements HeadFinder {
 
   private static PTBHeadFinder instance;
@@ -64,6 +65,9 @@ public final class PTBHeadFinder implements HeadFinder {
         Parse child0 = (Parse) parts.get(0);
         if (child0.isNounPhrase()) {
           List ctoks = child0.getTokens();
+          if (ctoks.size() == 0) {
+            System.err.println("PTBHeadFinder: NP "+child0+" with no tokens");
+          }
           Parse tok = (Parse) ctoks.get(ctoks.size() - 1);
           if (tok.getSyntacticType().equals("POS")) {
             return (null);
@@ -82,6 +86,7 @@ public final class PTBHeadFinder implements HeadFinder {
       //all other NPs
       for (int pi = 0; pi < parts.size(); pi++) {
         Parse child = (Parse) parts.get(pi);
+        //System.err.println("PTBHeadFinder.getHead: "+p.getSyntacticType()+" "+p+" child "+pi+"="+child.getSyntacticType()+" "+child);
         if (child.isNounPhrase()) {
           return (child);
         }
@@ -100,8 +105,14 @@ public final class PTBHeadFinder implements HeadFinder {
     //check for NP -> NN S type structures and return last token before S as head.
     for (int sci=0,scn = sChildren.size();sci<scn;sci++) {
       Parse sc = (Parse) sChildren.get(sci);
+      //System.err.println("PTBHeadFinder.getHeadIndex "+p+" "+p.getSyntacticType()+" sChild "+sci+" type = "+sc.getSyntacticType());
       if (sc.getSyntacticType().startsWith("S")) {
-        countTokens = true;
+        if (sci != 0) {
+          countTokens = true;
+        }
+        else {
+          System.err.println("PTBHeadFinder.getHeadIndex(): NP -> S production assuming right-most head");
+        }
       }
       if (countTokens) {
         tokenCount+=sc.getTokens().size();
@@ -109,7 +120,7 @@ public final class PTBHeadFinder implements HeadFinder {
     }
     List toks = p.getTokens();
     if (toks.size() == 0) {
-      System.err.println("PTBHeadFinder.getHeadIndex(): empty tok list");
+      System.err.println("PTBHeadFinder.getHeadIndex(): empty tok list for parse "+p);
     }
     for (int ti = toks.size() - tokenCount -1; ti >= 0; ti--) {
       Parse tok = (Parse) toks.get(ti);
@@ -117,6 +128,7 @@ public final class PTBHeadFinder implements HeadFinder {
         return (ti);
       }
     }
+    //System.err.println("PTBHeadFinder.getHeadIndex: "+p+" hi="+toks.size()+"-"+tokenCount+" -1 = "+(toks.size()-tokenCount -1));
     return (toks.size() - tokenCount -1);
   }
 
