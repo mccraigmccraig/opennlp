@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////////
-// Copyright (C) 2002 Jason Baldridge and Gann Bierner
+// Copyright (C) 2004 Jason Baldridge, Gann Bierner, and Tom Morton
 // 
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
@@ -32,7 +32,7 @@ import opennlp.maxent.io.SuffixSensitiveGISModelReader;
  * achieved >96% accuracy on unseen data.
  *
  * @author      Gann Bierner
- * @version     $Revision: 1.6 $, $Date: 2004/03/16 22:58:32 $
+ * @version     $Revision: 1.7 $, $Date: 2004/04/07 17:27:44 $
  */
 
 public class EnglishPOSTaggerME extends POSTaggerME {
@@ -63,7 +63,7 @@ public class EnglishPOSTaggerME extends POSTaggerME {
    */
   public static void main(String[] args) throws IOException {
     if (args.length == 0) {
-      System.err.println("Usage: EnglishPOSTTaggerME -td tagdict model < sentences");
+      System.err.println("Usage: EnglishPOSTTaggerME [-td tagdict] model < tokenized_sentences");
       System.err.println("       EnglishPOSTTaggerME -test model \"sentence\"");
       System.exit(1);
     }
