@@ -10,6 +10,7 @@ import java.io.RandomAccessFile;
  * @author     Mike Atkinson (mratkinson)
  * @since      0.1.0
  * @created    20 March 2002
+ * @version    $Id: WNUtil.java,v 1.3 2002/03/26 19:39:36 mratkinson Exp $
  */
 public class WNUtil {
 

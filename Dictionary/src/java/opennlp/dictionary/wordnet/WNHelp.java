@@ -6,9 +6,8 @@ package opennlp.dictionary.wordnet;
  * @author     Mike Atkinson (mratkinson)
  * @since      0.1.0
  * @created    20 March 2002
- * @modified   $Id: WNHelp.java,v 1.2 2002/03/22 00:14:27 mratkinson Exp $
+ * @modified   $Id: WNHelp.java,v 1.3 2002/03/26 19:38:45 mratkinson Exp $
  */
-
 public class WNHelp {
 
     /**

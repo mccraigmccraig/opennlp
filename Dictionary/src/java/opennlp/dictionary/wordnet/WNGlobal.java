@@ -3,12 +3,12 @@ package opennlp.dictionary.wordnet;
 /**
  *  Global variables used by various WordNet applications.<p>
  *
- *  This class was created by heavily modifying the WordNet 1.7 code src/lib/wnglobal.c
+ *  This class was created by heavily modifying the WordNet 1.7 code src/lib/wnglobal.h
  *
  * @author     Mike Atkinson (mratkinson)
  * @since      0.1.0
- * @created    21 March 2002
- * @version    $Id: WNGlobal.java,v 1.3 2002/03/21 23:57:02 mratkinson Exp $
+ * @created    20 March 2002
+ * @version    $Id: WNGlobal.java,v 1.4 2002/03/26 19:37:51 mratkinson Exp $
  */
 public class WNGlobal {
     /**
@@ -17,7 +17,7 @@ public class WNGlobal {
      *
      * @since    0.1.0
      */
-    public static String wnrelease = "1.7";
+    public static String wnRelease = "1.7";
 
     /**
      *  Lexicographer file names, Lexicographer numbers are equals to their index
@@ -73,7 +73,7 @@ public class WNGlobal {
      *
      * @since    0.1.0
      */
-    public final static String[] lexfiles = {
+    public final static String[] lexFiles = {
             "adj.all", // 0
     "adj.pert", // 1
     "adv.all", // 2
@@ -193,7 +193,7 @@ public class WNGlobal {
      *
      * @since    0.1.0
      */
-    public final static String[] ptrtyp = {
+    public final static String[] ptrType = {
             "", // 0 not used
     "!", // 1 ANTPTR
     "@", // 2 HYPERPTR
@@ -255,23 +255,29 @@ public class WNGlobal {
             };
 
     /**
-     *  Part of Speech names 
+     *  Part of Speech names.<p>
+     *  <ol>
+     *    <li>"noun"</li>
+     *    <li>"verb"</li>
+     *    <li>"adj"</li>
+     *    <li>"adv"</li>
+     *  </ol>
      *
      * @since    0.1.0
      */
-    public final static String[] partnames = {"", "noun", "verb", "adj", "adv", null};
+    public final static String[] partNames = {"", "noun", "verb", "adj", "adv", null};
     /**
      *  Characters to add to end of options for the various parts of speech.
      *
      * @since    0.1.0
      */
-    public final static String partchars = " nvara";// add char for satellites to end
+    public final static String partChars = " nvara";// add char for satellites to end
     /**
      *  Classes of adjectives.
      *
      * @since    0.1.0
      */
-    public final static String[] adjclass = {"", "(p)", "(a)", "(ip)"};
+    public final static String[] adjClass = {"", "(p)", "(a)", "(ip)"};
 
 
     /**
@@ -279,7 +285,7 @@ public class WNGlobal {
      *
      * @since    0.1.0
      */
-    public final static String[] frametext = {
+    public final static String[] frameText = {
             "",
             "Something ----s",
             "Somebody ----s",

@@ -7,21 +7,24 @@ package opennlp.dictionary.wordnet;
  *  buffer.
  *  <ul>
  *    <li> nextss</li>
- *    <li> nextform</li>
- *    <li> searchtype</li>
- *    <li> ptrlist</li>
- *    <li> headword</li>
- *    <li> headsense</li>
+ *    <li> nextForm</li>
+ *    <li> searchType</li>
+ *    <li> ptrList</li>
+ *    <li> headWord</li>
+ *    <li> headSense</li>
  *  </ul>
  *  <p>
  *
- *  FIXME: This should probably be broken up into two classes to reflex its different
- *  uses.
+ *  <b>FIXME: This should probably be broken up into two classes to reflex its different
+ *  uses.</b><p>
+ *
+ *  This class was created by heavily modifying part of the WordNet 1.7 code
+ *  src/include/wntypes.h
  *
  * @author     Mike Atkinson (mratkinson)
  * @since      0.1.0
  * @created    20 March 2002
- * @version    $Id: SynSet.java,v 1.2 2002/03/21 23:09:52 mratkinson Exp $
+ * @version    $Id: SynSet.java,v 1.3 2002/03/26 19:36:45 mratkinson Exp $
  */
 public class SynSet {
     /**
@@ -77,7 +80,7 @@ public class SynSet {
      *
      * @since    0.1.0
      */
-    public int whichword;
+    public int whichWord;
     /**
      *  pointer types.
      *
@@ -101,7 +104,7 @@ public class SynSet {
     // instead of a text buffer.
 
     /**
-     *  ptr to next synset containing searchword.
+     *  ptr to next synset containing searchWord.
      *
      * @since    0.1.0
      */
@@ -111,32 +114,32 @@ public class SynSet {
      *
      * @since    0.1.0
      */
-    public SynSet nextform;
+    public SynSet nextForm;
 
     /**
      *  // type of search performed.
      *
      * @since    0.1.0
      */
-    public int searchtype;
+    public int searchType;
     /**
      *  ptr to synset list result of search.
      *
      * @since    0.1.0
      */
-    public SynSet ptrlist;
+    public SynSet ptrList;
     /**
      *  if pos is "s", this is cluster head word.
      *
      * @since    0.1.0
      */
-    public String headword;
+    public String headWord;
     /**
-     *  sense number of headword.
+     *  sense number of headWord.
      *
      * @since    0.1.0
      */
-    public int headsense;
+    public int headSense;
 
 
     /**
@@ -153,7 +156,7 @@ public class SynSet {
          *
          * @since    0.1.0
          */
-        public int ptrtyp;
+        public int ptrType;
         /**
          *  pointer offset.
          *

@@ -6,6 +6,7 @@ import java.io.FileOutputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 
+
 /**
  *  Command line interface to WordNet.<p>
  *  
@@ -245,7 +246,7 @@ import java.io.IOException;
  * @author     Mike Atkinson (mratkinson)
  * @since      0.1.0
  * @created    20 March 2002
- * @version    "$Id: WordNet.java,v 1.2 2002/03/26 19:16:36 mratkinson Exp $";
+ * @version    "$Id: WordNet.java,v 1.3 2002/03/26 19:40:38 mratkinson Exp $";
  */
 public class WordNet {
     private Search searcher;
@@ -253,7 +254,7 @@ public class WordNet {
     private Morph morpher;
     private WNrtl wnRtl;
 
-    static String Id = "$Id: WordNet.java,v 1.2 2002/03/26 19:16:36 mratkinson Exp $";
+    static String Id = "$Id: WordNet.java,v 1.3 2002/03/26 19:40:38 mratkinson Exp $";
 
     private static String license =
             "This software and database is being provided to you, the LICENSEE, by  " +
