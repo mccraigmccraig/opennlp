@@ -19,6 +19,7 @@
 package opennlp.tools.postag;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.regex.Pattern;
 
@@ -28,7 +29,7 @@ import opennlp.tools.util.Sequence;
  * A context generator for the POS Tagger.
  *
  * @author      Gann Bierner
- * @version     $Revision: 1.4 $, $Date: 2004/04/08 03:07:16 $
+ * @version     $Revision: 1.5 $, $Date: 2004/04/30 17:04:39 $
  */
 
 public class DefaultPOSContextGenerator implements POSContextGenerator {
@@ -68,17 +69,21 @@ public class DefaultPOSContextGenerator implements POSContextGenerator {
     return getContext(pos, tokens, s.getOutcomes());
   }
 
+  public String[] getContext(int index, Object[] sequence, String[] priorDecisions, Object[] additionalContext) {
+    return getContext(index,Arrays.asList(sequence),Arrays.asList(priorDecisions));
+  }  
+
   public String[] getContext(int pos, List tokens, List tags) {
     String next, nextnext, lex, prev, prevprev;
     String tagprev, tagprevprev;
     tagprev = tagprevprev = null;
     next = nextnext = lex = prev = prevprev = null;
 
-    lex = (String) tokens.get(pos);
+    lex = tokens.get(pos).toString();
     if (tokens.size() > pos + 1) {
-      next = (String) tokens.get(pos + 1);
+      next = tokens.get(pos + 1).toString();
       if (tokens.size() > pos + 2)
-        nextnext = (String) tokens.get(pos + 2);
+        nextnext = tokens.get(pos + 2).toString();
       else
         nextnext = SE; // Sentence End
 
@@ -88,12 +93,12 @@ public class DefaultPOSContextGenerator implements POSContextGenerator {
     }
 
     if (pos - 1 >= 0) {
-      prev = (String) tokens.get(pos - 1);
-      tagprev = (String) tags.get(pos - 1);
+      prev =  tokens.get(pos - 1).toString();
+      tagprev =  tags.get(pos - 1).toString();
 
       if (pos - 2 >= 0) {
-        prevprev = (String) tokens.get(pos - 2);
-        tagprevprev = (String) tags.get(pos - 2);
+        prevprev = tokens.get(pos - 2).toString();
+        tagprevprev = tags.get(pos - 2).toString();
       }
       else {
         prevprev = SB; // Sentence Beginning
@@ -153,4 +158,5 @@ public class DefaultPOSContextGenerator implements POSContextGenerator {
     }
     return (String[]) e.toArray(new String[e.size()]);
   }
+  
 }
