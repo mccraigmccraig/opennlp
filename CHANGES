@@ -1,3 +1,27 @@
+0.6.4
+-----
+Changed several aspects of unification.  The Unifiable interface now
+requires the method unify(Object o, Substitution s) to be implemented.
+The Unifier class provides the unify(Object a, Object b, Substitution
+s) method to handle Variables and non-Unifiable built-in Java classes
+such as String which we would still like to see being able to unify
+with other objects. Finally, failure of a Unifiable to unify with an
+object is signaled by throwing the UnifyFailure exception (required by
+the unify method).
+
+FeatureStructure has been added and will eventually replace the
+Feature interface.  It provides a much reduced set of methods to be
+implemented and also is simply a better name for that type of class.
+The naming of the methods has also been improved.
+
+The PerlHelp and BasicEnglishAffixes classes have migrated from
+opennlp.maxent to opennlp.common.util and opennlp.common.english,
+respectively.  The gnu-regexp.jar has been added to the project as a
+result.
+
+XmlUtils has been scrapped and rewritten to use JDOM.
+
+
 0.6.2
 -----
 Improved the build system for easier homepage updates.
