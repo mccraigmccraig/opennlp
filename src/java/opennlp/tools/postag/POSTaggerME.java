@@ -21,8 +21,10 @@ package opennlp.tools.postag;
 import java.io.*;
 import java.util.*;
 
+import opennlp.common.util.BeamSearch;
 import opennlp.common.util.FilterFcn;
 import opennlp.common.util.Pair;
+import opennlp.common.util.Sequence;
 
 import opennlp.maxent.*;
 import opennlp.maxent.io.*;
@@ -33,7 +35,7 @@ import opennlp.maxent.io.*;
  * surrounding context.
  *
  * @author      Gann Bierner
- * @version $Revision: 1.1 $, $Date: 2003/11/05 03:31:04 $
+ * @version $Revision: 1.2 $, $Date: 2003/12/05 05:13:27 $
  */
 public class POSTaggerME implements Evalable, POSTagger {
 
@@ -58,7 +60,10 @@ public class POSTaggerME implements Evalable, POSTagger {
    */
   protected boolean _useClosedClassTagsFilter = false;
 
+  private static final int BEAM_SIZE = 3;
+
   private Sequence bestSequence;
+  private BeamSearch beam;
 
   protected POSTaggerME() {}
 
@@ -69,6 +74,7 @@ public class POSTaggerME implements Evalable, POSTagger {
   public POSTaggerME(MaxentModel mod, ContextGenerator cg) {
     _posModel = mod;
     _contextGen = cg;
+    beam = new PosBeamSearch(BEAM_SIZE, cg, mod);
   }
 
   public String getNegativeOutcome() {
@@ -80,7 +86,7 @@ public class POSTaggerME implements Evalable, POSTagger {
   }
 
   public List tag(List sentence) {
-    return bestSequence(sentence);
+    return beam.bestSequence(sentence, null);
   }
 
   public String[] tag(String[] sentence) {
@@ -128,7 +134,7 @@ public class POSTaggerME implements Evalable, POSTagger {
         Pair p = POSEventCollector.convertAnnotatedString(line);
         List words = (List) p.a;
         List outcomes = (List) p.b;
-        List tags = bestSequence(words);
+        List tags = beam.bestSequence(words, null);
 
         int c = 0;
         boolean sentOk = true;
@@ -153,87 +159,20 @@ public class POSTaggerME implements Evalable, POSTagger {
 
   }
 
-  ///////////////////////////////////////////////////////////////////
-  // Do a beam search to compute best sequence of results (as in pos)
-  // taken from Ratnaparkhi (1998), PhD diss, Univ. of Pennsylvania
-  ///////////////////////////////////////////////////////////////////
-  private static class Sequence implements Comparable {
-    double score = 1;
-    List tagList;
-    List probList;
-    Sequence() {
-      tagList = new ArrayList();
-      probList = new ArrayList();
-    };
+  class PosBeamSearch extends BeamSearch {
 
-    Sequence(double s) {
-      this();
-      score = s;
-    }
-    public int compareTo(Object o) {
-      Sequence s = (Sequence) o;
-      if (score < s.score)
-        return 1;
-      else if (score == s.score)
-        return 0;
-      else
-        return -1;
-    }
-    public Sequence copy() {
-      Sequence s = new Sequence(score);
-      s.tagList.addAll(tagList);
-      s.probList.addAll(probList);
-      return s;
+    public PosBeamSearch(int size, ContextGenerator cg, MaxentModel model) {
+      super(size, cg, model);
     }
 
-    public void add(String t, double d) {
-      tagList.add(t);
-      probList.add(new Double(d));
-      score *= d;
-    }
-
-    public List getTags() {
-      return (tagList);
-    }
-
-    public List getProbs() {
-      return (probList);
-    }
-    public String toString() {
-      return super.toString() + " " + score;
-    }
-  }
-
-  public List bestSequence(List words) {
-    int n = words.size();
-    int N = 3;
-    SortedSet[] h = new SortedSet[n + 1];
-
-    for (int i = 0; i < h.length; i++)
-      h[i] = new TreeSet();
-
-    h[0].add(new Sequence());
-
-    for (int i = 0; i < n; i++) {
-      int sz = Math.min(N, h[i].size());
-      for (int j = 1; j <= sz; j++) {
-        Sequence top = (Sequence) h[i].first();
-        h[i].remove(top);
-        Object[] params = { words, top.getTags(), new Integer(i)};
-        double[] scores = _posModel.eval(_contextGen.getContext(params));
-        for (int p = 0; p < scores.length; p++) {
-          if (!_useClosedClassTagsFilter || _closedClassTagsFilter.filter((String) words.get(i), _posModel.getOutcome(p))) {
-            Sequence newS = top.copy();
-            newS.add(_posModel.getOutcome(p), scores[p]);
-            h[i + 1].add(newS);
-          }
-        }
+    protected boolean validSequence(int i, List sequence, Sequence s, String outcome) {
+      if (_useClosedClassTagsFilter) {
+        return (_closedClassTagsFilter.filter((String) sequence.get(i), outcome));
       }
+      return true;
     }
-    bestSequence = (Sequence) h[n].first();
-    return bestSequence.getTags();
   }
-
+  
   public String[] getOrderedTags(List words, List tags, int index) {
     Object[] params = { words, tags, new Integer(index)};
     double[] probs = _posModel.eval(_contextGen.getContext(params));
