@@ -29,16 +29,6 @@ import opennlp.tools.coref.sim.SimilarityModel;
 
 public class DefaultLinker extends AbstractLinker {
   
-  private static final int SINGULAR_PRONOUN_RESOLVER_INDEX = 0;
-  private static final int PLURAL_PRONOUN_RESOLVER_INDEX = 1;
-  private static final int DEFINITE_NOUN_RESOLVER_INDEX = 2;
-  private static final int ISA_RESOLVER_INDEX = 3;
-  private static final int PLURAL_NOUN_RESOLVER_INDEX = 4;
-  private static final int COMMON_NOUN_RESOLVER_INDEX = 5;
-  private static final int SPEECH_PRONOUN_RESOLVER_INDEX = 6;
-  
-  
-  
   public DefaultLinker(String project, LinkerMode mode) throws IOException {
     this(project,mode,true,-1);
   }
@@ -123,5 +113,4 @@ public class DefaultLinker extends AbstractLinker {
   protected void initMentionFinder() {
     mentionFinder = ShallowParseMentionFinder.getInstance(headFinder);
   }
-  
 }
