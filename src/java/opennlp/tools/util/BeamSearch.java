@@ -78,7 +78,7 @@ public class BeamSearch {
           temp_scores[c] = scores[c];
         }
         Arrays.sort(temp_scores);
-        double min = temp_scores[Math.min(scores.length,size)];
+        double min = temp_scores[Math.min(scores.length-1,size)];
 
         for (int p = 0; p < scores.length; p++) {
           if (scores[p] < min)
