@@ -28,7 +28,7 @@ import java.util.*;
  * a particular point named by a nominal.
  *
  * @author      Jason Baldridge
- * @version     $Revision: 1.8 $, $Date: 2002/01/18 18:02:54 $
+ * @version     $Revision: 1.9 $, $Date: 2002/01/20 15:03:47 $
  **/
 public class SatOp extends HyloFormula {
     protected Nominal _nominal;
@@ -81,19 +81,24 @@ public class SatOp extends HyloFormula {
     public Unifiable unify (Unifiable u, Substitution sub)
 	throws UnifyFailure {
 
-	if (!(u instanceof HyloFormula)) {
-	    throw new UnifyFailure();
-	} else {
+	if (u instanceof HyloFormula) {
 	    if (u instanceof SatOp) {
 		try {
-		    Nominal $nom =
-			(Nominal)Unifier.unify(_nominal,
-					       ((SatOp)u)._nominal, sub);
+		    Nominal $nom;
+		    LF $nomUnif =
+			(LF)Unifier.unify(_nominal, ((SatOp)u)._nominal, sub);
+		    if ($nomUnif instanceof Nominal) {
+			$nom = (Nominal)$nomUnif;
+		    } else {
+			$nom = (Nominal)_nominal.copy();
+		    }
 		    LF $arg = (LF)Unifier.unify(_arg,((SatOp)u)._arg, sub);
 		    return new SatOp($nom, $arg);
 		} catch (UnifyFailure uf) {}
 	    }
-	    return new Op("conj", copy(), ((LF)u).copy());
+	    return super.unify(u,sub);
+	} else {
+	    throw new UnifyFailure();
 	}
     }
 
@@ -102,7 +107,7 @@ public class SatOp extends HyloFormula {
     }
 
     public String toString () {	
-	return "@_" + _nominal + "(" + _arg + ")";
+	return "@" + _nominal + "(" + _arg + ")";
     }
 
 }

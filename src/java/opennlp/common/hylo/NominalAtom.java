@@ -19,6 +19,7 @@
 package opennlp.common.hylo;
 
 import opennlp.common.synsem.*;
+import opennlp.common.unify.*;
 import org.jdom.*;
 
 /**
@@ -26,7 +27,7 @@ import org.jdom.*;
  * point in a model.
  *
  * @author      Jason Baldridge
- * @version     $Revision: 1.1 $, $Date: 2002/01/18 18:02:54 $
+ * @version     $Revision: 1.2 $, $Date: 2002/01/20 15:03:47 $
  **/
 public class NominalAtom extends HyloAtom implements Nominal {
 
@@ -53,9 +54,23 @@ public class NominalAtom extends HyloAtom implements Nominal {
 	return new NominalAtom(_name);
     }
 
+    public Unifiable unify (Unifiable u, Substitution sub)
+	throws UnifyFailure {
+
+	if (u instanceof HyloFormula) {
+	    if (u instanceof NominalAtom && equals(u)) {
+		return copy();
+	    }
+	    return super.unify(u,sub);
+	} else {
+	    throw new UnifyFailure();
+	}
+    }
+    
     public boolean equals (Object o) {
 	if (o instanceof NominalAtom
-	    && _name == ((NominalAtom)o)._name) {
+	    && _name.equals(((NominalAtom)o)._name) 
+	    && _index == ((NominalAtom)o)._index) {
 	    return true;
 	} else {
 	    return false;
