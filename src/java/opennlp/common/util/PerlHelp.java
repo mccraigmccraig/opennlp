@@ -28,35 +28,45 @@ import java.util.*;
  * gnu.regexp.
  *
  * @author      Jason Baldridge
- * @version     $Revision: 1.8 $, $Date: 2002/02/05 17:53:04 $
+ * @version     $Revision: 1.9 $, $Date: 2002/02/05 20:16:24 $
  */
 public final class PerlHelp {
 
-    /**
-     * Regular expressions.
-     */
-    public static RE alphanumRE, capRE, peqRE, punctRE, wsRE,
-	hasCap, hasNum, hasHyph, hasAt;
-
-    static {
-        try {
-            alphanumRE = new RE("^[A-Za-z0-9]+$");
-            hasCap = new RE(".*[A-Z].*");
-            hasNum = new RE(".*[0-9].*");
-            hasHyph = new RE(".*-.*");
-            hasAt = new RE(".*@.*");
-            capRE = new RE("^[A-Z]\\S*$");
-	    peqRE = new RE("\\.|!|\\?|\\\"|\\)");
-	    punctRE = new RE("[^a-zA-Z0-9]+");
-            wsRE = new RE("\\s+");
-          }
-        catch (REException e) { System.out.println(e); }
-    }
-
-    public static boolean hasAt (String s) {
+    public static boolean isAlphanumeric (String s) {
 	char[] ca = s.toCharArray();
 	for (int i=0; i<ca.length; i++) {
-	    if (ca[i] == '@') {
+	    if (!Character.isLetterOrDigit(ca[i])) {
+		return false;
+	    }
+	}
+	return true;
+    }
+    
+    public static boolean isPunctuation (String s) {
+	char[] ca = s.toCharArray();
+	for (int i=0; i<ca.length; i++) {
+	    if (Character.isLetterOrDigit(ca[i])
+		|| Character.isWhitespace(ca[i])) {
+		return false;
+	    }
+	}
+	return true;
+    }
+
+    public static boolean hasCap (String s) {
+	char[] ca = s.toCharArray();
+	for (int i=0; i<ca.length; i++) {
+	    if (Character.isUpperCase(ca[i])) {
+		return true;
+	    }
+	}
+	return false;
+    }
+
+    public static boolean hasNum (String s) {
+	char[] ca = s.toCharArray();
+	for (int i=0; i<ca.length; i++) {
+	    if (Character.isDigit(ca[i])) {
 		return true;
 	    }
 	}
