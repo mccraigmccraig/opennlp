@@ -28,7 +28,7 @@ import java.util.*;
  * gnu.regexp.
  *
  * @author      Jason Baldridge
- * @version     $Revision: 1.4 $, $Date: 2001/11/27 17:00:30 $
+ * @version     $Revision: 1.5 $, $Date: 2001/11/29 11:11:03 $
  */
 public final class PerlHelp {
 
@@ -55,17 +55,34 @@ public final class PerlHelp {
 
 
     public static String[] getParagraphs (String text) {
-	String[] pars = { text };
-	return pars;
+	StringTokenizer st = new StringTokenizer(text, "\n", true);
+	List pars = new ArrayList();
+	StringBuffer nextPar = new StringBuffer();
+	boolean prevWasReturn = false;
+	while (st.hasMoreTokens()) {
+	    String s = st.nextToken();
+	    if (s.equals("\n") && !prevWasReturn) {
+		prevWasReturn = true;
+	    }
+	    else if (prevWasReturn) {
+		prevWasReturn = false;
+		pars.add(nextPar.toString());
+		nextPar = new StringBuffer(s.trim());
+	    }
+	    else {
+		nextPar.append(s.trim());
+	    }
+	}
+	pars.add(nextPar.toString());
+	String[] parsArray = new String[pars.size()];
+	pars.toArray(parsArray);
+	return parsArray;
     }
 
     public static String[] splitByWhitespace (String s) {
-	String[] segments = split(s);
-	return segments;
+	return split(s, " \t\n\r\f");
     }
 
-    
-    
     /*
      * Calls split(String s, string delim), assuming space (" ") as the
      * delimiter.

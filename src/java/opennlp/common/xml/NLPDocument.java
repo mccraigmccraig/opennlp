@@ -30,7 +30,7 @@ import java.io.*;
  * specifications.
  *
  * @author      Jason Baldridge
- * @version     $Revision: 1.4 $, $Date: 2001/11/27 17:19:38 $
+ * @version     $Revision: 1.5 $, $Date: 2001/11/29 11:11:04 $
  */
 public class NLPDocument extends Document {
 
@@ -118,7 +118,7 @@ public class NLPDocument extends Document {
     }
 
     public static void main (String[] args) {
-	NLPDocument doc = new NLPDocument("Here is a sentence");
+	NLPDocument doc = new NLPDocument("Here is a sentence. And this is another one.\n\nThis is a sentence in a new paragraph.");
 	System.out.println(doc.toString());
     }
 }
