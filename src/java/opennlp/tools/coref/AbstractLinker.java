@@ -23,6 +23,7 @@ import java.util.List;
 
 import opennlp.tools.coref.mention.Extent;
 import opennlp.tools.coref.mention.HeadFinder;
+import opennlp.tools.coref.mention.MentionContext;
 import opennlp.tools.coref.mention.MentionFinder;
 import opennlp.tools.coref.mention.Parse;
 import opennlp.tools.coref.resolver.AbstractResolver;
@@ -141,7 +142,8 @@ public abstract class AbstractLinker implements Linker {
     }
     else {
       if (mention.getParse() != null) {
-        mention.getParse().removeEntityId();
+        //:TODO Check regression test to see if this does anything.
+        //mention.getParse().removeEntityId();
       }
     }
   }
@@ -226,17 +228,18 @@ public abstract class AbstractLinker implements Linker {
   }
   */
 
-  public List getEntities(MentionContext[] extentContexts) {
+  public DiscourseEntity[] getEntities(Extent[] mentions) {
+    MentionContext[] extentContexts = this.constructMentionContexts(mentions);
     DiscourseModel dm = new DiscourseModel();
     for (int ei = 0; ei < extentContexts.length; ei++) {
+      //System.err.println(ei+" "+extentContexts[ei].toText());
       resolve(extentContexts[ei], dm);
     }
-    return (Arrays.asList(dm.getEntities()));
+    return (dm.getEntities());
   }
 
-  public void setEntities(MentionContext[] extentContexts) {
-    //System.err.println("AbstractLinler.setEntities: "+extentContexts.size());
-    getEntities(extentContexts);
+  public void setEntities(Extent[] mentions) {
+    getEntities(mentions);
   }
 
   public void train() throws IOException {
@@ -245,8 +248,28 @@ public abstract class AbstractLinker implements Linker {
     }
   }
 
-  public Extent[] getMentions(Parse s) {
-    return (mentionFinder.getMentions(s));
+  public Extent[] getMentions(Parse sentence) {
+    return (mentionFinder.getMentions(sentence));
+  }
+  
+  public MentionContext[] constructMentionContexts(Extent[] mentions) {
+    int mentionInSentenceIndex=-1;
+    int numMentionsInSentence=-1;
+    MentionContext[] contexts = new MentionContext[mentions.length];
+    for (int mi=0,mn=mentions.length;mi<mn;mi++) {
+      Parse mentionParse = mentions[mi].getParse();
+      //System.err.println("AbstractLinker.constructMentionContexts: mentionParse="+mentionParse);
+      if (mentionParse == null) {
+        System.err.println("no parse for "+mentions[mi]);
+      }
+      int sentenceIndex = mentionParse.getSentenceNumber();
+      
+      contexts[mi]=new MentionContext(mentionParse, mentionInSentenceIndex, numMentionsInSentence, mi, sentenceIndex, mentions[mi].getNameType(),getHeadFinder());
+      //System.err.println("AbstractLinker.constructMentionContexts: mi="+mi+" sn="+mentionParse.getSentenceNumber()+" extent="+mentions[mi]+" parse="+mentionParse.getSpan()+" mc="+contexts[mi].toText());
+      contexts[mi].setId(mentions[mi].getId());
+      mentionInSentenceIndex++;
+    }
+    return (contexts);
   }
 
 }

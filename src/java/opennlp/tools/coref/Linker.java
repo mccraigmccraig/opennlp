@@ -22,9 +22,10 @@ import java.util.List;
 import java.util.regex.Pattern;
 
 import opennlp.tools.coref.mention.HeadFinder;
+import opennlp.tools.coref.mention.MentionContext;
+import opennlp.tools.coref.mention.Parse;
 
 import opennlp.tools.coref.mention.Extent;
-import opennlp.tools.coref.mention.Parse;
 
 /** A linker provides an interface for finding mentions <code>getMentions</code>, 
  * and creating entities out of those mentions <code>getEntities</code>.  This interface also allows
@@ -60,22 +61,29 @@ public interface Linker {
   public static final Pattern honorificsPattern = Pattern.compile("[A-Z][a-z]+\\.$|^[A-Z][b-df-hj-np-tv-xz]+$");
   public static final Pattern designatorsPattern = Pattern.compile("[a-z]\\.$|^[A-Z][b-df-hj-np-tv-xz]+$|^Co(rp)?$");
   
-  public void setEntities(MentionContext[] mentions);
+  public void setEntities(Extent[] mentions);
   
   /** Returns a list of entities which group the mentions into entity classes. 
    * @param mentions A array of mentions. 
-   * return A list of entities with elements of type <code>DiscourseEntity</code>.
+   * return An array of discourse entities.
    */
-  public List getEntities(MentionContext[] mentions);
+  public DiscourseEntity[] getEntities(Extent[] mentions);
+  
+  /**
+   * Creates mention contexts for the specified mention exents.  These are used to compute coreference features over.
+   * @param mentions The mention of a document.
+   * @return mention contexts for the specified mention exents.
+   */
+  public MentionContext[] constructMentionContexts(Extent[] mentions);
   
   /** Trains the linker based on the data specified via calls to #setEntities */ 
   public void train() throws IOException;
     
   /** Returns a array of mentions contained in the specified parse for coreference resolution.
-   * @param p A top-level arse from which mentions are gathered.  Typically this represents a document.
+   * @param sentence The parse for a sentence. 
    * @return Array of mentions contained in the specified parse.
    */
-  public Extent[] getMentions(Parse parse);
+  public Extent[] getMentions(Parse sentence);
  
   /** 
    * Returns the head finder associated with this linker.
