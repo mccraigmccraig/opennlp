@@ -7,7 +7,7 @@ package opennlp.dictionary.wordnet;
  * @author     Mike Atkinson (mratkinson)
  * @since      0.2.0
  * @created    21 March 2002
- * @verson     $Id: WordNetCache.java,v 1.1 2002/03/21 23:27:22 mratkinson Exp $
+ * @version    $Id: WordNetCache.java,v 1.2 2002/03/26 19:17:14 mratkinson Exp $
  */
 public class WordNetCache extends java.util.WeakHashMap {
     private Object[] holdOnTo;

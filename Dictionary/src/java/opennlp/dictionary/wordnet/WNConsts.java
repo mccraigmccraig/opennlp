@@ -1,5 +1,15 @@
 package opennlp.dictionary.wordnet;
 
+/**
+ *  Global constants used by WordNet Java implementation.<p>
+ *
+ *  This class was created by heavily modifying the WordNet 1.7 code src/include/wnconsts.c
+ *
+ * @author     Mike Atkinson (mratkinson)
+ * @since      0.1.0
+ * @created    20 March 2002
+ * @version    "$Id: WNConsts.java,v 1.2 2002/03/26 19:13:43 mratkinson Exp $";
+ */
 public class WNConsts {
     // Unix
     public final static String DICTDIR          = "/dict";
@@ -50,7 +60,7 @@ public class WNConsts {
     public final static int SMLINEBUF	= 3*1024; // small buffer for output lines.
     public final static int WORDBUF	= 256;	// buffer for one word or collocation.
 
-    public final static int ALLSENSES	= 0;	// pass to findtheinfo() if want all senses.
+    public final static int ALLSENSES	= 0;	// pass to findTheInfo() if want all senses.
     public final static int MAXID	= 15;	// maximum id number in lexicographer file.
     public final static int MAXDEPTH	= 20;	// maximum tree depth - used to find cycles.
     public final static int MAXSENSE	= 75;	// maximum number of senses in database.
@@ -149,7 +159,7 @@ public class WNConsts {
     public final static int SATELLITE	        = 5;	// not really a part of speech.
     public final static int ADJSAT		= SATELLITE;
 
-    public final static int ALL_POS		=0;	// passed to in_wn() to check all POS.
+    public final static int ALL_POS		=0;	// passed to inWN() to check all POS.
 
 
 // Adjective markers.

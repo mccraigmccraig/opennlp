@@ -1,276 +1,283 @@
-/**
- * 
- * morph.c - WordNet search code morphology functions
- * 
- */
-
 package opennlp.dictionary.wordnet;
 
 import java.io.File;
 import java.io.RandomAccessFile;
 
+/**
+ *  WordNet search code morphology functions.<p>
+ *
+ *  This class was created by heavily modifying the WordNet 1.7 code src/lib/morph.c
+ *
+ * @author     Mike Atkinson (mratkinson)
+ * @since      0.1.0
+ * @created    20 March 2002
+ * @version    "$Id: Morph.java,v 1.2 2002/03/26 19:11:22 mratkinson Exp $";
+ */
 public class Morph {
-   private static String Id = "$Id: Morph.java,v 1.1 2002/03/20 20:24:17 mratkinson Exp $";
 
-   private static String sufx[] ={ 
-        "s", "ses", "xes", "zes", "ches", "shes", "men",   // Noun suffixes.
-        "s", "ies", "es", "es", "ed", "ed", "ing", "ing",  // Verb suffixes.
-        "er", "est", "er", "est"                           // Adjective suffixes.
-    };
-    
-    private static String addr[] ={ 
-        
-        "", "s", "x", "z", "ch", "sh", "man",  // Noun endings.
-        "", "y", "e", "", "e", "", "e", "",    // Verb endings.
-        "", "", "e", "e"                        // Adjective endings.
-    };
-
-    private static int[] offsets = { 0, 0, 7, 15 };
-    private static int[] cnts = { 0, 7, 8, 4 };
-
-    private static final int NUMPREPS	= 15;
-
-    private static class Prepositions {
-        public String str;
-        public Prepositions(String prep) {
-            str = prep;
-        }
-    }
-
-    private static Prepositions[] prepositions = {
-        new Prepositions("to"),
-        new Prepositions("at"),
-        new Prepositions("of"),
-        new Prepositions("on"),
-        new Prepositions("off"),
-        new Prepositions("in"),
-        new Prepositions("out"),
-        new Prepositions("up"),
-        new Prepositions("down"),
-        new Prepositions("from"),
-        new Prepositions("with"),
-        new Prepositions("into"),
-        new Prepositions("for"),
-        new Prepositions("about"),
-        new Prepositions("between")
-    };
-    
-    private RandomAccessFile[] exc_fps = new RandomAccessFile[WNConsts.NUMPARTS + 1];
-    
-
+    private RandomAccessFile[] exceptionFiles = new RandomAccessFile[WNConsts.NUMPARTS + 1];
 
     private boolean done = false;
-    private int openerr = 0;
+    private boolean openerr = false;
     private BinSearch binSearcher;
     private Search searcher;
     private WNrtl wnRtl;
-    
+
+    private String searchstr, str;
+    private int svcnt, svprep;
+
+    private static String sufx[] = {
+            "s", "ses", "xes", "zes", "ches", "shes", "men",  // Noun suffixes.
+            "s", "ies", "es", "es", "ed", "ed", "ing", "ing", // Verb suffixes.
+            "er", "est", "er", "est"                          // Adjective suffixes.
+    };
+
+    private static String addr[] = {
+            "", "s", "x", "z", "ch", "sh", "man", // Noun endings.
+            "", "y", "e", "", "e", "", "e", "",   // Verb endings.
+            "", "", "e", "e"                      // Adjective endings.
+    };
+
+    private static int[] offsets = {0, 0, 7, 15};
+    private static int[] cnts = {0, 7, 8, 4};
+
+    private final static int NUMPREPS = 15;
+
+    private static String[] prepositions = {
+            "to", "at", "of", "on", "off", "in", "out", "up",
+            "down", "from", "with", "into", "for", "about", "between"
+            };
+
+
+    /**
+     *  Constructor for the Morph object
+     *
+     * @param  binSearcher  Used to perform binary searches.
+     * @param  searcher     Used to find if part of a word is defined.
+     * @param  wnRtl        Holds whether the database files are open.
+     * @since               0.1.0
+     */
     public Morph(BinSearch binSearcher, Search searcher, WNrtl wnRtl) {
-       this.binSearcher= binSearcher;
-       this.searcher= searcher;
-       this.wnRtl= wnRtl;
+        this.binSearcher = binSearcher;
+        this.searcher = searcher;
+        this.wnRtl = wnRtl;
     }
-    
-    
-   /** Open exception list files. */
-    public int morphinit() {
+
+
+    /**
+     *  Open exception list files.
+     *
+     * @return    <tt>true</tt> if the database exception list files have been opened
+     *      correctly.
+     * @since     0.1.0
+     */
+    public boolean morphInit() {
         if (!done) {
-            if (wnRtl.OpenDB) {		// make sure WN database files are open.
-                openerr = do_init();
-                if (openerr==0) { 
+            if (wnRtl.OpenDB) {// make sure WN database files are open.
+                openerr = doInit();
+                if (!openerr) {
                     done = true;
                 }
             } else {
-                openerr = -1;
+                openerr = true;
             }
         }
-        return openerr;
+        return !openerr;
     }
 
-    
-    /** Close exception list files and reopen. */
-    public int re_morphinit() {
+
+    /**
+     *  Close exception list files and reopen.
+     *
+     * @return    <tt>true</tt> if the database exception list files have been opened
+     *      correctly.
+     * @since     0.1.0
+     */
+    public boolean re_morphInit() {
         for (int i = 1; i <= WNConsts.NUMPARTS; i++) {
-            if (exc_fps[i] != null) {
+            if (exceptionFiles[i] != null) {
                 try {
-                   exc_fps[i].close();
-                   exc_fps[i] = null;
+                    exceptionFiles[i].close();
+                    exceptionFiles[i] = null;
                 } catch (java.io.IOException e) {
                     e.printStackTrace();
                 }
             }
         }
-    
-        return (wnRtl.OpenDB) ? do_init() : -1;
+
+        return (wnRtl.OpenDB) ? doInit() : false;
     }
 
-    private int do_init() {
-        int openerr = 0;
-        String env;
-        String searchdir;
-    
-        // Find base directory for database.  If set, use WNSEARCHDIR.
-        //   If not set, check for WNHOME/dict, otherwise use DEFAULTPATH.
-    
-        if ((env = System.getProperty("WNSEARCHDIR")) != null) {
-                searchdir = env;
-        } else if ((env = System.getProperty("WNHOME")) != null) {
-                searchdir = env+"/dict";
-        } else {
-                searchdir= WNConsts.DEFAULTPATH;
+
+    /**
+     *  Try to find baseform (lemma) of word or collocation in POS.<p>
+     *
+     *  Works like strtok() - first call is with string, subsequent calls with null
+     *  argument return additional baseforms for original string.<p>
+     *
+     *  The Parts of Speech are:
+     *  <ol>
+     *    <li> noun</li>
+     *    <li> verb</li>
+     *    <li> adj</li>
+     *    <li> adv</li>
+     *  </ol>
+     *
+     *
+     * @param  origstr  Word (or collocation) to find the baseform of (or null for
+     *      subsequent calls).
+     * @param  pos      Part of Speech
+     * @return          The baseform for the word given the part of speech.
+     * @since           0.1.0
+     */
+
+    public String morphStr(String origstr, int pos) {
+        int prep;
+
+        if (pos == WNConsts.SATELLITE) {
+            pos = WNConsts.ADJ;
         }
-    
-        for (int i = 1; i <= WNConsts.NUMPARTS; i++) {
-            String fname = searchdir+"/" +WNGlobal.partnames[i]+".exc";
-            try {
-                exc_fps[i] = new RandomAccessFile(new File(fname), "r");
-            } catch (java.io.IOException e) {
-                e.printStackTrace();
-                String msgbuf="WordNet library error: Can't open exception file("+fname+")";
-                WordNet.display_message(msgbuf);
-                openerr = -1;
+
+        // First time through for this string.
+
+        if (origstr != null) {
+            // Assume string hasn't had spaces substitued with '_'.
+            str = WNUtil.strToLower(origstr.replace(' ', '_'));
+            StringBuffer searchstr_sb = new StringBuffer();
+            int cnt = WNUtil.countWords(str, '_');
+            svprep = 0;
+
+            // first try exception list.
+
+            String tmp = excLookup(str, pos);
+            if (tmp != null && !tmp.equals(str)) {
+                svcnt = 1;// force next time to pass null.
+                return tmp;
             }
-        }
-        return openerr;
-    }
 
-    private String searchstr, str;
-    private int svcnt, svprep;
+            // Then try simply morph on original string.
 
-   /** Try to find baseform (lemma) of word or collocation in POS.
-    *  Works like strtok() - first call is with string, subsequent calls
-    *  with null argument return additional baseforms for original string.
-    */
-
-public String morphstr(String origstr, int pos) {
-    int prep;
-    
-    if (pos == WNConsts.SATELLITE) {
-	pos = WNConsts.ADJ;
-    }
-
-    // First time through for this string.
-
-    if (origstr != null) {
-	// Assume string hasn't had spaces substitued with '_'.
-	str = WNUtil.strtolower(origstr.replace(' ', '_'));
-	StringBuffer searchstr_sb = new StringBuffer();
-	int cnt = WNUtil.cntwords(str, '_');
-	svprep = 0;
-
-	// first try exception list.
-
-        String tmp = exc_lookup(str, pos);
-	if (tmp!=null && !tmp.equals(str)) {
-	    svcnt = 1;		// force next time to pass null.
-	    return tmp;
-	}
-
-	// Then try simply morph on original string.
-
-	if (pos != WNConsts.VERB) {
-            tmp = morphword(str, pos);
-            if (tmp!=null && !tmp.equals(str)) {
-	       return tmp;
-            }
-        }
-
-	if (pos == WNConsts.VERB && cnt > 1 && (prep = hasprep(str, cnt))!=0 ) {
-	    // assume we have a verb followed by a preposition.
-	    svprep = prep;
-	    return morphprep(str);
-	} else {
-            int end_idx1=0;
-            int end_idx2=0;
-            int st_idx = 0;
-            int end_idx=0;
-            String word;
-            String append;
-	    svcnt = cnt = WNUtil.cntwords(str, '-');
-	    while (origstr!=null && (--cnt!=0) ) {
-		end_idx1 = str.indexOf('_', st_idx);
-		end_idx2 = str.indexOf('-', st_idx);
-		if (end_idx1>=0 && end_idx2>=0) {
-		    if (end_idx1 < end_idx2) {
-			append = "_";
-		    } else {
-			append = "-";
-		    }
-		} else {
-		    if (end_idx1>=0) {
-			append = "_";
-		    } else {
-			append = "-";
-		    }
-		}	
-		if (end_idx < 0) { return null; }		// shouldn't do this.
-		word = str.substring(st_idx, end_idx - st_idx);
-                tmp = morphword(word, pos);
-		if (tmp!=null) {
-		    searchstr_sb.append(tmp);
-		} else {
-		    searchstr_sb.append(word);
+            if (pos != WNConsts.VERB) {
+                tmp = morphWord(str, pos);
+                if (tmp != null && !tmp.equals(str)) {
+                    return tmp;
                 }
-		searchstr_sb.append(append);
-		st_idx = end_idx + 1;
-	    }
-            
-            word = str + st_idx;
-	    tmp = morphword(word, pos);
-	    if(tmp!=null)  {
-		searchstr_sb.append(tmp);
-	    } else {
-		searchstr_sb.append(word);
             }
-            searchstr= searchstr_sb.toString();
-	    if (!searchstr.equals(str) && searcher.is_defined(searchstr,pos)!=0) {
-		return searchstr;
-	    } else {
-		return null;
+
+            if (pos == WNConsts.VERB && cnt > 1 && (prep = hasPrep(str, cnt)) != 0) {
+                // assume we have a verb followed by a preposition.
+                svprep = prep;
+                return morphPrep(str);
+            } else {
+                int end_idx1 = 0;
+                int end_idx2 = 0;
+                int st_idx = 0;
+                int end_idx = 0;
+                String word;
+                String append;
+                svcnt = cnt = WNUtil.countWords(str, '-');
+                while (origstr != null && (--cnt != 0)) {
+                    end_idx1 = str.indexOf('_', st_idx);
+                    end_idx2 = str.indexOf('-', st_idx);
+                    if (end_idx1 >= 0 && end_idx2 >= 0) {
+                        if (end_idx1 < end_idx2) {
+                            append = "_";
+                        } else {
+                            append = "-";
+                        }
+                    } else {
+                        if (end_idx1 >= 0) {
+                            append = "_";
+                        } else {
+                            append = "-";
+                        }
+                    }
+                    if (end_idx < 0) {
+                        return null;
+                    }// shouldn't do this.
+                    word = str.substring(st_idx, end_idx - st_idx);
+                    tmp = morphWord(word, pos);
+                    if (tmp != null) {
+                        searchstr_sb.append(tmp);
+                    } else {
+                        searchstr_sb.append(word);
+                    }
+                    searchstr_sb.append(append);
+                    st_idx = end_idx + 1;
+                }
+
+                word = str + st_idx;
+                tmp = morphWord(word, pos);
+                if (tmp != null) {
+                    searchstr_sb.append(tmp);
+                } else {
+                    searchstr_sb.append(word);
+                }
+                searchstr = searchstr_sb.toString();
+                if (!searchstr.equals(str) && searcher.isDefined(searchstr, pos) != 0) {
+                    return searchstr;
+                } else {
+                    return null;
+                }
             }
-	}
-    } else {		          // subsequent call on string.
-	if (svprep!=0) {		// if verb has preposition, no more morphs.
-	    svprep = 0;
-	    return null;
-	} else if (svcnt == 1) {
-	    return exc_lookup(null, pos);
-	} else {
-	    svcnt = 1;
-            String tmp = exc_lookup(str, pos);
-	    if (tmp!=null && !tmp.equals(str)) {
-		return tmp;
-	    } else {
-		return null;
+        } else {// subsequent call on string.
+            if (svprep != 0) {// if verb has preposition, no more morphs.
+                svprep = 0;
+                return null;
+            } else if (svcnt == 1) {
+                return excLookup(null, pos);
+            } else {
+                svcnt = 1;
+                String tmp = excLookup(str, pos);
+                if (tmp != null && !tmp.equals(str)) {
+                    return tmp;
+                } else {
+                    return null;
+                }
             }
-	}
+        }
     }
-}
 
 
-    
-    /** Try to find baseform (lemma) of individual word in POS */
-    public String morphword(String word, int pos) {        
+
+    /**
+     *  Try to find baseform (lemma) of individual word in POS.<p>
+     *
+     *  The Parts of Speech are:
+     *  <ol>
+     *    <li> noun</li>
+     *    <li> verb</li>
+     *    <li> adj</li>
+     *    <li> adv</li>
+     *  </ol>
+     *
+     *
+     * @param  word  Word to find the baseform of (or null for subsequent calls).
+     * @param  pos   Part of Speech
+     * @return       The baseform for the word given the part of speech.
+     * @since        0.1.0
+     */
+    public String morphWord(String word, int pos) {
         if (word == null) {
             return null;
         }
-    
+
         // first look for word on exception list.
-        String tmp = exc_lookup(word, pos);
+        String tmp = excLookup(word, pos);
         if (tmp != null) {
-            return tmp ;		// found it in exception list.
+            return tmp;// found it in exception list.
         }
-    
-        if (pos == WNConsts.ADV) {	// only use exception list for adverbs.
+
+        if (pos == WNConsts.ADV) {// only use exception list for adverbs.
             return null;
         }
-        
-        StringBuffer tmpbuf = new StringBuffer();
+
+        StringBuffer tmpBuf = new StringBuffer();
         String end = "";
-        
+
         if (pos == WNConsts.NOUN) {
             if (word.endsWith("ful")) {
-                tmpbuf.append(word.substring(0, word.length()-3));
+                tmpBuf.append(word.substring(0, word.length() - 3));
                 end = "ful";
             } else {
                 // check for noun ending with 'ss' or short words.
@@ -279,20 +286,20 @@ public String morphstr(String origstr, int pos) {
                 }
             }
         }
-    
+
         // If not in exception list, try applying rules from tables.
-    
-        if (tmpbuf.length() == 0) {
-           tmpbuf.append(word);
+
+        if (tmpBuf.length() == 0) {
+            tmpBuf.append(word);
         }
-    
+
         int offset = offsets[pos];
         int cnt = cnts[pos];
-    
-        for (int i = 0; i < cnt; i++){
-            String start = tmpbuf.toString();
-            String retval = wordbase(start, (i + offset));
-            if (!retval.equals(start) && searcher.is_defined(retval, pos)!=0) {
+
+        for (int i = 0; i < cnt; i++) {
+            String start = tmpBuf.toString();
+            String retval = wordBase(start, (i + offset));
+            if (!retval.equals(start) && searcher.isDefined(retval, pos) != 0) {
                 return retval + end;
             }
         }
@@ -300,44 +307,75 @@ public String morphstr(String origstr, int pos) {
     }
 
 
-    private static String wordbase(String word, int ender) {
-        if (word.endsWith(sufx[ender])) {
-            word = word.substring(0, word.length()-sufx[ender].length());
-        }
-        return word;
-    }
+    /**
+     *  Open the exception list files "adj.exc", "adv.exc", "noun.exc" and "verb.exc".
+     *  <p>
+     *
+     *  To find the base directory for the database: <br>
+     *  If WNSEARCHDIR system property set then use that. <br>
+     *  else if WNHOME system property set then use WNHOME/dict <br>
+     *  otherwise use WNConsts.DEFAULTPATH.<p>
+     *
+     *
+     *
+     * @return    <tt>true</tt> if the database exception list files have been opened
+     *      correctly.
+     * @since     0.1.0
+     */
+    private boolean doInit() {
+        String env;
+        String searchDir;
 
-    private static int hasprep(String s, int wdcnt) {
-        // Find a preposition in the verb string and return its
-        // corresponding word number.
-        for (int wdnum = 2; wdnum <= wdcnt; wdnum++) {
-            int pos = s.lastIndexOf('_');
-            pos++;
-            for (int i = 0; i < NUMPREPS; i++) {
-                if (s.startsWith(prepositions[i].str) &&
-                   (   s.charAt(prepositions[i].str.length()) == '_' ||
-                       s.charAt(prepositions[i].str.length()) == '\0') ) {
-                    return wdnum;
-                   }
+        // Find base directory for database.  If set, use WNSEARCHDIR.
+        //   If not set, check for WNHOME/dict, otherwise use DEFAULTPATH.
+
+        if ((env = System.getProperty("WNSEARCHDIR")) != null) {
+            searchDir = env;
+        } else if ((env = System.getProperty("WNHOME")) != null) {
+            searchDir = env + "/dict";
+        } else {
+            searchDir = WNConsts.DEFAULTPATH;
+        }
+
+        for (int i = 1; i <= WNConsts.NUMPARTS; i++) {
+            String fname = searchDir + "/" + WNGlobal.partNames[i] + ".exc";
+            try {
+                exceptionFiles[i] = new RandomAccessFile(new File(fname), "r");
+            } catch (java.io.IOException e) {
+                e.printStackTrace();
+                String msgbuf = "WordNet library error: Can't open exception file(" + fname + ")";
+                WordNet.displayMessage(msgbuf);
+                openerr = true;
+                return false;
             }
         }
-        return 0;
+        return true;
     }
- 
-    private String exc_lookup(String word, int pos) {
+
+
+    /**
+     *  Look up the word in the exception list file for the part of speech given
+     *  to get the baseform (lemma) of the word.
+     *
+     * @param  word  To look up.
+     * @param  pos   Part of Speech.
+     * @return       Baseform of the word.
+     * @since        0.1.0
+     */
+    private String excLookup(String word, int pos) {
         String line = "";
-        int  beglp;
-        int  endlp=-1;
+        int beglp;
+        int endlp = -1;
         String excline = "";
         boolean found = false;
-    
-        if (exc_fps[pos] == null) {
+
+        if (exceptionFiles[pos] == null) {
             return null;
         }
-    
+
         // first time through load line from exception file.
-        if (word != null){
-            excline = binSearcher.bin_search(word, exc_fps[pos]);
+        if (word != null) {
+            excline = binSearcher.binSearch(word, exceptionFiles[pos]);
             if (excline != null) {
                 line = excline;
                 endlp = line.indexOf(' ');
@@ -346,83 +384,94 @@ public String morphstr(String origstr, int pos) {
             }
         }
 
-        if (endlp>=0 && (endlp<line.length()-1) && line.charAt(endlp+1) != ' '){
+        if (endlp >= 0 && (endlp < line.length() - 1) && line.charAt(endlp + 1) != ' ') {
             beglp = endlp + 1;
-            while (beglp<line.length() && line.charAt(beglp) == ' ') {
+            while (beglp < line.length() && line.charAt(beglp) == ' ') {
                 beglp++;
             }
             endlp = beglp;
-            while (endlp<line.length() && line.charAt(endlp) != ' '
-                                       && line.charAt(endlp) != '\n')  {
+            while (endlp < line.length() && line.charAt(endlp) != ' '
+                     && line.charAt(endlp) != '\n') {
                 endlp++;
             }
-            if (endlp != beglp){
-                return line.substring(beglp,endlp);
+            if (endlp != beglp) {
+                return line.substring(beglp, endlp);
             }
         }
 
         return null;
     }
 
-    private String morphprep(String s) {
+
+    /**
+     *  morph a verb (first word) followed by a preposition (second or later words).
+     *
+     * @param  s  Collocation to morph.
+     * @return    New Collocation in baseform.
+     * @since     0.1.0
+     */
+    private String morphPrep(String s) {
         int rest;
         int last;
-        String exc_word;
-        String lastwd = null;
-        int offset, cnt;
+        String excWord;
+        String lastWord = null;
+        int offset;
+        int cnt;
         String word;
-        String end="";
+        String end = "";
         String retval;
-    
+
         // Assume that the verb is the first word in the phrase.  Strip it
         // off, check for validity, then try various morphs with the
         // rest of the phrase tacked on, trying to find a match.
-    
+
         rest = s.indexOf('_');
         last = s.lastIndexOf('_');
-        if (rest != last) {		// more than 2 words.
-            lastwd = morphword(s.substring(last + 1), WNConsts.NOUN);
-            if (lastwd!=null) {
+        if (rest != last) {// more than 2 words.
+            lastWord = morphWord(s.substring(last + 1), WNConsts.NOUN);
+            if (lastWord != null) {
                 end = s.substring(rest, last - rest + 1);
-                end = end + lastwd;
+                end = end + lastWord;
             }
         }
-        
+
         word = s.substring(0, rest);
-    
+
         for (int i = 0; i < word.length(); i++) {
-            if (!Character.isLetterOrDigit(word.charAt(i))) { return null; }
+            if (!Character.isLetterOrDigit(word.charAt(i))) {
+                return null;
+            }
         }
-    
+
         offset = offsets[WNConsts.VERB];
         cnt = cnts[WNConsts.VERB];
-    
+
         // First try to find the verb in the exception list.
-    
-        if ( ((exc_word = exc_lookup(word, WNConsts.VERB))!=null) &&
-            !exc_word.equals(word)) {
-    
-            retval = exc_word+rest;
-            if (searcher.is_defined(retval, WNConsts.VERB)!=0) {
+
+        if (((excWord = excLookup(word, WNConsts.VERB)) != null) &&
+                !excWord.equals(word)) {
+
+            retval = excWord + rest;
+            if (searcher.isDefined(retval, WNConsts.VERB) != 0) {
                 return retval;
-            } else if (lastwd!=null) {
-                retval = exc_word+end;
-                if ( (searcher.is_defined(retval, WNConsts.VERB))!=0) {
+            } else if (lastWord != null) {
+                retval = excWord + end;
+                if ((searcher.isDefined(retval, WNConsts.VERB)) != 0) {
                     return retval;
                 }
             }
         }
-        
+
         for (int i = 0; i < cnt; i++) {
-            exc_word = wordbase(word, (i + offset));
-            if (exc_word!=null && !word.equals(exc_word)) { // ending is different.
-    
-                retval = exc_word + rest;
-                if ((searcher.is_defined(retval, WNConsts.VERB))!=0) {
+            excWord = wordBase(word, (i + offset));
+            if (excWord != null && !word.equals(excWord)) {// ending is different.
+
+                retval = excWord + rest;
+                if ((searcher.isDefined(retval, WNConsts.VERB)) != 0) {
                     return retval;
-                } else if (lastwd!=null) {
-                    retval = exc_word + end;
-                    if ((searcher.is_defined(retval, WNConsts.VERB))!=0) {
+                } else if (lastWord != null) {
+                    retval = excWord + end;
+                    if ((searcher.isDefined(retval, WNConsts.VERB)) != 0) {
                         return retval;
                     }
                 }
@@ -432,13 +481,55 @@ public String morphstr(String origstr, int pos) {
         if (!s.equals(retval)) {
             return retval;
         }
-        if (lastwd!=null) {
+        if (lastWord != null) {
             retval = word + end;
             if (!s.equals(retval)) {
                 return retval;
             }
         }
         return null;
+    }
+
+
+    /**
+     *  Remove the suffix from the word (if it is present).
+     *
+     * @param  word   To have suffix removed from.
+     * @param  ender  Index into sufx array
+     * @return        Word minus the suffix (or original word if word does not end
+     *      with that suffix).
+     * @since         0.1.0
+     */
+    private static String wordBase(String word, int ender) {
+        if (word.endsWith(sufx[ender])) {
+            word = word.substring(0, word.length() - sufx[ender].length());
+        }
+        return word;
+    }
+
+
+    /**
+     *  Find a preposition in the verb string and return its corresponding word
+     *  number.
+     *
+     * @param  s      Collocation
+     * @param  wordcnt  Number of words in the collocation
+     * @return        Number of the word in the collocation which is a preposition,
+     *      or 0 if no preposition found.
+     * @since         0.1.0
+     */
+    private static int hasPrep(String s, int wordcnt) {
+        for (int wordnum = 2; wordnum <= wordcnt; wordnum++) {
+            s = s.substring(s.lastIndexOf('_') + 1);
+            for (int i = 0; i < NUMPREPS; i++) {
+                if (s.startsWith(prepositions[i]) &&
+                        (s.charAt(prepositions[i].length()) == '_' ||
+                        s.length() == prepositions[i].length())) {
+                    return wordnum;
+                }
+            }
+        }
+        return 0;
     }
 
 }
