@@ -29,14 +29,14 @@ import opennlp.tools.util.Sequence;
  * A context generator for the POS Tagger.
  *
  * @author      Gann Bierner
- * @version     $Revision: 1.2 $, $Date: 2004/02/04 15:43:57 $
+ * @version     $Revision: 1.3 $, $Date: 2004/03/16 22:58:02 $
  */
 
 public class DefaultPOSContextGenerator implements POSContextGenerator {
-  private MorphAnalyzer _manalyzer;
+  protected MorphAnalyzer _manalyzer;
 
-  private static final String SE = "*SE*";
-  private static final String SB = "*SB*";
+  protected final String SE = "*SE*";
+  protected final String SB = "*SB*";
   private static final int PREFIX_LENGTH = 4;
   private static final int SUFFIX_LENGTH = 4;
 
