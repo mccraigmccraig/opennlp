@@ -68,6 +68,51 @@ Looking at the <a href="api/index.html">API</a>.
 </p>
 
 
+<h2>Running the OpenNLP Dictionary</h2>
+
+
+<p>
+two files are required.
+<ul>
+  <li>
+    output/dictionary-0.1.0.jar
+    <br>You can create <i><b>output/dictionary-0.1.0.jar</b></i> by running Ant
+    with build.xml.
+    <p>
+  </li>
+  <li>
+    src/data/database.zip
+    <br>unzip into a directory (e.g. &lt;wordnet&gt; ).
+    <p>
+  </li>
+</ul>
+</p>
+
+<p>
+   To get a list of options use:
+</p>
+<p>
+   <i><b>java -jar output\dictionary-0.1.0.jar</b></i>
+</p>
+
+<p>
+  So to get an overview of the senses of a word <i><b>&lt;word&gt;</b></i> use
+<p>
+
+</p>
+  <i><b>java -DWNDBVERSION=1.7 -DWNSEARCHDIR=&lt;wordnet&gt; -jar output\dictionary-0.1.0.jar &lt;word&gt; -over</b></i>
+</p>
+<p>
+  where <i><b>-DWNDBVERSION=1.7</b></i> defines the version of the WordNet
+  database which is to be used and <i><b>-DWNSEARCHDIR=&lt;wordnet&gt;</b></i>
+  which tells the program where to find the database.
+</p>
+<p>
+  There is one extra option added over those available to the 'c' version of
+  WordNet, this is -O&lt;file&gt; which outputs the search results to the file
+  &lt;file&gt;.
+</p>
+
 
 <h2>OpenNLP Dictionary history</h3>
 
@@ -100,7 +145,7 @@ in the 'c' version.
 
 <HR WIDTH="100%">
     <h3>
-    2001 October 24 <br>
+    2002 March 20 <br>
     </h3>  
 
 </td>
