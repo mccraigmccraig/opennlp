@@ -47,7 +47,7 @@ import opennlp.tools.util.Sequence;
  * surrounding context.
  *
  * @author      Gann Bierner
- * @version $Revision: 1.8 $, $Date: 2004/03/16 22:59:26 $
+ * @version $Revision: 1.9 $, $Date: 2004/08/13 16:59:43 $
  */
 public class POSTaggerME implements Evalable, POSTagger {
 
@@ -194,7 +194,27 @@ public class POSTaggerME implements Evalable, POSTagger {
     public PosBeamSearch(int size, POSContextGenerator cg, MaxentModel model) {
       super(size, cg, model);
     }
+    
+    public PosBeamSearch(int size, POSContextGenerator cg, MaxentModel model, int cacheSize) {
+      super(size, cg, model, cacheSize);
+    }
 
+    
+    protected boolean validSequence(int i, Object[] inputSequence, String[] outcomesSequence, String outcome) {
+      if (dictionary == null) {
+        return true;
+      }
+      else {
+        String[] tags = dictionary.getTags(inputSequence[i].toString());
+        if (tags == null) {
+          return true;
+        }
+        else {
+          return Arrays.asList(tags).contains(outcome);
+        }
+      }
+    }
+    
     protected boolean validSequence(int i, List inputSequence, Sequence outcomesSequence, String outcome) {
       if (dictionary == null) {
         return true;
@@ -216,7 +236,7 @@ public class POSTaggerME implements Evalable, POSTagger {
   }
   
   public String[] getOrderedTags(List words, List tags, int index,double[] tprobs) {
-    double[] probs = _posModel.eval(_contextGen.getContext(index,words,new Sequence(tags),null));
+    double[] probs = _posModel.eval(_contextGen.getContext(index,words.toArray(),(String[]) tags.toArray(new String[tags.size()]),null));
     String[] orderedTags = new String[probs.length];
     for (int i = 0; i < probs.length; i++) {
       int max = 0;
