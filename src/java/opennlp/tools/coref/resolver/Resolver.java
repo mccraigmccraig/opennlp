@@ -28,16 +28,14 @@ import opennlp.tools.coref.mention.MentionContext;
 */
 public interface Resolver {
 
-  /** Returns true if the resolver handles this type of refering
-   * expression.
+  /** Returns true if the resolver handles this type of refering expression.
    * @param ec the refering expression. 
    * @return true if the resolver handles this type of refering
    * expression, false otherwise.
    */
   public boolean canResolve(MentionContext ec);
 
-  /** Resolve this refering extression to a discourse entity in the
-   * discourse model.
+  /** Resolve this refering extression to a discourse entity in the discourse model.
    * @param ec the refering expression. 
    * @param dm the discourse model.
    * @return the discourse entity which the resolver beleives this
@@ -45,10 +43,9 @@ public interface Resolver {
    * coreferent with the refering expression. */
   public DiscourseEntity resolve(MentionContext ec, DiscourseModel dm);
 
-  /** Incorporates this refering expression into the model for
-   * resolution. 
-   * @param ec refering expression
-   * @param ec discourse model.
+  /** Incorporates this refering expression into the model for resolution. 
+   * @param ec the refering expression.
+   * @param dm the discourse model.
    * @return the discourse entity which is refered to by the refering
    * expression or null if no discourse entity is appropiate.
    */ 
