@@ -17,6 +17,8 @@
 //////////////////////////////////////////////////////////////////////////////   
 package opennlp.common.util;
 
+import gnu.regexp.*;
+
 import java.io.*;
 import java.util.*;
 
@@ -26,11 +28,41 @@ import java.util.*;
  * gnu.regexp.
  *
  * @author      Jason Baldridge
- * @version     $Revision: 1.7 $, $Date: 2002/02/05 17:17:06 $
+ * @version     $Revision: 1.8 $, $Date: 2002/02/05 17:53:04 $
  */
 public final class PerlHelp {
 
+    /**
+     * Regular expressions.
+     */
+    public static RE alphanumRE, capRE, peqRE, punctRE, wsRE,
+	hasCap, hasNum, hasHyph, hasAt;
 
+    static {
+        try {
+            alphanumRE = new RE("^[A-Za-z0-9]+$");
+            hasCap = new RE(".*[A-Z].*");
+            hasNum = new RE(".*[0-9].*");
+            hasHyph = new RE(".*-.*");
+            hasAt = new RE(".*@.*");
+            capRE = new RE("^[A-Z]\\S*$");
+	    peqRE = new RE("\\.|!|\\?|\\\"|\\)");
+	    punctRE = new RE("[^a-zA-Z0-9]+");
+            wsRE = new RE("\\s+");
+          }
+        catch (REException e) { System.out.println(e); }
+    }
+
+    public static boolean hasAt (String s) {
+	char[] ca = s.toCharArray();
+	for (int i=0; i<ca.length; i++) {
+	    if (ca[i] == '@') {
+		return true;
+	    }
+	}
+	return false;
+    }
+    
     public static String[] getParagraphs (String text) {
 	StringTokenizer st = new StringTokenizer(text, "\n", true);
 	List pars = new ArrayList();
