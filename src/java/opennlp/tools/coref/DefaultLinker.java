@@ -29,7 +29,6 @@ import opennlp.tools.coref.sim.SimilarityModel;
 
 public class DefaultLinker extends AbstractLinker {
   
-  private double fixedNonReferentialProbability = 0.35;
   private static final int SINGULAR_PRONOUN_RESOLVER_INDEX = 0;
   private static final int PLURAL_PRONOUN_RESOLVER_INDEX = 1;
   private static final int DEFINITE_NOUN_RESOLVER_INDEX = 2;
@@ -41,49 +40,64 @@ public class DefaultLinker extends AbstractLinker {
   
   
   public DefaultLinker(String project, LinkerMode mode) throws IOException {
-    this(project,mode,true,true);
+    this(project,mode,true,-1);
   }
   
-  
-  
-  private void prepMaxentResolvers(MaxentResolver[] resolvers, boolean useNonRefModel) {
-    //System.err.println("prepMaxentResolvers useNonRefMode =
-    // "+useNonRefModel);
-    if (!useNonRefModel) {
-      for (int ri = 0, rn = resolvers.length; ri < rn; ri++) {
-        resolvers[ri].useFixedNonReferentialProbability(fixedNonReferentialProbability);
-      }
-    }
-    resolvers[DefaultLinker.ISA_RESOLVER_INDEX].useFixedNonReferentialProbability(0.5);
-    //resolvers[DefaultLinker.DEFINITE_NOUN_RESOLVER_INDEX].useFixedNonReferentialProbability(0.35);
+  public DefaultLinker(String project, LinkerMode mode, boolean useDiscourseModel) throws IOException {
+    this(project,mode,useDiscourseModel,-1);
   }
-
-  public DefaultLinker(String project, LinkerMode mode, boolean useDiscourseModel, boolean useNonRefModel) throws IOException {
+  
+  public DefaultLinker(String project, LinkerMode mode, boolean useDiscourseModel, double fixedNonReferentialProbability) throws IOException {
     super(project, mode, useDiscourseModel);
-    headFinder = PTBHeadFinder.getInstance();
-    mentionFinder = ShallowParseMentionFinder.getInstance(headFinder);
+    initHeadFinder();
+    initMentionFinder();
+    initResolvers(mode, fixedNonReferentialProbability);
+    entities = new DiscourseEntity[resolvers.length];
+  }
+  
+  /**
+   * Initializes the resolvers used by this linker.
+   * @param mode The mode in which this linker is being used.
+   * @param fixedNonReferentialProbability 
+   * @throws IOException
+   */
+  protected void initResolvers(LinkerMode mode, double fixedNonReferentialProbability) throws IOException {
     if (mode == LinkerMode.TRAIN) {
       mentionFinder.setPrenominalNamedEntityCollection(false);
       mentionFinder.setCoordinatedNounPhraseCollection(false);
     }
     SINGULAR_PRONOUN = 0;
     if (LinkerMode.TEST == mode || LinkerMode.EVAL == mode) {
-      resolvers = new MaxentResolver[] {
-      new SingularPronounResolver(corefProject, ResolverMode.TEST),
-      new ProperNounResolver(corefProject, ResolverMode.TEST),
-      new DefiniteNounResolver(corefProject, ResolverMode.TEST),
-      new IsAResolver(corefProject, ResolverMode.TEST),
-      new PluralPronounResolver(corefProject, ResolverMode.TEST),
-      new PluralNounResolver(corefProject, ResolverMode.TEST),
-      new CommonNounResolver(corefProject, ResolverMode.TEST),
-      new SpeechPronounResolver(corefProject, ResolverMode.TEST)
-      };
+      if (fixedNonReferentialProbability < 0) {
+        resolvers = new MaxentResolver[] {
+            new SingularPronounResolver(corefProject, ResolverMode.TEST),
+            new ProperNounResolver(corefProject, ResolverMode.TEST),
+            new DefiniteNounResolver(corefProject, ResolverMode.TEST),
+            new IsAResolver(corefProject, ResolverMode.TEST),
+            new PluralPronounResolver(corefProject, ResolverMode.TEST),
+            new PluralNounResolver(corefProject, ResolverMode.TEST),
+            new CommonNounResolver(corefProject, ResolverMode.TEST),
+            new SpeechPronounResolver(corefProject, ResolverMode.TEST)
+        };
+      }
+      else {
+        NonReferentialResolver nrr = new FixedNonReferentialResolver(fixedNonReferentialProbability);        
+        resolvers = new MaxentResolver[] {
+            new SingularPronounResolver(corefProject, ResolverMode.TEST,nrr),
+            new ProperNounResolver(corefProject, ResolverMode.TEST,nrr),
+            new DefiniteNounResolver(corefProject, ResolverMode.TEST,nrr),
+            new IsAResolver(corefProject, ResolverMode.TEST,nrr),
+            new PluralPronounResolver(corefProject, ResolverMode.TEST,nrr),
+            new PluralNounResolver(corefProject, ResolverMode.TEST,nrr),
+            new CommonNounResolver(corefProject, ResolverMode.TEST,nrr),
+            new SpeechPronounResolver(corefProject, ResolverMode.TEST,nrr)
+        };
+      }
       if (LinkerMode.EVAL == mode) {
         //String[] names = {"Pronoun", "Proper", "Def-NP", "Is-a", "Plural Pronoun"};
         //eval = new Evaluation(names);
       }
       MaxentResolver.setSimilarityModel(SimilarityModel.testModel(corefProject + "/sim"), GenderModel.testModel(corefProject + "/gen"), NumberModel.testModel(corefProject + "/num"));
-      prepMaxentResolvers((MaxentResolver[]) resolvers, useNonRefModel);
     }
     else if (LinkerMode.TRAIN == mode) {
       resolvers = new AbstractResolver[9];
@@ -100,8 +114,14 @@ public class DefaultLinker extends AbstractLinker {
     else {
       System.err.println("DefaultLinker: Invalid Mode");
     }
-
-    entities = new DiscourseEntity[resolvers.length];
   }
 
+  protected void initHeadFinder() {
+    headFinder = PTBHeadFinder.getInstance();
+  }
+  
+  protected void initMentionFinder() {
+    mentionFinder = ShallowParseMentionFinder.getInstance(headFinder);
+  }
+  
 }
