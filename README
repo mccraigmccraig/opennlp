@@ -132,7 +132,7 @@ java opennlp.tools.sentdetect.EnglishSentenceDetectorME
   opennlp.models/sentdetect/EnglishSD.bin.gz < text | 
 java opennlp.tools.tokenize.EnglishTokenizerME 
    opennlp.models/tokenize/EnglishTok.bin.gz | 
-java -mx300M openlp.tools.parser.EnglishTreebankParser
+java -mx300M opennlp.tools.parser.EnglishTreebankParser
   opennlp.models/parser
     
 Name Finding:
