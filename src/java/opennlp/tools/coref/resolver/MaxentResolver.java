@@ -89,17 +89,24 @@ public abstract class MaxentResolver extends AbstractResolver {
   private ResolverMode mode;
   private List events;
 
+  /** When true, this designates that the resolver should use the first referent encountered which it
+   * more preferable than non-reference.  When false all non-excluded referents within this resolvers range
+   * are considered. 
+   */
   protected boolean preferFirstReferent;
+  /** When true, this designates that training should consist of a single positive and a single negitive example
+   * (when possible) for each mention.  When false all possible pairs are used for training. */
   protected boolean sampleSelection;
-
+  /** When true, this designates that the same maximum entropy model should be used non-reference
+   * events (the pairing of a mention and the "null" reference) as is used for potentially 
+   * referential pairs.  When false a seperate model is created for these events.  
+   */ 
   protected boolean useSameModelForNonRef;
-  protected boolean useFixedNonReferentialProbability;
-  protected double fixedNonReferentialProbability;
-
+  
   private static TestSimilarityModel simModel = null;
   private static TestGenderModel genModel = null;
   private static TestNumberModel numModel = null;
-  
+  /** The model for computing non-referential probabilities. */
   protected NonReferentialResolver nonReferentialResolver;
 
   /**
@@ -165,9 +172,18 @@ public abstract class MaxentResolver extends AbstractResolver {
     this(projectName, modelName, mode, numberEntitiesBack, false);
   }
   
+  public MaxentResolver(String projectName, String modelName, ResolverMode mode, int numberEntitiesBack, NonReferentialResolver nonReferentialResolver) throws IOException {
+    this(projectName, modelName, mode, numberEntitiesBack, false,nonReferentialResolver);
+  }
+  
   public MaxentResolver(String projectName, String modelName, ResolverMode mode, int numberEntitiesBack, boolean preferFirstReferent) throws IOException {
     //this(projectName, modelName, mode, numberEntitiesBack, preferFirstReferent, SingletonNonReferentialResolver.getInstance(projectName,mode));
     this(projectName, modelName, mode, numberEntitiesBack, preferFirstReferent, new DefaultNonReferentialResolver(projectName, modelName, mode));
+  }
+  
+  public MaxentResolver(String projectName, String modelName, ResolverMode mode, int numberEntitiesBack, boolean preferFirstReferent, double nonReferentialProbability) throws IOException {
+    //this(projectName, modelName, mode, numberEntitiesBack, preferFirstReferent, SingletonNonReferentialResolver.getInstance(projectName,mode));
+    this(projectName, modelName, mode, numberEntitiesBack, preferFirstReferent, new FixedNonReferentialResolver(nonReferentialProbability));
   }
   
   public static void loadAsResource(boolean las) {
@@ -176,19 +192,6 @@ public abstract class MaxentResolver extends AbstractResolver {
   
   public static boolean loadAsResource() {
     return loadAsResource;
-  }
-
-  public void useFixedNonReferentialProbability(double nonReferentialProbability) {
-    this.fixedNonReferentialProbability = nonReferentialProbability;
-    this.useFixedNonReferentialProbability = true;
-  }
-
-  public boolean getUseFixedNonreferentialProbability() {
-    return this.useFixedNonReferentialProbability;
-  }
-
-  public void useModelNonReferentialProbability() {
-    this.useFixedNonReferentialProbability = false;
   }
 
   public DiscourseEntity resolve(MentionContext ec, DiscourseModel dm) {
