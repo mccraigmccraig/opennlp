@@ -1,4 +1,4 @@
-<!-- $Id: build.xml,v 1.30 2004/04/07 17:24:17 tsmorton Exp $ -->
+<!-- $Id: build.xml,v 1.31 2004/06/11 21:02:27 tsmorton Exp $ -->
 <!-- This build file based on the JDOM build.xml file. -->
 
 <project name="OpenNLP" default="package" basedir=".">
@@ -166,9 +166,9 @@
              use="true"
              splitindex="true"
              noindex="false"
-             windowtitle="opennlp.common"
-             doctitle="The ${Name} Common API v${version}"
-             bottom="Copyright &#169; ${year} Jason Baldridge and Gann Bierner. All Rights Reserved."
+             windowtitle="opennlp.tools"
+             doctitle="The ${Name} API v${version}"
+             bottom="Copyright &#169; ${year} Jason Baldridge, Gann Bierner, and Thomas Morton. All Rights Reserved."
     />
   </target>
 
