@@ -35,7 +35,7 @@ public class ChunkerME implements Chunker {
   protected MaxentModel _npModel;
   protected ContextGenerator _contextGen;
   private int beamSize;
-  private BeamSearch beam;
+  protected BeamSearch beam;
   private Sequence bestSequence;
 
   public ChunkerME(MaxentModel mod) {
@@ -111,6 +111,13 @@ public class ChunkerME implements Chunker {
      *
      */
   public static void main(String[] args) {
+    if (args.length == 0) {
+      System.err.println("Usage: ChunkerME trainingFile modelFile");
+      System.err.println();
+      System.err.println("Training file should be one word per line where each line consists of a ");
+      System.err.println("space-delimited triple of \"word pos outome\".  Sentence breaks are indicated by blank lines.");
+      System.exit(1);
+    }
     try {
       java.io.File inFile = new java.io.File(args[0]);
       java.io.File outFile = new java.io.File(args[1]);

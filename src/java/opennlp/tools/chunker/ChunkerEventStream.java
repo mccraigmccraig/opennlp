@@ -31,10 +31,10 @@ import java.util.*;
 
 public class ChunkerEventStream implements EventStream {
 
-  ContextGenerator cg;
-  DataStream data;
-  Event[] events;
-  int ei;
+  private ContextGenerator cg;
+  private DataStream data;
+  private Event[] events;
+  private int ei;
 
   public ChunkerEventStream(DataStream d) {
     this(d, new DefaultChunkerContextGenerator());

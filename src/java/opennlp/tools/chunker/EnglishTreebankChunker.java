@@ -17,17 +17,24 @@
 //////////////////////////////////////////////////////////////////////////////
 package opennlp.tools.chunker;
 
+import java.io.File;
+import java.io.IOException;
 import java.util.List;
 
 import opennlp.common.util.Sequence;
 import opennlp.maxent.ContextGenerator;
 import opennlp.maxent.MaxentModel;
+import opennlp.maxent.io.SuffixSensitiveGISModelReader;
 
 /** This is a chunker based on the CONLL chunking task which uses Penn Treebank constituents as the basis for the chunks.
  *   See   http://cnts.uia.ac.be/conll2000/chunking/ for data and task definition.
  * @author Tom Morton
  */
 public class EnglishTreebankChunker extends ChunkerME {
+  
+  public EnglishTreebankChunker(String modelFile) throws IOException {
+    this(new SuffixSensitiveGISModelReader(new File(modelFile)).getModel());
+  }
 
   public EnglishTreebankChunker(MaxentModel mod) {
     super(mod);
