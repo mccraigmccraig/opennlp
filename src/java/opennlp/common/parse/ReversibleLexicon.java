@@ -27,7 +27,7 @@ import opennlp.common.xml.*;
  * Contains words and their associated categories and semantics.
  *
  * @author      Gann Bierner
- * @version     $Revision: 1.1 $, $Date: 2001/11/05 12:21:50 $
+ * @version     $Revision: 1.2 $, $Date: 2001/11/29 13:21:11 $
  */
 public interface ReversibleLexicon extends Lexicon {
     
@@ -37,7 +37,6 @@ public interface ReversibleLexicon extends Lexicon {
      *
      * @param h the head to look for
      * @return a collection of Constituents
-     * @see Category#getHead()
      */
     public Collection getSemHeads(String h);
     
@@ -47,7 +46,6 @@ public interface ReversibleLexicon extends Lexicon {
      *
      * @param h the head to look for
      * @return a collection of Constituents
-     * @see Category#getHead()
      */
     public Collection getPreHeads(String h);
 }

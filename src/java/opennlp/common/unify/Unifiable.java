@@ -22,7 +22,7 @@ package opennlp.common.unify;
  * An interface for classes that may be unified.
  *
  * @author      Gann Bierner
- * @version     $Revision: 1.4 $, $Date: 2001/11/26 18:46:53 $
+ * @version     $Revision: 1.5 $, $Date: 2001/11/29 13:21:11 $
  **/
 public interface Unifiable {
    
@@ -72,8 +72,6 @@ public interface Unifiable {
      * for them in the Substitution argument.
      *
      * @param s Substitution containing the variable resolutions
-     * @exception UnifyFailure if this Unifiable cannot be unified with 
-     *            the Object
      * @return a copy of this Unifiable with all variables from the
      *         Substitution replaced by their values.  
      */

@@ -29,7 +29,7 @@ import java.util.ArrayList;
  * a structured form representing that string.
  *
  * @author      Gann Bierner
- * @version     $Revision: 1.2 $, $Date: 2001/11/05 14:42:54 $
+ * @version     $Revision: 1.3 $, $Date: 2001/11/29 13:21:11 $
  */
 public interface Parser {
     
@@ -50,7 +50,6 @@ public interface Parser {
      * @exception LexException thrown if a lex item isn't found
      * @exception ParseException thrown if a parse can't be found for the
      *            entire string
-     * @exception IOException
      */
     public void parse(String s)
 	throws CatParseException, LexException, ParseException;

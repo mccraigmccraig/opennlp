@@ -27,7 +27,7 @@ import opennlp.common.xml.*;
  * Contains words and their associated categories and semantics.
  *
  * @author      Gann Bierner
- * @version     $Revision: 1.2 $, $Date: 2001/11/05 12:21:50 $
+ * @version     $Revision: 1.3 $, $Date: 2001/11/29 13:21:10 $
  */
 public interface Lexicon {
     
@@ -60,8 +60,6 @@ public interface Lexicon {
      *          by whitespace
      * @return a list of WordHashes
      * @exception LexException thrown if word not found
-     * @exception CatParseException thrown if the syntax or semantics of
-     *            the word fails to parse
      */
     public List getWords(String w) throws LexException;
     
