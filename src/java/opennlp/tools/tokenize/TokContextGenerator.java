@@ -19,17 +19,17 @@
 package opennlp.tools.tokenize;
 
 import opennlp.maxent.ContextGenerator;
+import opennlp.tools.util.ObjectIntPair;
 
 import java.util.List;
 import java.util.ArrayList;
 
-import opennlp.common.util.ObjectIntPair;
 
 /**
  * Generate events for maxent decisions for tokenization.
  *
  * @author      Jason Baldridge
- * @version     $Revision: 1.1 $, $Date: 2003/11/05 03:31:04 $
+ * @version     $Revision: 1.2 $, $Date: 2004/01/26 14:16:37 $
  */
 
 public class TokContextGenerator implements ContextGenerator {

@@ -21,13 +21,13 @@ package opennlp.tools.tokenize;
 import opennlp.maxent.Event;
 import opennlp.maxent.EventStream;
 import opennlp.maxent.ContextGenerator;
+import opennlp.tools.util.ObjectIntPair;
+import opennlp.tools.util.Span;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import opennlp.common.util.Span;
 import opennlp.common.util.PerlHelp;
-import opennlp.common.util.ObjectIntPair;
 
 /** An implementation of EventStream which allows events to be added by 
  *  offset and returns events for these offset-based tokens.

@@ -22,8 +22,6 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 
-import opennlp.common.util.Span;
-import opennlp.common.util.ObjectIntPair;
 import opennlp.common.util.PerlHelp;
 
 import opennlp.maxent.MaxentModel;
@@ -33,6 +31,8 @@ import opennlp.maxent.ContextGenerator;
 import opennlp.maxent.GIS;
 import opennlp.maxent.GISModel;
 import opennlp.maxent.io.SuffixSensitiveGISModelWriter;
+import opennlp.tools.util.ObjectIntPair;
+import opennlp.tools.util.Span;
 
 import java.util.List;
 import java.util.ArrayList;
@@ -45,7 +45,7 @@ import java.util.ArrayList;
  * homepage: <http://www.cis.upenn.edu/~jcreynar>.
  *
  * @author      Tom Morton
- * @version $Revision: 1.1 $, $Date: 2003/11/05 03:31:04 $
+ * @version $Revision: 1.2 $, $Date: 2004/01/26 14:16:37 $
  */
 
 public class TokenizerME implements Tokenizer {

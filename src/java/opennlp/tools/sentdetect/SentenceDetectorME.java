@@ -22,6 +22,7 @@ import opennlp.maxent.*;
 import opennlp.maxent.io.*;
 
 import opennlp.maxent.IntegerPool;
+import opennlp.tools.util.Pair;
 
 import java.io.IOException;
 import java.io.File;
@@ -32,7 +33,6 @@ import java.io.FileReader;
 import java.util.List;
 import java.util.ArrayList;
 
-import opennlp.common.util.Pair;
 
 /**
  * A sentence detector for splitting up raw text into sentences.  A maximum
@@ -40,7 +40,7 @@ import opennlp.common.util.Pair;
  * string to determine if they signify the end of a sentence.
  *
  * @author      Jason Baldridge
- * @version     $Revision: 1.1 $, $Date: 2003/11/05 03:31:04 $
+ * @version     $Revision: 1.2 $, $Date: 2004/01/26 14:15:50 $
  */
 
 public class SentenceDetectorME implements SentenceDetector {

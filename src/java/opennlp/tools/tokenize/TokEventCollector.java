@@ -21,9 +21,9 @@ package opennlp.tools.tokenize;
 import opennlp.maxent.Event;
 import opennlp.maxent.EventCollector;
 import opennlp.maxent.ContextGenerator;
+import opennlp.tools.util.ObjectIntPair;
 
 import opennlp.common.util.PerlHelp;
-import opennlp.common.util.ObjectIntPair;
 
 import java.io.BufferedReader;
 import java.io.Reader;
@@ -33,7 +33,7 @@ import java.util.ArrayList;
  * Generate event contexts for maxent decisions for sentence detection.
  *
  * @author      Jason Baldridge
- * @version     $Revision: 1.1 $, $Date: 2003/11/05 03:31:04 $
+ * @version     $Revision: 1.2 $, $Date: 2004/01/26 14:16:37 $
  */
 
 public class TokEventCollector implements EventCollector {

@@ -19,11 +19,11 @@ package opennlp.tools.sentdetect;
 
 import java.util.Iterator;
 
-import opennlp.common.util.Pair;
 import opennlp.maxent.ContextGenerator;
 import opennlp.maxent.DataStream;
 import opennlp.maxent.Event;
 import opennlp.maxent.EventStream;
+import opennlp.tools.util.Pair;
 
 /**
  * An implementation of EventStream which assumes that it is receiving
@@ -35,7 +35,7 @@ import opennlp.maxent.EventStream;
  *
  * @author      Jason Baldridge
  * @author      Eric D. Friedman
- * @version     $Revision: 1.1 $, $Date: 2003/11/05 03:31:04 $
+ * @version     $Revision: 1.2 $, $Date: 2004/01/26 14:15:50 $
  */
 public class SDEventStream implements EventStream {
     private DataStream data;

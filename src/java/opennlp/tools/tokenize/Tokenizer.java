@@ -18,14 +18,14 @@
 
 package opennlp.tools.tokenize;
 
-import opennlp.common.util.Span;
+import opennlp.tools.util.Span;
 
 /**
  * The interface for tokenizers, which turn messy text into nicely segmented
  * text tokens.
  *
  * @author      Jason Baldridge
- * @version     $Revision: 1.1 $, $Date: 2003/11/05 03:31:04 $
+ * @version     $Revision: 1.2 $, $Date: 2004/01/26 14:16:37 $
  */
 
 public interface Tokenizer {

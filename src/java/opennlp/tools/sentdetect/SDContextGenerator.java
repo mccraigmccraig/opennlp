@@ -23,15 +23,15 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 
-import opennlp.common.util.Pair;
 import opennlp.maxent.ContextGenerator;
+import opennlp.tools.util.Pair;
 
 /**
  * Generate event contexts for maxent decisions for sentence detection.
  *
  * @author      Jason Baldridge
  * @author      Eric D. Friedman
- * @version     $Revision: 1.1 $, $Date: 2003/11/05 03:31:04 $
+ * @version     $Revision: 1.2 $, $Date: 2004/01/26 14:15:50 $
  */
 
 public class SDContextGenerator implements ContextGenerator {
