@@ -1,3 +1,33 @@
+0.6.5
+-----
+Summary: Minor bug fix, further updates to unification stuff.
+
+Jason: Fixed a bug in XmlUtils in which the replace() methods did not
+have the parent Element disown its children before setting a new List
+to be its Children.
+
+Jason: Further changes to unification.  Unifiable's now must implement
+the unifyCheck() method, which should be a fast way of determining
+whether or not the Unifiable can possibly unify with another object.
+Unifiables must also implement the fill() method to allow replace all
+Variable contained in the Unifiable to be replaced according to a
+given Substitution object.  Consequently, the fill() method is now
+gone from the Substitution interface.  The fail() and setFail()
+methods have also gone from Substitution as unification failure is now
+indicated by the UnifyFailure exception rather than a "failed"
+substitution.
+
+Jason: Added two implementations of the Substitution interface,
+SimpleSubstitution and SelfCondensingSub.  Use the latter if you want
+to get up and running with unification stuff right away.
+
+Jason: Added static method unify(Object o1, Object o2) to the Unifier
+class which hides the details of needing a Substitution object for
+those who just want to get the unification of two objects and nothing
+else.  Uses a SelfCondensingSub instance to return the object
+corresponding to the unification of o1 and o2.
+
+
 0.6.4
 -----
 Changed several aspects of unification.  The Unifiable interface now
