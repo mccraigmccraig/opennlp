@@ -56,7 +56,6 @@ public class NLPDocumentBuilder {
         } catch (Exception e) {
             System.out.println(e);
 	}
-	System.out.println(text.toString());
 	return build(text.toString());
     }
 }
