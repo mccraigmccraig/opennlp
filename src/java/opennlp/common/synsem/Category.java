@@ -20,6 +20,7 @@ package opennlp.common.synsem;
 
 import opennlp.common.unify.*;
 import opennlp.common.util.*;
+import java.util.*;
 
 /**
  * Represents syntactic and/or semantic forms in a lexicalized grammar.
@@ -31,7 +32,7 @@ import opennlp.common.util.*;
  * @author      Jason Baldridge
  * @author      Gann Bierner
  * @author      Michael White
- * @version     $Revision: 1.4 $, $Date: 2002/11/05 17:38:54 $
+ * @version     $Revision: 1.5 $, $Date: 2002/11/21 18:02:14 $
  */
 public interface Category extends Unifiable, Mutable, java.io.Serializable {
 
@@ -89,4 +90,9 @@ public interface Category extends Unifiable, Mutable, java.io.Serializable {
      * @return a string representing this category that we can hash on
      */
     public String hashString();
+
+    /**
+     * Returns a hash string using the given map from vars to int strings.
+     */
+    public String hashString(Map varMap);
 }

@@ -19,12 +19,13 @@
 package opennlp.common.synsem;
 
 import opennlp.common.unify.*;
+import java.util.*;
 
 /**
  * An interface for objects which represent Logical Forms.
  *
  * @author      Jason Baldridge
- * @version     $Revision: 1.5 $, $Date: 2002/08/23 10:43:37 $
+ * @version     $Revision: 1.6 $, $Date: 2002/11/21 18:02:15 $
  */
 
 public interface LF extends Unifiable, Mutable {
@@ -36,6 +37,8 @@ public interface LF extends Unifiable, Mutable {
 
     public LF copy ();
 
-    public String hashString ();
-
+    /**
+     * Returns a hash string using the given map from vars to int strings.
+     */
+    public String hashString(Map varMap);
 }
