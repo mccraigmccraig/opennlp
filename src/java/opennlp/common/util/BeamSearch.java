@@ -98,7 +98,7 @@ public class BeamSearch {
     }
     int numSeq = Math.min(numSequences,prev.size());
     List topSequences = new ArrayList(numSeq);
-    for (Iterator si=prev.iterator();numSeq>= 0;numSeq--) {
+    for (Iterator si=prev.iterator();numSeq> 0;numSeq--) {
       topSequences.add(si.next());
     }
     return (Sequence[]) topSequences.toArray(new Sequence[topSequences.size()]);
