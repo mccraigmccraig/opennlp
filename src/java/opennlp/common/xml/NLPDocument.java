@@ -31,7 +31,7 @@ import java.util.*;
  * specifications.
  *
  * @author      Jason Baldridge
- * @version     $Revision: 1.10 $, $Date: 2001/11/29 17:46:24 $
+ * @version     $Revision: 1.11 $, $Date: 2001/11/30 14:35:08 $
  **/
 public class NLPDocument extends Document {
     public static final String WORD_LABEL = "w";
@@ -149,7 +149,7 @@ public class NLPDocument extends Document {
 	    String[] words = getWords((Element)i.next());
 	    StringBuffer sent = new StringBuffer();
 	    for (int j=0; j<words.length; j++)
-		sent.append(words[j]);
+		sent.append(words[j]).append(' ');
 	    sents[index++] = sent.toString().trim();
 	}
 	return sents;
@@ -285,7 +285,7 @@ public class NLPDocument extends Document {
 	for (Iterator i=parEls.iterator(); i.hasNext();) {
 	    String[] sents = getSentences((Element)i.next());
 	    for (int j=0; j<sents.length; j++)
-		sb.append(sents[j]);
+		sb.append(sents[j]).append(' ');
 	    sb.append("\n\n");
 	}
 	return sb.toString().trim();
