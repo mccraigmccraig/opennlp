@@ -39,7 +39,7 @@ public class BuildContextGenerator implements ContextGenerator {
     StringBuffer feat = new StringBuffer(20);
     feat.append(i).append("=");
     if (p != null) {
-      if (p.getLabel() != null) {
+      if (i < 0) {
         feat.append(p.getLabel()).append("|");
       }
       feat.append(p.getType()).append("|").append(p.getHead().toString());
@@ -54,7 +54,7 @@ public class BuildContextGenerator implements ContextGenerator {
     StringBuffer feat = new StringBuffer(20);
     feat.append(i).append("*=");
     if (p != null) {
-      if (p.getLabel() != null) {
+      if (i < 0) {
         feat.append(p.getLabel()).append("|");
       }
       feat.append(p.getType());
