@@ -23,12 +23,15 @@ package opennlp.common.unify;
  * it to another feature.
  *
  * @author      Jason Baldridge
- * @version     $Revision: 1.2 $, $Date: 2001/12/11 23:29:24 $
+ * @version     $Revision: 1.3 $, $Date: 2001/12/19 11:32:17 $
  **/
-public interface Feature extends Unifiable {
+public interface Feature {
 
     public String getAttribute ();
     public Unifiable getValue ();
-    public int getIndex ();
+    public short getIndex ();
+
+    public void setValue (Unifiable u);
+    public void setIndex (short index);
 
 }

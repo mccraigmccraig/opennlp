@@ -22,7 +22,7 @@ package opennlp.common.unify;
  * A feature structure containing attributes and their associated values.
  *
  * @author      Jason Baldridge and Gann Bierner
- * @version     $Revision: 1.1 $, $Date: 2001/11/14 17:51:10 $
+ * @version     $Revision: 1.2 $, $Date: 2001/12/19 11:32:17 $
  */
 public interface FeatureStructure extends Unifiable {
 
@@ -65,7 +65,7 @@ public interface FeatureStructure extends Unifiable {
     /**
      * The all attributes in set form
      *
-     * @return the set of feature/value pairs
+     * @return the set of attributes
      */
     public java.util.Set getAttributes ();
 
@@ -87,11 +87,11 @@ public interface FeatureStructure extends Unifiable {
 
     
     /**
-     * Explictly set whether or not this feature structure is empty
+     * Explictly clear the attribute value mappings in this feature structure
      *
      * @param b the empty value
      */
-    public void setEmpty (boolean b);
+    public void clear ();
     
 
     /**
@@ -121,23 +121,14 @@ public interface FeatureStructure extends Unifiable {
     public boolean contains (FeatureStructure fs);
 
     /**
-     * Given a feature structure, computes a new feature that is the unification
-     * of it and this feature structure.  This is non-destructive.
-     *
-     * @param f the second feature structure
-     * @return the unified feature structure
-     */
-    //public FeatureStructure unify (FeatureStructure fs) throws UnifyFailure;
-
-    /**
      * Changes this feature structure such that all its features that
      * are in another feature structure are changed to have the values of
-     * the other feature structure.  This is non-destructive.
+     * the other feature structure.  This is destructive.
      *
-     * @param f the overriding feature structure
+     * @param f the feature structure to inherit from
      * @return the changed feature structure
      */
-    public FeatureStructure override (FeatureStructure fs);
+    public FeatureStructure inherit (FeatureStructure fs);
 
     /**
      * Determines if this feature structure is exactly the same as another.  This
@@ -148,4 +139,8 @@ public interface FeatureStructure extends Unifiable {
      */
     public boolean equals (FeatureStructure fs);
 
+    public int getIndex ();
+    public void setIndex (int index);
+    public int getInheritorIndex ();
+    public void setInheritorIndex (int inheritorIndex);
 }

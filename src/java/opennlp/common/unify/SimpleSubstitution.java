@@ -25,7 +25,7 @@ import java.util.*;
  * Simple implementation of Substitution interface.
  *
  * @author      Jason Baldridge
- * @version     $Revision: 1.3 $, $Date: 2001/11/23 13:06:10 $
+ * @version     $Revision: 1.4 $, $Date: 2001/12/19 11:32:17 $
  */
 public class SimpleSubstitution extends HashMap implements Substitution {
 
@@ -42,5 +42,8 @@ public class SimpleSubstitution extends HashMap implements Substitution {
 	return get(var);
     }
 
+    public Iterator varIterator() {
+	return keySet().iterator();
+    }
     
 }

@@ -26,7 +26,7 @@ import java.util.*;
  * made.
  *
  * @author      Jason Baldridge
- * @version $Revision: 1.1 $, $Date: 2001/11/23 13:06:10 $ 
+ * @version $Revision: 1.2 $, $Date: 2001/12/19 11:32:17 $ 
 */
 public class SelfCondensingSub extends HashMap implements Substitution {
 
@@ -88,6 +88,10 @@ public class SelfCondensingSub extends HashMap implements Substitution {
      */
     public Object getValue(Variable var) {
 	return get(var);
+    }
+
+    public Iterator varIterator () {
+	return keySet().iterator();
     }
     
 }
