@@ -1,4 +1,4 @@
-<!-- $Id: build.xml,v 1.5 2001/10/30 11:37:27 jasonbaldridge Exp $ -->
+<!-- $Id: build.xml,v 1.6 2001/11/09 15:23:47 jasonbaldridge Exp $ -->
 <!-- This build file based on the JDOM build.xml file. -->
 
 <project default="package" basedir=".">
@@ -10,7 +10,7 @@
     <tstamp/>
     <property name="Name" value="OpenNLP"/>
     <property name="name" value="opennlp"/>
-    <property name="version" value="0.6.1"/>
+    <property name="version" value="0.6.2"/>
     <property name="year" value="2001"/>
 
     <echo message="----------- ${Name} ${version} [${year}] ------------"/>
@@ -43,7 +43,6 @@
     <path id="build.classpath">
       <pathelement location="${lib.dir}/jdom.jar"/>
       <pathelement location="${lib.dir}/xerces.jar"/>
-      <pathelement location="${lib.dir}/xml.jar"/>
     </path>
 
 
@@ -118,20 +117,21 @@
   <!-- =================================================================== -->
   <!-- Creates Jar file with all other needed jars built in.               -->
   <!-- =================================================================== -->
-  <target name="standalone" depends="compile">
+  <target name="exe" depends="compile">
     <jar jarfile="${build.dir}/${name}-${DSTAMP}.jar"
          basedir="${build.dest}" />
-    <jlink outfile="${build.dir}/${name}-${version}.jar">
+    <jlink outfile="${build.dir}/${name}-exe-${version}.jar">
       <mergefiles>
         <pathelement path="${build.dir}/${name}-${DSTAMP}.jar"/>
 	<pathelement path="lib/jdom.jar"/>
-	<pathelement path="lib/xml.jar"/>
 	<pathelement path="lib/xerces.jar"/>
       </mergefiles>
+      <addfiles>
+        <pathelement path="META-INF"/>
+      </addfiles>
     </jlink>
     <delete file="${build.dir}/${name}-${DSTAMP}.jar" />
   </target>
-
 
   <!-- =================================================================== -->
   <!-- Creates the release file                                           -->
@@ -186,9 +186,6 @@
   <!-- =================================================================== -->
   <target name="clean" depends="init">
     <delete dir="${build.dir}"/>
-    <delete file="${docs.dir}/changes.xml"/>
-    <delete file="${docs.dir}/todo.xml"/>
-    <delete file="${docs.dir}/book.xml"/>
   </target>
 
   <target name="distclean" depends="clean">
