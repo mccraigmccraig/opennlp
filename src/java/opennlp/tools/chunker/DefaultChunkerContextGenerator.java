@@ -38,7 +38,7 @@ public class DefaultChunkerContextGenerator implements ChunkerContextGenerator {
   }
   
   public String[] getContext(int index, Object[] sequence, String[] priorDecisions, Object[] additionalContext) {
-    return getContext(index,sequence,priorDecisions,(String[]) additionalContext[0]); 
+    return getContext(index,sequence,(String[]) additionalContext[0],priorDecisions); 
   }  
   
   public String[] getContext(int i, Object[] toks, String[] tags, String[] preds) {
