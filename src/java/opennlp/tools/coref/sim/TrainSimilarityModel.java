@@ -19,7 +19,7 @@ package opennlp.tools.coref.sim;
 
 import java.io.IOException;
 
-import opennlp.tools.coref.MentionContext;
+import opennlp.tools.coref.mention.MentionContext;
 
 public interface TrainSimilarityModel {
   public void trainModel() throws IOException;

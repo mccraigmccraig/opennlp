@@ -23,7 +23,7 @@ import java.util.List;
 
 import opennlp.tools.coref.DiscourseEntity;
 import opennlp.tools.coref.Linker;
-import opennlp.tools.coref.MentionContext;
+import opennlp.tools.coref.mention.MentionContext;
 
 public class PluralPronounResolver extends MaxentResolver {
 

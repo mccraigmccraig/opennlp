@@ -33,7 +33,7 @@ import java.util.StringTokenizer;
 import java.util.regex.Pattern;
 
 import opennlp.tools.coref.DiscourseEntity;
-import opennlp.tools.coref.MentionContext;
+import opennlp.tools.coref.mention.MentionContext;
 
 public class ProperNounResolver extends MaxentResolver {
 

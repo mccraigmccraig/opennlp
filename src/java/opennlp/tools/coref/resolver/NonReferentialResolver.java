@@ -19,7 +19,7 @@ package opennlp.tools.coref.resolver;
 
 import java.io.IOException;
 
-import opennlp.tools.coref.MentionContext;
+import opennlp.tools.coref.mention.MentionContext;
 
 /** 
  * Provides the interface for a object to provide a resolver with a non-referential

@@ -40,7 +40,7 @@ import opennlp.maxent.io.SuffixSensitiveGISModelWriter;
 import opennlp.tools.coref.DiscourseEntity;
 import opennlp.tools.coref.DiscourseModel;
 import opennlp.tools.coref.Linker;
-import opennlp.tools.coref.MentionContext;
+import opennlp.tools.coref.mention.MentionContext;
 import opennlp.tools.coref.mention.Parse;
 import opennlp.tools.coref.sim.Context;
 import opennlp.tools.coref.sim.GenderEnum;
@@ -50,7 +50,9 @@ import opennlp.tools.coref.sim.TestNumberModel;
 import opennlp.tools.coref.sim.TestSimilarityModel;
 import opennlp.tools.util.CollectionEventStream;
 
-
+/**
+ *  Provides common functionality used by classes which implement the {@link Resolver} class and use maximum entropy models to make resolution decisions. 
+ */
 public abstract class MaxentResolver extends AbstractResolver {
 
   public static final String SAME = "same";
@@ -78,7 +80,7 @@ public abstract class MaxentResolver extends AbstractResolver {
   private final String GEN_INCOMPATIBLE = "gen.incompatible";
   private final String GEN_UNKNOWN = "gen.unknown";
 
-  private static boolean debugOn=true;
+  private static boolean debugOn=false;
   
   private static boolean loadAsResource=false;
 
@@ -125,11 +127,11 @@ public abstract class MaxentResolver extends AbstractResolver {
    * Creates a maximum-entropy-based resolver with the specified model name, using the 
    * specified mode, which will look the specified number of entities back for a referent and
    * prefer the first referent if specified.
-   * @param modelName The name of the file where this model will be read or written.
+   * @param project The name of the file where this model will be read or written.
    * @param mode The mode this resolver is being using in (training, testing).
-   * @param numberEntitiesBack The number of entities back in the text that this resolver will look
+   * @param numberOfEntitiesBack The number of entities back in the text that this resolver will look
    * for a referent.
-   * @param preferFirtReferent Set to true if the resolver should prefer the first referent which is more
+   * @param preferFirstReferent Set to true if the resolver should prefer the first referent which is more
    * likly than non-reference.  This only affects testing.
    * @param nonReferentialResolver Determines how likly it is that this entity is non-referential.
    * @throws IOException If the model file is not found or can not be written to.
@@ -376,17 +378,17 @@ public abstract class MaxentResolver extends AbstractResolver {
    * @param entity The disource entity with which the mention is being considered referential.  
    * @return a list of features used to predict reference between the specified mention and entity.
    */
-  protected List getFeatures(MentionContext mention, DiscourseEntity de) {
+  protected List getFeatures(MentionContext mention, DiscourseEntity entity) {
     List features = new ArrayList();
     features.add(DEFAULT);
-    features.addAll(getCompatibilityFeatures(mention, de));
+    features.addAll(getCompatibilityFeatures(mention, entity));
     return features;
   }
 
   public void train() throws IOException {
     if (ResolverMode.TRAIN == mode) {
-      System.err.println(this +" referential");
       if (debugOn) {
+        System.err.println(this +" referential");
         FileWriter writer = new FileWriter(modelName+".events");
         for (Iterator ei=events.iterator();ei.hasNext();) {
           Event e = (Event) ei.next();
@@ -408,6 +410,9 @@ public abstract class MaxentResolver extends AbstractResolver {
   private Object[] computeGender(Context c) {
     Object[] rv = new Object[2];
     double[] gdist = genModel.genderDistribution(c);
+    if (debugOn) {
+      System.err.println("MaxentResolver.computeGender: "+c.toString()+" m="+gdist[genModel.getMaleIndex()]+" f="+gdist[genModel.getFemaleIndex()]+" n="+gdist[genModel.getNeuterIndex()]);
+    }
     if (genModel.getMaleIndex() >= 0 && gdist[genModel.getMaleIndex()] > minGenderProb) {
       rv[0] = GenderEnum.MALE;
       rv[1] = new Double(gdist[genModel.getMaleIndex()]);
@@ -453,7 +458,7 @@ public abstract class MaxentResolver extends AbstractResolver {
         MentionContext ec2 = (MentionContext) xi.next();
         double sim = simModel.compatible(ec, ec2);
         if (debugOn) {
-          System.err.println("sem-compat " + sim + " " + ec.toText() + " " + ec2.toText());
+          System.err.println("MaxentResolver,getSemanticCompatibilityFeature: sem-compat " + sim + " " + ec.toText() + " " + ec2.toText());
         }
         if (sim > best) {
           best = sim;
@@ -577,6 +582,7 @@ public abstract class MaxentResolver extends AbstractResolver {
   }
 
   private boolean isSubstring(String ecStrip, String xecStrip) {
+    //System.err.println("MaxentResolver.isSubstring: ec="+ecStrip+" xec="+xecStrip);
     int io = xecStrip.indexOf(ecStrip);
     if (io != -1) {
       //check boundries
@@ -749,7 +755,6 @@ public abstract class MaxentResolver extends AbstractResolver {
       //}  want to match NN NNP
       String entityMentionHeadString = entityMention.getHeadTokenText().toLowerCase();
       // model lexical similarity
-      //deFeatureSet.add("tgs=" + ecHead.getSyntacticType() + "," + xecHead.getSyntacticType());
       if (mentionHeadString.equals(entityMentionHeadString)) {
         sameHead = true;
         featureSet.add("hds=" + mentionHeadString);

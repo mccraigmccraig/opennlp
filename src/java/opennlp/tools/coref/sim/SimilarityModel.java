@@ -31,6 +31,7 @@ import java.util.Map;
 import java.util.Set;
 
 import opennlp.tools.coref.*;
+import opennlp.tools.coref.mention.MentionContext;
 import opennlp.tools.coref.resolver.AbstractResolver;
 import opennlp.tools.coref.resolver.MaxentResolver;
 
@@ -56,7 +57,7 @@ public class SimilarityModel implements TestSimilarityModel, TrainSimilarityMode
   private int SAME_INDEX;
   private static final String SAME = "same";
   private static final String DIFF = "diff";
-  private boolean debugOn = true;
+  private boolean debugOn = false;
 
   public static TestSimilarityModel testModel(String name) throws IOException {
     return new SimilarityModel(name, false);
@@ -328,8 +329,7 @@ public class SimilarityModel implements TestSimilarityModel, TrainSimilarityMode
             MentionContext sec1 = (MentionContext) allExtents.get(axi);
             axi = (axi + 1) % allExtents.size();
             if (!exclusionSet.contains(sec1)) {
-              System.err.println(ec1.toText()+" "+entityNameSet+" "+sec1.toText()+" "+nameSets.get(new Integer(sec1.getId())));
-
+              if (debugOn) System.err.println(ec1.toText()+" "+entityNameSet+" "+sec1.toText()+" "+nameSets.get(new Integer(sec1.getId())));
               addEvent(false, ec1, sec1);
               break;
             }
@@ -353,7 +353,7 @@ public class SimilarityModel implements TestSimilarityModel, TrainSimilarityMode
    */
   public double compatible(Context mention1, Context mention2) {
     List feats = getFeatures(mention1, mention2);
-    //System.err.println("SimilarityModel.compatible: feats="+feats);
+    if (debugOn) System.err.println("SimilarityModel.compatible: feats="+feats);
     return (testModel.eval((String[]) feats.toArray(new String[feats.size()]))[SAME_INDEX]);
   }
 
@@ -649,7 +649,7 @@ public class SimilarityModel implements TestSimilarityModel, TrainSimilarityMode
     for (String line = in.readLine(); line != null; line = in.readLine()) {
       String[] words = line.split(" ");
       double p = model.compatible(Context.parseContext(words[0]), Context.parseContext(words[1]));
-      System.err.println(p + " " + model.getFeatures(Context.parseContext(words[0]), Context.parseContext(words[1])));
+      System.out.println(p + " " + model.getFeatures(Context.parseContext(words[0]), Context.parseContext(words[1])));
     }
   }
 }

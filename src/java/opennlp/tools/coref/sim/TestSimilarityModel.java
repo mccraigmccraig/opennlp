@@ -17,7 +17,7 @@
 //////////////////////////////////////////////////////////////////////////////
 package opennlp.tools.coref.sim;
 
-import opennlp.tools.coref.MentionContext;
+import opennlp.tools.coref.mention.MentionContext;
 
 public interface TestSimilarityModel {
   public double compatible(MentionContext np1, MentionContext np2);

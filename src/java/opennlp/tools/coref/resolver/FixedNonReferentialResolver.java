@@ -19,7 +19,7 @@ package opennlp.tools.coref.resolver;
 
 import java.io.IOException;
 
-import opennlp.tools.coref.MentionContext;
+import opennlp.tools.coref.mention.MentionContext;
 
 public class FixedNonReferentialResolver implements NonReferentialResolver {
 

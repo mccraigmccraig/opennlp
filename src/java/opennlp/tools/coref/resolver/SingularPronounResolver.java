@@ -25,7 +25,7 @@ import java.util.regex.Pattern;
 
 import opennlp.tools.coref.DiscourseEntity;
 import opennlp.tools.coref.Linker;
-import opennlp.tools.coref.MentionContext;
+import opennlp.tools.coref.mention.MentionContext;
 
 /**
  * This class resolver singlular pronouns such as "he", "she", "it" and their various forms. 

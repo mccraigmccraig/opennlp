@@ -19,7 +19,7 @@ package opennlp.tools.coref.resolver;
 
 import opennlp.tools.coref.DiscourseEntity;
 import opennlp.tools.coref.DiscourseModel;
-import opennlp.tools.coref.MentionContext;
+import opennlp.tools.coref.mention.MentionContext;
 
 public class PerfectResolver extends  AbstractResolver {
 

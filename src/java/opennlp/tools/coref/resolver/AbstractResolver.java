@@ -22,7 +22,7 @@ import java.io.IOException;
 import opennlp.tools.coref.DiscourseEntity;
 import opennlp.tools.coref.DiscourseModel;
 import opennlp.tools.coref.Linker;
-import opennlp.tools.coref.MentionContext;
+import opennlp.tools.coref.mention.MentionContext;
 import opennlp.tools.coref.mention.Parse;
 import opennlp.tools.util.CountedSet;
 

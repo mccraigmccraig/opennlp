@@ -15,7 +15,7 @@ import opennlp.maxent.MaxentModel;
 import opennlp.maxent.io.PlainTextGISModelReader;
 import opennlp.maxent.io.SuffixSensitiveGISModelReader;
 import opennlp.maxent.io.SuffixSensitiveGISModelWriter;
-import opennlp.tools.coref.MentionContext;
+import opennlp.tools.coref.mention.MentionContext;
 import opennlp.tools.coref.mention.Parse;
 import opennlp.tools.util.CollectionEventStream;
 
@@ -27,7 +27,7 @@ public class DefaultNonReferentialResolver implements NonReferentialResolver {
   private MaxentModel model;
   private List events;
   private boolean loadAsResource;
-  private boolean debugOn = true;
+  private boolean debugOn = false;
   private ResolverMode mode;
   private String modelName;
   private int nonRefIndex;

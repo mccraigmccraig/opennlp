@@ -21,7 +21,7 @@ import java.io.IOException;
 
 import opennlp.tools.coref.DiscourseEntity;
 import opennlp.tools.coref.DiscourseModel;
-import opennlp.tools.coref.MentionContext;
+import opennlp.tools.coref.mention.MentionContext;
 
 /* Interface for reference resolvers. 
    @author Tom Morton

@@ -22,7 +22,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import opennlp.tools.coref.DiscourseEntity;
-import opennlp.tools.coref.MentionContext;
+import opennlp.tools.coref.mention.MentionContext;
 
 /**
  * @author Tom Morton
