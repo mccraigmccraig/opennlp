@@ -26,14 +26,14 @@ public class PTBMentionFinder extends AbstractMentionFinder {
 
   static MentionFinder ef = null;
 
-  private PTBMentionFinder(HeadFinder hf) { //String entityProject) {
-    collectPrenominalNamedEntities = true;
+  private PTBMentionFinder(HeadFinder hf) { 
+    collectPrenominalNamedEntities = false;
     headFinder = hf;
   }
 
-  public static MentionFinder getInstance(HeadFinder hf) { //String dir) {
+  public static MentionFinder getInstance(HeadFinder hf) {
     if (ef == null) {
-      ef = new PTBMentionFinder(hf); //dir);
+      ef = new PTBMentionFinder(hf);
     }
     return (ef);
   }
@@ -75,7 +75,7 @@ public class PTBMentionFinder extends AbstractMentionFinder {
     return (nes);
   }
 
-  /** moves entity ids assigned to basal nps and possesives to their
+  /** Moves entity ids assigned to basal nps and possesives to their
    * maximaly containing np.  Also assign head information of basal
    * noun phase to the maximally containing np.
    * @deprecated No on uses this any more.
