@@ -27,43 +27,29 @@ import opennlp.common.xml.*;
  * Contains words and their associated categories and semantics.
  *
  * @author      Gann Bierner
- * @version     $Revision: 1.2 $, $Date: 2001/11/05 12:21:50 $
+ * @version     $Revision: 1.1 $, $Date: 2001/11/05 12:21:50 $
  */
-public interface Lexicon {
+public interface ReversibleLexicon extends Lexicon {
     
     /**
-     * For a given lexical string, return all of its lexical entries
+     * Return all lexical items whose semantics have the same head
+     * as computed by Category.
      *
-     * @param w the word
+     * @param h the head to look for
      * @return a collection of Constituents
-     * @exception LexException thrown if word not found
+     * @see Category#getHead()
      */
-    public Collection getWord(String w) throws LexException;
-
-    /**
-     * For a lexical string of 1 or more words, return all of its lexical
-     * entries for each "word".  The method is allowed to group several words
-     * together .
-     *
-     * @param ppd An XML (NLP) document of preprocessed text.
-     * @return a list of WordHashes
-     * @exception LexException thrown if word not found
-     */
-    public List getWords(NLPDocument ppd) throws LexException;
+    public Collection getSemHeads(String h);
     
     /**
-     * For a lexical string of 1 or more words, return all of its lexical
-     * entries for each "word".  The method is allowed to group several words
-     * together .
+     * Return all lexical items where one of its presuppositions
+     * has the same head as computed by Category.
      *
-     * @param w the words in string format.  We assume tokens are separeted
-     *          by whitespace
-     * @return a list of WordHashes
-     * @exception LexException thrown if word not found
-     * @exception CatParseException thrown if the syntax or semantics of
-     *            the word fails to parse
+     * @param h the head to look for
+     * @return a collection of Constituents
+     * @see Category#getHead()
      */
-    public List getWords(String w) throws LexException;
-    
+    public Collection getPreHeads(String h);
 }
+
 
