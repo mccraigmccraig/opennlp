@@ -15,16 +15,13 @@
 //License along with this program; if not, write to the Free Software
 //Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 //////////////////////////////////////////////////////////////////////////////
-package opennlp.tools.coref;
+package opennlp.tools.coref.mention;
 
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import opennlp.tools.coref.mention.HeadFinder;
-import opennlp.tools.coref.mention.Parse;
 import opennlp.tools.coref.sim.GenderEnum;
 import opennlp.tools.coref.sim.NumberEnum;
 import opennlp.tools.util.Span;
@@ -94,31 +91,26 @@ public class MentionContext {
    * @param mentionParse Mention parse structure for which context is to be constructed.
    *  @param mentionIndex mention position in sentence.
    *  @param mentionsInSentence Number of mentions in the sentence.
-   *  @param sentenceTokens Tokens in sentence.
    *  @param mentionsInDocument Number of mentions in the document.
    *  @param sentenceIndex Sentence number for this mention.
    *  @param nameType The named-entity type for this mention.
    *  @param headFinder Object which provides head information.
    **/
-  public MentionContext(Parse mentionParse, int mentionIndex, int mentionsInSentence, List sentenceTokens, int mentionsInDocument, int sentenceIndex, String nameType, HeadFinder headFinder) {
-    List entTokens = mentionParse.getTokens();
-    Parse prevToken = getPrevToken(1, entTokens, sentenceTokens);
-    Parse nextToken = getNextToken(1, entTokens, sentenceTokens);
-    Span entSpan = getTokenSpan(entTokens, sentenceTokens);
-    List etoks;
+  public MentionContext(Parse mentionParse, int mentionIndex, int mentionsInSentence, int mentionsInDocument, int sentenceIndex, String nameType, HeadFinder headFinder) {
+    nounLocation = mentionIndex;
+    maxNounLocation = mentionsInDocument;
+    sentenceNumber = sentenceIndex;
+    parse = mentionParse;
+    span = mentionParse.getSpan();
+    prevToken = mentionParse.getPreviousToken();
+    nextToken = mentionParse.getNextToken();
     Parse head = headFinder.getLastHead(mentionParse);
-    if (null != head) {
-      etoks = head.getTokens();
-    }
-    else {
-      //System.err.println("MentionContext: head=null for "+mentionParse);
-      etoks = getNoHeadTokens(mentionParse);
-    }
-    Parse basalNextToken = getNextToken(1, etoks, sentenceTokens);
+    List headTokens = head.getTokens();
+    tokens = (Parse[]) headTokens.toArray(new Parse[headTokens.size()]);
+    basalNextToken = head.getNextToken();
     //System.err.println("MentionContext.init: "+ent+" "+ent.getEntityId()+" head="+head);
-    Span headSpan = getTokenSpan(etoks, sentenceTokens);
-    int descriptorLength = 0;
-    init(etoks, entSpan, headSpan, mentionIndex, mentionsInDocument, mentionsInSentence, sentenceIndex, prevToken, nextToken, basalNextToken, mentionParse, descriptorLength);
+    headSpan = head.getSpan();
+    nonDescriptorStart = 0;
     initHeads(head, headFinder);
     this.neType= nameType;
     if (getHeadTokenTag().startsWith("NN") && !getHeadTokenTag().startsWith("NNP")) {
@@ -134,58 +126,6 @@ public class MentionContext {
     this.numberProb = 0d;
   }
 
-  /*
-  private int findNameStart(List toks) {
-    String neType = toks.get(toks.size()-1);
-    for (int ti=toks.size()-1;ti>=0;ti--) {
-      
-    }
-  }
-  */
-
-  private List getNoHeadTokens(Parse ent) {
-    List headTokens = new ArrayList();
-    List parts = ent.getChildren();
-    for (int pi = 0; pi < parts.size(); pi++) {
-      Parse child = (Parse) parts.get(pi);
-      if (child.isToken()) {
-        headTokens.add(child);
-      }
-    }
-    if (headTokens.size() != 0) {
-      return (headTokens);
-    }
-    else {
-      return (ent.getTokens());
-    }
-  }
-
-  private Span getTokenSpan(List etoks, List stoks) {
-    Parse firstTok = (Parse) etoks.get(0);
-    for (int sti = 0; sti < stoks.size(); sti++) {
-      if (stoks.get(sti).equals(firstTok)) {
-        return (new Span(sti, sti + etoks.size() - 1));
-      }
-    }
-    return (null);
-  }
-
-  private Parse getPrevToken(int numPrev, List etoks, List stoks) {
-    //System.err.println("AbstractLinker.getPrevToken: etoks.size()="+etoks.size());
-    Parse firstTok = (Parse) etoks.get(0);
-    for (int sti = 0; sti < stoks.size(); sti++) {
-      if (stoks.get(sti).equals(firstTok)) {
-        int pti = sti - numPrev;
-        if (pti >= 0) {
-          return ((Parse) stoks.get(pti));
-        }
-        return (null);
-      }
-    }
-    System.err.println("MentionContext.getPrevToken: token not found in sentence: " + firstTok);
-    return (null);
-  }
-
   private void initHeads(Parse head, HeadFinder headFinder) {
     this.headTokenIndex=headFinder.getHeadIndex(head);
     this.headToken = tokens[getHeadTokenIndex()];
@@ -196,36 +136,6 @@ public class MentionContext {
     this.firstTokenText=firstToken.toString();
   }
 
-  private Parse getNextToken(int numNext, List etoks, List stoks) {
-    Parse lastTok = (Parse) etoks.get(etoks.size() - 1);
-    for (int sti = stoks.size() - 1; sti >= 0; sti--) {
-      if (stoks.get(sti).equals(lastTok)) {
-        int nti = sti + numNext;
-        if (nti < stoks.size()) {
-          return ((Parse) stoks.get(nti));
-        }
-        return (null);
-      }
-    }
-    System.err.println("MentionContext.getNextToken: token not found in sentence: " + lastTok);
-    return (null);
-  }
-
-  private void init(List toks, Span s, Span hs, int nl, int nn, int mnl, int sn, Parse pt, Parse nt, Parse bnt, Parse p, int ndi) {
-    this.tokens = (Parse[]) toks.toArray(new Parse[toks.size()]);
-    this.span = s;
-    this.headSpan = hs;
-    this.nounLocation = nl;
-    this.nounNumber = nn;
-    this.maxNounLocation = mnl;
-    this.sentenceNumber = sn;
-    this.prevToken = pt;
-    this.nextToken = nt;
-    this.basalNextToken = bnt;
-    this.parse = p;
-    this.nonDescriptorStart = ndi;
-  }
-  
   public Parse getHeadToken() {
     return headToken;
   }
@@ -370,16 +280,7 @@ public class MentionContext {
    * @return A space-delimited string of the tokens of this mention.
    */
   public String toText() {
-    if (parse != null) {
-      return (parse.toString());
-    }
-    else {
-      String s = tokens[0].toString();
-      for (int ti = 1,tn=tokens.length; ti < tn; ti++) {
-        s += " " + tokens[ti];
-      }
-      return (s);
-    }
+    return (parse.toString());
   }
   
   private static String[] getLemmas(MentionContext xec) {

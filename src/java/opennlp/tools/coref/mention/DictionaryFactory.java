@@ -15,22 +15,23 @@
 //License along with this program; if not, write to the Free Software
 //Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 //////////////////////////////////////////////////////////////////////////////
-package opennlp.tools.coref;
+package opennlp.tools.coref.mention;
 
 import java.io.IOException;
 
+
 import net.didion.jwnl.JWNLException;
 
-/** Factory class used to get na instance of a dictionary object. 
- * @see opennlp.tools.coref.Dictionary
+/** Factory class used to get an instance of a dictionary object. 
+ * @see opennlp.tools.coref.mention.Dictionary
  * */
 public class DictionaryFactory {
   
   private static Dictionary dictionary;
   
   /** 
-   * Returns the default implementation of the <code>Dictionary</code> interface.
-   * @return the default implementation of the <code>Dictionary</code> interface.
+   * Returns the default implementation of the Dictionary interface.
+   * @return the default implementation of the Dictionary interface.
    */
   public static Dictionary getDictionary() {
     if (dictionary == null) {
