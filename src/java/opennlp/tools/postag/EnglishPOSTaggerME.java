@@ -18,11 +18,15 @@
 
 package opennlp.tools.postag;
 
-import java.io.*;
-import java.util.zip.*;
-import opennlp.common.english.*;
-import opennlp.maxent.*;
-import opennlp.maxent.io.*;
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStreamReader;
+
+import opennlp.common.english.BasicEnglishAffixes;
+import opennlp.common.english.EnglishClosedClassTags;
+import opennlp.maxent.MaxentModel;
+import opennlp.maxent.io.SuffixSensitiveGISModelReader;
 
 /**
  * A part of speech tagger that uses a model trained on English data from the
@@ -30,7 +34,7 @@ import opennlp.maxent.io.*;
  * achieved >96% accuracy on unseen data.
  *
  * @author      Gann Bierner
- * @version     $Revision: 1.2 $, $Date: 2003/11/22 19:45:14 $
+ * @version     $Revision: 1.3 $, $Date: 2003/12/08 11:30:49 $
  */
 
 public class EnglishPOSTaggerME extends POSTaggerME {
