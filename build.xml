@@ -1,4 +1,4 @@
-<!-- $Id: build.xml,v 1.31 2004/06/11 21:02:27 tsmorton Exp $ -->
+<!-- $Id: build.xml,v 1.32 2004/07/15 16:59:05 gann Exp $ -->
 <!-- This build file based on the JDOM build.xml file. -->
 
 <project name="OpenNLP" default="package" basedir=".">
@@ -40,7 +40,7 @@
     <filter token="verbose" value="true"/>
 
     <path id="build.classpath">
-      <pathelement location="${lib.dir}/maxent-2.2.jar"/>
+      <pathelement location="${lib.dir}/maxent-2.2.0.jar"/>
       <pathelement location="${lib.dir}/trove.jar"/>
     </path>
 
