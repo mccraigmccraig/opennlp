@@ -67,4 +67,46 @@ public class EnglishTreebankChunker extends ChunkerME {
     return (true);
   }
 
+  public static void main(String[] args) throws IOException {
+      if (args.length == 0) {
+        System.err.println("Usage:  java opennlp.tools.chunker.EnglishTreebankChunker model < tokenized_sentences");
+        System.exit(1);
+      }
+      EnglishTreebankChunker chunker = new EnglishTreebankChunker(args[0]);
+      java.io.BufferedReader inReader = new java.io.BufferedReader(new java.io.InputStreamReader(System.in));
+      for (String line = inReader.readLine(); line != null; line = inReader.readLine()) {
+        if (line.equals("")) {
+          System.out.println();
+        }
+        else {
+          String[] tts = line.split(" ");
+          String[] tokens = new String[tts.length];
+          String[] tags = new String[tts.length];
+          for (int ti=0,tn=tts.length;ti<tn;ti++) {
+            String[] tt = tts[ti].split("/");
+            tokens[ti]=tt[0];
+            tags[ti]=tt[1]; 
+          }
+          String[] chunks = chunker.chunk(tokens,tags);
+          for (int ci=0,cn=chunks.length;ci<cn;ci++) {
+            if (ci > 0 && !chunks[ci].startsWith("I-") && !chunks[ci-1].equals("O")) {
+              System.out.print(" ]");
+            }            
+            if (chunks[ci].startsWith("B-")) {
+              System.out.print(" ["+chunks[ci].substring(2));
+            }
+            /*
+            else {
+              System.out.print(" ");
+            }
+            */
+            System.out.print(" "+tokens[ci]+"/"+tags[ci]);
+          }
+          if (!chunks[chunks.length-1].equals("O")) {
+            System.out.print(" ]");
+          }
+          System.out.println();
+        }
+      }
+    }
 }

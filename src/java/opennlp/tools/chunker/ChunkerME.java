@@ -103,7 +103,7 @@ public class ChunkerME implements Chunker {
      * <p>Usage: java opennlp.chunker.ChunkerME data_file new_model_name (iterations cutoff)?</p>
      *
      */
-  public static void main(String[] args) {
+  public static void main(String[] args) throws java.io.IOException {
     if (args.length == 0) {
       System.err.println("Usage: ChunkerME trainingFile modelFile");
       System.err.println();
@@ -111,22 +111,16 @@ public class ChunkerME implements Chunker {
       System.err.println("space-delimited triple of \"word pos outome\".  Sentence breaks are indicated by blank lines.");
       System.exit(1);
     }
-    try {
-      java.io.File inFile = new java.io.File(args[0]);
-      java.io.File outFile = new java.io.File(args[1]);
-      GISModel mod;
-      opennlp.maxent.EventStream es = new ChunkerEventStream(new opennlp.maxent.PlainTextByLineDataStream(new java.io.FileReader(inFile)));
-      if (args.length > 3)
-        mod = train(es, Integer.parseInt(args[2]), Integer.parseInt(args[3]));
-      else
-        mod = train(es, 100, 5);
+    java.io.File inFile = new java.io.File(args[0]);
+    java.io.File outFile = new java.io.File(args[1]);
+    GISModel mod;
+    opennlp.maxent.EventStream es = new ChunkerEventStream(new opennlp.maxent.PlainTextByLineDataStream(new java.io.FileReader(inFile)));
+    if (args.length > 3)
+      mod = train(es, Integer.parseInt(args[2]), Integer.parseInt(args[3]));
+    else
+      mod = train(es, 100, 5);
 
-      System.out.println("Saving the model as: " + args[1]);
-      new opennlp.maxent.io.SuffixSensitiveGISModelWriter(mod, outFile).persist();
-
-    }
-    catch (Exception e) {
-      e.printStackTrace();
-    }
+    System.out.println("Saving the model as: " + args[1]);
+    new opennlp.maxent.io.SuffixSensitiveGISModelWriter(mod, outFile).persist();
   }
 }
