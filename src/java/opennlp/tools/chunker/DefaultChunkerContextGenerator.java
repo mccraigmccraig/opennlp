@@ -21,6 +21,7 @@ package opennlp.tools.chunker;
 import java.util.ArrayList;
 import java.util.List;
 
+import opennlp.common.util.Sequence;
 import opennlp.maxent.ContextGenerator;
 
 /**
@@ -31,7 +32,7 @@ public class DefaultChunkerContextGenerator implements ContextGenerator {
 
   public String[] getContext(Object o) {
     Object[] data = (Object[]) o;
-    return (getContext(((Integer) data[0]).intValue(), (List) data[1], (List) data[2], (List) data[3]));
+    return (getContext(((Integer) data[0]).intValue(), (List) data[1], (List) data[3], ((Sequence) data[2]).getOutcomes()));
   }
 
   public String[] getContext(int i, List toks, List tags, List preds) {

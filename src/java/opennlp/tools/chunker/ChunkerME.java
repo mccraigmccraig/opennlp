@@ -34,9 +34,9 @@ public class ChunkerME implements Chunker {
 
   protected MaxentModel _npModel;
   protected ContextGenerator _contextGen;
-  private Sequence bestSequence;
   private int beamSize;
   private BeamSearch beam;
+  private Sequence bestSequence;
 
   public ChunkerME(MaxentModel mod) {
     this(mod, new DefaultChunkerContextGenerator(),10);
@@ -54,11 +54,13 @@ public class ChunkerME implements Chunker {
    }
 
   public List chunk(List toks, List tags) {
-    return beam.bestSequence(toks, new Object[] {tags});
+    bestSequence = beam.bestSequence(toks, new Object[] {tags});
+    return bestSequence.getOutcomes();
   }
 
   public String[] chunk(Object[] toks, String[] tags) {
-    List c = beam.bestSequence(Arrays.asList(toks), new Object[] {Arrays.asList(tags)});
+    bestSequence = beam.bestSequence(Arrays.asList(toks), new Object[] {Arrays.asList(tags)});
+    List c = bestSequence.getOutcomes();
     return (String[]) c.toArray(new String[c.size()]);
   }
   
@@ -84,9 +86,8 @@ public class ChunkerME implements Chunker {
   }
   
   public void probs(double[] probs) {
-      List dlist = bestSequence.getProbs();
       for (int pi = 0; pi < probs.length; pi++) {
-        probs[pi] = ((Double) dlist.get(pi)).doubleValue();
+        probs[pi] = 0; //((Double) dlist.get(pi)).doubleValue();
       }
     }
 
@@ -94,7 +95,7 @@ public class ChunkerME implements Chunker {
       List dlist = bestSequence.getProbs();
       double[] probs = new double[dlist.size()];
       for (int pi = 0; pi < probs.length; pi++) {
-        probs[pi] = ((Double) dlist.get(pi)).doubleValue();
+        probs[pi] = 0;((Double) dlist.get(pi)).doubleValue();
       }
       return (probs);
     }

@@ -35,7 +35,7 @@ import opennlp.maxent.io.*;
  * surrounding context.
  *
  * @author      Gann Bierner
- * @version $Revision: 1.2 $, $Date: 2003/12/05 05:13:27 $
+ * @version $Revision: 1.3 $, $Date: 2003/12/06 16:54:55 $
  */
 public class POSTaggerME implements Evalable, POSTagger {
 
@@ -86,7 +86,8 @@ public class POSTaggerME implements Evalable, POSTagger {
   }
 
   public List tag(List sentence) {
-    return beam.bestSequence(sentence, null);
+    bestSequence = beam.bestSequence(sentence,null);
+    return bestSequence.getOutcomes();
   }
 
   public String[] tag(String[] sentence) {
@@ -134,7 +135,7 @@ public class POSTaggerME implements Evalable, POSTagger {
         Pair p = POSEventCollector.convertAnnotatedString(line);
         List words = (List) p.a;
         List outcomes = (List) p.b;
-        List tags = beam.bestSequence(words, null);
+        List tags = beam.bestSequence(words, null).getOutcomes();
 
         int c = 0;
         boolean sentOk = true;
