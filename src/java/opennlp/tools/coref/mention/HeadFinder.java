@@ -23,7 +23,7 @@ import java.util.List;
 public interface HeadFinder {
 
   /** Returns the child parse which contains the lexical head of the specifie parse.
-   * @param parse the parse in which to find the head.a
+   * @param parse the parse in which to find the head.
    * @return The parse containing the lexical head of the specified parse.  If no head is
    * available or the constituent has no sub-components that are eligible heads then null is returned.
    */
@@ -33,7 +33,7 @@ public interface HeadFinder {
    * @param toks The tokens of a basal noun phrase.
    * @return The index of the head token.  
    */
-  public int getHeadIndex(List toks);
+  public int getHeadIndex(Parse parse);
 
   /** Returns the parse bottom-most head of a <code>Parse</code>.  If no
    * head is available which is a child of <code>p</code> then
@@ -43,11 +43,11 @@ public interface HeadFinder {
    */
   public Parse getLastHead(Parse p);
 
-  /** Returns head token for the parse p.
+  /** Returns head token for the specified np parse.
    * @param p parse to get head from.
    * @return head token parse.
    */
-  public Parse getHeadToken(Parse p);
+  public Parse getHeadToken(Parse np);
 
 
 }
