@@ -54,7 +54,9 @@ public class DefaultNonReferentialResolver implements NonReferentialResolver {
   
   public double getNonReferentialProbability(MentionContext mention) {
     List features = getFeatures(mention);
-    return model.eval((String[]) features.toArray(new String[features.size()]))[nonRefIndex];
+    double r = model.eval((String[]) features.toArray(new String[features.size()]))[nonRefIndex];
+    if (debugOn) System.err.println(this +" " + mention.toText() + " ->  null " + r + " " + features);
+    return r;
   }
   
   public void addEvent(MentionContext ec) {
