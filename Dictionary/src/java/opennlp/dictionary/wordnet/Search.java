@@ -6,11 +6,12 @@
 package opennlp.dictionary.wordnet;
 
 import java.io.RandomAccessFile;
+import java.util.Map;
 import java.util.Set;
 import java.util.HashSet;
 
 public class Search {
-   private static String Id = "$Id: Search.java,v 1.1 2002/03/20 20:23:51 mratkinson Exp $";
+   private static String Id = "$Id: Search.java,v 1.2 2002/03/21 22:42:49 mratkinson Exp $";
 
    // For adjectives, indicates synset type.
    
@@ -78,7 +79,7 @@ public class Search {
       }
       
       if ((line = binSearcher.bin_search(word, fp)) != null) {
-         idx = parse_index( binSearcher.last_bin_search_offset, dbase, line);
+         idx = parse_index( binSearcher.getLastBinSearchOffset(), dbase, line);
       } 
       return idx;
    }
@@ -252,7 +253,7 @@ public class Search {
        return new SynSet();
    }
 
-   private java.util.Map synsetCache = new java.util.HashMap();
+   private Map synsetCache = new WordNetCache(10000);
    private final static class SynsetKey {
        private int dbase;
        private long boffset;
@@ -2076,8 +2077,9 @@ public int HasPtr(SynSet synptr, int ptrtyp) {
     return 0;
 }
 
-/** Set bit for each POS that search word is in.  0 returned if
- *  word is not in WordNet.
+/** For each POS that search word is in, set the relevant bit.<p>
+ *
+ *  Return 0 if word is not in WordNet.
  */
 
 public int in_wn(String word, int pos) {
