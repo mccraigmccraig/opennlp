@@ -36,6 +36,8 @@ public class MentionContext {
   private int nonDescriptorStart;
   /** The Parse for this mention. */
   private Parse parse;
+  /** The Parse of the head constituent of this mention. */
+  private Parse head;
   /** Sentence-token-based span whose end is the last token of the mention. */
   private Span span;
   /** Sentence-token-based span whose end is the last token of the menion head. */
@@ -104,14 +106,14 @@ public class MentionContext {
     span = mentionParse.getSpan();
     prevToken = mentionParse.getPreviousToken();
     nextToken = mentionParse.getNextToken();
-    Parse head = headFinder.getLastHead(mentionParse);
+    head = headFinder.getLastHead(mentionParse);
     List headTokens = head.getTokens();
     tokens = (Parse[]) headTokens.toArray(new Parse[headTokens.size()]);
     basalNextToken = head.getNextToken();
     //System.err.println("MentionContext.init: "+ent+" "+ent.getEntityId()+" head="+head);
     headSpan = head.getSpan();
     nonDescriptorStart = 0;
-    initHeads(head, headFinder);
+    initHeads(headFinder.getHeadIndex(head));
     this.neType= nameType;
     if (getHeadTokenTag().startsWith("NN") && !getHeadTokenTag().startsWith("NNP")) {
       //if (headTokenTag.startsWith("NNP") && neType != null) {
@@ -126,8 +128,8 @@ public class MentionContext {
     this.numberProb = 0d;
   }
 
-  private void initHeads(Parse head, HeadFinder headFinder) {
-    this.headTokenIndex=headFinder.getHeadIndex(head);
+  private void initHeads(int headIndex) {
+    this.headTokenIndex=headIndex;
     this.headToken = tokens[getHeadTokenIndex()];
     this.headTokenText = headToken.toString();
     this.headTokenTag=headToken.getSyntacticType();
@@ -150,6 +152,10 @@ public class MentionContext {
       headText.append(" ").append(tokens[hsi].toString());
     }
     return (headText.toString().substring(1));
+  }
+  
+  public Parse getHead() {
+    return head;
   }
   
   public Parse getParse() {
