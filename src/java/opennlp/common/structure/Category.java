@@ -29,7 +29,7 @@ import opennlp.common.util.*;
  * trees or whatnot), they should not feel inhibited by the name category.
  *
  * @author      Gann Bierner
- * @version     $Revision: 1.2 $, $Date: 2001/11/14 17:51:10 $
+ * @version     $Revision: 1.3 $, $Date: 2001/12/11 11:58:42 $
  */
 public interface Category
     extends opennlp.common.unify.Unifiable, java.io.Serializable {
@@ -41,7 +41,15 @@ public interface Category
      * @param o object to check for equality
      * @return whether or not this is shallowly equal to object
      */
-    public boolean shallowEquals(Object o);
+    public boolean shallowEquals (Object o);
+
+    /**
+     * Determines if this category is equal to another.
+     *
+     * @param o object to check for equality
+     * @return whether or not this is equal to object
+     */
+    public boolean equals (Object o);
 
 
     /**
@@ -49,7 +57,7 @@ public interface Category
      *
      * @return a deep copy of this category
      */
-    public Category copy();
+    public Category copy ();
 
 
     /**
@@ -60,7 +68,7 @@ public interface Category
      * @return a copy of this category where every category has been
      *         changed to be the result of the category function.
      */    
-    public Category deepMap(CategoryFcn f); //to ls
+    public Category deepMap (CategoryFcn f); //to ls
     
     /**
      * Iterates through this Category applying a function to this category
@@ -68,21 +76,7 @@ public interface Category
      *
      * @param f a function to be applied
      */    
-    public void forall(CategoryFcn f); //to ls
-
-    /**
-     * Accessor function for a feature associated with this category
-     *
-     * @return the feature for this cateogory
-     */    
-    public Feature getFeature();
-    
-    /**
-     * Gives this category a new feature
-     *
-     * @param f the new feature
-     */    
-    public void setFeature(Feature f);
+    public void forall (CategoryFcn f); //to ls
 
     /**
      * Accessor function for the feature structure associated with this category
@@ -99,20 +93,13 @@ public interface Category
     public void setFeatureStructure (FeatureStructure fs);
     
     /**
-     * creates a nice, multi-line, indented string represeting this Category
-     *
-     * @return a nicely formatted string representing this category
-     */
-    public String prettyPrint();
-
-    /**
      * Creates a unique string that we can hash on.  It's good to do
      * things like normalize variables and to about the shortest
      * string possible.
      *
      * @return a string representing this category that we can hash on
      */
-    public String hashString();
+    public String hashString ();
 
     /**
      * Returns the string position of the constituent.  Starts with 0.
@@ -143,6 +130,4 @@ public interface Category
      */
     public void setSpan(int a, int b);
     
-    
-    public String toString();
 }
