@@ -15,14 +15,13 @@
 // License along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 //////////////////////////////////////////////////////////////////////////////
-
 package opennlp.common;
 
 /**
  * Parent class for all NLPExceptions.
  *
  * @author      Jason Baldridge
- * @version     $Revision: 1.3 $, $Date: 2002/02/08 12:17:50 $
+ * @version     $Revision: 1.4 $, $Date: 2002/04/25 14:41:55 $
  */
 public class NLPException extends Exception {
 
