@@ -28,7 +28,7 @@ import java.util.*;
  * gnu.regexp.
  *
  * @author      Jason Baldridge
- * @version     $Revision: 1.2 $, $Date: 2001/11/27 16:56:48 $
+ * @version     $Revision: 1.3 $, $Date: 2001/11/27 16:58:57 $
  */
 public final class PerlHelp {
 
@@ -55,12 +55,12 @@ public final class PerlHelp {
 
 
     public static String[] getParagraphs (String text) {
-	String[] pars = new String[0];
+	String[] pars = new String { text };
 	return pars;
     }
 
     public static String[] splitByWhitespace (String s) {
-	String[] segments = new String[0];
+	String[] segments = split(s);
 	return segments;
     }
 
