@@ -17,11 +17,35 @@
 //////////////////////////////////////////////////////////////////////////////
 package opennlp.tools.util;
 
+/** Inteface for interacting with a Heap data structure. */
 public interface Heap  {
 
+  /** 
+   * Removes the top element from the heap and returns it.
+   * @return The top element from the heap.
+   */  
   public Object extract();
+  
+  /**
+   * Returns the top element of the heap.
+   * @return The top element of the heap.
+   */
   public Object top();
+  
+  /**
+   * Adds the specified object to the heap.
+   * @param o The objec tto add to the heap.
+   */
   public void add(Object o);
+  
+  /**
+   * Returns the size of the heap.
+   * @return The size of the heap.
+   */
   public int size();
+  
+  /**
+   * Clears the contents of the heap.
+   */
   public void clear();
 }

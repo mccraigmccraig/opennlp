@@ -2,6 +2,9 @@ package opennlp.tools.chunker;
 
 import opennlp.tools.util.BeamSearchContextGenerator;
 
+/**
+ * Interface for the context generator used in syntactic chunking.  
+ */
 public interface ChunkerContextGenerator extends BeamSearchContextGenerator {
   
   /**

@@ -22,6 +22,9 @@ import java.util.Map;
 
 import opennlp.tools.util.BeamSearchContextGenerator;
 
+/**
+ * Interface for the context generator used in name finding.
+ */
 public interface NameContextGenerator extends BeamSearchContextGenerator {
   
   /**

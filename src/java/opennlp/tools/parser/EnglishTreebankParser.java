@@ -37,6 +37,9 @@ import opennlp.tools.postag.DefaultPOSContextGenerator;
 import opennlp.tools.postag.POSDictionary;
 import opennlp.tools.postag.POSTaggerME;
 
+/**
+ * Class for performing full parsing on English text. 
+ */
 public class EnglishTreebankParser {
 
   public static ParserME getParser(String dataDir, boolean useTagDictionary, boolean useCaseSensitiveTagDictionary, int beamSize, double advancePercentage) throws IOException {

@@ -19,7 +19,9 @@ package opennlp.tools.util;
 
 import opennlp.maxent.ContextGenerator;
 
-
+/**
+ * Interface for context generators used with a sequence beam search. 
+ */
 public interface BeamSearchContextGenerator extends ContextGenerator {
     
   /** Returns the context for the specified position in the specified sequence (list).  

@@ -3,14 +3,24 @@ package opennlp.tools.util;
 import java.util.SortedSet;
 import java.util.TreeSet;
 
+/** 
+ * An implmention of the heap interface based on java.util.SortedSet.
+ */
 public class TreeHeap implements Heap {
 
-  SortedSet tree;
+  private SortedSet tree;
 
+  /** 
+   * Creates a new tree heap.
+   */
   public TreeHeap() {
     tree = new TreeSet();
   }
 
+  /**
+   * Creates a new tree heap of the specified size.
+   * @param size The size of the new tree heap.
+   */
   public TreeHeap(int size) {
     tree = new TreeSet();
   }

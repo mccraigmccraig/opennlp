@@ -26,6 +26,9 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
 
+/** 
+ * Class for writting a pos-tag-dictionary to a file.
+ */
 public class POSDictionaryWriter {
 
   private Writer dictFile;
