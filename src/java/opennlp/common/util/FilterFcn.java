@@ -15,8 +15,7 @@
 // License along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 //////////////////////////////////////////////////////////////////////////////
-
-package opennlp.common.unify;
+package opennlp.common.util;
 
 /**
  * To get around the lack of 1st class functions, this class defines
@@ -24,14 +23,26 @@ package opennlp.common.unify;
  * Thus, it is a "filter".
  *
  * @author      Gann Bierner
- * @version     $Revision: 1.2 $, $Date: 2002/02/08 12:17:50 $
+ * @version     $Revision: 1.1 $, $Date: 2002/04/25 14:41:31 $
  */
 public interface FilterFcn {
+
     /**
      * Determines if a string is "acceptable" by some unknown metric.
      *
      * @param s the string
      * @return its acceptability
      */
-    public boolean fcn(String s);
+    public boolean filter (String s);
+
+
+    /**
+     * Determines if two strings are "acceptable" by some unknown metric.
+     *
+     * @param s1 the first string for the filter to consider
+     * @param s2 the second string for the filter to consider
+     * @return the acceptability of the two strings with respect to each other
+     */
+    public boolean filter (String s1, String s2);
+
 }

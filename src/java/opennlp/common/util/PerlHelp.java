@@ -17,18 +17,14 @@
 //////////////////////////////////////////////////////////////////////////////   
 package opennlp.common.util;
 
-import gnu.regexp.*;
-
 import java.io.*;
 import java.util.*;
 
 /**
  * A class to help out by providing useful Perl-type functions on strings.
- * Maybe one day we could get some of this functionality incorporated into
- * gnu.regexp.
  *
  * @author      Jason Baldridge
- * @version     $Revision: 1.10 $, $Date: 2002/02/08 12:17:50 $
+ * @version     $Revision: 1.11 $, $Date: 2002/04/25 14:41:31 $
  */
 public final class PerlHelp {
 

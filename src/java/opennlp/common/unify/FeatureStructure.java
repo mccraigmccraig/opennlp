@@ -15,14 +15,15 @@
 // License along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 //////////////////////////////////////////////////////////////////////////////
-
 package opennlp.common.unify;
+
+import opennlp.common.util.*;
 
 /**
  * A feature structure containing attributes and their associated values.
  *
  * @author      Jason Baldridge and Gann Bierner
- * @version     $Revision: 1.3 $, $Date: 2002/02/08 12:17:50 $
+ * @version     $Revision: 1.4 $, $Date: 2002/04/25 14:43:47 $
  */
 public interface FeatureStructure extends Unifiable {
 
