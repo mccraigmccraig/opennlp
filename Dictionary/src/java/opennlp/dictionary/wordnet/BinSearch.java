@@ -9,12 +9,12 @@ import java.util.Map;
  *  associated with open file descriptor fp, and returns a buffer containing the
  *  line in the file. <p>
  *
- *  This class was created by heavily modifying the WordNet 1.7 code src/lib binsearch.c.
+ *  This class was created by heavily modifying the WordNet 1.7 code src/lib/binsearch.c.
  *
  * @author     Mike Atkinson
  * @since      0.1.0
  * @created    20 March 2002
- * @verson     $Id: BinSearch.java,v 1.2 2002/03/21 22:32:43 mratkinson Exp $
+ * @version    $Id: BinSearch.java,v 1.3 2002/03/26 19:07:50 mratkinson Exp $
  */
 public class BinSearch {
 
@@ -25,7 +25,7 @@ public class BinSearch {
     private String NULL_DATA = "NULL_DATA";
 
     private long offset;
-    private static String Id = "$Id: BinSearch.java,v 1.2 2002/03/21 22:32:43 mratkinson Exp $";
+    private static String Id = "$Id: BinSearch.java,v 1.3 2002/03/26 19:07:50 mratkinson Exp $";
     private final static int LINE_LEN = 1024;
 
 
@@ -83,7 +83,7 @@ public class BinSearch {
      *      or null if not found.
      * @since             0.1.0
      */
-    public String bin_search(String searchKey, RandomAccessFile fp) {
+    public String binSearch(String searchKey, RandomAccessFile fp) {
         if (searchKey == null) {
             throw new IllegalArgumentException("searchKey should not be null");
         }
@@ -109,24 +109,45 @@ public class BinSearch {
             long mid = (bot - top) >> 1;
 
             do {
-                fp.seek(mid - 1);
-                int c;
+                int size;
                 if (mid != 1) {
-                    int size = fp.read(buffer);
-                    int i;
-                    for (i = 0; i < size; i++) {
-                        if (buffer[i] == '\n') {
-                            break;
+                    r = (BinSearchData)binSearchCache.get(new BinSearchKey2(mid, fp));
+                    if (r==null) {
+                        fp.seek(mid - 1);
+                        size = readBufferTillNewLine(fp, buffer);
+                        lastBinSearchOffset = mid + size;
+                        fp.seek(lastBinSearchOffset);
+                        size = Search.fgets(fp, lineBuf);
+                        if (size>0) {
+                            line = new String(lineBuf, 0, 0, size);
+                            int length = line.indexOf(' ');
+                            key = line.substring(0, length);
+                        } else {
+                            line = "";
+                            key = "";
                         }
+                        //System.out.println(line);
+                        binSearchCache.put(new BinSearchKey2(mid, fp), new BinSearchData(line, key, lastBinSearchOffset));
+                    } else {
+                        line = r.data;
+                        size = line.length();
+                        lastBinSearchOffset = r.pos;
+                        fp.seek(lastBinSearchOffset);
+                        key = r.key;
                     }
-                    fp.seek(mid + i);
-                }
-                lastBinSearchOffset = fp.getFilePointer();
-                int size = Search.fgets(fp, lineBuf);
-                if (size > 0) {
+                } else {
+                    fp.seek(mid - 1);
+                    //lastBinSearchOffset = fp.getFilePointer();
+                    lastBinSearchOffset = mid - 1;
+                    size = Search.fgets(fp, lineBuf);
                     line = new String(lineBuf, 0, 0, size);
                     int length = line.indexOf(' ');
                     key = line.substring(0, length);
+                }
+                if (size > 0) {
+                    //line = new String(lineBuf, 0, 0, size);
+                    //int length = line.indexOf(' ');
+                    //key = line.substring(0, length);
                     if (key.compareTo(searchKey) < 0) {
                         top = mid;
                         diff = (bot - top) >> 1;
@@ -138,16 +159,16 @@ public class BinSearch {
                         mid = top + diff;
                     }
                 } else {
-                    binSearchCache.put(new BinSearchKey(searchKey, fp), new BinSearchData(NULL_DATA, fp.getFilePointer()));
+                    binSearchCache.put(new BinSearchKey(searchKey, fp), new BinSearchData(NULL_DATA, "", fp.getFilePointer()));
                     return null;
                 }
             } while (!key.equals(searchKey) && (diff != 0));
 
             if (searchKey.equals(key)) {
-                binSearchCache.put(new BinSearchKey(searchKey, fp), new BinSearchData(line, fp.getFilePointer()));
+                binSearchCache.put(new BinSearchKey(searchKey, fp), new BinSearchData(line, key, fp.getFilePointer()));
                 return line;
             } else {
-                binSearchCache.put(new BinSearchKey(searchKey, fp), new BinSearchData(NULL_DATA, fp.getFilePointer()));
+                binSearchCache.put(new BinSearchKey(searchKey, fp), new BinSearchData(NULL_DATA, "", fp.getFilePointer()));
                 return null;
             }
         } catch (Exception e) {
@@ -156,7 +177,28 @@ public class BinSearch {
         }
     }
 
-
+    
+    private int readBufferTillNewLine(RandomAccessFile fp, byte[] buffer) {
+        try {
+            int start =0;
+            int len = buffer.length>>2;
+            for (int x=0; x<4; x++) {
+                int size = fp.read(buffer, start, len);
+                for (int i = 0; i < size; i++) {
+                    if (buffer[start+i] == '\n') {
+                        return start+i;
+                    }
+                }
+                start += len;
+            }
+            return buffer.length;
+        } catch (java.io.IOException e) {
+            e.printStackTrace();
+        }
+        return -1;
+    }
+    
+    
     /**
      *  Function to replace a line in a file. Returns the original line, or null
      *  in case of error.
@@ -170,9 +212,9 @@ public class BinSearch {
      * @since             0.1.0
      */
 
-    public String replace_line(String newLine, String searchKey, RandomAccessFile fp) {
+    public String replaceLine(String newLine, String searchKey, RandomAccessFile fp) {
         try {
-            if (!bin_search_key(searchKey, fp)) {
+            if (!binSearchKey(searchKey, fp)) {
                 return null;// line with key not found.
             }
 
@@ -181,11 +223,11 @@ public class BinSearch {
             fp.seek(offset);
             int size = Search.fgets(fp, lineBuf);// read original.
             String line = new String(lineBuf, 0, 0, size);
-            copyfile(fp, tfp);
+            copyFile(fp, tfp);
             fp.seek(offset);
             fp.writeBytes(newLine);// write line.
             tfp.seek(0);
-            copyfile(tfp, fp);
+            copyFile(tfp, fp);
 
             tfp.close();
 
@@ -209,9 +251,9 @@ public class BinSearch {
      * @since             0.1.0
      */
 
-    public String insert_line(String newLine, String searchKey, RandomAccessFile fp) {
+    public String insertLine(String newLine, String searchKey, RandomAccessFile fp) {
         try {
-            if (bin_search_key(searchKey, fp)) {
+            if (binSearchKey(searchKey, fp)) {
                 return null;
             }
 
@@ -219,11 +261,11 @@ public class BinSearch {
             RandomAccessFile tfp = new RandomAccessFile(tmp, "rw");// temporary file pointer.
 
             fp.seek(offset);
-            copyfile(fp, tfp);
+            copyFile(fp, tfp);
             fp.seek(offset);
             fp.writeBytes(newLine);// write line.
             tfp.seek(0);
-            copyfile(tfp, fp);
+            copyFile(tfp, fp);
 
             tfp.close();
 
@@ -247,7 +289,7 @@ public class BinSearch {
      * @return            <tt>true</tt> if the searchKey is found in the file.
      * @since             0.1.0
      */
-    private boolean bin_search_key(String searchKey, RandomAccessFile fp) {
+    private boolean binSearchKey(String searchKey, RandomAccessFile fp) {
         if (searchKey == null) {
             throw new IllegalArgumentException("searchKey should not be null");
         }
@@ -342,11 +384,11 @@ public class BinSearch {
     /**
      *  Copy contents from one file to another.
      *
-     * @param  fromfp  Description of Parameter
-     * @param  tofp    Description of Parameter
+     * @param  fromfp  Copy from this file.
+     * @param  tofp    To this file.
      * @since          0.1.0
      */
-    public static void copyfile(RandomAccessFile fromfp, RandomAccessFile tofp) {
+    public static void copyFile(RandomAccessFile fromfp, RandomAccessFile tofp) {
         try {
             int c;
 
@@ -412,6 +454,59 @@ public class BinSearch {
             return false;
         }
     }
+    /**
+     *  This class is used to hold a key for the Binary Search cache of recent search
+     *  results.
+     *
+     * @author     Mike Atkinson (mratkinson)
+     * @since      0.1.0
+     * @created    20 March 2002
+     */
+    private final static class BinSearchKey2 {
+        private long searchKey;
+        private RandomAccessFile fp;
+
+
+        /**
+         *  Constructor for the Binary Search cache Key.
+         *
+         * @param  searchKey  The string which was searched for.
+         * @param  fp         The file it was searched for in.
+         * @since             0.1.0
+         */
+        public BinSearchKey2(long searchKey, RandomAccessFile fp) {
+            this.searchKey = searchKey;
+            this.fp = fp;
+        }
+
+
+        /**
+         *  Compute the hash for this object so that it can be used within Maps.
+         *
+         * @return    The hash value of this object.
+         * @since     0.1.0
+         */
+        public int hashCode() {
+            return (int)searchKey + fp.hashCode();
+        }
+
+
+        /**
+         *  Tests whether this object is equal to the parameter so that it can be
+         *  used within Maps.
+         *
+         * @param  o  The object to compare to.
+         * @return    <tt>true</tt> if the object equals this one.
+         * @since     0.1.0
+         */
+        public boolean equals(Object o) {
+            if (o instanceof BinSearchKey2) {
+                BinSearchKey2 rhs = (BinSearchKey2)o;
+                return (fp == rhs.fp) && (searchKey==rhs.searchKey);
+            }
+            return false;
+        }
+    }
 
 
     /**
@@ -430,6 +525,12 @@ public class BinSearch {
          */
         public String data;
         /**
+         *  The key (line up to the first space).
+         *
+         * @since    0.1.0
+         */
+        public String key;
+        /**
          *  The position the data was found in the file.
          *
          * @since    0.1.0
@@ -444,8 +545,9 @@ public class BinSearch {
          * @param  pos   The position the data was found in the file.
          * @since        0.1.0
          */
-        public BinSearchData(String data, long pos) {
+        public BinSearchData(String data, String key, long pos) {
             this.data = data;
+            this.key = key;
             this.pos = pos;
         }
     }
