@@ -31,7 +31,7 @@ import java.util.*;
  * specifications.
  *
  * @author      Jason Baldridge
- * @version     $Revision: 1.6 $, $Date: 2001/11/29 13:12:05 $
+ * @version     $Revision: 1.7 $, $Date: 2001/11/29 14:23:32 $
  **/
 public class NLPDocument extends Document {
     public static final String WORD_LABEL = "w";
@@ -113,6 +113,13 @@ public class NLPDocument extends Document {
 	return pars;
     }
 
+    /**
+     * Return an iterator over the paragraph Elements in the document.
+     **/
+    public Iterator paragraphIterator (Element e) {
+	return getParagraphElements().iterator();
+    }
+    
     
     /**
      * Grabs all paragraph elements in this document.
@@ -157,6 +164,13 @@ public class NLPDocument extends Document {
 
     
     /**
+     * Return an iterator over the sentence Elements below the given element.
+     **/
+    public Iterator sentenceIterator (Element e) {
+	return getSentenceElements(e).iterator();
+    }
+    
+    /**
      * Grabs all sentence elements below the given element.
      **/
     public List getSentenceElements (Element e) {
@@ -168,6 +182,13 @@ public class NLPDocument extends Document {
      **/
     public List getSentenceElements () {
 	return getSentenceElements(_root);
+    }
+    
+    /**
+     * Return an iterator over the token Elements below the given element.
+     **/
+    public Iterator tokenIterator (Element e) {
+	return getTokenElements(e).iterator();
     }
     
     /**
@@ -184,6 +205,13 @@ public class NLPDocument extends Document {
 	return getTokenElements(_root);
     }
 
+    /**
+     * Return an iterator over the word Elements below the given element.
+     **/
+    public Iterator wordIterator (Element e) {
+	return getWordElements(e).iterator();
+    }
+    
     /**
      * Grabs all word elements below the given element;
      **/
