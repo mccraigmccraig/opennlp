@@ -92,6 +92,14 @@ public class Sequence implements Comparable {
     getProbs(ps);
     return (ps);
   }
+  
+  /**
+   * Returns the score of this sequence. 
+   * @return The score of this sequence.
+   */
+  public double getScore() {
+    return score;
+  }
 
   /** Populates  an array with the probabilities associated with the outcomes of this sequece.
    * @param ps a pre-allocated array to use to hold the values of the probabilities of the outcomes for this sequence.
