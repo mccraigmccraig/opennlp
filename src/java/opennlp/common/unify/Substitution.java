@@ -21,10 +21,9 @@ package opennlp.common.unify;
  * Specifies how variable are to be replaced to make two objects unify.  
  *
  * @author      Gann Bierner & Jason Baldridge
- * @version     $Revision: 1.2 $, $Date: 2001/11/22 15:04:50 $
+ * @version     $Revision: 1.3 $, $Date: 2001/11/23 10:41:45 $
  */
 public interface Substitution {
-    public boolean makeSubstitution(Variable var, Object o);
+    public void makeSubstitution(Variable var, Object o) throws UnifyFailure;
     public Object getValue(Variable var);
-    public Object fill(Object o);
 }

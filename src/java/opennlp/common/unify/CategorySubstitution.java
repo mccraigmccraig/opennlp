@@ -9,7 +9,7 @@
 // This library is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-// GNU General Public License for more details.
+// GNU Lesser General Public License for more details.
 // 
 // You should have received a copy of the GNU Lesser General Public
 // License along with this program; if not, write to the Free Software
@@ -27,11 +27,12 @@ import java.util.*;
  * unify.  Most of this will change so it is not documented at this time.
  *
  * @author      Gann Bierner
- * @version     $Revision: 1.2 $, $Date: 2001/11/22 15:04:50 $
+ * @version     $Revision: 1.3 $, $Date: 2001/11/23 10:41:45 $
  */
 public interface CategorySubstitution extends Substitution {
     public boolean fail();
     public Substitution setFail();
+    public Object fill(Object o);
 
     public CategorySubstitution copy();
     public void addFeatIndex(int i, Object o);
