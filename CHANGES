@@ -1,4 +1,4 @@
-0.9.0
+0.9.1
 -----
 Summary: Moved sentence, tokenization, and pos tagging out of grok and into
 main opennlp package and retrained models.
@@ -30,9 +30,13 @@ Create POSEventStream for training.
 Retrained to create new data/EnglishPOS.bin.gz
 
 
-0.8.5
------
+0.9.0 - Final opennnlp.common release!
+--------------------------------------
 
+Probably some changes here and there, but doesn't really matter since
+we are discontinuing the opennlp.common package. This release is only
+being made so that the source code of the package at this point is
+readily available if ever needed in the future. (Jason)
 
 
 0.8.4

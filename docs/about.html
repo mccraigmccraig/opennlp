@@ -31,8 +31,6 @@
 
 <HR WIDTH="100%">
 
-<h2>Organizational role of OpenNLP</h2>
-
 <p>
 OpenNLP is meant to provide an umbrella for various <a
 href="http://www.opensource.org">open source</a> NLP projects to work
@@ -47,166 +45,41 @@ OpenNLP provides a top-level name package name for Java programs
 which will be unique.
 </p>
 
-<p>
-It is hoped that one day OpenNLP will be one of the major sites for
-cutting edge open source NLP software where people can find the
+<p> It is hoped that one day OpenNLP will be one of the major sites
+for cutting edge open source NLP software where people can find the
 software they need and get help on using and developing it.  The
 current members are not advocacy crazy, so please do not feel left out
 if you already have an open source NLP project and we have not
 contacted you.  We have just set the ball rolling and look forward to
-others joining in and increasing the level of interaction.
-</p>
+others joining in and increasing the level of interaction.  </p>
 
 
-
-<h2>The OpenNLP Java standard: opennlp.common</h2>
-
-
-<p>The OpenNLP project defines a set of Java interfaces and implements
-some basic infrastructure for Natural Language Processing (NLP)
-components.  There are currently many NLP systems and programs
-available, but those which are freely available are generally too
-tightly integrated, limited to very specific tasks, or toyish in their
-capabilities to easily incorporate into other systems (they also often
-are not open source, even though they are free).  OpenNLP would
-attempt to forge a standard which will facilitate code re-use in NLP
-(as such standards have done for other areas), and help focus and
-propel NLP developers to cooperate in building robust, highly
-functional <a href="http://www.opensource.org">open source</a> NLP
-components.
-</p>
-
-<p>
-OpenNLP is being designed to provide many different levels of
-granularity since NLP tasks can be cut up in many different ways.
-Part of the solution for this has been to have interfaces which have
-basic methods for tight integration, and higher level methods which
-use XML documents to pass linguistic information between loosely
-coupled components.
-</p>
-
-
-<p>
-The latest version of the <code>opennlp.common</code> package can be
-downloaded <a
-href="https://sourceforge.net/project/showfiles.php?group_id=3368">here</a>.
-Looking at the <a href="api/index.html">API</a>, one will notice
-several sub-packages such as <code>opennlp.common.parse</code> and
-<code>opennlp.common.structure</code>.  These packages contain
-interfaces for fairly specific components which were extracted from
-Grok <http://grok.sourceforge.net/>. The code for Grok will probably
-be the best guide to how OpenNLP has been used.  Of course, the
-<code>opennlp.common</code> package grew from Grok, so there are still
-idiosyncracies in it which should be rooted out at some point.
-Hopefully, other projects will start working with the API to help us
-further define and refine it, and make it more general.
-</p>
-
-<p>
-Probably the most important packages are
-<code>opennlp.common.preprocess</code> and
-<code>opennlp.common.xml</code>.  It is in these packages that one can
-see better where we envision OpenNLP standards heading.  This is where
-we have big components that are linked together through passing of XML
-documents and/or very specific methods.  For example, the Tokenizer
-interface requires an implementation to be able to do two things: 1)
-process an NLPDocument and, using the XML definitions for the
-document, mark up the tokens appropriately; 2) take a String and
-return a String[] with each of the tokens as an element in the array
-(For example "Mr. Brown, my teacher, likes spam." should become
-[Mr.|Brown|,|my|teacher|,|likes|spam|.]  (using "|" as an array
-delimiter for this example)).  The idea for now is that by providing
-methods for both high-level (XML) and low-level data passing, we can
-get around some of the problems of modularity and portability that
-large NLP systems often suffer from.
-</p>
-
-<p>
-Our hope is that by defining an API such as this, we can encourage
-others to build more NLP components which can work together.  As
-Computational Linguistics students, we are all too aware that students
-keep reinventing a lot of these things, which means less time
-advancing the state of our academic knowledge, and more time kludging
-together code that often is only an approximation for the task in
-hand.  The open source "revolution" appears to us to be a way of
-getting around this situation much more efficaciously.
-</p>
-
-<h2>OpenNLP and XML Schemas</h3>
-
-<p>
-Partly because Java and XML go hand and hand, but also because XML is
-programming language independent, we envision XML become more and more
-important in defining standards for OpenNLP.  The latest version of
-<code>opennlp.common</code> at the time of this writing is 0.6.0,
-which uses XML in important ways but does not take advantage of many
-new XML resources since that part of the package is virtually
-unchanged from version 0.4.0.  The plan is to move towards defining
-XML Schemas to declare data types separately of the coden and thereby
-get away from OpenNLP's currently Java-centric nature.  XML entities
-conforming to the schemas can then be marshalled into Java objects in
-the <code>opennlp.common</code> package.
-</p>
-
-<p>
-We would like to conform with some of the XML standards that are being
-defined for natural language data and data structures, but don't
-always really have the time to examine them very closely.  Take for
-example the <a
-href="http://hal2001.itakura.toyo.ac.jp/~chiekon/nlpxml/">XML for
-NLP</a> workshop to be held on 30 November 2001 and the <a
-href="http://www.oasis-open.org/cover/acadapps.html#tei">Text Encoding
-Initiative</a>.  Any help towards this end would be very welcome.
-</p>
-
-
-
-
-<h2>OpenNLP history</h3>
-
-<p>
-OpenNLP is an offshoot of the <a
-href="http://grok.sourceforge.net/">Grok</a> system, which is a large
-scale, open source NLP system that started life at the University of
-Edinburgh.  The initial <code>opennlp.common</code> interfaces were
-abstracted from Grok, but now they are being developed
-independently. As many interfaces as possible are implemented by Grok
-modules, providing a demonstration of the feasibility of OpenNLP
-standards and architectures. At first, OpenNLP was just the Java API
-of interfaces for NLP components and was part of the Quipu project as
-the package <code>quipu.opennlp</code>.  With the creation of the <a
-href="http://leonlp.sf.net">Leo</a> project, it was decided that
-OpenNLP was a better banner name than Quipu for an organizational
-entity to encourage open source NLP development and collaboration.
-The <code>quipu.opennlp</code> package then became
-<code>opennlp.common</code>, and others such as
-<code>quipu.grok</code> and <code>quipu.maxent</code> became
-<code>opennlp.grok</code> and <code>opennlp.maxent</code>,
-respectively.
-</p>
-
-<p>
-OpenNLP is thus moving into a new stage of existence.  We are very
-open to suggestions and new members.  So if you take the time to look
-at our stuff and find yourself saying "why don't they use this" or
-"they could be doing that", then please come on board and change it!
-</p>
-
+<p> If you are working on open source natural language software or
+wish to start a project and are interested in joining OpenNLP, let us
+know about it by either posting to the <a
+href="https://sourceforge.net/forum/?group_id=3368">OpenNLP forum</a>
+or sending mail to Jason Baldridge (<a
+href="mailto:jmb@cogsci.ed.ac.uk">jmb@cogsci.ed.ac.uk</a>). The only
+requirement is that the software is related to NLP and is distributed
+under an <a href="http://www.opensource.org">open source</a> license.
+You are otherwise free to use your favorite programming languages,
+theories, methodologies, operating systems, etc. Also note that open
+source projects that have been around for a while and wish to be part
+of OpenNLP are welcome to join. The only administrative duty you have
+is to notify Jason with the name of your project, your website, and a
+brief description.  </p>
 
 <center>
 [<a href="index.html">Home</a>]
 [<a href="projects.html">Projects</a>]
 [<a href="about.html">About</a>]
-[<a href="https://sourceforge.net/project/showfiles.php?group_id=3368">Download</a>]
-[<a href="api/index.html">API</a>]
 [<a href="https://sourceforge.net/forum/?group_id=3368">Forums</a>]
-[<a href="http://cvs.sourceforge.net/cgi-bin/viewcvs.cgi/opennlp/">CVS</a>]
 [<a href="links.html">Links</a>]
 </center>
 
 <HR WIDTH="100%">
     <h3>
-    2001 October 24 <br>
+    2003 March 21 <br>
     </h3>  
 
 </td>
