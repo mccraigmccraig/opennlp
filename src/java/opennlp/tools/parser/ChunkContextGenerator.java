@@ -21,7 +21,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import opennlp.tools.chunker.ChunkerContextGenerator;
-import opennlp.tools.util.Sequence;
+import opennlp.tools.util.Cache;
 
 /**
  * Creates predivtive context for the pre-chunking phases of parsing.
@@ -29,32 +29,30 @@ import opennlp.tools.util.Sequence;
 public class ChunkContextGenerator implements ChunkerContextGenerator {
 
   private static final String EOS = "eos";
+  private Cache contextsCache;
+  private Object wordsKey;
 
+  
+  public ChunkContextGenerator() {
+    this(0);
+  }
+  
+  public ChunkContextGenerator(int cacheSize) {
+    super();
+    if (cacheSize > 0) {
+      contextsCache = new Cache(cacheSize);
+    }
+  }
+  
   public String[] getContext(Object o) {
     Object[] data = (Object[]) o;
-    return (getContext(((Integer) data[0]).intValue(), (List) data[1], (List) data[3], ((Sequence) data[2]).getOutcomes()));
+    return (getContext(((Integer) data[0]).intValue(), (String[]) data[1], (String[]) data[2], (String[]) data[3]));
   }
-  
-  public String[] getContext(int i, List toks, Sequence s, Object[] ac) {
-    return getContext(i,toks,s.getOutcomes(),(List) ac[0]); 
-  }
-
-  public String[] getContext(int i, List toks, List preds, List tags) {
-    return (getContext(i, toks.toArray(), (String[]) tags.toArray(new String[tags.size()]), (String[]) preds.toArray(new String[preds.size()])));
-  }
-  
+    
   public String[] getContext(int i, Object[] words, String[] prevDecisions, Object[] ac) {
     return(getContext(i,words,(String[]) ac[0],prevDecisions));
   }
 
-  /**
-   * Returns the contexts for chunking of the specified index. 
-   * @param i The index of the token in the specified toks array for which the context should be constructed. 
-   * @param words The tokens of the sentence.  The <code>toString</code> methods of these objects should return the token text.
-   * @param preds The previous decisions made in the taging of this sequence.  Only indices less than i will be examined.
-   * @param tags The POS tags for the the specified tokens.
-   * @return An array of predictive contexts on which a model basis its decisions.
-   */
   public String[] getContext(int i, Object[] words, String[] tags, String[] preds) {
     List features = new ArrayList(19);
     int x0 = i;
@@ -62,63 +60,84 @@ public class ChunkContextGenerator implements ChunkerContextGenerator {
     int x_1 = x0 - 1;
     int x2 = x0 + 2;
     int x1 = x0 + 1;
-    String ct_2;
-    String ctbo_2;
-    String ct_1;
-    String ctbo_1;
-    String ct0;
-    String ctbo0;
-    String ct1;
-    String ctbo1;
-    String ct2;
-    String ctbo2;
+    
+    String w_2,w_1,w0,w1,w2;
+    String t_2,t_1,t0,t1,t2;
+    String p_2,p_1;
 
     // chunkandpostag(-2)
     if (x_2 >= 0) {
-      String t_2 = tags[x_2];
-      ct_2 = chunkandpostag(-2, words[x_2].toString(), tags[x_2], t_2);
-      ctbo_2 = chunkandpostagbo(-2, tags[x_2], t_2);
+      t_2=tags[x_2];
+      p_2=preds[x_2];
+      w_2=words[x_2].toString();
     }
     else {
-      ct_2 = chunkandpostag(-2, EOS, EOS, EOS);
-      ctbo_2 = chunkandpostagbo(-2, EOS, EOS);
+      t_2=EOS;
+      p_2=EOS;
+      w_2=EOS;
     }
 
     // chunkandpostag(-1)
     if (x_1 >= 0) {
-      String t_1 = tags[x_1];
-      ct_1 = chunkandpostag(-1, words[x_1].toString(), tags[x_1], t_1);
-      ctbo_1 = chunkandpostagbo(-1, tags[x_1], t_1);
+      t_1=tags[x_1];
+      p_1=preds[x_1];
+      w_1=words[x_1].toString();
     }
     else {
-      ct_1 = chunkandpostag(-1, EOS, EOS, EOS);
-      ctbo_1 = chunkandpostagbo(-1, EOS, EOS);
+      t_1=EOS;
+      p_1=EOS;
+      w_1=EOS;
     }
 
     // chunkandpostag(0)
-    ct0 = chunkandpostag(0, words[x0].toString(), tags[x0], null);
-    ctbo0 = chunkandpostagbo(0, tags[x0], null);
+    t0=tags[x0];
+    w0=words[x0].toString();
 
     // chunkandpostag(1)
     if (x1 < tags.length) {
-      ct1 = chunkandpostag(1, words[x1].toString(), tags[x1], null);
-      ctbo1 = chunkandpostagbo(1, tags[x1], null);
+      t1=tags[x1];
+      w1=words[x1].toString();
     }
     else {
-      ct1 = chunkandpostag(1, EOS, EOS, EOS);
-      ctbo1 = chunkandpostagbo(1, EOS, EOS);
+      t1=EOS;
+      w1=EOS;
     }
 
     // chunkandpostag(2)
     if (x2 < tags.length) {
-      ct2 = chunkandpostag(2, words[x2].toString(), tags[x2], null);
-      ctbo2 = chunkandpostagbo(2, tags[x2], null);
+      t2=tags[x2];
+      w2=words[x2].toString();
     }
     else {
-      ct2 = chunkandpostag(2, EOS, EOS, EOS);
-      ctbo2 = chunkandpostagbo(2, EOS, EOS);
+      t2=EOS;
+      w2=EOS;
     }
-
+    
+    String cacheKey = x0+t_2+t1+t0+t1+t2+p_2+p_1;
+    if (contextsCache!= null) {
+      if (wordsKey == words) {
+        String[] contexts = (String[]) contextsCache.get(cacheKey);
+        if (contexts != null) {
+          return contexts;
+        }
+      }
+      else {
+        contextsCache.clear();
+        wordsKey = words;
+      }
+    }
+    
+    String ct_2 = chunkandpostag(-2, w_2, t_2, p_2);
+    String ctbo_2 = chunkandpostagbo(-2, t_2, p_2);
+    String ct_1 = chunkandpostag(-1, w_1, t_1, p_1);
+    String ctbo_1 = chunkandpostagbo(-1, t_1, p_1);
+    String ct0 = chunkandpostag(0, w0, t0, null);
+    String ctbo0 = chunkandpostagbo(0, t0, null);
+    String ct1 = chunkandpostag(1, w1, t1, null);
+    String ctbo1 = chunkandpostagbo(1, t1, null);
+    String ct2 = chunkandpostag(2, w2, t2, null);
+    String ctbo2 = chunkandpostagbo(2, t2, null);
+    
     features.add("default");
     features.add(ct_2);
     features.add(ctbo_2);
@@ -142,8 +161,11 @@ public class ChunkContextGenerator implements ChunkerContextGenerator {
     features.add(ctbo0 + "," + ct1);
     features.add(ct0 + "," + ctbo1);
     features.add(ctbo0 + "," + ctbo1);
-
-    return ((String[]) features.toArray(new String[features.size()]));
+    String contexts[] = (String[]) features.toArray(new String[features.size()]);
+    if (contextsCache != null) {
+      contextsCache.put(cacheKey,contexts);
+    }
+    return (contexts);
   }
 
   private String chunkandpostag(int i, String tok, String tag, String chunk) {
