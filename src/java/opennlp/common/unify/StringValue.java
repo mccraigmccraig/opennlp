@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////////
-// Copyright (C) 2000 Jason Baldridge and Gann Bierner
+// Copyright (C) 2001 Jason Baldridge
 // 
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
@@ -19,22 +19,30 @@
 package opennlp.common.unify;
 
 /**
- * An interface for classes that may be unified.
+ * A unifiable String value.
  *
- * @author      Gann Bierner
- * @version     $Revision: 1.6 $, $Date: 2001/12/11 23:29:24 $
+ * @author      Jason Baldridge
+ * @version     $Revision: 1.1 $, $Date: 2001/12/11 23:29:24 $
  **/
-public interface Unifiable {
-   
+public class StringValue implements Unifiable {
+    private String _val;
+
+    public StringValue (String s) {
+	_val = s;
+    }
+
+
     /**
      * Determines if a Variable occurs within this Unifiable
      *
      * @param v the Variable to check for
      * @return whether or not the Variable occurs
      */
-    public boolean occurs (Variable v);
+    public boolean occurs (Variable v) {
+	return false;
+    }
 
-    
+
     /**
      * Tests for equality with the given Object.
      *
@@ -42,8 +50,17 @@ public interface Unifiable {
      * @return true if this Unifiable is equal to <code>o</code>,
      * false if not.
      **/
-    public boolean equals (Object o);
+    public boolean equals (Object o) {
+	if (o instanceof String) {
+	    return _val.equals(o);
+	} else if (o instanceof StringValue) {
+	    return _val.equals(((StringValue)o)._val);
+	} else {
+	    return false;
+	}
+    }
 
+  
     /**
      * Unify this Unfiable with another Object.
      *
@@ -54,27 +71,30 @@ public interface Unifiable {
      * @return an object which represents the unification of 
      *         this Unifiable with the Object
      */
-    public Object unify (Object o, Substitution s) throws UnifyFailure;
+    public Object unify (Object o, Substitution s) throws UnifyFailure {
+	if (equals(o)) {
+	    return this;
+	} else {
+	    throw new UnifyFailure();
+	}
+    }
+
 
     /**
-     * Check if this Unifiable can unify with another Object.  This
-     * should be implemented as a quick check to allow users of the
-     * Unifiable to scan a group of Unifications to rapidly see if the
-     * entire group is at least possible before descending into each
-     * one with a full unification procedure.  Thus, if a call to this
-     * method does not result in a UnifyFailure exception being
-     * thrown, it doesn't mean that the Object can definitely be
-     * unified with this Unifiable -- what is important is that when a
-     * call to this method throws a UnifyFailure exception, it permits
-     * one to avoid calling the unify() method on other Unifiables in
-     * a group because the quick check failed on this one.
+     * Check if this StringValue can unify with another Object.
      *
      * @param o object to check for unifiability
      * @exception UnifyFailure if this Unifiable cannot be unified with 
      *            the Object
      * @return the Object o, unmodified 
      **/
-    public Object unifyCheck (Object o) throws UnifyFailure;
+    public Object unifyCheck (Object o) throws UnifyFailure {
+	if (o instanceof StringValue || o instanceof String) {
+	    return o;
+	} else {
+	    throw new UnifyFailure();
+	}
+    }
 
     /**
      * Replaces any variables in this Unifiable with the values found
@@ -84,7 +104,13 @@ public interface Unifiable {
      * @return a copy of this Unifiable with all variables from the
      *         Substitution replaced by their values.  
      */
-    public Object fill (Substitution s);
-    
+    public Object fill (Substitution s) {
+	return this;
+    }
 
+
+    public String toString () {
+	return _val;
+    }
+    
 }
