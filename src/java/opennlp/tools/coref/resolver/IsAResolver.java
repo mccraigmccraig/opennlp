@@ -23,7 +23,7 @@ import java.util.List;
 import java.util.regex.Pattern;
 
 import opennlp.tools.coref.DiscourseEntity;
-import opennlp.tools.coref.MentionContext;
+import opennlp.tools.coref.mention.MentionContext;
 
 public class IsAResolver extends MaxentResolver {
 
@@ -53,27 +53,27 @@ public class IsAResolver extends MaxentResolver {
 
   protected boolean excluded(MentionContext ec, DiscourseEntity de) {
     MentionContext cec = de.getLastExtent();
-    //System.err.println("MaxentIsAResolver.excluded?: ec.span="+ec.span+" cec.span="+cec.span+" cec="+cec.toText()+" lastToken="+ec.nextToken);
+    //System.err.println("IsAResolver.excluded?: ec.span="+ec.getSpan()+" cec.span="+cec.getSpan()+" cec="+cec.toText()+" lastToken="+ec.getNextToken());
     if (ec.getSentenceNumber() != cec.getSentenceNumber()) {
-      //System.err.println("MaxentIsAResolver.excluded: (true) not same sentence");
+      //System.err.println("IsAResolver.excluded: (true) not same sentence");
       return (true);
     }
     //shallow parse appositives
-    //System.err.println("MaxentIsAResolver.excluded: ec="+ec.toText()+" "+ec.span+" cec="+cec.toText()+" "+cec.span);
+    //System.err.println("IsAResolver.excluded: ec="+ec.toText()+" "+ec.span+" cec="+cec.toText()+" "+cec.span);
     if (cec.getSpan().getEnd() == ec.getSpan().getStart() - 2) {
       return (false);
     }
     //full parse w/o trailing comma
     if (cec.getSpan().getEnd() == ec.getSpan().getEnd()) {
-      //System.err.println("MaxentIsAResolver.excluded: (false) spans share end");
+      //System.err.println("IsAResolver.excluded: (false) spans share end");
       return (false);
     }
-    //full parse w/ trailing comma
-    if (cec.getSpan().getEnd() == ec.getSpan().getEnd() + 1 && (ec.getNextToken().toString().equals(",") || ec.getNextToken().toString().equals("."))) {
-      //System.err.println("MaxentIsAResolver.excluded: (false) spans end + punct");
+    //full parse w/ trailing comma or period
+    if (cec.getSpan().getEnd() <= ec.getSpan().getEnd() + 2 && (ec.getNextToken().toString().equals(",") || ec.getNextToken().toString().equals("."))) {
+      //System.err.println("IsAResolver.excluded: (false) spans end + punct");
       return (false);
     }
-    //System.err.println("MaxentIsAResolver.excluded: (true) default");
+    //System.err.println("IsAResolver.excluded: (true) default");
     return (true);
   }
 
