@@ -89,9 +89,13 @@ public class EnglishTreebankChunker extends ChunkerME {
     return (true);
   }
 
+  /**
+   * Chunks tokenized input from stdin. <br>
+   * Usage: java opennlp.tools.chunker.EnglishTreebankChunker model < tokenized_sentences <br>
+   */
   public static void main(String[] args) throws IOException {
       if (args.length == 0) {
-        System.err.println("Usage:  java opennlp.tools.chunker.EnglishTreebankChunker model < tokenized_sentences");
+        System.err.println("Usage: java opennlp.tools.chunker.EnglishTreebankChunker model < tokenized_sentences");
         System.exit(1);
       }
       EnglishTreebankChunker chunker = new EnglishTreebankChunker(args[0]);
