@@ -18,7 +18,7 @@
 
 package opennlp.common.parse;
 
-import opennlp.common.structure.*;
+import opennlp.common.synsem.*;
 import opennlp.common.xml.*;
 
 import java.io.*;
@@ -29,17 +29,9 @@ import java.util.ArrayList;
  * a structured form representing that string.
  *
  * @author      Gann Bierner
- * @version     $Revision: 1.4 $, $Date: 2001/12/05 13:43:12 $
+ * @version     $Revision: 1.5 $, $Date: 2001/12/11 22:22:55 $
  */
 public interface Parser {
-    
-    /**
-     * Tells the parser where to get lexical items and how to combine them.
-     *
-     * @param _L the lexicon containing the whole vocabulary
-     * @param _R the rules saying how to combine lexical items
-     */
-    public void setGrammar(Lexicon _L, RuleGroup _R);
     
     /**
      * Parses a string
@@ -51,8 +43,7 @@ public interface Parser {
      * @exception ParseException thrown if a parse can't be found for the
      *            entire string
      */
-    public void parse(String s)
-	throws CatParseException, LexException, ParseException;
+    public void parse (String s) throws ParseException;
     
     /**
      * Parses given a set of lexical items.  The lexical choice phrase
@@ -64,9 +55,8 @@ public interface Parser {
      * @exception ParseException thrown if a parse can't be found for the
      *            entire string
      */
-    public void parse(Constituent[] inits)
-	throws ParseException, CatParseException,
-	IOException, LexException;
+    public void parse (Sign[] inits) throws ParseException;
+
     /**
      * Parses given a set of lexical items.  The lexical choice phrase
      * has already been done.
@@ -77,51 +67,7 @@ public interface Parser {
      * @exception ParseException thrown if a parse can't be found for the
      *            entire string
      */
-    public void parse(NLPDocument d)
-	throws ParseException, CatParseException, IOException, LexException;
-
-    /**
-     * Parses given either a string or lexical items plus a KB.
-     *
-     * @param o the string to be parsed, tokens separated by whitespace
-     * @param b knowledge that might be useful when parsing
-     * @exception CatParseException thrown if the syntax/semantics of
-     *            a lexical item can't be parsed
-     * @exception LexException thrown if a lex item isn't found
-     * @exception ParseException thrown if a parse can't be found for the
-     *            entire string
-     * @exception IOException
-     */
-    public void parse(String s, KB b)
-	throws ParseException, LexException, IOException, CatParseException;
-    /**
-     * Parses given either a string or lexical items plus a KB.
-     *
-     * @param c the lexical entries already computed
-     * @param b knowledge that might be useful when parsing
-     * @exception CatParseException thrown if the syntax/semantics of
-     *            a lexical item can't be parsed
-     * @exception LexException thrown if a lex item isn't found
-     * @exception ParseException thrown if a parse can't be found for the
-     *            entire string
-     * @exception IOException
-     */
-    public void parse(Constituent[] c, KB b)
-	throws ParseException, LexException, IOException, CatParseException;
-    /**
-     * Parses given either a string or lexical items plus a KB.
-     *
-     * @param d A preprocessed xml document
-     * @param b knowledge that might be useful when parsing
-     * @exception CatParseException thrown if the syntax/semantics of
-     *            a lexical item can't be parsed
-     * @exception LexException thrown if a lex item isn't found
-     * @exception ParseException thrown if a parse can't be found for the
-     *            entire string
-     * @exception IOException
-     */
-    public void parse(NLPDocument d, KB b)
-	throws ParseException, LexException, IOException, CatParseException;
+    public void parse (NLPDocument d) throws ParseException;
 
     /**
      * Returns the results of the parse
