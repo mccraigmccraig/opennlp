@@ -39,7 +39,7 @@ import java.util.ArrayList;
  * string to determine if they signify the end of a sentence.
  *
  * @author      Jason Baldridge and Tom Morton
- * @version     $Revision: 1.5 $, $Date: 2004/04/22 02:24:11 $
+ * @version     $Revision: 1.6 $, $Date: 2004/06/11 19:15:30 $
  */
 
 public class SentenceDetectorME implements SentenceDetector {
@@ -56,9 +56,6 @@ public class SentenceDetectorME implements SentenceDetector {
 
   // a pool of read-only java.lang.Integer objects in the range 0..100
   private static final IntegerPool INT_POOL = new IntegerPool(100);
-
-  // the index of the "true" outcome in the model
-  private final int _trueIndex;
 
   private List sentProbs;
 
@@ -102,7 +99,6 @@ public class SentenceDetectorME implements SentenceDetector {
    */
   public SentenceDetectorME(MaxentModel m, ContextGenerator cg, EndOfSentenceScanner s) {
     model = m;
-    _trueIndex = model.getIndex("T");
     cgen = cg;
     scanner = s;
   }
@@ -167,7 +163,7 @@ public class SentenceDetectorME implements SentenceDetector {
       sentProb *= probs[model.getIndex(bestOutcome)];
       if (bestOutcome.equals("T") && isAcceptableBreak(s, index, cint)) {
         if (index != cint) {
-          positions.add(INT_POOL.get(getFirstNonWS(s, cint + 1)));
+          positions.add(INT_POOL.get(getFirstNonWS(s, getFirstWS(s,cint + 1))));
           sentProbs.add(new Double(probs[model.getIndex(bestOutcome)]));
         }
         index = cint + 1;
