@@ -16,7 +16,7 @@
 // Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 //////////////////////////////////////////////////////////////////////////////
 
- package opennlp.common.xml;
+package opennlp.common.xml;
 
 import java.io.*;
 
@@ -24,7 +24,7 @@ import java.io.*;
  * A class for going from plain text to a roughly marked-up NLPDocument.
  *
  * @author      Jason Baldridge
- * @version     $Revision: 1.1 $, $Date: 2001/10/23 13:46:24 $
+ * @version     $Revision: 1.2 $, $Date: 2001/10/30 11:16:17 $
  */
 
 public class RawToXml {
@@ -42,29 +42,29 @@ public class RawToXml {
     }
 
     public static PreProcessDocument process(Reader r) {
-	String text = "";
-	String par, read;
-	
+	StringBuffer text = new StringBuffer(32);
+	String read;
+	StringBuffer chunk = new StringBuffer(16);
+
 	try {
 	    BufferedReader br = new BufferedReader(r);
 	    read = br.readLine();
 
 	    while (read != null) {
-		par = "";
-		
+				
 		while (read.equals("")) read = br.readLine();
 		while (read != null && !read.equals("")) {
-		    par += read;
+		    chunk.append(read);
 		    read = br.readLine();
 		}
 		
-		if (!par.equals(""))
-		    text += "<PAR><SENT><TOK><LEX><![CDATA[" + par +
-			"]]></LEX></TOK></SENT></PAR>";
+		// Don't think this is needed - jmb, joaoc
+		//if (chunk.length() > 0)
+		//   text.append("<PAR><SENT><TOK><LEX><![CDATA[").append(chunk.toString()).append("]]></LEX></TOK></SENT></PAR>");
 
 	    }
 	    
-	    return new PreProcessDocument(text);
+	    return new PreProcessDocument(chunk.toString());
 	    
 	} catch (Exception E) {
 	    System.out.println(E);
@@ -75,6 +75,12 @@ public class RawToXml {
 
     public static PreProcessDocument process(String s) {
 	return new PreProcessDocument(s);
+    }
+
+    public static void main(String[] args){
+	PreProcessDocument ppd = process(new File(args[0]));
+	// PreProcessDocument ppd = process(args[0]);
+	System.out.println(ppd.toString());
     }
 
 }
