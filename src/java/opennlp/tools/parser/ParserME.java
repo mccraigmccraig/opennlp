@@ -93,10 +93,9 @@ public class ParserME {
     parses.clear();
     int i = 0; //derivation length
     int maxDerivationLength = 2 * p.getChildren().size() + 3;
-    System.err.println("maxDerivationLength=" + maxDerivationLength);
     odh.add(p);
     Parse guess = null;
-    double bestComplete = -100; //approximating -infinity in ln domain
+    double bestComplete = -100000; //approximating -infinity in ln domain
     while (parses.size() < M && i < maxDerivationLength) {
       ndh = new TreeSet();
       if (odh.size() > 0) {
@@ -146,14 +145,6 @@ public class ParserME {
     //System.err.println(parses.size()+" parses");
 
     /*  convert to use iterator
-    if (parses.size() == 0) {
-      System.out.print("1 ");
-      guess.setType(TOP_NODE);
-      guess.show();
-      System.out.println();
-    }
-    else {
-    */
     int pc = 1;
     for (Iterator pi = parses.iterator(); pi.hasNext(); pc++) {
       Parse tp = (Parse) pi.next();
@@ -162,7 +153,7 @@ public class ParserME {
       System.out.println();
     }
     System.out.println();
-
+    */
     Parse r;
     if (parses.size() == 0) {
       System.err.println("Couldn't find parse for: " + p);
@@ -307,15 +298,11 @@ public class ParserME {
               lastStart = part;
               lst = tag.substring(START.length());
             }
-            else if (lastStart != null) {
-              if (tag.startsWith(CONT) && !lst.equals(tag.substring(CONT.length()))) {
-                continue; //Cont must match previous start
+            else if (tag.startsWith(CONT)) {
+              if (lastStart == null || !lst.equals(tag.substring(CONT.length()))) {
+                continue; //Cont must match previous start or continue
               }
             }
-            else {
-              continue; //must have a start before anything else
-            }
-
             Parse newParse1 = (Parse) p.clone(); //clone parse
             newParse1.derivation.append(max).append("-");
             Parse pc = (Parse) part.clone(); //clone constituent being labeled

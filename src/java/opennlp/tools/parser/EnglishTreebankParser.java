@@ -139,7 +139,7 @@ public class EnglishTreebankParser extends ParserME {
           start += tok.length() + 1;
         }
         p = parser.parse(p);
-        System.out.print(p.getProb()+" ");
+        //System.out.print(p.getProb()+" ");
         p.show();
         System.out.println();
       }
