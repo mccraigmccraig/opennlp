@@ -1,4 +1,4 @@
-<!-- $Id: build.xml,v 1.6 2001/11/09 15:23:47 jasonbaldridge Exp $ -->
+<!-- $Id: build.xml,v 1.7 2001/11/19 02:15:59 ericdf Exp $ -->
 <!-- This build file based on the JDOM build.xml file. -->
 
 <project default="package" basedir=".">
@@ -43,6 +43,7 @@
     <path id="build.classpath">
       <pathelement location="${lib.dir}/jdom.jar"/>
       <pathelement location="${lib.dir}/xerces.jar"/>
+      <pathelement location="${lib.dir}/gnu-regexp.jar"/>
     </path>
 
 
