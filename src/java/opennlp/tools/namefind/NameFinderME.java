@@ -157,7 +157,7 @@ public class NameFinderME implements NameFinder {
 
   public static void main(String[] args) throws IOException {
     if (args.length == 0) {
-      System.err.println("usage: NameFinderME training_file model");
+      System.err.println("Usage: NameFinderME training_file model");
       System.exit(1);
     }
     try {
