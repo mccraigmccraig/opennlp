@@ -86,7 +86,7 @@ public class NameFinderME implements NameFinder {
       if (li == -1) {
         return false;
       }
-      else if (((String) tags.get(li)).equals(START)) {
+      else if (((String) tags.get(li)).equals(OTHER)) {
         return false;
       }
     }
