@@ -25,7 +25,7 @@ License: LGPL
 ------------------------------------------------------------------------
 jdom.jar
 
-JDOM, version 1.0 beta 7
+JDOM, version 1.0 beta 8
 Homepage: http://www.jdom.org
 License: see jdom.license
 
@@ -36,7 +36,7 @@ outputting XML data from Java code
 ------------------------------------------------------------------------
 xerces.jar
 
-The Xerces Java Parser for XML, version 1.4.3
+The Xerces Java Parser for XML, version 1.4.4
 Homepage: http://xml.apache.org/xerces-j/
 License: Apache Software License
 
