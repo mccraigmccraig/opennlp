@@ -21,7 +21,9 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Iterator;
 import java.util.List;
 import java.util.StringTokenizer;
 
@@ -118,6 +120,22 @@ public class EnglishTreebankParser extends ParserME {
       return (true);
     }
   }
+  
+  private static String convertToken(String token) {
+    if (token.equals("(")) {
+      return "-LRB-";
+    }
+    else if (token.equals(")")) {
+      return "-RRB-";
+    }
+    else if (token.equals("{")) {
+      return "-LCB-";
+    }
+    else if (token.equals("}")) {
+      return "-RCB-";
+    }
+    return token;
+  }
 
   public static void main(String[] args) throws IOException {
     if (args.length != 1) {
@@ -130,12 +148,21 @@ public class EnglishTreebankParser extends ParserME {
     String line;
     try {
       while (null != (line = in.readLine())) {
-        Parse p = new Parse(line, new Span(0, line.length()), "INC", 1, null);
         StringTokenizer str = new StringTokenizer(line);
-        int start = 0;
+        int numToks = str.countTokens();
+        StringBuffer sb = new StringBuffer();
+        List tokens = new ArrayList();        
         while (str.hasMoreTokens()) {
-          String tok = str.nextToken();
-          p.insert(new Parse(line, new Span(start, start + tok.length()), ParserME.TOK_NODE, 0));
+          String tok = convertToken(str.nextToken());
+          tokens.add(tok);
+          sb.append(tok).append(" ");
+        }
+        String text = sb.substring(0,sb.length()-1).toString();
+        Parse p = new Parse(text, new Span(0,text.length()), "INC", 1, null);
+        int start = 0;
+        for (Iterator ti=tokens.iterator();ti.hasNext();) {
+          String tok = (String) ti.next();
+          p.insert(new Parse(text, new Span(start, start + tok.length()), ParserME.TOK_NODE, 0));
           start += tok.length() + 1;
         }
         p = parser.parse(p);
