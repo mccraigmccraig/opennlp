@@ -19,8 +19,18 @@ else
   PS=":"
 fi
 
-LOCALCLASSPATH=$JAVA_HOME/lib/tools.jar${PS}./lib/ant.jar${PS}./lib/jaxp.jar${PS}./lib/crimson.jar${PS}./lib/jdom.jar${PS}./lib/xerces.jar${PS}./lib/xml.jar
+LOCALCLASSPATH=$JAVA_HOME/lib/tools.jar
+# add in the dependency .jar files
+DIRLIBS=lib/*.jar
+for i in ${DIRLIBS}
+do
+    if [ "$i" != "${DIRLIBS}" ] ; then
+        LOCALCLASSPATH=$LOCALCLASSPATH${PS}"$i"
+    fi
+done
+
 ANT_HOME=./lib
+
 
 echo Building with classpath $LOCALCLASSPATH
 echo
