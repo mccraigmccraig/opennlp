@@ -25,7 +25,7 @@ import java.util.Iterator;
 import java.util.Stack;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import java.text.DecimalFormat;
+//import java.text.DecimalFormat;
 
 /** Class for holding constitents. */
 public class Parse implements Cloneable, Comparable {
@@ -37,7 +37,7 @@ public class Parse implements Cloneable, Comparable {
   private String label;
   private Parse parent;
 
-  private static DecimalFormat df = new DecimalFormat("#.###");
+  //private static DecimalFormat df = new DecimalFormat("#.###");
   /* these are added to */
   double prob;
   StringBuffer derivation;
