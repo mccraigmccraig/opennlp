@@ -31,7 +31,7 @@ import java.util.*;
  * specifications.
  *
  * @author      Jason Baldridge
- * @version     $Revision: 1.8 $, $Date: 2001/11/29 14:32:07 $
+ * @version     $Revision: 1.9 $, $Date: 2001/11/29 14:45:37 $
  **/
 public class NLPDocument extends Document {
     public static final String WORD_LABEL = "w";
@@ -146,18 +146,10 @@ public class NLPDocument extends Document {
 	String[] sents = new String[sentEls.size()];
 	int index = 0;
 	for (Iterator i=sentEls.iterator(); i.hasNext();) {
-	    List tokEls = getTokenElements((Element)i.next());
+	    List words = getWords((Element)i.next());
 	    StringBuffer sent = new StringBuffer();
-	    for (Iterator j=tokEls.iterator(); j.hasNext();) {
-		List wordEls = getWordElements((Element)j.next());
-		if (wordEls.size() == 1) {
-		    sent.append(((Element)wordEls.get(0)).getText()).append(' ');
-		}
-		else {
-		    for (Iterator k=wordEls.iterator(); k.hasNext();)
-			sent.append(((Element)k.next()).getText()).append(' ');
-		}
-	    }	    
+	    for (Iterator j=words.iterator(); j.hasNext();)
+		sent.append((String)j.next()).append(' ');
 	    sents[index++] = sent.toString().trim();
 	}
 	return sents;
@@ -222,6 +214,15 @@ public class NLPDocument extends Document {
 	return getTokenElements(e).iterator();
     }
 
+    public List getWords (Element e) {
+	List wordEls = getWordElements(e);
+	List words = new ArrayList(wordEls.size());
+	for (Iterator i=wordIterator(e); i.hasNext();) {
+	    words.add(((Element)i.next()).getText());
+	}
+	return words;
+    }
+    
     /**
      * Grabs all word elements below the given element;
      **/
@@ -322,7 +323,7 @@ public class NLPDocument extends Document {
 
     public static void main (String[] args) {
 	NLPDocument doc = new NLPDocument("Here is a sentence. And this is another one.\n\nThis is a sentence in a new paragraph.");
-	//System.out.println(doc.toString());
 	System.out.println(doc.toXml());
+	System.out.println(doc.toString());
     }
 }
