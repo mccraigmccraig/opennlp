@@ -23,7 +23,7 @@ import java.util.*;
  * A helper class for doing very *basic* English morphological analysis.
  *
  * @author      Jason Baldridge
- * @version     $Revision: 1.3 $, $Date: 2002/04/08 14:41:10 $
+ * @version     $Revision: 1.4 $, $Date: 2002/04/08 14:46:59 $
  */
 public final class BasicEnglishAffixes {
 
@@ -99,7 +99,10 @@ public final class BasicEnglishAffixes {
     public static int nextSuffix(String word) {
 	int index = 0;
 	short wordLength = (short)word.length();
-	
+	if (wordLength < MIN_WORD_LENGTH) {
+	    return 0;
+	}
+
 	String end = word.substring(MIN_WORD_LENGTH);
 	short len = (short)end.length();
 	if (len < 2) {
@@ -112,8 +115,9 @@ public final class BasicEnglishAffixes {
 	    return wordLength - 5;
 	} else if (len>1 && contains(twoCharSuffixes, end.substring(len-2))) {
 	    return wordLength - 2;
+	} else {
+	    return 0;
 	}
-	else return 0;
     }
 
     public static boolean contains (String[] suffixes, String suffix) {
