@@ -1,5 +1,57 @@
 0.6.6
 -----
+Summary: Lots of improvements in the way XML is handled.  The
+structure of NLPDocuments has been changed, though no DTD or Schema
+has been defined for it yet.  The NLPDocument now extends
+org.jdom.Document rather than holding a Document object inside it, and
+many methods have been added to make it easy to retrieve and
+manipulate various kinds of elements of the document.
+
+Here is an example of the XML structure of an NLPDocument:
+
+<nlpDocument>
+  <text>
+    <p>
+      <s>
+        <t>
+          <w pos="RB">First</w>
+        </t>
+        <t>
+          <w pos=",">,</w>
+        </t>
+        <t>
+          <w pos="PRP">it</w>
+        </t>
+        <t>
+          <w pos="VBZ">'s</w>
+        </t>
+        <t>
+          <w pos="DT">a</w>
+        </t>
+        <t>
+          <w pos="NN">sentence</w>
+        </t>
+        <t>
+          <w pos="IN">with</w>
+        </t>
+        <t type="name">
+          <w pos="NNP">John</w>
+          <w pos="NNP">Smith</w>
+        </t>
+        <t>
+          <w pos="IN">in</w>
+        </t>
+        <t>
+          <w pos="CD">it</w>
+        </t>
+        <t>
+          <w pos=".">.</w>
+        </t>
+      </s>
+    </p>
+  </text>
+</nlpDocument>
+
 Joao: changed NLPDocument. Extends org.jdom.Document. Now the constructor 
 method creates a NLPDocument object from a given text, breaking it into 
 paragraphs and "quasiWords" (chunks of text separated by white spaces). 
@@ -9,6 +61,9 @@ different kinds of Elements easier.  Removed RawToXml and
 PreProcessDocument classes.
 
 Jason: All exceptions in opennlp.common now extend NLPException.
+
+Jason: Removed updateKB() method from Parser interface.
+
 
 0.6.5
 -----
