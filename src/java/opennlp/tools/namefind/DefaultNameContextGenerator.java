@@ -92,6 +92,8 @@ public class DefaultNameContextGenerator implements NameContextGenerator {
       po = preds[i-1];
     }
     features.add("po="+po);
+    features.add("pow="+po+toks[i]);
+    features.add("powf="+po+wordFeature(toks[i].toString()));
     features.add("ppo="+ppo);
     //System.err.println("getContext: "+i+" "+toks[i]+" "+features);
     return (String[]) features.toArray(new String[features.size()]);
