@@ -33,6 +33,8 @@ import opennlp.tools.util.Span;
  * Class is used to create a name finder for English.
  */
 public class EnglishNameFinder extends NameFinderME {
+  
+  public static String[] NAME_TYPES = {"person", "organization", "location", "date", "time", "percentage", "money"};
 
   /** Creates an English name finder using the specified model.
    * @param mod The model used for finding names.
@@ -115,7 +117,7 @@ public class EnglishNameFinder extends NameFinderME {
 
   public static void main(String[] args) throws IOException {
     if (args.length == 0) {
-      System.err.println("Usage EnglishNameFinder model1 model2 ... modelN < sentnces");
+      System.err.println("Usage EnglishNameFinder model1 model2 ... modelN < sentences");
       System.exit(1);
     }
 
