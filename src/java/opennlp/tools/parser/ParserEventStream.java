@@ -94,10 +94,10 @@ public class ParserEventStream implements EventStream {
       ichunks.add(p);
     }
     else {
-      List kids = p.getChildren();
+      Parse[] kids = p.getChildren();
       boolean allKidsAreTags = true;
-      for (int ci = 0, cl = kids.size(); ci < cl; ci++) {
-        if (!((Parse) kids.get(ci)).isPosTag()) {
+      for (int ci = 0, cl = kids.length; ci < cl; ci++) {
+        if (!kids[ci].isPosTag()) {
           allKidsAreTags = false;
         }
       }
@@ -105,34 +105,34 @@ public class ParserEventStream implements EventStream {
         ichunks.add(p);
       }
       else {
-        for (int ci = 0, cl = kids.size(); ci < cl; ci++) {
-          getInitialChunks((Parse) kids.get(ci), ichunks);
+        for (int ci = 0, cl = kids.length; ci < cl; ci++) {
+          getInitialChunks(kids[ci], ichunks);
         }
       }
     }
   }
 
-  private static List getInitialChunks(Parse p) {
+  private static Parse[] getInitialChunks(Parse p) {
     List chunks = new ArrayList();
     getInitialChunks(p, chunks);
-    return chunks;
+    return (Parse[]) chunks.toArray(new Parse[chunks.size()]);
   }
 
   private static boolean firstChild(Parse c, Parse parent) {
-    List kids = parent.getChildren();
-    return (kids.get(0) == c);
+    return parent.getChildren()[0] == c;
   }
 
   private static boolean lastChild(Parse c, Parse parent) {
-    List kids = parent.getChildren();
-    return (kids.get(kids.size() - 1) == c);
+    Parse[] kids = parent.getChildren();
+    return (kids[kids.length - 1] == c);
   }
 
   private void addNewEvents() {
     String parseStr = (String) data.nextToken();
     List events = new ArrayList();
-    Parse p = Parse.parseParse(parseStr, rules);
-    List chunks = getInitialChunks(p);
+    Parse p = Parse.parseParse(parseStr);
+    p.updateHeads(rules);
+    Parse[] chunks = getInitialChunks(p);
     if (etype == EventTypeEnum.TAG) {
       addTagEvents(events, chunks);
     }
@@ -145,10 +145,10 @@ public class ParserEventStream implements EventStream {
     this.events = (Event[]) events.toArray(new Event[events.size()]);
   }
 
-  private void addParseEvents(List events, List chunks) {
+  private void addParseEvents(List events, Parse[] chunks) {
     int ci = 0;
-    while (ci < chunks.size()) {
-      Parse c = (Parse) chunks.get(ci);
+    while (ci < chunks.length) {
+      Parse c = chunks[ci];
       Parse parent = c.getParent();
       if (parent != null) {
         String type = parent.getType();
@@ -164,7 +164,7 @@ public class ParserEventStream implements EventStream {
           events.add(new Event(outcome, bcg.getContext(chunks, ci)));
         }
         int start = ci - 1;
-        while (start >= 0 && ((Parse) chunks.get(start)).getParent() == parent) {
+        while (start >= 0 && chunks[start].getParent() == parent) {
           start--;
         }
         if (lastChild(c, parent)) {
@@ -172,6 +172,35 @@ public class ParserEventStream implements EventStream {
             events.add(new Event(ParserME.COMPLETE, kcg.getContext( chunks, type, start + 1, ci)));
           }
           //perform reduce
+          int reduceStart = ci-1;
+          int reduceEnd = ci;
+          while (reduceStart >=0 && chunks[reduceStart].getParent() == parent) {
+            reduceStart--;
+          }
+          reduceStart++;
+          if (!type.equals(ParserME.TOP_NODE)) {
+            Parse[] reducedChunks = new Parse[chunks.length-(reduceEnd-reduceStart+1)+1]; //total - num_removed + 1 (for new node)
+            int ri=0;
+            //insert nodes before reduction
+            for (int rn=reduceStart;ri<rn;ri++) {
+              reducedChunks[ri]=chunks[ri];
+            }
+            //insert reduced node
+            reducedChunks[ri]=parent;
+            ri++;
+            //insert nodes after reduction
+            for (int rci=reduceEnd;rci<chunks.length;rci++) {
+              reducedChunks[ri]=chunks[rci];
+              ri++;
+            }
+            chunks = reducedChunks;
+          }
+          /* probbaly don't need this
+          else {
+            chunks = new Parse[0];
+          }
+          */
+          /* List version of code for reference until testing complete
           chunks.remove(ci);
           ci--;
           while (ci >= 0 && ((Parse) chunks.get(ci)).getParent() == parent) {
@@ -181,6 +210,7 @@ public class ParserEventStream implements EventStream {
           if (!type.equals(ParserME.TOP_NODE)) {
             chunks.add(ci + 1, parent);
           }
+          */
         }
         else {
           if (etype == EventTypeEnum.CHECK) {
@@ -192,12 +222,12 @@ public class ParserEventStream implements EventStream {
     }
   }
 
-  private void addChunkEvents(List events, List chunks) {
+  private void addChunkEvents(List events, Parse[] chunks) {
     List toks = new ArrayList();
     List tags = new ArrayList();
     List preds = new ArrayList();
-    for (int ci = 0, cl = chunks.size(); ci < cl; ci++) {
-      Parse c = (Parse) chunks.get(ci);
+    for (int ci = 0, cl = chunks.length; ci < cl; ci++) {
+      Parse c = chunks[ci];
       if (c.isPosTag()) {
         toks.add(c.toString());
         tags.add(c.getType());
@@ -206,8 +236,9 @@ public class ParserEventStream implements EventStream {
       else {
         boolean start = true;
         String ctype = c.getType();
-        for (Iterator ti = c.getChildren().iterator(); ti.hasNext();) {
-          Parse tok = (Parse) ti.next();
+        Parse[] kids = c.getChildren();
+        for (int ti=0,tl=kids.length;ti<tl;ti++) {
+          Parse tok = kids[ti];
           toks.add(tok.toString());
           tags.add(tok.getType());
           if (start) {
@@ -225,18 +256,19 @@ public class ParserEventStream implements EventStream {
     }
   }
 
-  private void addTagEvents(List events, List chunks) {
+  private void addTagEvents(List events, Parse[] chunks) {
     List toks = new ArrayList();
     List preds = new ArrayList();
-    for (int ci = 0, cl = chunks.size(); ci < cl; ci++) {
-      Parse c = (Parse) chunks.get(ci);
+    for (int ci = 0, cl = chunks.length; ci < cl; ci++) {
+      Parse c = (Parse) chunks[ci];
       if (c.isPosTag()) {
         toks.add(c.toString());
         preds.add(c.getType());
       }
       else {
-        for (Iterator ti = c.getChildren().iterator(); ti.hasNext();) {
-          Parse tok = (Parse) ti.next();
+        Parse[] kids = c.getChildren();
+        for (int ti=0,tl=kids.length;ti<tl;ti++) {
+          Parse tok = kids[ti];
           toks.add(tok.toString());
           preds.add(tok.getType());
         }

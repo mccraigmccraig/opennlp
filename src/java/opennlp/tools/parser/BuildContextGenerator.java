@@ -40,7 +40,7 @@ public class BuildContextGenerator implements ContextGenerator {
 
   public String[] getContext(Object o) {
     Object[] params = (Object[]) o;
-    return getContext((List) params[0], ((Integer) params[1]).intValue());
+    return getContext((Parse[]) params[0], ((Integer) params[1]).intValue());
   }
 
   private String cons(Parse p, int i) {
@@ -80,9 +80,9 @@ public class BuildContextGenerator implements ContextGenerator {
    * @param index The index of the constituent whcihi is being considered.
    * @return the context for building constituents at the specified index.
    */
-  public String[] getContext(List constituents, int index) {
+  public String[] getContext(Parse[] constituents, int index) {
     List features = new ArrayList(100);
-    int ps = constituents.size();
+    int ps = constituents.length;
 
     //default 
     features.add("default");
@@ -95,17 +95,17 @@ public class BuildContextGenerator implements ContextGenerator {
     Parse p2 = null;
 
     if (index - 2 >= 0) {
-      p_2 = (Parse) constituents.get(index - 2);
+      p_2 = constituents[index - 2];
     }
     if (index - 1 >= 0) {
-      p_1 = (Parse) constituents.get(index - 1);
+      p_1 = constituents[index - 1];
     }
-    p0 = (Parse) constituents.get(index);
+    p0 = constituents[index];
     if (index + 1 < ps) {
-      p1 = (Parse) constituents.get(index + 1);
+      p1 = constituents[index + 1];
     }
     if (index + 2 < ps) {
-      p2 = (Parse) constituents.get(index + 2);
+      p2 = constituents[index + 2];
     }
 
     // cons(-2), cons(-1), cons(0), cons(1), cons(2)
@@ -167,7 +167,7 @@ public class BuildContextGenerator implements ContextGenerator {
     String p0Word = p0.toString();
     if (p0Word.equals("-RRB-")) {
       for (int pi = index - 1; pi >= 0; pi--) {
-        Parse p = (Parse) constituents.get(pi);
+        Parse p = constituents[pi];
         if (p.toString().equals("-LRB-")) {
           features.add("bracketsmatch");
           break;
@@ -179,7 +179,7 @@ public class BuildContextGenerator implements ContextGenerator {
     }
     if (p0Word.equals("-RCB-")) {
       for (int pi = index - 1; pi >= 0; pi--) {
-        Parse p = (Parse) constituents.get(pi);
+        Parse p = constituents[pi];
         if (p.toString().equals("-LCB-")) {
           features.add("bracketsmatch");
           break;
@@ -191,7 +191,7 @@ public class BuildContextGenerator implements ContextGenerator {
     }
     if (p0Word.equals("''")) {
       for (int pi = index - 1; pi >= 0; pi--) {
-        Parse p = (Parse) constituents.get(pi);
+        Parse p = constituents[pi];
         if (p.toString().equals("``")) {
           features.add("quotesmatch");
           break;
@@ -203,7 +203,7 @@ public class BuildContextGenerator implements ContextGenerator {
     }
     if (p0Word.equals("'")) {
       for (int pi = index - 1; pi >= 0; pi--) {
-        Parse p = (Parse) constituents.get(pi);
+        Parse p = constituents[pi];
         if (p.toString().equals("`")) {
           features.add("quotesmatch");
           break;
@@ -215,7 +215,7 @@ public class BuildContextGenerator implements ContextGenerator {
     }
     if (p0Word.equals(",")) {
       for (int pi = index - 1; pi >= 0; pi--) {
-        Parse p = (Parse) constituents.get(pi);
+        Parse p = constituents[pi];
         if (p.toString().equals(",")) {
           features.add("iscomma");
           break;
@@ -227,7 +227,7 @@ public class BuildContextGenerator implements ContextGenerator {
     }
     if (p0Word.equals(".") && index == ps - 1) {
       for (int pi = index - 1; pi >= 0; pi--) {
-        Parse p = (Parse) constituents.get(pi);
+        Parse p = constituents[pi];
         if (p.getLabel().startsWith(ParserME.START)) {
           if (pi == 0) {
             features.add("endofsentence");

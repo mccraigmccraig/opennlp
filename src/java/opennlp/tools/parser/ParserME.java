@@ -24,7 +24,6 @@ import java.util.Map;
 import java.util.SortedSet;
 import java.util.TreeSet;
 
-import opennlp.maxent.ContextGenerator;
 import opennlp.maxent.GISModel;
 import opennlp.maxent.MaxentModel;
 import opennlp.maxent.TwoPassDataIndexer;
@@ -93,6 +92,7 @@ public class ParserME {
   private int incompleteIndex;
   
   private boolean createDerivationString = false;
+  private boolean debugOn = false;
   
   /**
    * Creates a new parser using the specified models and head rules.
@@ -162,7 +162,7 @@ public class ParserME {
     ndh.clear();
     parses.clear();
     int i = 0; //derivation length
-    int maxDerivationLength = 2 * p.getChildren().size() + 3;
+    int maxDerivationLength = 2 * p.getChildCount() + 3;
     odh.add(p);
     Parse guess = null;
     double bestComplete = -100000; //approximating -infinity/0 in ln domain
@@ -178,10 +178,11 @@ public class ParserME {
           if (guess == null && i == 2) {
             guess = tp;
           }
-
-          //System.out.print(i + " " + j + " "+tp.getProb());
-          //tp.show();
-          //System.out.println();
+          if (debugOn) {
+            System.out.print(i + " " + j + " "+tp.getProb());
+            tp.show();
+            System.out.println();
+          }
           Parse[] nd = null;
           if (0 == i) {
             nd = advanceTags(tp);
@@ -266,16 +267,23 @@ public class ParserME {
    * @param p The parse to advance.
    * @param Q The amount of probability mass that should be accounted for by the advanced parses. 
    */
-  private Parse[] advanceParses(Parse p, double Q) {
+  private Parse[] advanceParses(final Parse p, double Q) {
     double q = 1 - Q;
+    /** The closest previous node which has been labeled as a start node. */
     Parse lastStartNode = null;
+    /** The index of the closest previous node which has been labeled as a start node. */
     int lastStartIndex = -1;
+    /** The type of the closest previous node which has been labeled as a start node. */
     String lastStartType = null;
-    int numNodes = p.getChildren().size();
+    /** The index of the node which will be labeled in this iteration of advancing the parse. */
     int advanceNodeIndex;
+    /** The node which will be labeled in this iteration of advancing the parse. */
     Parse advanceNode=null;
+    Parse[] children = p.getChildren();
+    int numNodes = children.length;
+    //determines which node needs to be labeled and prior labels.
     for (advanceNodeIndex = 0; advanceNodeIndex < numNodes; advanceNodeIndex++) {
-      advanceNode = (Parse) p.getChildren().get(advanceNodeIndex);
+      advanceNode = children[advanceNodeIndex];
       if (advanceNode.getLabel() == null) {
         break;
       }
@@ -288,9 +296,10 @@ public class ParserME {
     }
     ArrayList newParsesList = new ArrayList(buildModel.getNumOutcomes());
     //call build
-    buildModel.eval(buildContextGenerator.getContext(p.getChildren(), advanceNodeIndex), bprobs);
+    buildModel.eval(buildContextGenerator.getContext(children, advanceNodeIndex), bprobs);
     double bprobSum = 0;
     while (bprobSum < Q) {
+      /** The largest unadvanced labeling. */ 
       int max = 0;
       for (int pi = 1; pi < bprobs.length; pi++) { //for each build outcome
         if (bprobs[pi] > bprobs[max]) {
@@ -301,8 +310,8 @@ public class ParserME {
         break;
       }
       double bprob = bprobs[max];
-      bprobSum += bprobs[max];
       bprobs[max] = 0; //zero out so new max can be found
+      bprobSum += bprob;
       String tag = buildModel.getOutcome(max);
       //System.out.println("trying "+tag+" "+bprobSum+" lst="+lst);
       if (max == topStartIndex) { // can't have top until complete
@@ -321,9 +330,7 @@ public class ParserME {
       }
       Parse newParse1 = (Parse) p.clone(); //clone parse
       if (createDerivationString) newParse1.getDerivation().append(max).append("-");
-      Parse pc = (Parse) advanceNode.clone(); //clone constituent being labeled
-      newParse1.getChildren().set(advanceNodeIndex, pc); //replace constituent labeled
-      pc.setLabel(tag);
+      newParse1.setChild(advanceNodeIndex,tag); //replace constituent labeled
       newParse1.addProb(Math.log(bprob));
       //check
       checkModel.eval(checkContextGenerator.getContext(newParse1.getChildren(), lastStartType, lastStartIndex, advanceNodeIndex), cprobs);
@@ -348,7 +355,7 @@ public class ParserME {
         }
         //middle
         for (int ci = 1; ci < advanceNodeIndex - lastStartIndex; ci++) {
-          cons[ci] = (Parse) p.getChildren().get(ci + lastStartIndex);
+          cons[ci] = children[ci + lastStartIndex];
           if (flat && !cons[ci].getType().equals(cons[ci].getHead().getType())) {
             flat = false;
           }
@@ -378,14 +385,15 @@ public class ParserME {
    *          A pos-tag assigned parse.
    * @return The top chunk assignments to the specified parse.
    */
-  private Parse[] advanceChunks(Parse p, double minChunkScore) {
+  private Parse[] advanceChunks(final Parse p, double minChunkScore) {
     // chunk
-    String words[] = new String[p.getChildren().size()];
+    Parse[] children = p.getChildren();
+    String words[] = new String[children.length];
     String ptags[] = new String[words.length];
     double probs[] = new double[words.length];
     Parse sp = null;
-    for (int i = 0, il = p.getChildren().size(); i < il; i++) {
-      sp = (Parse) p.getChildren().get(i);
+    for (int i = 0, il = children.length; i < il; i++) {
+      sp = children[i];
       words[i] = sp.getHead().toString();
       ptags[i] = sp.getType();
     }
@@ -412,8 +420,8 @@ public class ParserME {
         else { //make previous constituent if it exists
           if (type != null) {
             //System.err.println("inserting tag "+tags[j]);
-            Parse p1 = (Parse) p.getChildren().get(start);
-            Parse p2 = (Parse) p.getChildren().get(end);
+            Parse p1 = p.getChildren()[start];
+            Parse p2 = p.getChildren()[end];
             //System.err.println("Putting "+type+" at "+start+","+end+" "+newParses[si].prob);
             Parse[] cons = new Parse[end - start + 1];
             cons[0] = p1;
@@ -422,7 +430,7 @@ public class ParserME {
               cons[end - start] = p2;
               //cons[end-start].label="Cont-"+type;
               for (int ci = 1; ci < end - start; ci++) {
-                cons[ci] = (Parse) p.getChildren().get(ci + start);
+                cons[ci] = p.getChildren()[ci + start];
                 //cons[ci].label="Cont-"+type;
               }
             }
@@ -450,11 +458,12 @@ public class ParserME {
    * @param p The parse to be tagged.
    * @return Parses with different POS-tag sequence assignments.
    */
-  private Parse[] advanceTags(Parse p) {
-    String[] words = new String[p.getChildren().size()];
+  private Parse[] advanceTags(final Parse p) {
+    Parse[] children = p.getChildren();
+    String[] words = new String[children.length];
     double[] probs = new double[words.length];
-    for (int i = 0; i < p.getChildren().size(); i++) {
-      words[i] = ((Parse) p.getChildren().get(i)).toString();
+    for (int i = 0,il = children.length; i < il; i++) {
+      words[i] = children[i].toString();
     }
     Sequence[] ts = tagger.topKSequences(words);
     if (ts.length == 0) {
@@ -467,7 +476,7 @@ public class ParserME {
       newParses[i] = (Parse) p.clone(); //copies top level
       if (createDerivationString) newParses[i].getDerivation().append(i).append(".");
       for (int j = 0; j < words.length; j++) {
-        Parse word = (Parse) p.getChildren().get(j);
+        Parse word = children[j];
         //System.err.println("inserting tag "+tags[j]);
         double prob = probs[j];
         newParses[i].insert(new Parse(word.getText(), word.getSpan(), tags[j], prob));

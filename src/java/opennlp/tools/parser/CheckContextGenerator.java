@@ -40,7 +40,7 @@ public class CheckContextGenerator implements ContextGenerator {
 
   public String[] getContext(Object o) {
     Object[] params = (Object[]) o;
-    return getContext((List) params[0], (String) params[1], ((Integer) params[2]).intValue(), ((Integer) params[3]).intValue());
+    return getContext((Parse[]) params[0], (String) params[1], ((Integer) params[2]).intValue(), ((Integer) params[3]).intValue());
   }
 
   private void surround(Parse p, int i, String type, List features) {
@@ -97,21 +97,21 @@ public class CheckContextGenerator implements ContextGenerator {
    * @param end The last constituent of the proposed constituent.
    * @return The predictive context for deciding whether a new constituent should be created.
    */
-  public String[] getContext(List constituents, String type, int start, int end) {
-    int ps = constituents.size();
+  public String[] getContext(Parse[] constituents, String type, int start, int end) {
+    int ps = constituents.length;
     List features = new ArrayList(100);
 
     //default 
     features.add("default");
 
-    Parse pstart = (Parse) constituents.get(start);
-    Parse pend = (Parse) constituents.get(end);
+    Parse pstart = constituents[start];
+    Parse pend = constituents[end];
     checkcons(pstart, "begin", type, features);
     checkcons(pend, "last", type, features);
     StringBuffer production = new StringBuffer(20);
     production.append(type).append("->");
     for (int pi = start; pi < end; pi++) {
-      Parse p = (Parse) constituents.get(pi);
+      Parse p = constituents[pi];
       checkcons(p, pend, type, features);
       production.append(p.getType()).append(",");
     }
@@ -122,16 +122,16 @@ public class CheckContextGenerator implements ContextGenerator {
     Parse p1 = null;
     Parse p2 = null;
     if (start - 2 >= 0) {
-      p_2 = (Parse) constituents.get(start - 2);
+      p_2 = constituents[start - 2];
     }
     if (start - 1 >= 0) {
-      p_1 = (Parse) constituents.get(start - 1);
+      p_1 = constituents[start - 1];
     }
     if (end + 1 < ps) {
-      p1 = (Parse) constituents.get(end + 1);
+      p1 = constituents[end + 1];
     }
     if (end + 2 < ps) {
-      p2 = (Parse) constituents.get(end + 2);
+      p2 = constituents[end + 2];
     }
     surround(p_1, -1, type, features);
     surround(p_2, -2, type, features);
