@@ -23,10 +23,13 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import opennlp.maxent.MaxentModel;
 import opennlp.maxent.io.SuffixSensitiveGISModelReader;
+import opennlp.tools.parser.Parse;
 import opennlp.tools.util.Span;
 
 /**
@@ -114,41 +117,137 @@ public class EnglishNameFinder extends NameFinderME {
   public static String[] tokenize(String s) {
     return spansToStrings(tokenizeToSpans(s), s);
   }
-
-  public static void main(String[] args) throws IOException {
-    if (args.length == 0) {
-      System.err.println("Usage EnglishNameFinder model1 model2 ... modelN < sentences");
-      System.exit(1);
-    }
-
-    EnglishNameFinder[] finders = new EnglishNameFinder[args.length];
-    String[] names = new String[args.length];
-    for (int ai = 0; ai < args.length; ai++) {
-      String modelName = args[ai];
-      finders[ai] = new EnglishNameFinder(new SuffixSensitiveGISModelReader(new File(modelName)).getModel());
-      int nameStart = modelName.lastIndexOf(System.getProperty("file.separator")) + 1;
-      int nameEnd = modelName.indexOf('.', nameStart);
-      if (nameEnd == -1) {
-        nameEnd = modelName.length();
+  
+  private static void addNames(String tag, List names, Parse[] tokens) {
+    for (int ni=0,nn=names.size();ni<nn;ni++) {
+      Span nameTokenSpan = (Span) names.get(ni);
+      Parse startToken = tokens[nameTokenSpan.getStart()];
+      Parse endToken = tokens[nameTokenSpan.getEnd()];
+      Parse commonParent = startToken.getCommonParent(endToken);
+      //System.err.println("addNames: "+startToken+" .. "+endToken+" commonParent = "+commonParent);
+      if (commonParent != null) {
+        Span nameSpan = new Span(startToken.getSpan().getStart(),endToken.getSpan().getEnd());
+        if (nameSpan.equals(commonParent.getSpan())) {
+          commonParent.insert(new Parse(commonParent.getText(),nameSpan,tag,1.0));
+        }
+        else {
+          Parse[] kids = commonParent.getChildren();
+          boolean crossingKids = false;
+          for (int ki=0,kn=kids.length;ki<kn;ki++) {
+            if (nameSpan.crosses(kids[ki].getSpan())){
+              crossingKids = true;
+            }
+          }
+          if (!crossingKids) {
+            commonParent.insert(new Parse(commonParent.getText(),nameSpan,tag,1.0));
+          }
+          else {
+            if (commonParent.getType().equals("NP")) {
+              Parse[] grandKids = kids[0].getChildren();
+              if (grandKids.length > 1 && nameSpan.contains(grandKids[grandKids.length-1].getSpan())) {
+                commonParent.insert(new Parse(commonParent.getText(),commonParent.getSpan(),tag,1.0));
+              }
+            }
+          }
+        }
       }
-      names[ai] = modelName.substring(nameStart, nameEnd);
     }
-    BufferedReader in = new BufferedReader(new InputStreamReader(System.in));
+  }
+  
+  private static Map[] createPrevTokenMaps(EnglishNameFinder[] finders){
+    Map[] prevTokenMaps = new HashMap[finders.length];
+    for (int fi = 0, fl = finders.length; fi < fl; fi++) {
+      prevTokenMaps[fi]=new HashMap();
+    }
+    return prevTokenMaps;
+  }
+  
+  private static void clearPrevTokenMaps(Map[] prevTokenMaps) {
+    for (int mi = 0, ml = prevTokenMaps.length; mi < ml; mi++) {
+      prevTokenMaps[mi].clear();
+    }
+  }
+  
+  private static void updatePrevTokenMaps(Map[] prevTokenMaps, Object[] tokens, String[][] finderTags) {
+    for (int mi = 0, ml = prevTokenMaps.length; mi < ml; mi++) {
+      for (int ti=0,tn=tokens.length;ti<tn;ti++) {
+        //System.err.println("updatePrevTokenMaps:"+tokens[ti]+" -> "+finderTags[mi][ti]);
+        prevTokenMaps[mi].put(tokens[ti],finderTags[mi][ti]);
+      }
+    }
+  }
+
+
+  private static void processParse(EnglishNameFinder[] finders, String[] tags, BufferedReader input) throws IOException {
     String[][] finderTags = new String[finders.length][];
-    for (String line = in.readLine(); null != line; line = in.readLine()) {
-
-      Span[] spans = tokenizeToSpans(line);
-      String[] tokens = spansToStrings(spans, line);
-      for (int fi = 0, fl = finders.length; fi < fl; fi++) {
-        finderTags[fi] = finders[fi].find(tokens, Collections.EMPTY_MAP);
-        //System.err.println(names[fi] + " " + java.util.Arrays.asList(finderTags[fi]));
+    Map[] prevTokenMaps = createPrevTokenMaps(finders);
+    for (String line = input.readLine(); null != line; line = input.readLine()) {
+      if (line.equals("")) {
+        System.out.println();
+        clearPrevTokenMaps(prevTokenMaps);
+        continue;
       }
+      Parse p = Parse.parseParse(line);
+      Parse[] tokens = p.getTagNodes();
+      //System.err.println(java.util.Arrays.asList(tokens));
+      for (int fi = 0, fl = finders.length; fi < fl; fi++) {
+        finderTags[fi] = finders[fi].find(tokens, prevTokenMaps[fi]);
+        //System.err.println("EnglishNameFinder.processParse: "+tags[fi] + " " + java.util.Arrays.asList(finderTags[fi]));
+      }
+      updatePrevTokenMaps(prevTokenMaps,tokens,finderTags);
+      for (int fi = 0, fl = finders.length; fi < fl; fi++) {
+        int start = -1;
+        List names = new ArrayList(5);
+        for (int ti = 0, tl = tokens.length; ti < tl; ti++) {
+          if ((finderTags[fi][ti].equals(NameFinderME.START) || finderTags[fi][ti].equals(NameFinderME.OTHER))) {
+            if (start != -1) {
+              names.add(new Span(start,ti-1));
+            }
+            start = -1;
+          }
+          if (finderTags[fi][ti].equals(NameFinderME.START)) {
+            start = ti;
+          }
+        }
+        if (start != -1) {
+          names.add(new Span(start,tokens.length-1));
+        }
+        addNames(tags[fi],names,tokens);
+      }
+      p.show();
+      System.out.println();
+    }
+  }
+      
+  /**
+   * Adds sgml style name tags to the specified input buffer and outputs this information to stdout. 
+   * @param finders The name finders to be used.
+   * @param tags The tag names for the coresponding name finder.
+   * @param input The input reader.
+   * @throws IOException
+   */
+  private static void processText(EnglishNameFinder[] finders, String[] tags, BufferedReader input) throws IOException {
+    String[][] finderTags = new String[finders.length][];
+    Map[] prevTokenMaps = createPrevTokenMaps(finders); 
+    for (String line = input.readLine(); null != line; line = input.readLine()) {
+      if (line.equals("")) {
+        clearPrevTokenMaps(prevTokenMaps);
+        System.out.println();
+        continue;
+      }
+      Span[] spans = tokenizeToSpans(line);
+      String[] tokens = spansToStrings(spans,line);
+      for (int fi = 0, fl = finders.length; fi < fl; fi++) {
+        finderTags[fi] = finders[fi].find(tokens, prevTokenMaps[fi]);
+        //System.err.println("EnglighNameFinder.processText: "+tags[fi] + " " + java.util.Arrays.asList(finderTags[fi]));
+      }
+      updatePrevTokenMaps(prevTokenMaps,tokens,finderTags);
       for (int ti = 0, tl = tokens.length; ti < tl; ti++) {
         for (int fi = 0, fl = finders.length; fi < fl; fi++) {
           //check for end tags
           if (ti != 0) {
             if ((finderTags[fi][ti].equals(NameFinderME.START) || finderTags[fi][ti].equals(NameFinderME.OTHER)) && (finderTags[fi][ti - 1].equals(NameFinderME.START) || finderTags[fi][ti - 1].equals(NameFinderME.CONTINUE))) {
-              System.out.print("</" + names[fi] + ">");
+              System.out.print("</" + tags[fi] + ">");
             }
           }
         }
@@ -158,7 +257,7 @@ public class EnglishNameFinder extends NameFinderME {
         //check for start tags
         for (int fi = 0, fl = finders.length; fi < fl; fi++) {
           if (finderTags[fi][ti].equals(NameFinderME.START)) {
-            System.out.print("<" + names[fi] + ">");
+            System.out.print("<" + tags[fi] + ">");
           }
         }
         System.out.print(tokens[ti]);
@@ -167,7 +266,7 @@ public class EnglishNameFinder extends NameFinderME {
       if (tokens.length != 0) {
         for (int fi = 0, fl = finders.length; fi < fl; fi++) {
           if (finderTags[fi][tokens.length - 1].equals(NameFinderME.START) || finderTags[fi][tokens.length - 1].equals(NameFinderME.CONTINUE)) {
-            System.out.print("</" + names[fi] + ">");
+            System.out.print("</" + tags[fi] + ">");
           }
         }
       }
@@ -177,6 +276,44 @@ public class EnglishNameFinder extends NameFinderME {
         }
       }
       System.out.println();
+    }
+  }
+
+  public static void main(String[] args) throws IOException {
+    if (args.length == 0) {
+      System.err.println("Usage EnglishNameFinder -[parse] model1 model2 ... modelN < sentences");
+      System.err.println(" -parse: Use this option to find names on parsed input.  Un-tokenized sentence text is the default.");
+      System.exit(1);
+    }
+    int ai = 0;
+    boolean parsedInput = false;
+    while (args[ai].startsWith("-") && ai < args.length) {
+      if (args[ai].equals("-parse")) {
+        parsedInput = true;
+      }
+      else {
+        System.err.println("Ignoring unknown option "+args[ai]);
+      }
+      ai++;
+    }
+    EnglishNameFinder[] finders = new EnglishNameFinder[args.length-ai];
+    String[] names = new String[args.length-ai];
+    for (int fi=0; ai < args.length; ai++,fi++) {
+      String modelName = args[ai];
+      finders[fi] = new EnglishNameFinder(new SuffixSensitiveGISModelReader(new File(modelName)).getModel());
+      int nameStart = modelName.lastIndexOf(System.getProperty("file.separator")) + 1;
+      int nameEnd = modelName.indexOf('.', nameStart);
+      if (nameEnd == -1) {
+        nameEnd = modelName.length();
+      }
+      names[fi] = modelName.substring(nameStart, nameEnd);
+    }
+    BufferedReader in = new BufferedReader(new InputStreamReader(System.in));
+    if (parsedInput) {
+      processParse(finders,names,in);
+    }
+    else {
+      processText(finders,names,in);
     }
   }
 }
