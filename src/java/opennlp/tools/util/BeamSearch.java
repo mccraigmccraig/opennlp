@@ -61,13 +61,6 @@ public class BeamSearch {
       int sc =0;
       for (Iterator si = prev.iterator();si.hasNext() && sc<sz;sc++) {
         Sequence top = (Sequence) si.next();
-        Object[] params = new Object[additionalContext.length + 3];
-        params[0] = new Integer(i);
-        params[1] = sequence;
-        params[2] = top;
-        for (int aci = 0, acl = additionalContext.length; aci < acl; aci++) {
-          params[3 + aci] = additionalContext[aci];
-        }
         double[] scores = model.eval(cg.getContext(i,sequence,top,additionalContext));
         double[] temp_scores = new double[scores.length];
 
