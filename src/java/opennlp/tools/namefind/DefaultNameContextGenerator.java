@@ -93,6 +93,7 @@ public class DefaultNameContextGenerator implements NameContextGenerator {
     }
     features.add("po="+po);
     features.add("ppo="+ppo);
+    //System.err.println("getContext: "+i+" "+toks[i]+" "+features);
     return (String[]) features.toArray(new String[features.size()]);
   }
 
@@ -124,9 +125,10 @@ public class DefaultNameContextGenerator implements NameContextGenerator {
     if (i == 0) {
       feats.add("df=it");
     }
+    // previous previous word
     if (i - 2 >= 0) {
       String ppw = toks[i - 2].toString().toLowerCase();
-      feats.add("pw=" + ppw);
+      feats.add("ppw=" + ppw);
       String ppwf = wordFeature(toks[i - 2].toString());
       feats.add("ppwf=" + ppwf);
       feats.add("ppw&f=" + ppw + "," + ppwf);
