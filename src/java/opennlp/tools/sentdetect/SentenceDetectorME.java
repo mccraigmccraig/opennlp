@@ -39,24 +39,24 @@ import java.util.ArrayList;
  * string to determine if they signify the end of a sentence.
  *
  * @author      Jason Baldridge and Tom Morton
- * @version     $Revision: 1.6 $, $Date: 2004/06/11 19:15:30 $
+ * @version     $Revision: 1.7 $, $Date: 2004/06/11 20:57:30 $
  */
 
 public class SentenceDetectorME implements SentenceDetector {
 
-  // The maximum entropy model to use to evaluate contexts.
+  /** The maximum entropy model to use to evaluate contexts. */
   private MaxentModel model;
 
-  // The feature context generator.
+  /** The feature context generator. */
   private final ContextGenerator cgen;
 
-  // The EndOfSentenceScanner to use when scanning for end of
-  // sentence offsets.
+  /** The EndOfSentenceScanner to use when scanning for end of sentence offsets. */
   private final EndOfSentenceScanner scanner;
 
-  // a pool of read-only java.lang.Integer objects in the range 0..100
+  /** A pool of read-only java.lang.Integer objects in the range 0..100 */
   private static final IntegerPool INT_POOL = new IntegerPool(100);
-
+  
+  /** The list of probabilities associated with each decision. */
   private List sentProbs;
 
   /**
