@@ -26,7 +26,7 @@ import java.util.*;
  * made.
  *
  * @author      Jason Baldridge
- * @version $Revision: 1.4 $, $Date: 2002/02/08 12:17:50 $ 
+ * @version $Revision: 1.5 $, $Date: 2002/06/04 17:36:26 $ 
 */
 public class SelfCondensingSub extends HashMap implements Substitution {
 
@@ -44,14 +44,14 @@ public class SelfCondensingSub extends HashMap implements Substitution {
      * @exception throws UnifyFailure if the Object cannot be unified
      * with a previous value substituted for the Variable.
      */
-    public Unifiable makeSubstitution (Variable var, Unifiable u) 
+    public Object makeSubstitution (Variable var, Object u) 
 	throws UnifyFailure {
 
-	Unifiable val1 = getValue(var);
+	Object val1 = getValue(var);
 
 	if (u instanceof Variable) {
 	    Variable var2 = (Variable)u;
-	    Unifiable val2 = getValue(var2);
+	    Object val2 = getValue(var2);
 	    if (val1 != null) {
 		if (val2 != null)
 		    u = Unifier.unify(var, val2, this);
@@ -71,9 +71,15 @@ public class SelfCondensingSub extends HashMap implements Substitution {
 	put(var, u);
 	for (Iterator i=keySet().iterator(); i.hasNext();) {
 	    Variable v = (Variable)i.next();
-	    put(v, getValue(v).fill(this));
+	    Object res = getValue(v);
+	    if (res instanceof Unifiable) {
+		res = ((Unifiable)res).fill(this);
+	    }
+	    put(v, res);
 	}
-	u = u.fill(this);
+	if (u instanceof Unifiable) {
+	    u = ((Unifiable)u).fill(this);
+	}
 	return u;
     }
 
@@ -84,8 +90,8 @@ public class SelfCondensingSub extends HashMap implements Substitution {
      * @param var the variable whose value after unification is desired
      * @return the Object which this variable has been unified with 
      */
-    public Unifiable getValue (Variable var) {
-	return (Unifiable)get(var);
+    public Object getValue (Variable var) {
+	return get(var);
     }
 
     public Iterator varIterator () {

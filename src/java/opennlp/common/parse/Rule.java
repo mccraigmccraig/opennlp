@@ -20,13 +20,14 @@ package opennlp.common.parse;
 
 import opennlp.common.synsem.*;
 import opennlp.common.unify.*;
+import java.util.*;
 
 
 /**
  * Interface for categorial rules.
  *
  * @author Gann Bierner and Jason Baldridge
- * @version $Revision: 1.2 $, $Date: 2002/02/21 16:01:35 $
+ * @version $Revision: 1.3 $, $Date: 2002/06/04 17:36:26 $
  */
 public interface Rule {
 
@@ -38,7 +39,7 @@ public interface Rule {
      *         inputs
      * @exception UnifyFailure if the inputs cannot be combined by this Rule
      **/
-    public Category applyRule (Category[] inputs) throws UnifyFailure;
+    public List applyRule (Category[] inputs) throws UnifyFailure;
 
     /**
      * The number of arguments this rule takes.  For example, the arity of the

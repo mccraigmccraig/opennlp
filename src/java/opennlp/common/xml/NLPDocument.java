@@ -31,7 +31,7 @@ import java.util.*;
  * specifications.
  *
  * @author      Jason Baldridge
- * @version     $Revision: 1.19 $, $Date: 2002/02/11 14:18:56 $
+ * @version     $Revision: 1.20 $, $Date: 2002/06/04 17:36:26 $
  **/
 public class NLPDocument extends Document {
     public static final String WORD_LABEL = "w";
@@ -70,19 +70,26 @@ public class NLPDocument extends Document {
     protected void addTextContent (String text) {
 	_textLength = text.length();
 	Element textEl = new Element("text");
-	String[] paragraphs, quasiWords;
-	    
-	paragraphs = PerlHelp.getParagraphs(text);
+
+	String[] paragraphs = PerlHelp.getParagraphs(text);
 	for (int i=0; i<paragraphs.length; i++) {
 	    Element paraEl = new Element(PARAGRAPH_LABEL);
 	    Element sentEl = new Element(SENTENCE_LABEL);
-	    quasiWords = PerlHelp.splitByWhitespace(paragraphs[i]);
-	    for (int j=0; j<quasiWords.length; j++) {
-		Element tokenEl = new Element(TOKEN_LABEL);
-		Element wordEl = new Element(WORD_LABEL);
-		wordEl.setText(quasiWords[j]);
-		tokenEl.addContent(wordEl);
-		sentEl.addContent(tokenEl);
+	    String[] chunksByLine = PerlHelp.split(paragraphs[i], "\n");
+	    for (int j=0; j<chunksByLine.length; j++) {
+		int difference = 80 - chunksByLine[j].trim().length();
+		if ((difference > 20
+		     || (chunksByLine[j].startsWith("\t")
+			 || chunksByLine[j].startsWith("   ")))
+		    && (sentEl.hasChildren())) {
+		    paraEl.addContent(sentEl);
+		    sentEl = new Element(SENTENCE_LABEL);
+		}
+		String[] quasiWords =
+		    PerlHelp.splitByWhitespace(chunksByLine[j]);
+		for (int k=0; k<quasiWords.length; k++) {
+		    sentEl.addContent(createTOK(quasiWords[k]));
+		}
 	    }
 	    paraEl.addContent(sentEl);
 	    textEl.addContent(paraEl);

@@ -1,5 +1,8 @@
 0.8.3
 -----
+Made the unification stuff work on Objects instead of
+Unifiables. (Jason)
+
 Added EnglishClosedClassTags (formerly from
 opennlp.grok.preprocess.postag) to opennlp.common.english. (Jason)
 

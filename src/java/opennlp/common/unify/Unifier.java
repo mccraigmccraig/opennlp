@@ -22,7 +22,7 @@ package opennlp.common.unify;
  * Variables and not needed to pass a substitution object explictly.
  *
  * @author      Jason Baldridge
- * @version     $Revision: 1.6 $, $Date: 2002/02/08 12:17:50 $
+ * @version     $Revision: 1.7 $, $Date: 2002/06/04 17:36:26 $
  **/
 public class Unifier {
 
@@ -35,12 +35,15 @@ public class Unifier {
      * @param u2 the second of two Unifiables to unify
      * @return the result of unifying u1 and u2
      **/
-    public static final Unifiable unify (Unifiable u1, Unifiable u2) 
+    public static final Object unify (Object u1, Object u2) 
 	throws UnifyFailure {
 
 	Substitution sub = new SelfCondensingSub();
-	return unify(u1, u2, sub).fill(sub);
-
+	Object result =  unify(u1, u2, sub);
+	if (result instanceof Unifiable) {
+	    result = ((Unifiable)result).fill(sub);
+	}
+	return result;
     }
 
 
@@ -58,9 +61,9 @@ public class Unifier {
      * information
      * @return the result of unifying u1 and u2
      **/
-    public static final Unifiable unify (Unifiable u1, 
-					 Unifiable u2, 
-					 Substitution sub) 
+    public static final Object unify (Object u1, 
+				      Object u2, 
+				      Substitution sub) 
 	throws UnifyFailure {
 
 	// !!!!!!!!!!!!!!!!!!!!!!!! CAUTION !!!!!!!!!!!!!!!!!!!!!!!!
@@ -68,12 +71,16 @@ public class Unifier {
 	// careful before you change it!
 	// !!!!!!!!!!!!!!!!!!!!!!!! CAUTION !!!!!!!!!!!!!!!!!!!!!!!!
 	if (u2 instanceof Variable) {
-	    return u2.unify(u1, sub);
+	    return ((Variable)u2).unify(u1, sub);
+	} else if (u1 instanceof Unifiable) {
+	    return ((Unifiable)u1).unify(u2, sub);
+	} else if (u2 instanceof Unifiable) {
+	    return ((Unifiable)u2).unify(u1, sub);
+	} else if (u1.equals(u2)) {
+	    return u1;
+	} else {
+	    throw new UnifyFailure();
 	}
-	else {
-	    return u1.unify(u2, sub);
-	}
-
     }
 
 }
