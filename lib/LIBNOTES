@@ -13,22 +13,10 @@ License: Apache Software License
 A Java based build tool. It is supported by xml-apis and license
 information for that is included in this directory.
 
-
 ------------------------------------------------------------------------
-jdom.jar
+maxent-2.2.0
 
-JDOM, version 1.0 beta 8
-Homepage: http://www.jdom.org
-License: see jdom.license
-
-A complete, Java-based solution for accessing, manipulating, and
-outputting XML data from Java code
-
-
-------------------------------------------------------------------------
-maxent-2.1.0
-
-Maxent, version 2.1.0 
+Maxent, version 2.2.0 
 Homepage http://maxent.sourceforge.net/
 Licience LGPL
 
@@ -38,19 +26,10 @@ Package for training and using maximum entropy models.
 ------------------------------------------------------------------------
 trove.jar
 
-GNU Trove, version 0.1.4
+GNU Trove, version 1.0.2
 Homepage: http://trove4j.sf.net
 License: LGPL
 
 High performance collections for Java.
 
-
 ------------------------------------------------------------------------
-xerces.jar
-
-The Xerces Java Parser for XML, version 1.4.4
-Homepage: http://xml.apache.org/xerces-j/
-License: Apache Software License
-
-Java parser for XML.
-

@@ -22,7 +22,6 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 
-import opennlp.common.util.PerlHelp;
 
 import opennlp.maxent.MaxentModel;
 import opennlp.maxent.EventStream;
@@ -36,6 +35,7 @@ import opennlp.tools.util.Span;
 
 import java.util.List;
 import java.util.ArrayList;
+import java.util.regex.Pattern;
 
 /**
  * A Tokenizer for converting raw text into separated tokens.  It uses
@@ -45,7 +45,7 @@ import java.util.ArrayList;
  * homepage: <http://www.cis.upenn.edu/~jcreynar>.
  *
  * @author      Tom Morton
- * @version $Revision: 1.3 $, $Date: 2004/04/07 17:28:37 $
+ * @version $Revision: 1.4 $, $Date: 2004/04/08 03:07:16 $
  */
 
 public class TokenizerME implements Tokenizer {
@@ -61,6 +61,8 @@ public class TokenizerME implements Tokenizer {
   private final ContextGenerator cg = new TokContextGenerator();
 
   private static final Double ONE = new Double(1.0);
+  
+  public static Pattern alphaNumeric = Pattern.compile("^[A-Za-z0-9]+$");
 
   /** optimization flag to skip alpha numeric tokens for further
    * tokenization 
@@ -125,7 +127,7 @@ public class TokenizerME implements Tokenizer {
         newTokens.add(s);
         tokProbs.add(ONE);
       }
-      else if (useAlphaNumericOptimization() && PerlHelp.isAlphanumeric(tok)) {
+      else if (useAlphaNumericOptimization() && alphaNumeric.matcher(tok).matches()) {
         newTokens.add(s);
         tokProbs.add(ONE);
       }

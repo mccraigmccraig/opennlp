@@ -27,7 +27,6 @@ import opennlp.tools.util.Span;
 import java.util.ArrayList;
 import java.util.List;
 
-import opennlp.common.util.PerlHelp;
 
 /** An implementation of EventStream which allows events to be added by 
  *  offset and returns events for these offset-based tokens.
@@ -61,7 +60,7 @@ public class TokSpanEventStream implements EventStream {
         cSpan = new Span(cSpan.getStart() + start, cSpan.getEnd() + start);
         //should we skip this token
         if (ctok.length() > 1
-          && (!skipAlphaNumerics || !PerlHelp.isAlphanumeric(ctok))) {
+          && (!skipAlphaNumerics || TokenizerME.alphaNumeric.matcher(ctok).matches())) {
           //find offsets of annotated tokens inside candidate tokens
           boolean foundTrainingTokens = false;
           for (int ti = aend + 1; ti < tokens.length; ti++) {

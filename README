@@ -5,11 +5,8 @@ which perform sentence detection, tokenization, pos-tagging, chunking and
 parsing, and named-entity detection.  
 
 In its previous life it was used to hold a common infrastructure code
-for the opennlp.grok project.  In order to preserve the work preciously
-done the new efforts have been placed in a separate package in the CVS
-repository and current release only reflect changes to the tools set.  The
-original README for the opennlp project can be found in README.common.
-
+for the opennlp.grok project.  The work previously done can be found in
+the final release of that project available on the main project page.
 
 Installing the build tools
 ==========================

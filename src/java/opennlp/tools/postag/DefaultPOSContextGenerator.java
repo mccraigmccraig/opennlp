@@ -20,37 +20,32 @@ package opennlp.tools.postag;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.regex.Pattern;
 
-import opennlp.common.morph.MorphAnalyzer;
-import opennlp.common.util.PerlHelp;
 import opennlp.tools.util.Sequence;
 
 /**
  * A context generator for the POS Tagger.
  *
  * @author      Gann Bierner
- * @version     $Revision: 1.3 $, $Date: 2004/03/16 22:58:02 $
+ * @version     $Revision: 1.4 $, $Date: 2004/04/08 03:07:16 $
  */
 
 public class DefaultPOSContextGenerator implements POSContextGenerator {
-  protected MorphAnalyzer _manalyzer;
 
   protected final String SE = "*SE*";
   protected final String SB = "*SB*";
   private static final int PREFIX_LENGTH = 4;
   private static final int SUFFIX_LENGTH = 4;
 
-  public DefaultPOSContextGenerator() {
-    _manalyzer = null;
-  }
-  
-  public DefaultPOSContextGenerator(MorphAnalyzer manalyser) {
-      _manalyzer = manalyser;
-    }
+  private static Pattern hasCap = Pattern.compile("[A-Z]");
+  private static Pattern hasNum = Pattern.compile("[0-9]");
+
+  public DefaultPOSContextGenerator() {}
 
   public String[] getContext(Object o) {
     Object[] data = (Object[]) o;
-    return getContext(((Integer) data[0]).intValue(), (List) data[1], (Sequence) data[2],null);
+    return getContext(((Integer) data[0]).intValue(), (List) data[1], (Sequence) data[2], null);
   }
 
   protected static String[] getPrefixes(String lex) {
@@ -64,13 +59,13 @@ public class DefaultPOSContextGenerator implements POSContextGenerator {
   protected static String[] getSuffixes(String lex) {
     String[] suffs = new String[4];
     for (int li = 0, ll = PREFIX_LENGTH; li < ll; li++) {
-      suffs[li] = lex.substring(Math.max(lex.length()-li-1, 0));
+      suffs[li] = lex.substring(Math.max(lex.length() - li - 1, 0));
     }
     return suffs;
   }
-  
+
   public String[] getContext(int pos, List tokens, Sequence s, Object[] ac) {
-    return getContext(pos,tokens,s.getOutcomes());
+    return getContext(pos, tokens, s.getOutcomes());
   }
 
   public String[] getContext(int pos, List tokens, List tags) {
@@ -114,33 +109,25 @@ public class DefaultPOSContextGenerator implements POSContextGenerator {
     e.add("w=" + lex);
 
     // do some basic suffix analysis
-    if (_manalyzer != null) {
-      String[] suffs = _manalyzer.getSuffixes(lex);
-      for (int i = 0; i < suffs.length; i++) {
-        e.add("suf=" + suffs[i]);
-      }
+    String[] suffs = getSuffixes(lex);
+    for (int i = 0; i < suffs.length; i++) {
+      e.add("suf=" + suffs[i]);
     }
-    else {
-      String[] suffs = getSuffixes(lex);
-      for (int i = 0; i < suffs.length; i++) {
-        e.add("suf=" + suffs[i]);
-      }
 
-      String[] prefs = getPrefixes(lex);
-      for (int i = 0; i < prefs.length; i++) {
-        e.add("pre=" + prefs[i]);
-      }
+    String[] prefs = getPrefixes(lex);
+    for (int i = 0; i < prefs.length; i++) {
+      e.add("pre=" + prefs[i]);
     }
     // see if the word has any special characters
     if (lex.indexOf('-') != -1) {
       e.add("h");
     }
 
-    if (PerlHelp.hasCap(lex)) {
+    if (hasCap.matcher(lex).find()) {
       e.add("c");
     }
 
-    if (PerlHelp.hasNum(lex)) {
+    if (hasNum.matcher(lex).find()) {
       e.add("d");
     }
 

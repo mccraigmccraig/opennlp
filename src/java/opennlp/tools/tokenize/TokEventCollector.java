@@ -23,8 +23,6 @@ import opennlp.maxent.EventCollector;
 import opennlp.maxent.ContextGenerator;
 import opennlp.tools.util.ObjectIntPair;
 
-import opennlp.common.util.PerlHelp;
-
 import java.io.BufferedReader;
 import java.io.Reader;
 import java.util.ArrayList;
@@ -33,7 +31,7 @@ import java.util.ArrayList;
  * Generate event contexts for maxent decisions for sentence detection.
  *
  * @author      Jason Baldridge
- * @version     $Revision: 1.2 $, $Date: 2004/01/26 14:16:37 $
+ * @version     $Revision: 1.3 $, $Date: 2004/04/08 03:07:16 $
  */
 
 public class TokEventCollector implements EventCollector {
@@ -58,10 +56,10 @@ public class TokEventCollector implements EventCollector {
 	try {
 	    String s = br.readLine();
 	    while (s != null) {
-		String[] spaceToks = PerlHelp.split(s);
+		String[] spaceToks = s.split(" ");
 		for (int tok=0; tok<spaceToks.length; tok++) {
 		    StringBuffer sb = new StringBuffer(spaceToks[tok]);
-		    if (!PerlHelp.isAlphanumeric(spaceToks[tok])) {
+		    if (TokenizerME.alphaNumeric.matcher(spaceToks[tok]).matches()) {
 			int lastIndex = sb.length()-1;
 			for (int id=0; id<sb.length(); id++) {
 			    String[] context =
