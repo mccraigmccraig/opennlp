@@ -18,6 +18,7 @@
 package opennlp.tools.parser;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
 
@@ -99,6 +100,7 @@ public class ParserEventStream implements EventStream {
       for (int ci = 0, cl = kids.length; ci < cl; ci++) {
         if (!kids[ci].isPosTag()) {
           allKidsAreTags = false;
+          break;
         }
       }
       if (allKidsAreTags) {
@@ -129,6 +131,7 @@ public class ParserEventStream implements EventStream {
 
   private void addNewEvents() {
     String parseStr = (String) data.nextToken();
+    //System.err.println("ParserEventStream.addNewEvents: "+parseStr);
     List events = new ArrayList();
     Parse p = Parse.parseParse(parseStr);
     p.updateHeads(rules);
@@ -148,6 +151,7 @@ public class ParserEventStream implements EventStream {
   private void addParseEvents(List events, Parse[] chunks) {
     int ci = 0;
     while (ci < chunks.length) {
+      //System.err.println("parserEventStream.addParseEvents: chunks="+Arrays.asList(chunks));
       Parse c = chunks[ci];
       Parse parent = c.getParent();
       if (parent != null) {
@@ -159,6 +163,7 @@ public class ParserEventStream implements EventStream {
         else {
           outcome = ParserME.CONT + type;
         }
+        //System.err.println("parserEventStream.addParseEvents: chunks["+ci+"]="+c+" label="+outcome);
         c.setLabel(outcome);
         if (etype == EventTypeEnum.BUILD) {
           events.add(new Event(outcome, bcg.getContext(chunks, ci)));
@@ -172,7 +177,7 @@ public class ParserEventStream implements EventStream {
             events.add(new Event(ParserME.COMPLETE, kcg.getContext( chunks, type, start + 1, ci)));
           }
           //perform reduce
-          int reduceStart = ci-1;
+          int reduceStart = ci;
           int reduceEnd = ci;
           while (reduceStart >=0 && chunks[reduceStart].getParent() == parent) {
             reduceStart--;
@@ -180,37 +185,24 @@ public class ParserEventStream implements EventStream {
           reduceStart++;
           if (!type.equals(ParserME.TOP_NODE)) {
             Parse[] reducedChunks = new Parse[chunks.length-(reduceEnd-reduceStart+1)+1]; //total - num_removed + 1 (for new node)
-            int ri=0;
             //insert nodes before reduction
-            for (int rn=reduceStart;ri<rn;ri++) {
+            for (int ri=0,rn=reduceStart;ri<rn;ri++) {
               reducedChunks[ri]=chunks[ri];
             }
             //insert reduced node
-            reducedChunks[ri]=parent;
-            ri++;
+            reducedChunks[reduceStart]=parent;
             //insert nodes after reduction
-            for (int rci=reduceEnd;rci<chunks.length;rci++) {
+            int ri=reduceStart+1;
+            for (int rci=reduceEnd+1;rci<chunks.length;rci++) {
               reducedChunks[ri]=chunks[rci];
               ri++;
             }
             chunks = reducedChunks;
+            ci=reduceStart-1; //ci will be incremented at end of loop
           }
-          /* probbaly don't need this
           else {
             chunks = new Parse[0];
           }
-          */
-          /* List version of code for reference until testing complete
-          chunks.remove(ci);
-          ci--;
-          while (ci >= 0 && ((Parse) chunks.get(ci)).getParent() == parent) {
-            chunks.remove(ci);
-            ci--;
-          }
-          if (!type.equals(ParserME.TOP_NODE)) {
-            chunks.add(ci + 1, parent);
-          }
-          */
         }
         else {
           if (etype == EventTypeEnum.CHECK) {
