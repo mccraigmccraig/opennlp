@@ -21,12 +21,11 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 
-import opennlp.tools.coref.Dictionary;
-import opennlp.tools.coref.MentionContext;
+import opennlp.tools.coref.mention.Dictionary;
+import opennlp.tools.coref.mention.MentionContext;
 
 /**
- * @author Tom Morton
- *
+ * Specifies the context of a mention for computing gender, number, and semantic compatibility.
  */
 public class Context {
 
@@ -90,7 +89,6 @@ public class Context {
   
   public static Context parseContext(String word) {
       String[] parts = word.split("/");
-      Context c1 = null;
       if (parts.length == 2) {
         String[] tokens = parts[0].split(" ");
         return new Context(tokens,tokens[tokens.length-1], parts[1], null);

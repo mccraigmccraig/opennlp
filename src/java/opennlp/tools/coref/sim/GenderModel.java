@@ -31,8 +31,8 @@ import opennlp.maxent.MaxentModel;
 import opennlp.maxent.io.PlainTextGISModelReader;
 import opennlp.maxent.io.SuffixSensitiveGISModelReader;
 import opennlp.maxent.io.SuffixSensitiveGISModelWriter;
-import opennlp.tools.coref.MentionContext;
 import opennlp.tools.coref.Linker;
+import opennlp.tools.coref.mention.MentionContext;
 import opennlp.tools.coref.mention.Parse;
 import opennlp.tools.coref.resolver.MaxentResolver;
 
@@ -40,6 +40,7 @@ import opennlp.tools.util.CollectionEventStream;
 import opennlp.tools.util.HashList;
 
 /**
+ * Class which models the gender of a particular mentions and entities made up of mentions. 
  * @author Tom Morton
  *
  */
@@ -52,6 +53,7 @@ public class GenderModel implements TestGenderModel, TrainSimilarityModel {
   private String modelName;
   private MaxentModel testModel;
   private List events;
+  private boolean debugOn = false;
 
   public static TestGenderModel testModel(String name) throws IOException {
     GenderModel gm = new GenderModel(name, false);
@@ -99,17 +101,22 @@ public class GenderModel implements TestGenderModel, TrainSimilarityModel {
     events.add(new Event(outcome, (String[]) feats.toArray(new String[feats.size()])));
   }
 
-  private GenderEnum getGender(MentionContext ec) {
-    if (Linker.malePronounPattern.matcher(ec.getHeadTokenText()).matches()) {
+  /**
+   * Hueristic computation of gender for a mention context using pronouns and honorifics. 
+   * @param mention The mention whose gender is to be computed.
+   * @return The hueristically determined gender or unknown.
+   */
+  private GenderEnum getGender(MentionContext mention) {
+    if (Linker.malePronounPattern.matcher(mention.getHeadTokenText()).matches()) {
       return GenderEnum.MALE;
     }
-    else if (Linker.femalePronounPattern.matcher(ec.getHeadTokenText()).matches()) {
+    else if (Linker.femalePronounPattern.matcher(mention.getHeadTokenText()).matches()) {
       return GenderEnum.FEMALE;
     }
-    else if (Linker.neuterPronounPattern.matcher(ec.getHeadTokenText()).matches()) {
+    else if (Linker.neuterPronounPattern.matcher(mention.getHeadTokenText()).matches()) {
       return GenderEnum.NEUTER;
     }
-    Parse[] mtokens = ec.getTokens();
+    Parse[] mtokens = mention.getTokens();
     for (int ti = 0, tl = mtokens.length - 1; ti < tl; ti++) {
       String token = mtokens[ti].toString();
       if (token.equals("Mr.") || token.equals("Mr")) {
@@ -198,6 +205,9 @@ public class GenderModel implements TestGenderModel, TrainSimilarityModel {
 
   public double[] genderDistribution(Context np1) {
     List features = getFeatures(np1);
+    if (debugOn) {
+      System.err.println("GenderModel.genderDistribution: "+features);
+    }
     return testModel.eval((String[]) features.toArray(new String[features.size()]));
   }
 
