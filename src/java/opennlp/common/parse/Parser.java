@@ -29,7 +29,7 @@ import java.util.ArrayList;
  * a structured form representing that string.
  *
  * @author      Gann Bierner
- * @version     $Revision: 1.3 $, $Date: 2001/11/29 13:21:11 $
+ * @version     $Revision: 1.4 $, $Date: 2001/12/05 13:43:12 $
  */
 public interface Parser {
     
@@ -130,16 +130,6 @@ public interface Parser {
      */
     public ArrayList getResult();
     
-    /**
-     * Makes changes to the knowledge base that occurred locally during the
-     * parse.  Not all parsers need implement this-- it makes sense for
-     * incremental parsers.
-     *
-     * @param kb the knowledge base to update
-     * @param lex the constituent that was finally chosen as the correct
-     *            interpretation
-     */
-    public void updateKB(KB kb, Constituent lex);
 
     /**
      * Returns the results of the parse reduced by a semantic/syntactic
