@@ -27,89 +27,106 @@ import java.util.Set;
  */
 public class Cache implements Map {
 
+  /** The element in the linked list which was most recently used. **/
   private DoubleLinkedListElement first;
+  /** The element in the linked list which was least recently used. **/
   private DoubleLinkedListElement last;
+  /** Temporary holder of the key of the least-recently-used element. */
   private Object lastKey;
+  /** Temperary value used in swap. */ 
   private ObjectWrapper temp;
-  private ObjectWrapper[] blank;
+  /** Holds the object wrappers which the keys are mapped to. */
+  private ObjectWrapper[] wrappers;
+  /** Map which stores the keys and values of the cache. */ 
   private Map map;
-  
+  /** The size of the cache. */
   private int size;
 
-  public Cache(int s) {
-    map = new HashMap(s);
-    blank = new ObjectWrapper[s];
-    size=s;
+  /**
+   * Creates a new cache of the specified size.
+   * @param size The size of the cache.
+   */
+  public Cache(int size) {
+    map = new HashMap(size);
+    wrappers = new ObjectWrapper[size];
+    this.size=size;
     Object o = new Object();
     first = new DoubleLinkedListElement(null, null, o);
     map.put(o, new ObjectWrapper(null, first));
-    blank[0] = new ObjectWrapper(null, first);
+    wrappers[0] = new ObjectWrapper(null, first);
 
     DoubleLinkedListElement e = first; 
     for(int i=1; i<size; i++) {
       o = new Object();
       e = new DoubleLinkedListElement(e, null, o);
-      blank[i] = new ObjectWrapper(null, e);
-      map.put(o, blank[i]);
+      wrappers[i] = new ObjectWrapper(null, e);
+      map.put(o, wrappers[i]);
       e.prev.next = e;
     }
     last = e;
   }
 
   public void clear() {
+    map.clear();
+    DoubleLinkedListElement e = first;
     for (int oi=0;oi<size;oi++) {
-      blank[oi].object=null;
+      wrappers[oi].object=null;
+      Object o = new Object();
+      map.put(o,wrappers[oi]);
+      e.object = o;
+      e = e.next;
     }
   }
   
   public Object put(Object key, Object value) {
-    /* this should never be the case, we only do a put on a cache miss which 
-       means the current value wasn't in the cache.  However if the user 
-       screws up or wants to use this as a fixed size hash and puts the same 
-       thing in the list twice things break
-    */
     ObjectWrapper o = (ObjectWrapper) map.get(key);
-    if (o != null) { 
-      //System.err.println("Cache.put: inserting same object into cache!!!!");
+    if (o != null) {
+      /*
+       * this should never be the case, we only do a put on a cache miss which
+       * means the current value wasn't in the cache. However if the user screws
+       * up or wants to use this as a fixed size hash and puts the same thing in
+       * the list twice then we update the value and more the key to the front of the
+       * most recently used list.
+       */
+
       // Move o's partner in the list to front
-      DoubleLinkedListElement e =  o.listItem;
-      
+      DoubleLinkedListElement e = o.listItem;
+
       //move to front
       if (e != first) {
-	//remove list item
-	e.prev.next = e.next;
-	if (e.next != null) {
-	  e.next.prev = e.prev;
-	}
-	else { //were moving last
-	  last = e.prev;
-	}
-      
-	//put list item in front
-	e.next = first;
-	first.prev = e;
-	e.prev = null;
-      
-	//update first
-	first = e;
+        //remove list item
+        e.prev.next = e.next;
+        if (e.next != null) {
+          e.next.prev = e.prev;
+        }
+        else { //were moving last
+          last = e.prev;
+        }
+
+        //put list item in front
+        e.next = first;
+        first.prev = e;
+        e.prev = null;
+
+        //update first
+        first = e;
       }
       return o.object;
     }
     // Put o in the front and remove the last one
-    lastKey = last.object; // key to remove from hash
-    //System.err.println("lastKey="+lastKey);
+    lastKey = last.object; // store key to remove from hash later
     last.object = key; //update list element with new key
 
     // connect list item to front of list
-    last.next = first; 
+    last.next = first;
     first.prev = last;
-      
+
     // update first and last value
     first = last;
     last = last.prev;
     first.prev = null;
     last.next = null;
-      
+
     // remove old value from cache
     temp = (ObjectWrapper) map.remove(lastKey);
     //update wrapper
@@ -121,30 +138,28 @@ public class Cache implements Map {
   }
 
   public Object get(Object key) {
-
-    ObjectWrapper o = (ObjectWrapper)map.get(key);
-    //System.err.println(size+" get "+key+" "+o);
+    ObjectWrapper o = (ObjectWrapper) map.get(key);
     if (o != null) {
       // Move it to the front
       DoubleLinkedListElement e = (DoubleLinkedListElement) o.listItem;
 
       //move to front
       if (e != first) {
-	//remove list item
-	e.prev.next = e.next;
-	if (e.next != null) {
-	  e.next.prev = e.prev;
-	}
-	else { //were moving last
-	  last = e.prev;
-	}
-	//put list item in front
-	e.next = first;
-	first.prev = e;
-	e.prev = null;
-      
-	//update first
-	first = e;
+        //remove list item
+        e.prev.next = e.next;
+        if (e.next != null) {
+          e.next.prev = e.prev;
+        }
+        else { //were moving last
+          last = e.prev;
+        }
+        //put list item in front
+        e.next = first;
+        first.prev = e;
+        e.prev = null;
+
+        //update first
+        first = e;
       }
       return o.object;
     }
