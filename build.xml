@@ -1,4 +1,4 @@
-<!-- $Id: build.xml,v 1.29 2003/03/25 13:58:45 jasonbaldridge Exp $ -->
+<!-- $Id: build.xml,v 1.30 2004/04/07 17:24:17 tsmorton Exp $ -->
 <!-- This build file based on the JDOM build.xml file. -->
 
 <project name="OpenNLP" default="package" basedir=".">
@@ -8,10 +8,10 @@
   <!-- =================================================================== -->
   <target name="init">
     <tstamp/>
-    <property name="Name" value="OpenNLP"/>
-    <property name="name" value="opennlp"/>
-    <property name="version" value="0.9.1"/>
-    <property name="year" value="2003"/>
+    <property name="Name" value="OpenNLP Tools"/>
+    <property name="name" value="opennlp-tools"/>
+    <property name="version" value="1.0.0"/>
+    <property name="year" value="2004"/>
 
     <echo message="----------- ${Name} ${version} [${year}] ------------"/>
 
@@ -22,7 +22,7 @@
 
     <property name="src.dir" value="./src/java"/>
     <property name="lib.dir" value="./lib"/>
-    <property name="packages" value="opennlp.*"/>
+    <property name="packages" value="opennlp.tools.*"/>
 
     <property name="build.dir" value="./output"/>
     <property name="build.dest" value="${build.dir}/classes"/>
@@ -40,9 +40,8 @@
     <filter token="verbose" value="true"/>
 
     <path id="build.classpath">
-      <pathelement location="${lib.dir}/opennlp.jar"/>
-      <pathelement location="${lib.dir}/jdom.jar"/>
-      <pathelement location="${lib.dir}/xerces.jar"/>
+      <pathelement location="${lib.dir}/maxent-2.2.jar"/>
+      <pathelement location="${lib.dir}/trove.jar"/>
     </path>
 
 
@@ -59,7 +58,7 @@
     <echo message=""/>
     <echo message=" available targets are:"/>
     <echo message=""/>
-    <echo message="   package  --> generates the maxent.jar file (default)"/>
+    <echo message="   package  --> generates the opennlp-tools.jar file (default)"/>
     <echo message="   compile  --> compiles the source code"/>
     <echo message="   javadoc  --> generates the API documentation"/>
     <echo message="   clean    --> cleans up the directory"/>
@@ -70,7 +69,7 @@
     <echo message=""/>
   </target>
 
-  <!-- =================================================================== -->
+ <!-- =================================================================== -->
   <!-- Prepares the build directory                                        -->
   <!-- =================================================================== -->
   <target name="prepare" depends="init">

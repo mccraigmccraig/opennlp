@@ -1,7 +1,7 @@
 #!/bin/sh
 
 echo
-echo "OpenNLP Build System"
+echo "OpenNLP Tools Build System"
 echo "-------------------"
 echo
 

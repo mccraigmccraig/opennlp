@@ -1,18 +1,30 @@
-0.9.1
+1.0.0
 -----
-Summary: Moved sentence, tokenization, and pos tagging out of grok and into
-main opennlp package and retrained models.
+These changes represent what went into this release since many of these 
+components were part of the GROK project.
 
-General:
+Summary
+=======
+Moved sentence, tokenization, and pos tagging out of grok and into
+main opennlp package and retrained models.  Added parser, chunker, and named 
+entity detection.
+
+General
+=======
 Added Span class to util for token training.
 
 Remove Pipelink dependicies from above packages in order to minimize 
 dependicies
 
-Sentence Detection:
-Retrained to create new data/EnglishSD.bin.gz
+Made "taggers" use common beam search code.
 
-Tokenization:
+Sentence Detection
+==================
+Retrained to create new data/EnglishSD.bin.gz
+Fixed context creation bug.
+
+Tokenization
+============
 Changed tokenization features.
 
 Removed possesive hack since trained model now correctly tokenizes
@@ -25,272 +37,16 @@ other types of tokenization.
 
 Retrain to create new data/EnglishTok.bin.gz
 
-POS:
+Part-Of-Speech Tagger
+=====================
 Create POSEventStream for training.
 Retrained to create new data/EnglishPOS.bin.gz
-
-
-0.9.0 - Final opennnlp.common release!
---------------------------------------
-
-Probably some changes here and there, but doesn't really matter since
-we are discontinuing the opennlp.common package. This release is only
-being made so that the source code of the package at this point is
-readily available if ever needed in the future. (Jason)
-
-
-0.8.4
------
-Summary: A fair number of changes in the way various interfaces
-work.
-
-Made the unification stuff work on Objects instead of
-Unifiables. (Jason)
-
-Added EnglishClosedClassTags (formerly from
-opennlp.grok.preprocess.postag) to opennlp.common.english. (Jason)
-
-Moved FilterFcn from opennlp.common.unify to
-opennlp.common.util. (Jason)
-
-Made MorphAnalyzer an interface that does not extend Pipelink, and
-added new methods getPrefixes() and getSuffixes(). (Jason)
-
-Removed dependency on gnu-regexp (finally) by getting rid of regexps
-in the BasicEnglishAffixes class. (Jason)
-
-Removed xSpan methods from Category interface. (Jason)
-
-Added Rule interface to opennlp.common.parse package. (Jason)
-
-
-0.8.2
------
-Summary: Not too many changes, but warrants a release because the
-hybrid logic stuff has been split off from the opennlp.common
-package.
-
-Spun-off the the hybrid logic package into its own package,
-opennlp.hylo. (Jason)
-
-Reduced the dependence on the gnu-regexp package.  Now only
-BasicEnglishAffixes uses it. The PerlHelp class was modified to use
-method in place of the regular expressions used before. (Jason)
-
-Improved the unification aspects of the hybrid logic classes. (Jason)
-
-
-0.8.0 - "Stabilized"
---------------------
-Summary: After a long journey, the API is to a point where the design has
-restabilized, hence the jump to version 0.8.0.  Major improvements to
-the hybrid logic package. A number of old interfaces were removed,
-most notably, those in the 'discourse' and 'structure' packages. Some
-minor enhancements to the 'xml' and 'unify' packages.
-
-The output directory of the build process is now 'output' instead of
-'build'. (Jason)
-
-Added Indexed interface for objects which can hold an index as a way
-of being unique. (Jason)
-
-Changed the Unifiable interface so that the methods work on Unifiables
-rather than Objects.  Also, unifyCheck no longer returns a
-value. (Jason)
-
-Removed the discourse and structure packages and most of the classes
-inside them. Moved Category and CategoryFcn to the synsem package.
-Category now extends Mutable. (Jason)
-
-Removed CategorySubstitution, CatVar, Synner, and Denoter. (Jason)
-
-Added Mutable and ModFcn for objects which can be recursively
-modified. This acts as a generalization of the deepMap() method of the
-Category interface. (Jason)
-
-Fixed a bug in the getParagraphs method of PerlHelp: newlines were not
-being added when they did not indicate a paragraph boundary. (Jason)
-
-Added Pipeline and PipelineException classes (orginally part of
-Grok). (Jason)
-
-Created a class NLPDocumentBuilder in order to build NLPDocuments from 
-different input sources (String, Reader or File). (Joao)
-
-Improved the hybrid logic subpackage so that its classes implement the
-Unifiable and LF interfaces. The classes also more succinctly capture
-the definition of well-formed formulas of hybrid logic. (Jason)
-
-Simplified the Category, Variable, Parser, and RuleGroup interfaces. (Jason)
-
-Added opennlp.common.synsem.Sign as a replacement for Constituent.
-The name is more standard, and Constituent had too many
-methods. (Jason)
-
-
-
-0.6.6
------
-Summary: Lots of improvements in the way XML is handled.  The
-structure of NLPDocuments has been changed, though no DTD or Schema
-has been defined for it yet.  The NLPDocument now extends
-org.jdom.Document rather than holding a Document object inside it, and
-many methods have been added to make it easy to retrieve and
-manipulate various kinds of elements of the document.
-
-Here is an example of the XML structure of an NLPDocument:
-
-<nlpDocument>
-  <text>
-    <p>
-      <s>
-        <t>
-          <w pos="RB">First</w>
-        </t>
-        <t>
-          <w pos=",">,</w>
-        </t>
-        <t>
-          <w pos="PRP">it</w>
-        </t>
-        <t>
-          <w pos="VBZ">'s</w>
-        </t>
-        <t>
-          <w pos="DT">a</w>
-        </t>
-        <t>
-          <w pos="NN">sentence</w>
-        </t>
-        <t>
-          <w pos="IN">with</w>
-        </t>
-        <t type="name">
-          <w pos="NNP">John</w>
-          <w pos="NNP">Smith</w>
-        </t>
-        <t>
-          <w pos="IN">in</w>
-        </t>
-        <t>
-          <w pos="CD">it</w>
-        </t>
-        <t>
-          <w pos=".">.</w>
-        </t>
-      </s>
-    </p>
-  </text>
-</nlpDocument>
-
-Joao: changed NLPDocument. Extends org.jdom.Document. Now the constructor 
-method creates a NLPDocument object from a given text, breaking it into 
-paragraphs and "quasiWords" (chunks of text separated by white spaces). 
-
-Jason: Added many new methods to NLPDocument to make access to
-different kinds of Elements easier.  Removed RawToXml and
-PreProcessDocument classes.
-
-Jason: All exceptions in opennlp.common now extend NLPException.
-
-Jason: Removed updateKB() method from Parser interface.
-
-
-0.6.5
------
-Summary: Minor bug fix, further updates to unification stuff.
-
-Jason: Fixed a bug in XmlUtils in which the replace() methods did not
-have the parent Element disown its children before setting a new List
-to be its Children.
-
-Jason: Further changes to unification.  Unifiable's now must implement
-the unifyCheck() method, which should be a fast way of determining
-whether or not the Unifiable can possibly unify with another object.
-Unifiables must also implement the fill() method to allow replace all
-Variable contained in the Unifiable to be replaced according to a
-given Substitution object.  Consequently, the fill() method is now
-gone from the Substitution interface.  The fail() and setFail()
-methods have also gone from Substitution as unification failure is now
-indicated by the UnifyFailure exception rather than a "failed"
-substitution.
-
-Jason: Added two implementations of the Substitution interface,
-SimpleSubstitution and SelfCondensingSub.  Use the latter if you want
-to get up and running with unification stuff right away.
-
-Jason: Added static method unify(Object o1, Object o2) to the Unifier
-class which hides the details of needing a Substitution object for
-those who just want to get the unification of two objects and nothing
-else.  Uses a SelfCondensingSub instance to return the object
-corresponding to the unification of o1 and o2.
-
-
-0.6.4
------
-Changed several aspects of unification.  The Unifiable interface now
-requires the method unify(Object o, Substitution s) to be implemented.
-The Unifier class provides the unify(Object a, Object b, Substitution
-s) method to handle Variables and non-Unifiable built-in Java classes
-such as String which we would still like to see being able to unify
-with other objects. Finally, failure of a Unifiable to unify with an
-object is signaled by throwing the UnifyFailure exception (required by
-the unify method).
-
-FeatureStructure has been added and will eventually replace the
-Feature interface.  It provides a much reduced set of methods to be
-implemented and also is simply a better name for that type of class.
-The naming of the methods has also been improved.
-
-The PerlHelp and BasicEnglishAffixes classes have migrated from
-opennlp.maxent to opennlp.common.util and opennlp.common.english,
-respectively.  The gnu-regexp.jar has been added to the project as a
-result.
-
-XmlUtils has been scrapped and rewritten to use JDOM.
-
-
-0.6.2
------
-Improved the build system for easier homepage updates.
-
-Simplified the Lexicon and Rules interfaces and pushed the methods
-intended for generation into the ReversibleLexicon and ReversibleRules
-interfaces which extend Lexicon and Rules, respectively.
-
-Replaced com.sun.xml.tree and org.xml.sax with org.jdom, org.jdom.input and
-org.jdom.output in NLPDocument. Removed com.sun.xml.tree and org.xml.sax from 
-class PreProcessDocument. xml.jar is no longer used.
-
-
-0.6.0
------
-A bunch of changes have happened since 0.4.0, but were unfortunately
-not documented in this file during that time.  Here are the major
-changes:
-
-The various interfaces were broken up and placed into directories
-such as "generate" and "structure" reflecting their grouping.
-
-A number of the classes in the opennlp.common.structure package were
-redesigned to be less specific to categorial grammar
-
-A new package opennlp.common.hylo was added with the beginnings for
-Java structures representing terms of hybrid logics.
-
-The class opennlp.common.xml.SchemaBasedValidator was added for
-making it easy to validate an XML file against an XML Schema.
-
-OpenNLP now uses Ant to build, and the directory structure has been
-changed considerably to facilitate the creation of the distribution
-files and to ensure that source code and supporting libraries are
-always provided with the distribution.
-
-
-0.4.0
------
-* First release version separated from Grok!
-* Addition of XML and preprocessing interfaces.
-* Cleaned up many interfaces in main package so that they had fewer
-  Grok specific methods.
-* Documentation of the interfaces (= API documentation)
+Added tag dictionary
+
+Parser
+======
+Integrated full parser and trained.
+
+Named Finding
+=============
+Integrated name finder and trained models.
