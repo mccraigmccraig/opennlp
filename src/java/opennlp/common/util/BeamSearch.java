@@ -38,19 +38,28 @@ public class BeamSearch {
     this.model = model;
   }
 
-  public List bestSequence(List sequence, Object context) {
+  public Sequence bestSequence(List sequence, Object context) {
     int n = sequence.size();
     SortedSet prev = new TreeSet();
     SortedSet next = new TreeSet();
     SortedSet tmp;
     prev.add(new Sequence());
-
+    Object[] additionalContext = (Object[]) context;
+    if (additionalContext == null) {
+      additionalContext = new Object[0];
+    }
     for (int i = 0; i < n; i++) {
       int sz = Math.min(size, prev.size());
       for (int j = 1; j <= sz; j++) {
         Sequence top = (Sequence) prev.first();
         prev.remove(top);
-        Object[] params = { new Integer(i), sequence, top };
+        Object[] params = new Object[additionalContext.length+3];
+        params[0] = new Integer(i);
+        params[1] = sequence;
+        params[2] = top;
+        for (int aci=0,acl=additionalContext.length;aci<acl;aci++) {
+          params[3+aci] = additionalContext[aci];          
+        }
         double[] scores = model.eval(cg.getContext(params));
         double[] temp_scores = new double[scores.length];
 
@@ -77,9 +86,7 @@ public class BeamSearch {
       prev = next;
       next = tmp;
     }
-
-    List result = ((Sequence) prev.first()).getOutcomes();
-    return result;
+    return (Sequence) prev.first();
   }
 
   protected boolean validSequence(int i, List sequence, Sequence s, String outcome) {
