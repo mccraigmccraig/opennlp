@@ -44,7 +44,7 @@ public class BeamSearch {
   /** Returns the best sequence of outcomes based on model for this object.
      * @param numSequences The maximum number of sequences to be returned.
      * @param sequence The input sequence.
-     * @param context An Object[] of additional context.  This is passed to the context generator blindly with the assumption that the context are appropiate.
+     * @param additionalContext An Object[] of additional context.  This is passed to the context generator blindly with the assumption that the context are appropiate.
      * @return An array of the top ranked sequences of outcomes.
      */
   public Sequence[] bestSequences(int numSequences,List sequence, Object[] additionalContext) {

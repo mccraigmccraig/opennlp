@@ -84,7 +84,7 @@ public class DefaultNameContextGenerator implements NameContextGenerator {
   /**
    * Return the context for finding names at the specified index.
    * @param i The index of the token in the specified toks array for which the context should be constructed. 
-   * @param toksThe tokens of the sentence.  The <code>toString</code> methods of these objects should return the token text.
+   * @param toks The tokens of the sentence.  The <code>toString</code> methods of these objects should return the token text.
    * @param preds The previous decisions made in the taging of this sequence.  Only indices less than i will be examined.
    * @param prevTags  A mapping between tokens and the previous outcome for these tokens. 
    * @return the context for finding names at the specified index.
