@@ -1,5 +1,11 @@
-0.6.7
+0.6.8
 -----
+
+The output directory of the build process is now 'output' instead of
+'build'. (Jason)
+
+Added Indexed interface for objects which can hold an index as a way
+of being unique. (Jason)
 
 Changed the Unifiable interface so that the methods work on Unifiables
 rather than Objects.  Also, unifyCheck no longer returns a
