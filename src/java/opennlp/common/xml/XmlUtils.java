@@ -25,7 +25,7 @@ import java.util.*;
  * Utilities for manipulating XML based objects.
  *
  * @author      Jason Baldridge
- * @version     $Revision: 1.3 $, $Date: 2001/11/16 12:12:15 $
+ * @version     $Revision: 1.4 $, $Date: 2001/11/16 14:22:16 $
  */
 
 public class XmlUtils {
@@ -49,6 +49,7 @@ public class XmlUtils {
 	return elements;
     }
 
+    
     /**
      * Returns the text content of all children with the given tag name.
      */
@@ -65,6 +66,7 @@ public class XmlUtils {
 	return sb.toString();
     }
 
+    
     /**
      * Returns the text content of all children with the given tag name.
      */
@@ -78,6 +80,30 @@ public class XmlUtils {
 	    sb.append(getAllTextNested((Element)i.next())).append(' ');
 	return sb.toString();
     }
+
+
+    /**
+     * Make a regular string into suitable PCDATA.
+     * 
+     * @param     s  The string which may contain special XML characters.
+     */    
+   public static String filt2XML(String s) {
+        StringBuffer input = new StringBuffer(s);
+        StringBuffer output = new StringBuffer(input.length());
+        for(int i=0; i<input.length(); i++) {
+            char c = input.charAt(i);
+            switch(c) {
+            case '<': output.append("&lt;"); break;
+            case '>': output.append("&gt;"); break;
+            case '&': output.append("&amp;"); break;
+            case '\'': output.append("&apos;"); break;
+            case '"': output.append("&quot;"); break;
+            default: output.append(c);
+            }
+        }
+        return output.toString();
+    }
+
 
 
 }
