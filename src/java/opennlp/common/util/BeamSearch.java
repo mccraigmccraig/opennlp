@@ -78,7 +78,7 @@ public class BeamSearch {
       next = tmp;
     }
 
-    List result = (List) prev.first();
+    List result = ((Sequence) prev.first()).getOutcomes();
     return result;
   }
 
