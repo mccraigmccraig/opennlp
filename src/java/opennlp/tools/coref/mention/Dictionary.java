@@ -36,15 +36,16 @@ public interface Dictionary {
    * @param lemma The lemmas for which the key is desired.
    * @param pos The pos for which the key is desired.
    * @param senseNumber The sense number for which the key is desired.
-   * @return
+   * @return a key indicating the specified sense number of the specified 
+   * lemma with the specified part-of-speech.
    */
  public  String getSenseKey(String lemma, String pos, int senseNumber);
   
   /**
-   * Returns to number of senses in the dictionry for the specified lemma.
+   * Returns the number of senses in the dictionry for the specified lemma.
    * @param lemma A lemmatized form of the word to look up.
    * @param pos The part-of-sppech for the lemma.
-   * @return
+   * @return the number of senses in the dictionry for the specified lemma.
    */
   public int getNumSenses(String lemma, String pos);
   
