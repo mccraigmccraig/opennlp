@@ -33,7 +33,8 @@ import opennlp.tools.util.Sequence;
 import opennlp.tools.util.Span;
 
 /**
- * Class for a shift reduce style parser based on Adwait Ratnaparki's 1998 thesis. 
+ * Class for a shift reduce style parser based on Adwait Ratnaparkhi's 1998 thesis. 
+ * 
  */
 public class ParserME {
 
@@ -95,7 +96,7 @@ public class ParserME {
   private int incompleteIndex;
   
   private boolean createDerivationString = false;
-  private boolean debugOn = true;
+  private boolean debugOn = false;
   
   /**
    * Creates a new parser using the specified models and head rules.
@@ -153,7 +154,6 @@ public class ParserME {
     topStartIndex = buildModel.getIndex(TOP_START);
     completeIndex = checkModel.getIndex(COMPLETE);
     incompleteIndex = checkModel.getIndex(INCOMPLETE);
-    
   }
   
   /**
@@ -351,8 +351,9 @@ public class ParserME {
       newParse1.setChild(originalAdvanceIndex,tag); //replace constituent labeled
       newParse1.addProb(Math.log(bprob));
       //check
-      checkModel.eval(checkContextGenerator.getContext(newParse1.getChildren(), lastStartType, lastStartIndex, advanceNodeIndex), cprobs);
-      //System.out.println("check "+cprobs[completeIndex]+" "+cprobs[incompleteIndex]);
+      //String[] context = checkContextGenerator.getContext(newParse1.getChildren(), lastStartType, lastStartIndex, advanceNodeIndex);
+      checkModel.eval(checkContextGenerator.getContext(collapsePunctuation(newParse1.getChildren(),punctSet), lastStartType, lastStartIndex, advanceNodeIndex), cprobs);
+      //System.out.println("check "+lastStartType+" "+cprobs[completeIndex]+" "+cprobs[incompleteIndex]+" "+tag+" "+java.util.Arrays.asList(context));
       Parse newParse2 = newParse1;
       if (cprobs[completeIndex] > q) { //make sure a reduce is likely
         newParse2 = (Parse) newParse1.clone();

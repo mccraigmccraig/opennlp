@@ -41,7 +41,7 @@ public class EnglishHeadRules implements HeadRules {
     punctSet.add(",");
     punctSet.add("``");
     punctSet.add("''");
-    punctSet.add(":");
+    //punctSet.add(":");
   }
   
   public EnglishHeadRules(Map ruleMap) {

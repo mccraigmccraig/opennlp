@@ -45,25 +45,54 @@ public class CheckContextGenerator implements ContextGenerator {
     return getContext((Parse[]) params[0], (String) params[1], ((Integer) params[2]).intValue(), ((Integer) params[3]).intValue());
   }
 
-  private void surround(Parse p, int i, String type, List features) {
+  private void surround(Parse p, int i, String type, Set punctSet, List features) {
     StringBuffer feat = new StringBuffer(20);
     feat.append("s").append(i).append("=");
-    if (p != null) {
-      feat.append(p.getHead().toString()).append("|").append(type).append("|").append(p.getType());
+    if (punctSet !=null) {
+      for (Iterator pi=punctSet.iterator();pi.hasNext();) {
+        Parse punct = (Parse) pi.next();
+        if (p != null) {
+          feat.append(p.getHead().toString()).append("|").append(type).append("|").append(p.getHead().getType()).append("|").append(punct.getType());
+        }
+        else {
+          feat.append(type).append("|").append(EOS).append("|").append(punct.getType());
+        }
+        features.add(feat.toString());
+        
+        feat.setLength(0);
+        feat.append("s").append(i).append("*=");
+        if (p != null) {
+          feat.append(type).append("|").append(p.getHead().getType()).append("|").append(punct.getType());
+        }
+        else {
+          feat.append(type).append("|").append(EOS).append("|").append(punct.getType());
+        }
+        features.add(feat.toString());
+
+        feat.setLength(0);
+        feat.append("s").append(i).append("*=");
+        feat.append(type).append("|").append(punct.getType());
+        features.add(feat.toString());
+      }
     }
     else {
-      feat.append(EOS).append("|").append(type);
+      if (p != null) {
+        feat.append(p.getHead().toString()).append("|").append(type).append("|").append(p.getHead().getType());
+      }
+      else {
+        feat.append(type).append("|").append(EOS);
+      }
+      features.add(feat.toString());
+      feat.setLength(0);
+      feat.append("s").append(i).append("*=");
+      if (p != null) {
+        feat.append(type).append("|").append(p.getHead().getType());
+      }
+      else {
+        feat.append(type).append("|").append(EOS);
+      }
+      features.add(feat.toString());
     }
-    features.add(feat.toString());
-    feat.setLength(0);
-    feat.append("s").append(i).append("*=");
-    if (p != null) {
-      feat.append(type).append("|").append(p.getType());
-    }
-    else {
-      feat.append(type).append("|").append(EOS);
-    }
-    features.add(feat.toString());
   }
 
   private void checkcons(Parse p, String i, String type, List features) {
@@ -90,16 +119,6 @@ public class CheckContextGenerator implements ContextGenerator {
     features.add(feat.toString());
   }
   
-  private String surrondPunct(String type, Parse punct, int i) {
-    StringBuffer feat = new StringBuffer(20);
-    feat.append(i).append("=");
-    if (type != null) {
-      feat.append(type).append("|");
-    }
-    feat.append(punct.getType());
-    return (feat.toString());
-  }
-
   /**
    * Returns predictive context for deciding whether the specified constituents between the specified start and end index 
    * can be combined to form a new constituent of the specified type.  
@@ -145,35 +164,28 @@ public class CheckContextGenerator implements ContextGenerator {
     Parse p_1 = null;
     Parse p1 = null;
     Parse p2 = null;
+    Set p1s = constituents[end].getNextPunctuationSet();
+    Set p2s = null;
+    Set p_1s = constituents[start].getPreviousPunctuationSet();
+    Set p_2s = null;
     if (start - 2 >= 0) {
       p_2 = constituents[start - 2];
     }
     if (start - 1 >= 0) {
       p_1 = constituents[start - 1];
+      p_2s = p_1.getPreviousPunctuationSet();
     }
     if (end + 1 < ps) {
       p1 = constituents[end + 1];
+      p2s = p1.getNextPunctuationSet();
     }
     if (end + 2 < ps) {
       p2 = constituents[end + 2];
     }
-    surround(p_1, -1, type, features);
-    surround(p_2, -2, type, features);
-    surround(p1, 1, type, features);
-    surround(p2, 2, type, features);
-
-    if (constituents[start].getPreviousPunctuationSet() != null) {
-      for (Iterator pi=constituents[start].getPreviousPunctuationSet().iterator();pi.hasNext();) {
-        Parse punct = (Parse) pi.next(); 
-        features.add("sp"+this.surrondPunct(type,punct,-1));
-      }
-    }
-    if (constituents[end].getNextPunctuationSet() != null) {
-      for (Iterator pi=constituents[end].getNextPunctuationSet().iterator();pi.hasNext();) {
-        Parse punct = (Parse) pi.next(); 
-        features.add("sp"+this.surrondPunct(type,punct,1));
-      }
-    }
+    surround(p_1, -1, type, p_1s, features);
+    surround(p_2, -2, type, p_2s, features);
+    surround(p1, 1, type, p1s, features);
+    surround(p2, 2, type, p2s, features);
 
     return ((String[]) features.toArray(new String[features.size()]));
   }

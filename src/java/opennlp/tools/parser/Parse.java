@@ -213,7 +213,7 @@ public class Parse implements Cloneable, Comparable {
     if (!type.equals(ParserME.TOK_NODE)) {
       System.out.print("(");
       System.out.print(type +" ");
-      System.out.print(label+" ");
+      //System.out.print(label+" ");
       //System.out.print(head+" ");
       //System.out.print(df.format(prob)+" ");
     }
