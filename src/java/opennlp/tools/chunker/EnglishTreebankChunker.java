@@ -17,16 +17,18 @@
 //////////////////////////////////////////////////////////////////////////////
 package opennlp.tools.chunker;
 
+import java.util.List;
+
+import opennlp.common.util.Sequence;
 import opennlp.maxent.ContextGenerator;
 import opennlp.maxent.MaxentModel;
-
 
 /** This is a chunker based on the CONLL chunking task which uses Penn Treebank constituents as the basis for the chunks.
  *   See   http://cnts.uia.ac.be/conll2000/chunking/ for data and task definition.
  * @author Tom Morton
  */
 public class EnglishTreebankChunker extends ChunkerME {
-  
+
   public EnglishTreebankChunker(MaxentModel mod) {
     super(mod);
   }
@@ -41,21 +43,22 @@ public class EnglishTreebankChunker extends ChunkerME {
 
   protected boolean validOutcome(String outcome, Sequence sequence) {
     if (outcome.startsWith("I-")) {
-        int lti = sequence.tagList.size()-1;
-        if (lti == -1) {
-          return(false);
+      List tagList = sequence.getOutcomes();
+      int lti = tagList.size() - 1;
+      if (lti == -1) {
+        return (false);
+      }
+      else {
+        String lastTag = (String) tagList.get(lti);
+        if (lastTag.equals("O")) {
+          return (false);
         }
-        else {
-          String lastTag = (String) sequence.tagList.get(lti);
-          if (lastTag.equals("O")) {
-            return(false); 
-          }
-          if (!lastTag.substring(2).equals(outcome.substring(2))) {
-            return(false);
-          }
+        if (!lastTag.substring(2).equals(outcome.substring(2))) {
+          return (false);
         }
+      }
     }
-    return(true);
+    return (true);
   }
 
 }
