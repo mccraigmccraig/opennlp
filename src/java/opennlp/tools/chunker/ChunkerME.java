@@ -27,7 +27,8 @@ import opennlp.tools.util.BeamSearch;
 import opennlp.tools.util.Sequence;
 
 /**
- * @author Tom Morton
+ * The class represents a maximum-entropy-based chunker.  Such a chunker can be used to
+ * find flat structures based on sequence inputs such as noun phrases or named entities.
  *
  */
 public class ChunkerME implements Chunker {
@@ -38,14 +39,30 @@ public class ChunkerME implements Chunker {
   protected BeamSearch beam;
   private Sequence bestSequence;
 
+  /**
+   * Creates a chunker using the specified model.
+   * @param mod The maximum entropy model for this chunker.
+   */
   public ChunkerME(MaxentModel mod) {
     this(mod, new DefaultChunkerContextGenerator(), 10);
   }
 
+  /**
+   * Creates a chunker using the specified model and context generator.
+   * @param mod The maximum entropy model for this chunker.
+   * @param cg The context generator to be used by the specified model.
+   */
   public ChunkerME(MaxentModel mod, ChunkerContextGenerator cg) {
     this(mod, cg, 10);
   }
 
+  /**
+   * Creates a chunker using the specified model and context generator and decodes the
+   * model using a beam search of the specified size.
+   * @param mod The maximum entropy model for this chunker.
+   * @param cg The context generator to be used by the specified model.
+   * @param beamSize The size of the beam that should be used when decoding sequences.
+   */
   public ChunkerME(MaxentModel mod, ChunkerContextGenerator cg, int beamSize) {
     _npModel = mod;
     _contextGen = cg;
@@ -53,11 +70,13 @@ public class ChunkerME implements Chunker {
     beam = new ChunkBeamSearch(beamSize, cg, mod);
   }
 
+  /* inherieted javadoc */
   public List chunk(List toks, List tags) {
     bestSequence = beam.bestSequence(toks, new Object[] { tags });
     return bestSequence.getOutcomes();
   }
-
+  
+  /* inherieted javadoc */
   public String[] chunk(Object[] toks, String[] tags) {
     bestSequence = beam.bestSequence(Arrays.asList(toks), new Object[] { Arrays.asList(tags)});
     List c = bestSequence.getOutcomes();
@@ -75,34 +94,48 @@ public class ChunkerME implements Chunker {
     return (true);
   }
 
+  /**
+   * This class implements the abstract BeamSearch class to allow for the chunker to use
+   * the common beam search code. 
+   *
+   */
   class ChunkBeamSearch extends BeamSearch {
+    
     public ChunkBeamSearch(int size, ChunkerContextGenerator cg, MaxentModel model) {
       super(size, cg, model);
     }
-
+    
+    /* inherieted java doc */
     protected boolean validSequence(int i, List sequence, Sequence s, String outcome) {
       return validOutcome(outcome, s);
     }
   }
 
+  /**
+   * Populates the specified array with the probabilities of the last decoded sequence.  The
+   * sequence was determined based on the previous call to <code>chunk</code>.  The 
+   * specified array should be at least as large as the numbe of tokens in the previous call to <code>chunk</code>.
+   * @param probs An array used to hold the probabilities of the last decoded sequence.
+   */
   public void probs(double[] probs) {
     bestSequence.getProbs(probs);
   }
 
+    /**
+     * Returns an array with the probabilities of the last decoded sequence.  The
+     * sequence was determined based on the previous call to <code>chunk</code>.
+     * @return An array with the same number of probabilities as tokens were sent to <code>chunk</code>
+     * when it was last called.   
+     */
   public double[] probs() {
     return bestSequence.getProbs();
   }
 
-  public static GISModel train(opennlp.maxent.EventStream es, int iterations, int cut) throws java.io.IOException {
+  
+  private static GISModel train(opennlp.maxent.EventStream es, int iterations, int cut) throws java.io.IOException {
     return opennlp.maxent.GIS.trainModel(iterations, new TwoPassDataIndexer(es, cut));
   }
 
-  /**
-     * <p>Trains a new chunker model.</p>
-     *
-     * <p>Usage: java opennlp.chunker.ChunkerME data_file new_model_name (iterations cutoff)?</p>
-     *
-     */
   public static void main(String[] args) throws java.io.IOException {
     if (args.length == 0) {
       System.err.println("Usage: ChunkerME trainingFile modelFile");

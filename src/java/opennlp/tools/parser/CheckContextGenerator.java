@@ -22,10 +22,18 @@ import java.util.List;
 
 import opennlp.maxent.ContextGenerator;
 
+/**
+ * Class for generating predictive context for deciding when a constituent is complete.
+ * @author Tom Morton
+ *
+ */
 public class CheckContextGenerator implements ContextGenerator {
 
   private static final String EOS = "eos";
   
+  /**
+   * Creates a new context generator for generating predictive context for deciding when a constituent is complete.
+   */
   public CheckContextGenerator() {
     super();
   }
@@ -80,21 +88,30 @@ public class CheckContextGenerator implements ContextGenerator {
     features.add(feat.toString());
   }
 
-  public String[] getContext(List parts, String type, int start, int end) {
-    int ps = parts.size();
+  /**
+   * Returns predictive context for deciding whether the specified constituents between the specified start and end index 
+   * can be combined to form a new constituent of the specified type.  
+   * @param constituents The constituents which have yet to be combined into new constituents.
+   * @param type The type of the new constituent proposed.
+   * @param start The first constituent of the proposed constituent.
+   * @param end The last constituent of the proposed constituent.
+   * @return The predictive context for deciding whether a new constituent should be created.
+   */
+  public String[] getContext(List constituents, String type, int start, int end) {
+    int ps = constituents.size();
     List features = new ArrayList(100);
 
     //default 
     features.add("default");
 
-    Parse pstart = (Parse) parts.get(start);
-    Parse pend = (Parse) parts.get(end);
+    Parse pstart = (Parse) constituents.get(start);
+    Parse pend = (Parse) constituents.get(end);
     checkcons(pstart, "begin", type, features);
     checkcons(pend, "last", type, features);
     StringBuffer production = new StringBuffer(20);
     production.append(type).append("->");
     for (int pi = start; pi < end; pi++) {
-      Parse p = (Parse) parts.get(pi);
+      Parse p = (Parse) constituents.get(pi);
       checkcons(p, pend, type, features);
       production.append(p.getType()).append(",");
     }
@@ -105,16 +122,16 @@ public class CheckContextGenerator implements ContextGenerator {
     Parse p1 = null;
     Parse p2 = null;
     if (start - 2 >= 0) {
-      p_2 = (Parse) parts.get(start - 2);
+      p_2 = (Parse) constituents.get(start - 2);
     }
     if (start - 1 >= 0) {
-      p_1 = (Parse) parts.get(start - 1);
+      p_1 = (Parse) constituents.get(start - 1);
     }
     if (end + 1 < ps) {
-      p1 = (Parse) parts.get(end + 1);
+      p1 = (Parse) constituents.get(end + 1);
     }
     if (end + 2 < ps) {
-      p2 = (Parse) parts.get(end + 2);
+      p2 = (Parse) constituents.get(end + 2);
     }
     surround(p_1, -1, type, features);
     surround(p_2, -2, type, features);

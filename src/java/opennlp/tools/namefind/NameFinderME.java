@@ -34,6 +34,9 @@ import opennlp.maxent.io.SuffixSensitiveGISModelWriter;
 import opennlp.tools.util.BeamSearch;
 import opennlp.tools.util.Sequence;
 
+/**
+ * Class for creating a maximum-entropy-based name finder.  
+ */
 public class NameFinderME implements NameFinder {
 
   protected MaxentModel _npModel;
@@ -46,26 +49,43 @@ public class NameFinderME implements NameFinder {
   public static final String CONTINUE = "cont";
   public static final String OTHER = "other";
 
+  /**
+   * Creates a new name finder with the specified model.
+   * @param mod The model to be used to find names.
+   */
   public NameFinderME(MaxentModel mod) {
     this(mod, new DefaultNameContextGenerator(), 10);
   }
 
+  /**
+   * Creates a new name finder with the specified model and context generator.
+   * @param mod The model to be used to find names.
+   * @param cg The context generator to be used with this name finder.
+   */
   public NameFinderME(MaxentModel mod, NameContextGenerator cg) {
     this(mod, cg, 10);
   }
 
+  /**
+   * Creates a new name finder with the specified model and context generator.
+   * @param mod The model to be used to find names.
+   * @param cg The context generator to be used with this name finder.
+   * @param beamSize The size of the beam to be used in decoding this model.
+   */
   public NameFinderME(MaxentModel mod, NameContextGenerator cg, int beamSize) {
     _npModel = mod;
     _contextGen = cg;
     this.beamSize = beamSize;
     beam = new NameBeamSearch(beamSize, cg, mod);
   }
-
+  
+  /* inherieted javadoc */
   public List find(List toks, Map prevTags) {
     bestSequence = beam.bestSequence(toks, new Object[] { prevTags });
     return bestSequence.getOutcomes();
   }
 
+  /* inherieted javadoc */
   public String[] find(Object[] toks, Map prevTags) {
     bestSequence = beam.bestSequence(Arrays.asList(toks), new Object[] { prevTags });
     List c = bestSequence.getOutcomes();
@@ -93,8 +113,18 @@ public class NameFinderME implements NameFinder {
     return true;
   }
 
+  /** 
+   * Implementation of the abstract beam search to allow the name finder to use the common beam search code. 
+   *
+   */
   private class NameBeamSearch extends BeamSearch {
 
+    /**
+     * Creams a beam seach of the specified size sing the specified model with the specified context generator.
+     * @param size The size of the beam.
+     * @param cg The context generator used with the specified model.
+     * @param model The model used to determine names.
+     */
     public NameBeamSearch(int size, NameContextGenerator cg, MaxentModel model) {
       super(size, cg, model);
     }
@@ -104,15 +134,27 @@ public class NameFinderME implements NameFinder {
     }
   }
 
+  /**
+     * Populates the specified array with the probabilities of the last decoded sequence.  The
+     * sequence was determined based on the previous call to <code>chunk</code>.  The 
+     * specified array should be at least as large as the numbe of tokens in the previous call to <code>chunk</code>.
+     * @param probs An array used to hold the probabilities of the last decoded sequence.
+     */
   public void probs(double[] probs) {
     bestSequence.getProbs(probs);
   }
-
+  
+  /**
+    * Returns an array with the probabilities of the last decoded sequence.  The
+    * sequence was determined based on the previous call to <code>chunk</code>.
+    * @return An array with the same number of probabilities as tokens were sent to <code>chunk</code>
+    * when it was last called.   
+    */
   public double[] probs() {
     return bestSequence.getProbs();
   }
 
-  public static GISModel train(EventStream es, int iterations, int cut) throws IOException {
+  private static GISModel train(EventStream es, int iterations, int cut) throws IOException {
     return GIS.trainModel(iterations, new TwoPassDataIndexer(es, cut));
   }
 

@@ -25,8 +25,7 @@ import java.util.regex.Pattern;
 import opennlp.tools.util.Sequence;
 
 
-/** Determines contextual features for a tag/chunk style named-entity recognizer.
- * @author Tom Morton
+/** Class for determining contextual features for a tag/chunk style named-entity recognizer.
  */
 public class DefaultNameContextGenerator implements NameContextGenerator {
 
@@ -45,8 +44,9 @@ public class DefaultNameContextGenerator implements NameContextGenerator {
   private Pattern capPeriod;
   private Pattern initialCap;
 
+
   /**
-   * 
+   * Creates a name context generator.
    */
   public DefaultNameContextGenerator() {
     super();
@@ -81,6 +81,14 @@ public class DefaultNameContextGenerator implements NameContextGenerator {
     return (getContext(i, toks.toArray(), (String[]) preds.toArray(new String[preds.size()]),prevTags));
   }
 
+  /**
+   * Return the context for finding names at the specified index.
+   * @param i The index of the token in the specified toks array for which the context should be constructed. 
+   * @param toksThe tokens of the sentence.  The <code>toString</code> methods of these objects should return the token text.
+   * @param preds The previous decisions made in the taging of this sequence.  Only indices less than i will be examined.
+   * @param prevTags  A mapping between tokens and the previous outcome for these tokens. 
+   * @return the context for finding names at the specified index.
+   */
   public String[] getContext(int i, Object[] toks, String[] preds, Map prevTags) {
     List features = getStaticFeatures(toks,i,prevTags);
     String po=NameFinderME.OTHER;

@@ -25,10 +25,9 @@ import opennlp.maxent.EventStream;
 import java.util.*;
 
 /**
- * @author Tom Morton
+ * Class for creating an event stream out of data files for training a chunker. 
  *
-  */
-
+ */
 public class ChunkerEventStream implements EventStream {
 
   private ContextGenerator cg;
@@ -36,10 +35,19 @@ public class ChunkerEventStream implements EventStream {
   private Event[] events;
   private int ei;
 
+  /**
+   * Creates a new event stream based on the specified data stream.
+   * @param d The data stream for this event stream.
+   */
   public ChunkerEventStream(DataStream d) {
     this(d, new DefaultChunkerContextGenerator());
   }
 
+  /**
+   * Creates a new event stream based on the specified data stream using the specified context generator.
+   * @param d The data stream for this event stream.
+   * @param cg The context generator which should be used in the creation of events for this event stream.
+   */
   public ChunkerEventStream(DataStream d, ContextGenerator cg) {
     this.cg = cg;
     data = d;
@@ -52,6 +60,7 @@ public class ChunkerEventStream implements EventStream {
     }
   }
 
+  /* inherieted javadoc */
   public Event nextEvent() {
     if (ei == events.length) {
       addNewEvents();
@@ -60,6 +69,7 @@ public class ChunkerEventStream implements EventStream {
     return ((Event) events[ei++]);
   }
 
+  /* inherieted javadoc */
   public boolean hasNext() {
     return (ei < events.length || data.hasNext());
   }

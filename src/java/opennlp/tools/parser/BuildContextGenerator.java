@@ -22,10 +22,18 @@ import java.util.List;
 
 import opennlp.maxent.ContextGenerator;
 
+/**
+ * Class to generator predictive contexts for deciding how constituents should be combined together.
+ * @author Tom Morton
+ */
 public class BuildContextGenerator implements ContextGenerator {
 
   private static final String EOS = "eos";
   
+  /**
+   * Creates a new context generator for making decisions about combining constitients togehter.
+   *
+   */
   public BuildContextGenerator() {
     super();
   }
@@ -65,9 +73,16 @@ public class BuildContextGenerator implements ContextGenerator {
     return (feat.toString());
   }
 
-  public String[] getContext(List parts, int index) {
+  /**
+   * Returns the predictive context used to determine how constituent at the specified index 
+   * should be combined with other contisuents. 
+   * @param constituents The constituents which have yet to be combined into new constituents.
+   * @param index The index of the constituent whcihi is being considered.
+   * @return the context for building constituents at the specified index.
+   */
+  public String[] getContext(List constituents, int index) {
     List features = new ArrayList(100);
-    int ps = parts.size();
+    int ps = constituents.size();
 
     //default 
     features.add("default");
@@ -80,17 +95,17 @@ public class BuildContextGenerator implements ContextGenerator {
     Parse p2 = null;
 
     if (index - 2 >= 0) {
-      p_2 = (Parse) parts.get(index - 2);
+      p_2 = (Parse) constituents.get(index - 2);
     }
     if (index - 1 >= 0) {
-      p_1 = (Parse) parts.get(index - 1);
+      p_1 = (Parse) constituents.get(index - 1);
     }
-    p0 = (Parse) parts.get(index);
+    p0 = (Parse) constituents.get(index);
     if (index + 1 < ps) {
-      p1 = (Parse) parts.get(index + 1);
+      p1 = (Parse) constituents.get(index + 1);
     }
     if (index + 2 < ps) {
-      p2 = (Parse) parts.get(index + 2);
+      p2 = (Parse) constituents.get(index + 2);
     }
 
     // cons(-2), cons(-1), cons(0), cons(1), cons(2)
@@ -152,7 +167,7 @@ public class BuildContextGenerator implements ContextGenerator {
     String p0Word = p0.toString();
     if (p0Word.equals("-RRB-")) {
       for (int pi = index - 1; pi >= 0; pi--) {
-        Parse p = (Parse) parts.get(pi);
+        Parse p = (Parse) constituents.get(pi);
         if (p.toString().equals("-LRB-")) {
           features.add("bracketsmatch");
           break;
@@ -164,7 +179,7 @@ public class BuildContextGenerator implements ContextGenerator {
     }
     if (p0Word.equals("-RCB-")) {
       for (int pi = index - 1; pi >= 0; pi--) {
-        Parse p = (Parse) parts.get(pi);
+        Parse p = (Parse) constituents.get(pi);
         if (p.toString().equals("-LCB-")) {
           features.add("bracketsmatch");
           break;
@@ -176,7 +191,7 @@ public class BuildContextGenerator implements ContextGenerator {
     }
     if (p0Word.equals("''")) {
       for (int pi = index - 1; pi >= 0; pi--) {
-        Parse p = (Parse) parts.get(pi);
+        Parse p = (Parse) constituents.get(pi);
         if (p.toString().equals("``")) {
           features.add("quotesmatch");
           break;
@@ -188,7 +203,7 @@ public class BuildContextGenerator implements ContextGenerator {
     }
     if (p0Word.equals("'")) {
       for (int pi = index - 1; pi >= 0; pi--) {
-        Parse p = (Parse) parts.get(pi);
+        Parse p = (Parse) constituents.get(pi);
         if (p.toString().equals("`")) {
           features.add("quotesmatch");
           break;
@@ -200,7 +215,7 @@ public class BuildContextGenerator implements ContextGenerator {
     }
     if (p0Word.equals(",")) {
       for (int pi = index - 1; pi >= 0; pi--) {
-        Parse p = (Parse) parts.get(pi);
+        Parse p = (Parse) constituents.get(pi);
         if (p.toString().equals(",")) {
           features.add("iscomma");
           break;
@@ -212,7 +227,7 @@ public class BuildContextGenerator implements ContextGenerator {
     }
     if (p0Word.equals(".") && index == ps - 1) {
       for (int pi = index - 1; pi >= 0; pi--) {
-        Parse p = (Parse) parts.get(pi);
+        Parse p = (Parse) constituents.get(pi);
         if (p.getLabel().startsWith(ParserME.START)) {
           if (pi == 0) {
             features.add("endofsentence");

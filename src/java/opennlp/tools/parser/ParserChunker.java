@@ -22,9 +22,25 @@ import java.util.List;
 import opennlp.tools.chunker.Chunker;
 import opennlp.tools.util.Sequence;
 
+/**
+ * Interface that a chunker used with the parser should implement. 
+ */
 public interface ParserChunker extends Chunker {
+  /**
+   * Returns the top k chunk sequences for the specified sentence with the specified pos-tags   
+   * @param sentence The tokens of the sentence.
+   * @param tags The pos-tags for the specified sentence.
+   * @return the top k chunk sequences for the specified sentence.
+   */
   public Sequence[] topKSequences(List sentence, List tags);
+  
+  /**
+   * Returns the top k chunk sequences for the specified sentence with the specified pos-tags   
+   * @param sentence The tokens of the sentence.
+   * @param tags The pos-tags for the specified sentence.
+   * @return the top k chunk sequences for the specified sentence.
+   */
   public Sequence[] topKSequences(String[] sentence, String[] tags);
-  public Sequence[] topKSequences(List sentence);
-  public Sequence[] topKSequences(String[] sentence);
+  
+
 }

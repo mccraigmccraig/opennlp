@@ -39,7 +39,7 @@ import java.util.ArrayList;
  * string to determine if they signify the end of a sentence.
  *
  * @author      Jason Baldridge and Tom Morton
- * @version     $Revision: 1.4 $, $Date: 2004/04/07 17:28:03 $
+ * @version     $Revision: 1.5 $, $Date: 2004/04/22 02:24:11 $
  */
 
 public class SentenceDetectorME implements SentenceDetector {
@@ -220,7 +220,7 @@ public class SentenceDetectorME implements SentenceDetector {
   /**
    * Use this training method if you wish to supply an end of
    * sentence scanner which provides a different set of ending chars
-   * than the default one, which is "\\.|!|\\?|\\\"|\\)".
+   * other than the default ones.  They are "\\.|!|\\?|\\\"|\\)".
    *
    */
   public static GISModel train(File inFile, int iterations, int cut, EndOfSentenceScanner scanner) throws IOException {

@@ -22,6 +22,9 @@ import java.util.List;
 import opennlp.tools.postag.POSTagger;
 import opennlp.tools.util.Sequence;
 
+/**
+ * Interface that a pos-tagger used by the parser must implement.
+ */
 public interface ParserTagger extends  POSTagger {
 
   public Sequence[] topKSequences(List sentence);

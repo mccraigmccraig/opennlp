@@ -26,6 +26,9 @@ import opennlp.maxent.DataStream;
 import opennlp.maxent.Event;
 import opennlp.maxent.EventStream;
 
+/**
+ * Class for creating an event stream out of data files for training an name finder. 
+ */
 public class NameFinderEventStream implements EventStream {
 
   private DataStream data;
@@ -35,11 +38,20 @@ public class NameFinderEventStream implements EventStream {
   private int ei;
   private List prevLineTokens;
   private List prevLineOutcomes;
-
+  
+  /**
+   * Creates a new event stream based on the specified data stream.
+   * @param d The data stream for this event stream.
+   */
   public NameFinderEventStream(DataStream d) {
     this(d, new DefaultNameContextGenerator());
   }
 
+  /**
+   * Creates a new event stream based on the specified data stream using the specified context generator.
+   * @param d The data stream for this event stream.
+   * @param cg The context generator which should be used in the creation of events for this event stream.
+   */
   public NameFinderEventStream(DataStream d, NameContextGenerator cg) {
     this.data = d;
     this.cg = cg;

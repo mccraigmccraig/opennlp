@@ -27,6 +27,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.text.DecimalFormat;
 
+/** Class for holding constitents. */
 public class Parse implements Cloneable, Comparable {
   private String text;
   private Span span;
@@ -304,7 +305,7 @@ public class Parse implements Cloneable, Comparable {
       System.err.println("Usage: ParserME head_rules < train_parses");
       System.exit(1);
     }
-    HeadRules rules = new HeadRules(args[0]);
+    EnglishHeadRules rules = new EnglishHeadRules(args[0]);
     java.io.BufferedReader in = new java.io.BufferedReader(new java.io.InputStreamReader(System.in));
     for (String line = in.readLine(); line != null; line = in.readLine()) {
       Parse p = Parse.parseParse(line, rules);

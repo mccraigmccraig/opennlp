@@ -29,6 +29,9 @@ import opennlp.maxent.TwoPassDataIndexer;
 import opennlp.tools.util.Sequence;
 import opennlp.tools.util.Span;
 
+/**
+ * Class for a shift reduce style parser based on Adwait Ratnaparki's 1998 thesis. 
+ */
 public class ParserME {
   private static int M = 20;
   private static int K = 20;
@@ -85,6 +88,11 @@ public class ParserME {
     parses = new TreeSet();
   }
 
+  /**
+   * Returns a parse for the specified parse of tokens.
+   * @param p A flat parse containing only tokens and a root node, p. 
+   * @return A full parse of the specified tokens or the flat chunks of the tokens if a fullparse could not be found.
+   */
   public Parse parse(Parse p) {
     p.derivation = new StringBuffer(100);
     odh.clear();
@@ -404,7 +412,7 @@ public class ParserME {
     }
     java.io.File inFile = new java.io.File(args[argIndex++]);
     String headRulesFile = args[argIndex++];
-    HeadRules rules = new HeadRules(headRulesFile);
+    EnglishHeadRules rules = new EnglishHeadRules(headRulesFile);
     java.io.File tagFile = new java.io.File(args[argIndex++]);
     java.io.File chunkFile = new java.io.File(args[argIndex++]);
     java.io.File buildFile = new java.io.File(args[argIndex++]);

@@ -30,18 +30,29 @@ import opennlp.tools.util.Sequence;
   */
 public class DefaultChunkerContextGenerator implements ChunkerContextGenerator {
 
+  /* inherieted java doc */
   public String[] getContext(Object o) {
     Object[] data = (Object[]) o;
     return (getContext(((Integer) data[0]).intValue(), (List) data[1], (List) data[3], ((Sequence) data[2]).getOutcomes()));
   }
-  
+  /* inherieted java doc */
   public String[] getContext(int i, List toks, Sequence s,Object[] additionalContext) {
     return (getContext(i, toks, s.getOutcomes(),  (List) additionalContext[0]));
   }
   
+  /* inherieted java doc */
   public String[] getContext(int i, List toks, List preds,List tags) {
     return (getContext(i, toks.toArray(), (String[]) tags.toArray(new String[tags.size()]), (String[]) preds.toArray(new String[preds.size()])));
   }
+  
+  /**
+   * Returns the contexts for chunking of the specified index.
+   * @param i The index of the token in the specified toks array for which the context should be constructed. 
+   * @param toks The tokens of the sentence.  The <code>toString</code> methods of these objects should return the token text.
+   * @param tags The POS tags for the the specified tokens.
+   * @param preds The previous decisions made in the taging of this sequence.  Only indices less than i will be examined.
+   * @return An array of predictive contexts on which a model basis its decisions.
+   */
   public String[] getContext(int i, Object[] toks, String[] tags, String[] preds) {
     List features = new ArrayList(45);
     /** Words in a 5-word window **/

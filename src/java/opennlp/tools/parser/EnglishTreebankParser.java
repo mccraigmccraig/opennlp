@@ -44,7 +44,7 @@ public class EnglishTreebankParser {
         new SuffixSensitiveGISModelReader(new File(dataDir + "/check.bin.gz")).getModel(),
         new EnglishTreebankPOSTagger(dataDir + "/tag.bin.gz", dataDir + "/tagdict", useCaseSensitiveTagDictionary),
         new EnglishTreebankChunker(dataDir + "/chunk.bin.gz"),
-        new HeadRules(dataDir + "/head_rules"));
+        new EnglishHeadRules(dataDir + "/head_rules"));
     }
     else {
       return new ParserME(
@@ -52,7 +52,7 @@ public class EnglishTreebankParser {
         new SuffixSensitiveGISModelReader(new File(dataDir + "/check.bin.gz")).getModel(),
         new EnglishTreebankPOSTagger(dataDir + "/tag.bin.gz"),
         new EnglishTreebankChunker(dataDir + "/chunk.bin.gz"),
-        new HeadRules(dataDir + "/head_rules"));
+        new EnglishHeadRules(dataDir + "/head_rules"));
     }
   }
 
@@ -90,14 +90,6 @@ public class EnglishTreebankParser {
 
     public Sequence[] topKSequences(String[] sentence, String[] tags) {
       return beam.bestSequences(K, Arrays.asList(sentence), new Object[] { Arrays.asList(tags)});
-    }
-
-    public Sequence[] topKSequences(List sentence) {
-      return beam.bestSequences(K, sentence, null);
-    }
-
-    public Sequence[] topKSequences(String[] sentence) {
-      return beam.bestSequences(K, Arrays.asList(sentence), null);
     }
 
     protected boolean validOutcome(String outcome, Sequence sequence) {

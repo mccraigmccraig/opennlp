@@ -24,8 +24,7 @@ import opennlp.tools.chunker.ChunkerContextGenerator;
 import opennlp.tools.util.Sequence;
 
 /**
- * @author Tom Morton
- *
+ * Creates predivtive context for the pre-chunking phases of parsing.
  */
 public class ChunkContextGenerator implements ChunkerContextGenerator {
 
@@ -44,6 +43,14 @@ public class ChunkContextGenerator implements ChunkerContextGenerator {
     return (getContext(i, toks.toArray(), (String[]) tags.toArray(new String[tags.size()]), (String[]) preds.toArray(new String[preds.size()])));
   }
 
+  /**
+   * Returns the contexts for chunking of the specified index. 
+   * @param i The index of the token in the specified toks array for which the context should be constructed. 
+   * @param words The tokens of the sentence.  The <code>toString</code> methods of these objects should return the token text.
+   * @param preds The previous decisions made in the taging of this sequence.  Only indices less than i will be examined.
+   * @param tags The POS tags for the the specified tokens.
+   * @return An array of predictive contexts on which a model basis its decisions.
+   */
   public String[] getContext(int i, Object[] words, String[] tags, String[] preds) {
     List features = new ArrayList(19);
     int x0 = i;

@@ -23,5 +23,14 @@ import java.util.Map;
 import opennlp.tools.util.BeamSearchContextGenerator;
 
 public interface NameContextGenerator extends BeamSearchContextGenerator {
+  
+  /**
+   * Returns the contexts for chunking of the specified index.
+   * @param i The index of the token in the specified toks array for which the context should be constructed. 
+   * @param toks The tokens of the sentence.  The <code>toString</code> methods of these objects should return the token text.
+   * @param preds The previous decisions made in the taging of this sequence.  Only indices less than i will be examined.
+   * @param prevTags A mapping between tokens and the previous outcome for these tokens. 
+   * @return An array of predictive contexts on which a model basis its decisions.
+   */
   public abstract String[] getContext(int i, List toks,List preds, Map prevTags);
 }

@@ -31,22 +31,44 @@ import opennlp.tools.util.Sequence;
  */
 public class EnglishTreebankChunker extends ChunkerME {
   
+  /**
+   * Creates an English Treebank Chunker which uses the specified model file.
+   * @param modelFile The name of the maxent model to be used.
+   * @throws IOException When the model file can't be open or read.
+   */
   public EnglishTreebankChunker(String modelFile) throws IOException {
     this(new SuffixSensitiveGISModelReader(new File(modelFile)).getModel());
   }
 
+  /**
+   * Creates an English Treebank Chunker which uses the specified model.
+   * @param mod The maxent model to be used.
+   */
   public EnglishTreebankChunker(MaxentModel mod) {
     super(mod);
   }
 
+  /**
+   * Creates an English Treebank Chunker which uses the specified model and context generator.
+   * @param mod The maxent model to be used.
+   * @param cg The context generator to be used.
+   */
   public EnglishTreebankChunker(MaxentModel mod, ChunkerContextGenerator cg) {
     super(mod, cg);
   }
 
+  /**
+   * Creates an English Treebank Chunker which uses the specified model and context generator 
+   * which will be decoded using the specified beamSize. 
+   * @param mod The maxent model to be used.
+   * @param cg The context generator to be used.
+   * @param beamSize The size of the beam used for decoding.
+   */
   public EnglishTreebankChunker(MaxentModel mod, ChunkerContextGenerator cg, int beamSize) {
     super(mod, cg, beamSize);
   }
 
+  /* inherieted java doc */
   protected boolean validOutcome(String outcome, Sequence sequence) {
     if (outcome.startsWith("I-")) {
       List tagList = sequence.getOutcomes();

@@ -28,6 +28,12 @@ import opennlp.maxent.Event;
 import opennlp.maxent.EventStream;
 import opennlp.tools.postag.DefaultPOSContextGenerator;
 
+/**
+ * Wrapper class for one of four parser event streams.  The particular event stram is specified 
+ * at construction.
+ * @author Tom Morton
+ *
+ */
 public class ParserEventStream implements EventStream {
 
   private ContextGenerator cg;
@@ -37,6 +43,12 @@ public class ParserEventStream implements EventStream {
   private HeadRules rules;
   private EventTypeEnum etype;
 
+  /**
+   * Create an event stream based on the specified data stream of the specified type using the specified head rules.
+   * @param d A 1-parse-per-line Penn Treebank Style parse. 
+   * @param rules The head rules.
+   * @param etype The type of events desired (tag, chunk, build, or check).
+   */
   public ParserEventStream(DataStream d, HeadRules rules, EventTypeEnum etype) {
     if (etype == EventTypeEnum.BUILD) {
       this.cg = new BuildContextGenerator();
@@ -258,7 +270,7 @@ public class ParserEventStream implements EventStream {
       System.exit(1);
     }
     ai++;
-    HeadRules rules = new HeadRules(args[ai++]);
+    EnglishHeadRules rules = new EnglishHeadRules(args[ai++]);
     opennlp.maxent.EventStream es = new ParserEventStream(new opennlp.maxent.PlainTextByLineDataStream(new java.io.InputStreamReader(System.in)), rules, etype);
     while (es.hasNext()) {
       System.out.println(es.nextEvent());
@@ -266,6 +278,10 @@ public class ParserEventStream implements EventStream {
   }
 }
 
+/**
+ * Enumerated type of event types for the parser. 
+ *
+ */
 class EventTypeEnum {
 
   private String name;

@@ -21,7 +21,6 @@ import java.util.List;
 
 /**
  * The interface for chunkers which provide chunk tags for a sequence of tokens.
- * @author      Thomas Morton
  */
 public interface Chunker {
   

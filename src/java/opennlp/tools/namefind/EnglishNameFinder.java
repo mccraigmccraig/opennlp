@@ -30,30 +30,30 @@ import opennlp.maxent.io.SuffixSensitiveGISModelReader;
 import opennlp.tools.util.Span;
 
 /**
- * @author Tom Morton
- *
+ * Class is used to create a name finder for English.
  */
 public class EnglishNameFinder extends NameFinderME {
 
-  /**
-   * @param mod
+  /** Creates an English name finder using the specified model.
+   * @param mod The model used for finding names.
    */
   public EnglishNameFinder(MaxentModel mod) {
     super(mod);
   }
 
-  /**
-   * @param mod
-   * @param cg
+  /** Creates an English name finder using the specified model and context generator.
+   * @param mod The model used for finding names.
+   * @param cg The context generator used with the specified model.
    */
   public EnglishNameFinder(MaxentModel mod, NameContextGenerator cg) {
     super(mod, cg);
   }
 
-  /**
-   * @param mod
-   * @param cg
-   * @param beamSize
+  /** Creates an English name finder using the specified model and context generator 
+   * which will be decoded using the specified beamSize. 
+   * @param mod The model used for finding names.
+   * @param cg The context generator used with the specified model.
+   * @param beamSize The size of the beam used for decoding.
    */
   public EnglishNameFinder(MaxentModel mod, NameContextGenerator cg, int beamSize) {
     super(mod, cg, beamSize);
