@@ -26,6 +26,26 @@ outputting XML data from Java code
 
 
 ------------------------------------------------------------------------
+maxent-2.1.0
+
+Maxent, version 2.1.0 
+Homepage http://maxent.sourceforge.net/
+Licience LGPL
+
+Package for training and using maximum entropy models. 
+
+
+------------------------------------------------------------------------
+trove.jar
+
+GNU Trove, version 0.1.4
+Homepage: http://trove4j.sf.net
+License: LGPL
+
+High performance collections for Java.
+
+
+------------------------------------------------------------------------
 xerces.jar
 
 The Xerces Java Parser for XML, version 1.4.4
