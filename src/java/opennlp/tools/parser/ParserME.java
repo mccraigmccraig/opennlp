@@ -19,7 +19,6 @@ package opennlp.tools.parser;
 
 import java.util.ArrayList;
 import java.util.Iterator;
-import java.util.List;
 import java.util.SortedSet;
 import java.util.TreeSet;
 
@@ -179,6 +178,7 @@ public class ParserME {
     if (0 == dl) {
       // tag
       String[] words = new String[p.getChildren().size()];
+      double[] probs = new double[words.length];
       for (int i = 0; i < p.getChildren().size(); i++) {
         words[i] = ((Parse) p.getChildren().get(i)).toString();
       }
@@ -186,7 +186,7 @@ public class ParserME {
       newParses = new Parse[ts.length];
       for (int i = 0; i < ts.length; i++) {
         String[] tags = (String[]) ts[i].getOutcomes().toArray(new String[words.length]);
-        double[] probs = ts[i].getProbs();
+        ts[i].getProbs(probs);
         newParses[i] = (Parse) p.clone(); //copies top level
         newParses[i].derivation.append(i).append(".");
         for (int j = 0; j < words.length; j++) {
@@ -202,7 +202,8 @@ public class ParserME {
     else if (1 == dl) {
       // chunk
       String words[] = new String[p.getChildren().size()];
-      String ptags[] = new String[p.getChildren().size()];
+      String ptags[] = new String[words.length];
+      double probs[] = new double[words.length]; 
       Parse sp = null;
       for (int i = 0, il = p.getChildren().size(); i < il; i++) {
         sp = (Parse) p.getChildren().get(i);
@@ -215,7 +216,7 @@ public class ParserME {
         newParses[si] = (Parse) p.clone(); //copies top level
         newParses[si].derivation.append(si).append(".");
         String[] tags = (String[]) cs[si].getOutcomes().toArray(new String[words.length]);
-        double[] probs = cs[si].getProbs();
+        cs[si].getProbs(probs);
         int start = -1;
         int end = 0;
         String type = null;
