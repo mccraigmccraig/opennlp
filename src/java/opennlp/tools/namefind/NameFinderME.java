@@ -113,7 +113,7 @@ public class NameFinderME implements NameFinder {
   }
 
   public static GISModel train(EventStream es, int iterations, int cut) throws IOException {
-    return opennlp.maxent.GIS.trainModel(iterations, new TwoPassDataIndexer(es, cut));
+    return GIS.trainModel(iterations, new TwoPassDataIndexer(es, cut));
   }
 
   public static void main(String[] args) throws IOException {
