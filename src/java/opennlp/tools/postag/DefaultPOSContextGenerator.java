@@ -28,7 +28,7 @@ import opennlp.tools.util.Cache;
  *
  * @author      Gann Bierner
  * @author      Tom Morton
- * @version     $Revision: 1.7 $, $Date: 2004/08/13 16:56:55 $
+ * @version     $Revision: 1.8 $, $Date: 2004/11/05 00:22:35 $
  */
 
 public class DefaultPOSContextGenerator implements POSContextGenerator {
@@ -129,7 +129,8 @@ public class DefaultPOSContextGenerator implements POSContextGenerator {
         }
       }
       else {
-        
+        contextsCache.clear();
+        wordsKey = tokens;
       }
     }
     ArrayList e = new ArrayList();
