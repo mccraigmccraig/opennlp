@@ -32,7 +32,7 @@ import opennlp.maxent.io.SuffixSensitiveGISModelReader;
  * achieved >96% accuracy on unseen data.
  *
  * @author      Gann Bierner
- * @version     $Revision: 1.7 $, $Date: 2004/04/07 17:27:44 $
+ * @version     $Revision: 1.8 $, $Date: 2004/08/29 19:48:21 $
  */
 
 public class EnglishPOSTaggerME extends POSTaggerME {
@@ -70,7 +70,7 @@ public class EnglishPOSTaggerME extends POSTaggerME {
     int ai=0;
     boolean test = false;
     String tagdict = null;
-    while(args[ai].startsWith("-")) {
+    while(ai < args.length && args[ai].startsWith("-")) {
       if (args[ai].equals("-test")) {
         ai++;
         test=true;
