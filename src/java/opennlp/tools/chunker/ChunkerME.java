@@ -33,7 +33,7 @@ import opennlp.tools.util.Sequence;
  */
 public class ChunkerME implements Chunker {
 
-  protected MaxentModel _npModel;
+  protected MaxentModel model;
   protected ChunkerContextGenerator _contextGen;
   private int beamSize;
   protected BeamSearch beam;
@@ -64,10 +64,11 @@ public class ChunkerME implements Chunker {
    * @param beamSize The size of the beam that should be used when decoding sequences.
    */
   public ChunkerME(MaxentModel mod, ChunkerContextGenerator cg, int beamSize) {
-    _npModel = mod;
+    model = mod;
     _contextGen = cg;
     this.beamSize = beamSize;
     beam = new ChunkBeamSearch(beamSize, cg, mod);
+    
   }
 
   /* inherieted javadoc */
@@ -87,10 +88,21 @@ public class ChunkerME implements Chunker {
    * This method determines wheter the outcome is valid for the preceeding sequence.  
    * This can be used to implement constraints on what sequences are valid.  
    * @param outcome The outcome.
-   * @param sequence The precceding sequence of outcomes assignments. 
+   * @param sequence The precceding sequence of outcome assignments. 
    * @return true is the outcome is valid for the sequence, false otherwise.
    */
   protected boolean validOutcome(String outcome, Sequence sequence) {
+    return (true);
+  }
+  
+  /** 
+    * This method determines wheter the outcome is valid for the preceeding sequence.  
+    * This can be used to implement constraints on what sequences are valid.  
+    * @param outcome The outcome.
+    * @param sequence The precceding sequence of outcome assignments. 
+    * @return true is the outcome is valid for the sequence, false otherwise.
+    */
+  protected boolean validOutcome(String outcome, String[] sequence) {
     return (true);
   }
 
@@ -107,6 +119,10 @@ public class ChunkerME implements Chunker {
     
     /* inherieted java doc */
     protected boolean validSequence(int i, List sequence, Sequence s, String outcome) {
+      return validOutcome(outcome, s);
+    }
+    
+    protected boolean validSequence(int i, Object[] sequence, String[] s, String outcome) {
       return validOutcome(outcome, s);
     }
   }
