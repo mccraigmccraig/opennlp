@@ -95,7 +95,7 @@ public class ParserME {
     int maxDerivationLength = 2 * p.getChildren().size() + 3;
     odh.add(p);
     Parse guess = null;
-    double bestComplete = -100000; //approximating -infinity in ln domain
+    double bestComplete = -100000; //approximating -infinity/0 in ln domain
     while (parses.size() < M && i < maxDerivationLength) {
       ndh = new TreeSet();
       if (odh.size() > 0) {
@@ -109,9 +109,9 @@ public class ParserME {
             guess = tp;
           }
 
-          System.out.print(i + " " + j + " " + tp.derivation + " " + tp.prob + " ");
-          tp.show();
-          System.out.println();
+          //System.out.print(i + " " + j + " " + tp.derivation + " " + tp.prob + " ");
+          //tp.show();
+          //System.out.println();
 
           Parse[] nd = advance(tp, Q, i);
           if (nd != null) {
