@@ -144,7 +144,7 @@ public abstract class AbstractMentionFinder implements MentionFinder {
     //System.err.println("collectCoordNp: "+np);
     List npTokens = np.getTokens();
     boolean inCoordinatedNounPhrase = false;
-    int lastNpTokenIndex = headFinder.getHeadIndex(npTokens);
+    int lastNpTokenIndex = headFinder.getHeadIndex(np);
     for (int ti = lastNpTokenIndex - 1; ti >= 0; ti--) {
       Parse tok = (Parse) npTokens.get(ti);
       String tokStr = tok.toString();

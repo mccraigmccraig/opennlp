@@ -18,7 +18,6 @@
 package opennlp.tools.coref;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
@@ -28,7 +27,6 @@ import opennlp.tools.coref.mention.HeadFinder;
 import opennlp.tools.coref.mention.Parse;
 import opennlp.tools.coref.sim.GenderEnum;
 import opennlp.tools.coref.sim.NumberEnum;
-
 import opennlp.tools.util.Span;
 
 /** Data strucure representation of a mention.  This includes numerous contextual
@@ -113,6 +111,7 @@ public class MentionContext {
       etoks = head.getTokens();
     }
     else {
+      //System.err.println("MentionContext: head=null for "+mentionParse);
       etoks = getNoHeadTokens(mentionParse);
     }
     Parse basalNextToken = getNextToken(1, etoks, sentenceTokens);
@@ -120,7 +119,7 @@ public class MentionContext {
     Span headSpan = getTokenSpan(etoks, sentenceTokens);
     int descriptorLength = 0;
     init(etoks, entSpan, headSpan, mentionIndex, mentionsInDocument, mentionsInSentence, sentenceIndex, prevToken, nextToken, basalNextToken, mentionParse, descriptorLength);
-    initHeads(headFinder);
+    initHeads(head, headFinder);
     this.neType= nameType;
     if (getHeadTokenTag().startsWith("NN") && !getHeadTokenTag().startsWith("NNP")) {
       //if (headTokenTag.startsWith("NNP") && neType != null) {
@@ -187,8 +186,8 @@ public class MentionContext {
     return (null);
   }
 
-  private void initHeads(HeadFinder headFinder) {
-    this.headTokenIndex=headFinder.getHeadIndex(Arrays.asList(tokens));
+  private void initHeads(Parse head, HeadFinder headFinder) {
+    this.headTokenIndex=headFinder.getHeadIndex(head);
     this.headToken = tokens[getHeadTokenIndex()];
     this.headTokenText = headToken.toString();
     this.headTokenTag=headToken.getSyntacticType();
