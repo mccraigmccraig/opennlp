@@ -18,17 +18,19 @@
 
 package opennlp.tools.sentdetect;
 
-import opennlp.maxent.*;
-import opennlp.maxent.io.*;
-import java.io.*;
-import java.util.zip.*;
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStreamReader;
+
+import opennlp.maxent.io.SuffixSensitiveGISModelReader;
 
 /**
  * A sentence detector which uses a model trained on English data (Wall Street
  * Journal text).
  *
  * @author      Jason Baldridge and Tom Morton
- * @version     $Revision: 1.2 $, $Date: 2004/04/07 17:28:02 $
+ * @version     $Revision: 1.3 $, $Date: 2004/06/11 20:56:18 $
  */
 
 public class EnglishSentenceDetectorME extends SentenceDetectorME {
@@ -38,16 +40,6 @@ public class EnglishSentenceDetectorME extends SentenceDetectorME {
    */
   public EnglishSentenceDetectorME(String name) throws IOException {
     super((new SuffixSensitiveGISModelReader(new File(name))).getModel());
-  }
-
-  private static MaxentModel getModel(String name) {
-    try {
-      return new BinaryGISModelReader(new DataInputStream(new GZIPInputStream(EnglishSentenceDetectorME.class.getResourceAsStream(name)))).getModel();
-    }
-    catch (IOException E) {
-      E.printStackTrace();
-      return null;
-    }
   }
 
   /**
