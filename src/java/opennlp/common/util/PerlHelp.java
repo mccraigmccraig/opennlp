@@ -28,7 +28,7 @@ import java.util.*;
  * gnu.regexp.
  *
  * @author      Jason Baldridge
- * @version     $Revision: 1.1 $, $Date: 2001/11/19 02:16:00 $
+ * @version     $Revision: 1.2 $, $Date: 2001/11/27 16:56:48 $
  */
 public final class PerlHelp {
 
@@ -53,6 +53,18 @@ public final class PerlHelp {
         catch (REException e) { System.out.println(e); }
     }
 
+
+    public static String[] getParagraphs (String text) {
+	String[] pars = new String[0];
+	return pars;
+    }
+
+    public static String[] splitByWhitespace (String s) {
+	String[] segments = new String[0];
+	return segments;
+    }
+
+    
     
     /*
      * Calls split(String s, string delim), assuming space (" ") as the
