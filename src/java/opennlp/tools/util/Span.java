@@ -83,6 +83,18 @@ public class Span {
     }
   }
 
+  public int hashCode() {
+    return((this.start << 16) | (0x0000FFFF | this.end));
+  }
+  
+  public boolean equals(Object o) {
+    if (o == null) {
+      return(false);
+    }
+    Span s = (Span) o;
+    return(getStart() == s.getStart() && getEnd() == s.getEnd());
+  }
+  
   public String toString() {
     StringBuffer toStringBuffer = new StringBuffer(15);
     return(toStringBuffer.append(getStart()).append("..").append(getEnd()).toString());
