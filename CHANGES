@@ -1,5 +1,15 @@
-0.8.1
-_____
+0.8.2
+-----
+Summary: Not too many changes, but warrants a release because the
+hybrid logic stuff has been split off from the opennlp.common
+package.
+
+Spun-off the the hybrid logic package into its own package,
+opennlp.hylo. (Jason)
+
+Reduced the dependence on the gnu-regexp package.  Now only
+BasicEnglishAffixes uses it. The PerlHelp class was modified to use
+method in place of the regular expressions used before. (Jason)
 
 Improved the unification aspects of the hybrid logic classes. (Jason)
 
