@@ -1,6 +1,8 @@
 0.8.3
 -----
 
+Removed xSpan methods from Category interface. (Jason)
+
 
 0.8.2
 -----

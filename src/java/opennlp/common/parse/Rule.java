@@ -19,28 +19,19 @@
 package opennlp.common.parse;
 
 import opennlp.common.synsem.*;
-    
-/**
- * A set of rules that describe how lexical items should be combined
- *
- * @author      Gann Bierner
- * @version     $Revision: 1.5 $, $Date: 2002/02/21 13:20:29 $
- */
-public interface RuleGroup {
+import opennlp.common.unify.*;
 
-    /**
-     * Add a rule to this group.
-     *
-     * @param ruleToAdd the rule object to add to the group.
-     */
-    public void addRule (Rule ruleToAdd);
-    
-    /**
-     * Applies all the rules.
-     *
-     * @param words the lexical items to combine
-     */
-    public java.util.List applyAllRules (Sign[] inputs);
-    
-    
+
+/**
+ * Interface for categorial rules.
+ *
+ * @author Gann Bierner and Jason Baldridge
+ * @version $Revision: 1.1 $, $Date: 2002/02/21 13:20:29 $
+ */
+
+public interface Rule {
+
+    public Category applyRule (Category[] inputs) throws UnifyFailure;
+
 }
+
