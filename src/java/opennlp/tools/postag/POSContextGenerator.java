@@ -28,9 +28,9 @@ import opennlp.tools.util.Sequence;
  * The interface for a context generator for the POS Tagger.
  *
  * @author      Gann Bierner
- * @version     $Revision: 1.6 $, $Date: 2004/01/26 14:14:38 $
+ * @version     $Revision: 1.7 $, $Date: 2004/08/13 16:58:14 $
  */
 
 public interface  POSContextGenerator extends BeamSearchContextGenerator { 
-  public String[] getContext(int pos, List tokens, Sequence s, Object[] ac);
+  public String[] getContext(int pos, Object[] tokens, String[] prevTags, Object[] ac);
 }
