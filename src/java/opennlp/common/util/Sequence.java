@@ -17,28 +17,45 @@
 //////////////////////////////////////////////////////////////////////////////
 package opennlp.common.util;
 
-import gnu.trove.*;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 /** Represents a weighted sequence of outcomes. */
 public class Sequence implements Comparable {
-  private double score = 0;
+  private double score;
   private List outcomes;
-  private TDoubleArrayList probs;
+  private List probs;
+  private static final Double ONE = new Double(1.0);
 
   /** Creates a new sequence of outcomes. */
   public Sequence() {
     outcomes = new ArrayList();
-    probs = new TDoubleArrayList();
+    probs = new ArrayList();
+    score = 0;
   }
+
+  public Sequence(Sequence s) {
+    outcomes = new ArrayList(s.outcomes.size()+1);
+    outcomes.addAll(s.outcomes);
+    probs = new ArrayList(s.probs.size()+1);
+    probs.addAll(s.probs);
+    score = s.score;
+  }
+  
+  public Sequence(Sequence s,String outcome, double p) {
+      outcomes = new ArrayList(s.outcomes.size()+1);
+      outcomes.addAll(s.outcomes);
+      outcomes.add(outcome);
+      probs = new ArrayList(s.probs.size()+1);
+      probs.addAll(s.probs);
+      probs.add(new Double(p));
+      score = s.score+Math.log(p);
+    }
 
   public Sequence(List outcomes) {
     this.outcomes = outcomes;
-    this.probs = new TDoubleArrayList(outcomes.size());
-    for (int oi=0,ol=outcomes.size();oi<ol;oi++) {
-      probs.add(1.0);
-    }
+    this.probs = Collections.nCopies(outcomes.size(),ONE);
   }
 
   public int compareTo(Object o) {
@@ -51,24 +68,13 @@ public class Sequence implements Comparable {
       return -1;
   }
 
-  /** Returns a copy of the this sequence.
-   * @return a copy of this sequence.
-   */
-  public Sequence copy() {
-    Sequence s = new Sequence();
-    s.outcomes.addAll(outcomes);
-    s.probs.add(probs.toNativeArray());
-    s.score = score;
-    return s;
-  }
-
   /** Adds an outcome and probability to this sequence. 
    * @param outcome the outcome to be added.
    * @param p the probability associated with this outcome.
    */
   public void add(String outcome, double p) {
     outcomes.add(outcome);
-    probs.add(p);
+    probs.add(new Double(p));
     score += Math.log(p);
   }
 
@@ -83,14 +89,18 @@ public class Sequence implements Comparable {
    * @return an array of probabilities.
    */
   public double[] getProbs() {
-    return (probs.toNativeArray());
+    double[] ps = new double[probs.size()];
+    getProbs(ps);
+    return (ps);
   }
-  
+
   /** Populates  an array with the probabilities associated with the outcomes of this sequece.
-   * @param p a pre-allocated array to use to hold the values of the probabilities of the outcomes for this sequence.
+   * @param ps a pre-allocated array to use to hold the values of the probabilities of the outcomes for this sequence.
    */
-  public void getProbs(double[] p) {
-    probs.toNativeArray(p,0,p.length);
+  public void getProbs(double[] ps) {
+    for (int pi=0,pl=probs.size();pi<pl;pi++) {
+      ps[pi] = ((Double) probs.get(pi)).doubleValue();
+    }
   }
 
   public String toString() {

@@ -85,9 +85,7 @@ public class BeamSearch {
         for (int p = 0; p < scores.length; p++) {
           if (scores[p] < min)
             continue; //only advance first "size" outcomes
-          Sequence newS = top.copy();
-          newS.add(model.getOutcome(p), scores[p]);
-          next.add(newS);
+          next.add(new Sequence(top,model.getOutcome(p),scores[p]));
         }
       }
       //    make prev = next; and re-init next (we reuse existing prev set once we clear it)
