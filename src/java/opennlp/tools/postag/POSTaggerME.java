@@ -35,7 +35,7 @@ import opennlp.maxent.io.*;
  * surrounding context.
  *
  * @author      Gann Bierner
- * @version $Revision: 1.5 $, $Date: 2003/12/23 16:50:25 $
+ * @version $Revision: 1.6 $, $Date: 2004/01/09 15:22:17 $
  */
 public class POSTaggerME implements Evalable, POSTagger {
 
@@ -63,7 +63,7 @@ public class POSTaggerME implements Evalable, POSTagger {
   private static final int DEFAULT_BEAM_SIZE =3;
 
   /** The size of the beam to be used in determining the best sequence of pos tags.*/
-  protected int size = 3;
+  protected int size;
 
   private Sequence bestSequence;
   /** The search object used for search multiple sequences of tags. */
@@ -205,7 +205,8 @@ public class POSTaggerME implements Evalable, POSTagger {
       File inFile = new File(args[0]);
       File outFile = new File(args[1]);
       GISModel mod;
-
+      
+      
       EventStream es = new POSEventStream(new PlainTextByLineDataStream(new FileReader(inFile)));
       if (args.length > 3)
         mod = train(es, Integer.parseInt(args[2]), Integer.parseInt(args[3]));
