@@ -17,36 +17,47 @@
 //////////////////////////////////////////////////////////////////////////////   
 package opennlp.tools.parser;
 
-import opennlp.tools.util.Span;
-
-import java.util.List;
-import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Set;
 import java.util.Stack;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
+import opennlp.tools.util.Span;
 //import java.text.DecimalFormat;
 
-/** Datastructure for holding parse constitents. */
+/** Data structure for holding parse constitents. */
 public class Parse implements Cloneable, Comparable {
+  /** The text string on which this parse is based.  This object is shared amonung all parses for the same sentence. */
   private String text;
+  /** The character offsets into the text for this constituent. */
   private Span span;
+  /** The syntactic type of this parse. */
   private String type;
-  private ArrayList parts;
+  /** The sub-constituents of this parse. */
+  private List parts;
+  /** The head parse of this parse. A parse can be its own head.*/
   private Parse head;
+  /** The outcome assigned to this parse during cconstruction of its parent parse. */
   private String label;
+  /** The parent parse of this parse. */
   private Parse parent;
-
+  /** The probability associated with the syntactic type assigned to this parse. */
   private double prob;
+  /** The string buffer used to track the derivation of this parse. */
   private StringBuffer derivation;
-
+  /** The pattern used to find the base constituent label of a Penn Treebank labeled constituent. */
   private static Pattern typePattern = Pattern.compile("^([^ =-]+)");
+  /** The patter used to identify tokens in Penn Treebank labeled constituents. */
   private static Pattern tokenPattern = Pattern.compile("^[^ ()]+ ([^ ()]+)\\s*\\)");
 
   protected Object clone() {
     try {
       Parse p = (Parse) super.clone();
-      p.parts = (ArrayList) this.parts.clone();
+      p.parts = (List) ((LinkedList) this.parts).clone();
       if (derivation != null) {
         p.derivation = new StringBuffer(100);
         p.derivation.append(derivation.toString());
@@ -66,7 +77,7 @@ public class Parse implements Cloneable, Comparable {
     this.type = type;
     this.prob = p;
     this.head = this;
-    this.parts = new ArrayList();
+    this.parts = new LinkedList();
     this.label = null;
     this.parent = null;
   }
@@ -94,7 +105,7 @@ public class Parse implements Cloneable, Comparable {
 
   /**
    * Inserts the specified constituent into this parse based on its text span.  This
-   * method assumes that the sepecifed constituent can be inserted into this parse.
+   * method assumes that the specified constituent can be inserted into this parse.
    * @param constituent The constituent to be inserted.
    */
   public void insert(Parse constituent) {
@@ -105,22 +116,29 @@ public class Parse implements Cloneable, Comparable {
       int pn = parts.size();
       for (; pi < pn; pi++) {
         Parse subPart = (Parse) parts.get(pi);
+        //System.err.println("Parse.insert:con="+constituent+" sp["+pi+"]"+subPart);
         Span sp = subPart.span;
         if (sp.getStart() >= ic.getEnd()) {
           break;
         }
-        // c Contains subPart
+        // constituent contains subPart
         else if (ic.contains(sp)) {
+          //System.err.println("Parse.insert:con contains subPart");
           parts.remove(pi);
           pi--;
           constituent.parts.add(subPart);
           subPart.setParent(constituent);
           pn = parts.size();
         }
+        else if (sp.contains(ic)) {
+          //System.err.println("Parse.insert:subPart contains con");
+          subPart.insert(constituent);
+          return;
+        }
       }
+      //System.err.println("Parse.insert:adding con="+constituent+" to "+this);
       parts.add(pi, constituent);
       constituent.setParent(this);
-      //prob*=oprob;
     }
     else {
       throw (new InternalError("Inserting constituent not contained in the sentence!"));
@@ -137,7 +155,6 @@ public class Parse implements Cloneable, Comparable {
       System.out.print("(");
       System.out.print(type +" ");
       //System.out.print(label+" ");
-
       //System.out.print(head+" ");
       //System.out.print(df.format(prob)+" ");
     }
@@ -228,8 +245,36 @@ public class Parse implements Cloneable, Comparable {
    * Returns the child constituents of this constiuent. 
    * @return The child constituents of this constiuent.
    */
-  public List getChildren() {
-    return parts;
+  public Parse[] getChildren() {
+    return (Parse[]) parts.toArray(new Parse[parts.size()]);
+  }
+  
+  /**
+   * Replaces the child at the specified index with a new child with the specified label. 
+   * @param index The index of the child to be replaced.
+   * @param label The label to be assigned to the new child.
+   */
+  public void setChild(int index, String label) {
+    Parse newChild = (Parse) ((Parse) parts.get(index)).clone();
+    newChild.setLabel(label);
+    parts.set(index,newChild);
+  }
+  
+  /**
+   * Returns the number of children for this parse node.
+   * @return the number of children for this parse node.
+   */
+  public int getChildCount() {
+    return parts.size();
+  }
+  
+  /**
+   * Returns the index of this specified child.
+   * @param child A child of this parse.
+   * @return the index of this specified child or -1 if the specified child is not a child of this parse.
+   */
+  public int indexOf(Parse child) {
+    return parts.indexOf(child);
   }
 
   /** Returns the head constituent associated with this constituent.
@@ -286,12 +331,38 @@ public class Parse implements Cloneable, Comparable {
     }
     return null;
   }
+  
+  /**
+   * Computes the head parses for this parse and its sub-parses and stores this information
+   * in the parse data structure. 
+   * @param rules The head rules which determine how the head of the parse is computed.
+   */
+  public void updateHeads(HeadRules rules) {
+    if (parts != null && parts.size() != 0) {
+      for (int pi=0,pn=parts.size();pi<pn;pi++) {
+        Parse c = (Parse) parts.get(pi);
+        c.updateHeads(rules);
+      }
+      this.head = rules.getHead((Parse[]) parts.toArray(new Parse[parts.size()]), type);
+      if (head == null) {
+        head = this;
+      }
+    }
+    else {
+      this.head = this;
+    }
+  }
 
-  public static Parse parseParse(String parse, HeadRules rules) {
+  /**
+   * Parses the specified tree-bank style parse string and return a Parse structure for that string. 
+   * @param parse A tree-bank style parse string.
+   * @return a Parse structure for the specified tree-bank style parse string.
+   */
+  public static Parse parseParse(String parse) {
     StringBuffer text = new StringBuffer();
     int offset = 0;
     Stack stack = new Stack();
-    List cons = new ArrayList();
+    List cons = new LinkedList();
     for (int ci = 0, cl = parse.length(); ci < cl; ci++) {
       char c = parse.charAt(ci);
       if (c == '(') {
@@ -319,19 +390,12 @@ public class Parse implements Cloneable, Comparable {
     }
     String txt = text.toString();
     Parse p = new Parse(txt, new Span(0, txt.length()), ParserME.TOP_NODE, 1);
-    for (int ci = 0, cl = cons.size(); ci < cl; ci++) {
-      Object[] parts = (Object[]) cons.get(ci);
+    for (Iterator ci=cons.iterator();ci.hasNext();) {
+      Object[] parts = (Object[]) ci.next();
       String type = (String) parts[0];
-      Parse con = new Parse(txt, (Span) parts[1], type, 1);
-      p.insert(con);
-      if (con.parts != null && con.parts.size() != 0) {
-        Parse head = rules.getHead((Parse[]) con.getChildren().toArray(new Parse[con.parts.size()]), type);
-        if (head == null) {
-          con.head = con;
-        }
-        else {
-          con.head = head;
-        }
+      if (!type.equals(ParserME.TOP_NODE)) {
+        Parse con = new Parse(txt, (Span) parts[1], type, 1);
+        p.insert(con);
       }
     }
     return p;
@@ -359,6 +423,52 @@ public class Parse implements Cloneable, Comparable {
    */
   public boolean isPosTag() {
     return (parts.size() == 1 && ((Parse) parts.get(0)).getType().equals(ParserME.TOK_NODE));
+  }
+  
+  /**
+   * Returns the parse nodes which are children of this node and which are pos tags.
+   * @return the parse nodes which are children of this node and which are pos tags.
+   */
+  public Parse[] getTagNodes() {
+    List tags = new LinkedList();
+    List nodes = new LinkedList();
+    nodes.addAll(this.parts);
+    while(nodes.size() != 0) {
+      Parse p = (Parse) nodes.remove(0);
+      if (p.isPosTag()) {
+        tags.add(p);
+      }
+      else {
+        nodes.addAll(0,p.parts);
+      }
+    }
+    return (Parse[]) tags.toArray(new Parse[tags.size()]);
+  }
+  
+  /**
+   * Returns the deepest shared parent of this node and the specified node. 
+   * If the nodes are identical then their parent is returned.  
+   * If one node is the parent of the other then the parent node is returned.
+   * @param node The node from which parents are compared to this node's parents.
+   * @return the deepest shared parent of this node and the specified node.
+   */
+  public Parse getCommonParent(Parse node) {
+    if (this == node) {
+      return parent;
+    }
+    Set parents = new HashSet();
+    Parse parent = this;
+    while(parent != null) {
+      parents.add(parent);
+      parent = parent.getParent();
+    }
+    while (node != null) {
+      if (parents.contains(node)) {
+        return node;
+      }
+      node = node.getParent();
+    }
+    return null;
   }
 
   public int compareTo(Object o) {
@@ -388,18 +498,24 @@ public class Parse implements Cloneable, Comparable {
     this.derivation = derivation;
   }
 
+  /**
+   * Reads training parses (one-sentence-per-line) and displays parse structure.
+   * @param args The head rules files.
+   * @throws java.io.IOException If the head rules file can not be opened and read.
+   */
   public static void main(String[] args) throws java.io.IOException {
     if (args.length == 0) {
-      System.err.println("Usage: ParserME head_rules < train_parses");
+      System.err.println("Usage: Parse head_rules < train_parses");
+      System.err.println("Reads training parses (one-sentence-per-line) and displays parse structure.");
       System.exit(1);
     }
     EnglishHeadRules rules = new EnglishHeadRules(args[0]);
     java.io.BufferedReader in = new java.io.BufferedReader(new java.io.InputStreamReader(System.in));
     for (String line = in.readLine(); line != null; line = in.readLine()) {
-      Parse p = Parse.parseParse(line, rules);
+      Parse p = Parse.parseParse(line);
+      p.updateHeads(rules);
       p.show();
       System.out.println();
     }
   }
-
 }
