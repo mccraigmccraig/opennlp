@@ -137,7 +137,7 @@ public class Op extends HyloFormula {
 	}
     }
     
-    public Unifiable fill (Substitution sub) {
+    public Unifiable fill (Substitution sub) throws UnifyFailure {
 	List $args = new ArrayList();
 	for (Iterator argsIt = _args.iterator(); argsIt.hasNext();) {
 	    $args.add(((LF)argsIt.next()).fill(sub));

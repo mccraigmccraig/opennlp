@@ -72,7 +72,7 @@ public class NominalVar extends HyloVar implements Nominal {
 	}
     }
 
-    public Unifiable fill (Substitution sub) {
+    public Unifiable fill (Substitution sub) throws UnifyFailure {
 	Unifiable val = sub.getValue(this);
 	if (val != null) {
 	    return val;

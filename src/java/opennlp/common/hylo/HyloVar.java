@@ -91,7 +91,7 @@ public class HyloVar extends HyloFormula implements Variable, Indexed {
 	}
     }
 
-    public Unifiable fill (Substitution sub) {
+    public Unifiable fill (Substitution sub) throws UnifyFailure {
 	Unifiable val = sub.getValue(this);
 	if (val != null) {
 	    return val;

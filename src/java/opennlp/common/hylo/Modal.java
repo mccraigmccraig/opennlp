@@ -85,7 +85,7 @@ public class Modal extends HyloFormula {
 	}
     }
 
-    public Unifiable fill (Substitution sub) {
+    public Unifiable fill (Substitution sub) throws UnifyFailure {
 	return new Modal(_isDiamond, _relation, (LF)_arg.fill(sub));
     }
     

@@ -26,7 +26,7 @@ import opennlp.common.unify.*;
  * representing data structures for hybrid logic.
  *
  * @author      Jason Baldridge
- * @version     $Revision: 1.7 $, $Date: 2002/01/20 15:03:47 $
+ * @version     $Revision: 1.8 $, $Date: 2002/01/20 17:45:25 $
  **/
 public abstract class HyloFormula implements LF {
 
@@ -89,7 +89,7 @@ public abstract class HyloFormula implements LF {
      * @return a copy of this Unifiable with all variables from the
      *         Substitution replaced by their values.  
      */
-    public Unifiable fill (Substitution s) {
+    public Unifiable fill (Substitution s) throws UnifyFailure {
 	return this;
     }
        
