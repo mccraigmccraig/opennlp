@@ -101,13 +101,16 @@ public class EnglishNameFinder extends NameFinderME {
     return ((Span[]) tokens.toArray(new Span[tokens.size()]));
   }
 
-  public static String[] tokenize(String s) {
-    Span[] spans = tokenizeToSpans(s);
+  public static String[] spansToStrings(Span[] spans, String s) {
     String[] tokens = new String[spans.length];
     for (int si = 0, sl = spans.length; si < sl; si++) {
       tokens[si] = s.substring(spans[si].getStart(), spans[si].getEnd());
     }
-    return (tokens);
+    return tokens;
+  }
+
+  public static String[] tokenize(String s) {
+    return spansToStrings(tokenizeToSpans(s), s);
   }
 
   public static void main(String[] args) throws IOException {
@@ -131,28 +134,32 @@ public class EnglishNameFinder extends NameFinderME {
     BufferedReader in = new BufferedReader(new InputStreamReader(System.in));
     String[][] finderTags = new String[finders.length][];
     for (String line = in.readLine(); null != line; line = in.readLine()) {
-      String[] tokens = tokenize(line);
+
+      Span[] spans = tokenizeToSpans(line);
+      String[] tokens = spansToStrings(spans, line);
       for (int fi = 0, fl = finders.length; fi < fl; fi++) {
         finderTags[fi] = finders[fi].find(tokens, Collections.EMPTY_MAP);
-        //System.err.println(names[fi] + " " + java.util.Arrays.asList(finderTags[fi]));
+        System.err.println(names[fi] + " " + java.util.Arrays.asList(finderTags[fi]));
       }
       for (int ti = 0, tl = tokens.length; ti < tl; ti++) {
         for (int fi = 0, fl = finders.length; fi < fl; fi++) {
           //check for end tags
           if (ti != 0) {
-            if ((finderTags[fi][ti].equals(NameFinderME.START) || 
-                  finderTags[fi][ti].equals(NameFinderME.OTHER)) && 
-                  (finderTags[fi][ti - 1].equals(NameFinderME.START) || 
-                  finderTags[fi][ti - 1].equals(NameFinderME.CONTINUE))) {
-              System.out.print(" </" + names[fi] + ">");
+            if ((finderTags[fi][ti].equals(NameFinderME.START) || finderTags[fi][ti].equals(NameFinderME.OTHER)) && (finderTags[fi][ti - 1].equals(NameFinderME.START) || finderTags[fi][ti - 1].equals(NameFinderME.CONTINUE))) {
+              System.out.print("</" + names[fi] + ">");
             }
           }
-          //check for start tags
+        }
+        if (ti > 0 && spans[ti - 1].getEnd() < spans[ti].getStart()) {
+          System.out.print(line.substring(spans[ti - 1].getEnd(), spans[ti].getStart()));
+        }
+        //check for start tags
+        for (int fi = 0, fl = finders.length; fi < fl; fi++) {
           if (finderTags[fi][ti].equals(NameFinderME.START)) {
-            System.out.print(" <" + names[fi] + ">");
+            System.out.print("<" + names[fi] + ">");
           }
         }
-        System.out.print(" "+tokens[ti]);
+        System.out.print(tokens[ti]);
       }
       //final end tags
       if (tokens.length != 0) {
@@ -161,6 +168,9 @@ public class EnglishNameFinder extends NameFinderME {
             System.out.print("</" + names[fi] + ">");
           }
         }
+      }
+      if (spans[tokens.length - 1].getEnd() < line.length()) {
+        System.out.print(line.substring(spans[tokens.length - 1].getEnd()));
       }
       System.out.println();
     }
