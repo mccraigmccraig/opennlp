@@ -23,8 +23,6 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
 
-import opennlp.common.english.BasicEnglishAffixes;
-import opennlp.common.english.EnglishClosedClassTags;
 import opennlp.maxent.MaxentModel;
 import opennlp.maxent.io.SuffixSensitiveGISModelReader;
 
@@ -34,15 +32,13 @@ import opennlp.maxent.io.SuffixSensitiveGISModelReader;
  * achieved >96% accuracy on unseen data.
  *
  * @author      Gann Bierner
- * @version     $Revision: 1.3 $, $Date: 2003/12/08 11:30:49 $
+ * @version     $Revision: 1.4 $, $Date: 2003/12/17 19:39:21 $
  */
 
 public class EnglishPOSTaggerME extends POSTaggerME {
 
   public EnglishPOSTaggerME(String modelFile) {
-    super(getModel(modelFile), new POSContextGenerator(new BasicEnglishAffixes()));
-    _useClosedClassTagsFilter = true;
-    _closedClassTagsFilter = new EnglishClosedClassTags();
+    super(getModel(modelFile), new POSContextGenerator());
   }
 
   private static MaxentModel getModel(String name) {
