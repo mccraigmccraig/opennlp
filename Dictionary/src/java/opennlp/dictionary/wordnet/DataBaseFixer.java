@@ -10,6 +10,7 @@ import java.io.*;
  * @author     Mike Atkinson (mratkinson)
  * @since      0.1.0
  * @created    21 March 2002
+ * @version    $Id: DataBaseFixer.java,v 1.3 2002/03/21 23:11:15 mratkinson Exp $
  */
 public class DataBaseFixer {
 
