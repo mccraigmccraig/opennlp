@@ -1,6 +1,12 @@
+0.8.1
+_____
+
+
+
+
 0.8.0 - "Stabilized"
 --------------------
-Summary: After a long journey, the API to a point where the design has
+Summary: After a long journey, the API is to a point where the design has
 restabilized, hence the jump to version 0.8.0.  Major improvements to
 the hybrid logic package. A number of old interfaces were removed,
 most notably, those in the 'discourse' and 'structure' packages. Some

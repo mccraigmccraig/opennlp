@@ -1,4 +1,4 @@
-<!-- $Id: build.xml,v 1.18 2002/01/07 16:07:40 jasonbaldridge Exp $ -->
+<!-- $Id: build.xml,v 1.19 2002/01/07 16:30:40 jasonbaldridge Exp $ -->
 <!-- This build file based on the JDOM build.xml file. -->
 
 <project default="package" basedir=".">
@@ -10,7 +10,7 @@
     <tstamp/>
     <property name="Name" value="OpenNLP"/>
     <property name="name" value="opennlp"/>
-    <property name="version" value="0.8.0"/>
+    <property name="version" value="0.8.1"/>
     <property name="year" value="2001"/>
 
     <echo message="----------- ${Name} ${version} [${year}] ------------"/>
