@@ -29,7 +29,7 @@ import opennlp.common.util.*;
  * trees or whatnot), they should not feel inhibited by the name category.
  *
  * @author      Gann Bierner
- * @version     $Revision: 1.1 $, $Date: 2001/10/23 13:46:24 $
+ * @version     $Revision: 1.2 $, $Date: 2001/11/14 17:51:10 $
  */
 public interface Category
     extends opennlp.common.unify.Unifiable, java.io.Serializable {
@@ -83,6 +83,20 @@ public interface Category
      * @param f the new feature
      */    
     public void setFeature(Feature f);
+
+    /**
+     * Accessor function for the feature structure associated with this category
+     *
+     * @return the feature structure for this cateogory
+     */    
+    public FeatureStructure getFeatureStructure ();
+    
+    /**
+     * Gives this category a new feature structure
+     *
+     * @param fs the new feature structure
+     */    
+    public void setFeatureStructure (FeatureStructure fs);
     
     /**
      * creates a nice, multi-line, indented string represeting this Category

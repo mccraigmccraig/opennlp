@@ -26,17 +26,10 @@ public abstract class WFF {
 
     public static WFF getWFF(Element e) {
 	String type = e.getName();
-	if (type.equals("unary-op")) {
-	    return new UnaryOp(e);
+	if (type.equals("op")) {
+	    return new NaryOp(e);
 	}
-	else if (type.equals("binary-op")) {
-	    return new BinaryOp(e);
-	    
-	}
-	else if (type.equals("nary-op")) {
-	    return new NaryOp(e);	    
-	}
-	else if (type.equals("wff-var")) {
+	else if (type.equals("var")) {
 	    String varname = e.getAttributeValue("val");
 	    WFF v;
 	    if (varhash.containsKey(varname)) {
@@ -57,7 +50,7 @@ public abstract class WFF {
 	else if (type.equals("sat-op")) {
 	    return new SatOp(e);
 	}
-	else if (type.equals("logical-form")) {
+	else if (type.equals("lf")) {
 	    return getWFF((Element)e.getChildren().get(0));
 	}
 	System.out.println("Invalid WFF type: " + type);

@@ -19,33 +19,22 @@
 package opennlp.common.unify;
 
 /**
- * An interface for classes that may be unified.
+ * 
  *
- * @author      Gann Bierner
- * @version     $Revision: 1.2 $, $Date: 2001/11/14 17:51:10 $
- **/
+ * @author      Jason Baldridge
+ * @version     $Revision: 1.1 $, $Date: 2001/11/14 17:51:10 $
+ *
+ */
+public class UnifyFailure extends opennlp.common.NLPException {
 
-public interface Unifiable {
-   
-    /**
-     * Determines if a Variable occurs within this Unifiable
-     *
-     * @param v the Variable to check for
-     * @return whether or not the Variable occurs
-     */
-    public boolean occurs(Variable v);
+    public UnifyFailure () {}
 
-    
-    /**
-     * Unify this Unfiable with another Object.
-     *
-     * @param o object to unify with
-     * @param s Substution containing the variable resolutions
-     * @exception UnifyFailure if this Unifiable cannot be unified with 
-     *            the Object
-     * @return an object which represents the unification of 
-     *         this Unifiable with the Object
-     */
-    public Object unify(Object o, Substitution s) throws UnifyFailure;
+    public UnifyFailure (String m) {
+	_message = m;
+    }
+
+    public UnifyFailure (String arg1, String arg2) {
+	_message = "Unable to unify " + arg1 + " with " + arg2 + ".";
+    }
 
 }
