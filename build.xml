@@ -1,7 +1,7 @@
-<!-- $Id: build.xml,v 1.23 2002/02/08 13:37:49 jasonbaldridge Exp $ -->
+<!-- $Id: build.xml,v 1.24 2002/03/15 02:50:52 mratkinson Exp $ -->
 <!-- This build file based on the JDOM build.xml file. -->
 
-<project default="package" basedir=".">
+<project name="OpenNLP" default="package" basedir=".">
 
   <!-- =================================================================== -->
   <!-- Initialization target                                               -->
