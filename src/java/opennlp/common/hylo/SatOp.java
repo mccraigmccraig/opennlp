@@ -28,7 +28,7 @@ import java.util.*;
  * a particular point named by a nominal.
  *
  * @author      Jason Baldridge
- * @version     $Revision: 1.4 $, $Date: 2002/01/03 11:10:50 $
+ * @version     $Revision: 1.5 $, $Date: 2002/01/05 17:14:41 $
  **/
 public class SatOp extends HyloFormula {
     protected Nominal _nominal;
@@ -48,7 +48,13 @@ public class SatOp extends HyloFormula {
     public LF copy () {
 	return new SatOp((Nominal)_nominal.copy(), _arg.copy());
     }
-    
+
+    public void modify (ModFcn mf) {
+	_nominal.deepMap(mf);
+	_arg.deepMap(mf);
+	mf.modify(this);
+    }
+
     public boolean occurs (Variable var) {
 	return (_arg.occurs(var));
     }

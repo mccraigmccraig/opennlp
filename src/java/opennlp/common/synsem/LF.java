@@ -24,10 +24,10 @@ import opennlp.common.unify.*;
  * An interface for objects which represent Logical Forms.
  *
  * @author      Jason Baldridge
- * @version     $Revision: 1.2 $, $Date: 2002/01/03 11:10:50 $
+ * @version     $Revision: 1.3 $, $Date: 2002/01/05 17:14:41 $
  */
 
-public interface LF extends Unifiable {
+public interface LF extends Unifiable, Mutable {
 
     /**
      * Simplifies this LF though some evaluation formula.

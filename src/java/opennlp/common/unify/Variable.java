@@ -22,7 +22,7 @@ package opennlp.common.unify;
  * A variable that can stand for any Object.
  *
  * @author      Gann Bierner
- * @version     $Revision: 1.3 $, $Date: 2002/01/02 10:44:22 $
+ * @version     $Revision: 1.4 $, $Date: 2002/01/05 17:14:41 $
  **/
 public interface Variable extends Unifiable {
 
@@ -34,14 +34,10 @@ public interface Variable extends Unifiable {
     public String name ();
 
     /**
-     * Creates a copy of this variable using the given int to make the new
-     * Variable unique.
+     * Sets the index of this Variable to make it unique.
      *
-     * @param index An int to use in creating the unique copy.
-     *
-     * @return a copy of this variable which is unique by virtue of the given
-     * index.
+     * @param index An int which provides a unique index
      **/
-    public Variable uniqueCopy (int index);
+    public void setIndex (int index);
     
 }

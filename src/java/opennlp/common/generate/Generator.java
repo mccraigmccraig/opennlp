@@ -18,7 +18,6 @@
 
 package opennlp.common.generate;
 
-import opennlp.common.structure.*;
 import opennlp.common.synsem.*;
 import java.util.Collection;
 
@@ -27,7 +26,7 @@ import java.util.Collection;
  * be capable of converting a semantic/syntactic information into a string.
  *
  * @author      Gann Bierner
- * @version     $Revision: 1.2 $, $Date: 2002/01/05 16:12:04 $
+ * @version     $Revision: 1.3 $, $Date: 2002/01/05 17:14:41 $
  */
 public interface Generator {
 

@@ -24,8 +24,8 @@ import opennlp.common.unify.*;
 public class HyloVar extends HyloFormula implements Variable {
     
     private final String _name;
-    private final int _index;
-    private final int _hashCode;
+    private int _index;
+    private int _hashCode;
     
     private static int UNIQUE_STAMP = 0;
     
@@ -51,8 +51,9 @@ public class HyloVar extends HyloFormula implements Variable {
 	return new HyloVar(_name, _index);
     }
     
-    public Variable uniqueCopy (int index) {
-	return new HyloVar(_name, index);
+    public void setIndex (int index) {
+	_hashCode += index - _index;
+	_index = index;
     }
 
     public boolean occurs (Variable var) {

@@ -26,16 +26,17 @@ import opennlp.common.unify.*;
  * representing data structures for hybrid logic.
  *
  * @author      Jason Baldridge
- * @version     $Revision: 1.3 $, $Date: 2002/01/03 11:10:50 $
+ * @version     $Revision: 1.4 $, $Date: 2002/01/05 17:14:41 $
  **/
 public abstract class HyloFormula implements LF {
 
     public abstract LF copy ();
     
-    public void reduce () {
-
-    }
+    public void reduce () {}
     
+    public void deepMap (ModFcn mf) {
+	mf.modify(this);
+    }
     
     /**
      * Unify this Unfiable with another Object.

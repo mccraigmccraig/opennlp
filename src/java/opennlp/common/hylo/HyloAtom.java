@@ -25,11 +25,11 @@ import org.jdom.*;
  * A logical atomic formula.
  *
  * @author      Jason Baldridge
- * @version     $Revision: 1.2 $, $Date: 2002/01/03 11:10:49 $
+ * @version     $Revision: 1.3 $, $Date: 2002/01/05 17:14:41 $
  **/
 public abstract class HyloAtom extends HyloFormula {
     
-    protected final String _name;
+    protected String _name;
 
     protected HyloAtom (String n) {
 	_name = n;
@@ -37,6 +37,10 @@ public abstract class HyloAtom extends HyloFormula {
     
     protected HyloAtom (Element e) {
 	_name = e.getAttributeValue("n");
+    }
+
+    public void setAtomName (String n) {
+	_name = n;
     }
 
     public boolean occurs (Variable var) {

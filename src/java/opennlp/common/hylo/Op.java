@@ -54,6 +54,13 @@ public class Op extends HyloFormula {
 	return new Op(_name, $args);
     }
 
+    public void deepMap (ModFcn mf) {
+	for (Iterator argsIt = _args.iterator(); argsIt.hasNext(); ) {
+	    ((LF)argsIt.next()).deepMap(mf);
+	}
+	mf.modify(this);
+    }
+
     public boolean occurs (Variable var) {
 	for (Iterator argsIt = _args.iterator(); argsIt.hasNext(); ) {
 	    if (((LF)argsIt.next()).occurs(var)) {

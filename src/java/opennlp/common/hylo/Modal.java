@@ -53,6 +53,11 @@ public class Modal extends HyloFormula {
 	return new Modal (_isDiamond, _relation, _arg.copy());
     }
     
+    public void modify (ModFcn mf) {
+	_arg.deepMap(mf);
+	mf.modify(this);
+    }
+
     public boolean occurs (Variable var) {
 	return _arg.occurs(var);
     }

@@ -20,14 +20,13 @@ package opennlp.common.parse;
 
 import java.util.*;
 
-import opennlp.common.structure.*;
 import opennlp.common.xml.*;
 
 /**
  * Contains words and their associated categories and semantics.
  *
  * @author      Gann Bierner
- * @version     $Revision: 1.3 $, $Date: 2001/11/29 13:21:10 $
+ * @version     $Revision: 1.4 $, $Date: 2002/01/05 17:14:41 $
  */
 public interface Lexicon {
     
