@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////////
-// Copyright (C) 2002 Jason Baldridge and Gann Bierner
+// Copyright (C) 2004 Jason Baldridge, Gann Bierner and Tom Morton
 // 
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
@@ -38,8 +38,8 @@ import java.util.ArrayList;
  * entropy model is used to evaluate the characters ".", "!", and "?" in a
  * string to determine if they signify the end of a sentence.
  *
- * @author      Jason Baldridge
- * @version     $Revision: 1.3 $, $Date: 2004/01/27 22:12:07 $
+ * @author      Jason Baldridge and Tom Morton
+ * @version     $Revision: 1.4 $, $Date: 2004/04/07 17:28:03 $
  */
 
 public class SentenceDetectorME implements SentenceDetector {
@@ -117,10 +117,11 @@ public class SentenceDetectorME implements SentenceDetector {
   public String[] sentDetect(String s) {
     int[] starts = sentPosDetect(s);
     String[] sents = new String[starts.length];
-    for (int si = 1; si < sents.length; si++) {
-      sents[si - 1] = s.substring(starts[si - 1], starts[si]);
+    sents[0] = s.substring(0,starts[0]);
+    for (int si = 1; si < starts.length; si++) {
+      sents[si] = s.substring(starts[si - 1], starts[si]);
     }
-    sents[starts.length - 1] = s.substring(starts[starts.length - 1]);
+    //sents[starts.length - 1] = s.substring(starts[starts.length - 1]);
     return (sents);
   }
 

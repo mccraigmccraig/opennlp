@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////////
-// Copyright (C) 2000 Jason Baldridge and Gann Bierner
+// Copyright (C) 2004 Jason Baldridge, Gann Bierner, and Tom Morton
 // 
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
@@ -18,46 +18,44 @@
 
 package opennlp.tools.tokenize;
 
-import opennlp.maxent.MaxentModel;
-import opennlp.maxent.io.BinaryGISModelReader;
-
-import java.io.DataInputStream;
+import java.io.File;
 import java.io.IOException;
-import java.util.zip.GZIPInputStream;
+
+import opennlp.maxent.io.SuffixSensitiveGISModelReader;
 
 /**
  * A tokenizer which uses default English data for the maxent model.
  *
- * @author      Jason Baldridge
- * @version     $Revision: 1.1 $, $Date: 2003/11/05 03:31:04 $
+ * @author      Jason Baldridge and Tom Morton
+ * @version     $Revision: 1.2 $, $Date: 2004/04/07 17:28:37 $
  */
-public class EnglishTokenizerME extends TokenizerME {
-  private static final String modelFile = "data/EnglishTok.bin.gz";
-
-  public EnglishTokenizerME() {
-    super(getModel(modelFile));
+public class EnglishTokenizerME extends TokenizerME  {
+  public EnglishTokenizerME(String name) throws IOException  {
+    super((new SuffixSensitiveGISModelReader(new File(name))).getModel());
     setAlphaNumericOptimization(true);
   }
 
-  private static MaxentModel getModel(String name) {
-    try {
-      return new BinaryGISModelReader(
-        new DataInputStream(
-          new GZIPInputStream(
-            EnglishTokenizerME.class.getResourceAsStream(name))))
-        .getModel();
-
+  public static void main(String[] args) throws IOException {
+    if (args.length == 0) {
+      System.err.println("Usage:  java opennlp.tools.tokenize.EnglishTokenizerME model < sentences");
+      System.exit(1);
     }
-    catch (IOException ioe) {
-      ioe.printStackTrace();
+    EnglishTokenizerME tokenizer = new EnglishTokenizerME(args[0]);
+    java.io.BufferedReader inReader = new java.io.BufferedReader(new java.io.InputStreamReader(System.in));
+    for (String line = inReader.readLine(); line != null; line = inReader.readLine()) {
+      if (line.equals("")) {
+        System.out.println();
+      }
+      else {
+        String[] tokens = tokenizer.tokenize(line);
+        if (tokens.length > 0) {
+          System.out.print(tokens[0]);
+        }
+        for (int ti=1,tn=tokens.length;ti<tn;ti++) {
+          System.out.print(" "+tokens[ti]);
+        }
+        System.out.println();
+      }
     }
-    return null;
   }
-
-  public static void main(String[] args) {
-    String[] tokenSA = new EnglishTokenizerME().tokenize(args[0]);
-    for (int i = 0; i < tokenSA.length; i++)
-      System.out.println(tokenSA[i]);
-  }
-
 }

@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////////
-// Copyright (C) 2002 Jason Baldridge and Gann Bierner
+// Copyright (C) 2002 Jason Baldridge, Gann Bierner, and Tom Morton
 // 
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
@@ -45,7 +45,7 @@ import java.util.ArrayList;
  * homepage: <http://www.cis.upenn.edu/~jcreynar>.
  *
  * @author      Tom Morton
- * @version $Revision: 1.2 $, $Date: 2004/01/26 14:16:37 $
+ * @version $Revision: 1.3 $, $Date: 2004/04/07 17:28:37 $
  */
 
 public class TokenizerME implements Tokenizer {
@@ -212,18 +212,12 @@ public class TokenizerME implements Tokenizer {
     new SuffixSensitiveGISModelWriter(tokMod, output).persist();
   }
 
-  public static void train(String[] args) {
-    try {
+  public static void train(String[] args) throws IOException {
       FileReader datafr = new FileReader(new File(args[0]));
       File output = new File(args[1]);
       EventStream evc =
         new EventCollectorAsStream(new TokEventCollector(datafr));
       train(evc, output);
-    }
-    catch (Exception e) {
-      e.printStackTrace();
-    }
-
   }
 
   /**
@@ -246,7 +240,7 @@ public class TokenizerME implements Tokenizer {
    * Trains a new model. Call from the command line with "java
    * opennlp.tokenize.TokenizerME trainingdata modelname"
    */
-  public static void main(String[] args) {
+  public static void main(String[] args) throws IOException {
     TokenizerME.train(args);
   }
 
