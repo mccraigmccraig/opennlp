@@ -39,72 +39,77 @@ public class TokSpanEventStream implements EventStream {
   private List events;
   private int eventIndex;
   private boolean skipAlphaNumerics;
-  
+
   public TokSpanEventStream(boolean skipAlphaNumerics) {
     this.skipAlphaNumerics = skipAlphaNumerics;
     events = new ArrayList(50);
-    eventIndex=0;
+    eventIndex = 0;
   }
 
-  public void addEvents(Span[] tokens,String text) {
+  public void addEvents(Span[] tokens, String text) {
     if (tokens.length > 0) {
       int start = tokens[0].getStart();
-      int end = tokens[tokens.length-1].getEnd();
-      String sent = text.substring(start,end);
+      int end = tokens[tokens.length - 1].getEnd();
+      String sent = text.substring(start, end);
       List candTokens = TokenizerME.split(sent);
-      int astart=-1;
-      int aend=-1;
-      for (int ci=0;ci<candTokens.size();ci++) {
-	Span cSpan = (Span) candTokens.get(ci);
-	String ctok = sent.substring(cSpan.getStart(),cSpan.getEnd());
-	//adjust cSpan to text offsets
-	cSpan= new Span(cSpan.getStart()+start,cSpan.getEnd()+start);
-	//should we skip this token
-	if (ctok.length() > 1 && (!skipAlphaNumerics || !PerlHelp.isAlphanumeric(ctok))) {
-	  //find offsets of annotated tokens inside candidate tokens
-	  boolean foundTrainingTokens = false;
-	  for (int ti=aend+1;ti<tokens.length;ti++) {
-	    if (cSpan.contains(tokens[ti])) {
-	      if (!foundTrainingTokens) {
-		astart=ti;
-		foundTrainingTokens=true;
-	      }
-	      aend=ti;
-	    }
-	    else if (cSpan.getEnd() < tokens[ti].getEnd()) {
-	      break;
-	    }
-	    else if (tokens[ti].getEnd() < cSpan.getStart()) {
-	      //keep looking
-	    }
-	    else {
-	      System.err.println("Bad training token: "+tokens[ti]+" cand: "+cSpan);
-	    }
-	  }
-	  // create training data
-	  //System.err.println("astart="+astart+" valid="+valid);
-	  if (foundTrainingTokens) {
-	    for (int ti=astart;ti<=aend;ti++) {
-	      Span tSpan = tokens[ti];
-	      //System.err.println("PTBTokenizer.generateEvents: tSpan="+tSpan);
-	      int cStart=cSpan.getStart();
-	      for (int i=tSpan.getStart()+1;i<tSpan.getEnd();i++) {
-		String[] context =cg.getContext(new ObjectIntPair(ctok, i-cStart));
-		events.add(new Event(TokContextGenerator.NO_SPLIT, context));
-	      }
-	      if (tSpan.getEnd() != cSpan.getEnd()) {
-		String[] context =cg.getContext(new ObjectIntPair(ctok, tSpan.getEnd()-cStart));
-		events.add(new Event(TokContextGenerator.SPLIT, context));
-	      }
-	    }
-	  }
-	}
+      int astart = -1;
+      int aend = -1;
+      for (int ci = 0; ci < candTokens.size(); ci++) {
+        Span cSpan = (Span) candTokens.get(ci);
+        String ctok = sent.substring(cSpan.getStart(), cSpan.getEnd());
+        //adjust cSpan to text offsets
+        cSpan = new Span(cSpan.getStart() + start, cSpan.getEnd() + start);
+        //should we skip this token
+        if (ctok.length() > 1
+          && (!skipAlphaNumerics || !PerlHelp.isAlphanumeric(ctok))) {
+          //find offsets of annotated tokens inside candidate tokens
+          boolean foundTrainingTokens = false;
+          for (int ti = aend + 1; ti < tokens.length; ti++) {
+            if (cSpan.contains(tokens[ti])) {
+              if (!foundTrainingTokens) {
+                astart = ti;
+                foundTrainingTokens = true;
+              }
+              aend = ti;
+            }
+            else if (cSpan.getEnd() < tokens[ti].getEnd()) {
+              break;
+            }
+            else if (tokens[ti].getEnd() < cSpan.getStart()) {
+              //keep looking
+            }
+            else {
+              System.err.println(
+                "Bad training token: " + tokens[ti] + " cand: " + cSpan);
+            }
+          }
+          // create training data
+          //System.err.println("astart="+astart+" valid="+valid);
+          if (foundTrainingTokens) {
+            for (int ti = astart; ti <= aend; ti++) {
+              Span tSpan = tokens[ti];
+              //System.err.println("PTBTokenizer.generateEvents: tSpan="+tSpan);
+              int cStart = cSpan.getStart();
+              for (int i = tSpan.getStart() + 1; i < tSpan.getEnd(); i++) {
+                String[] context =
+                  cg.getContext(new ObjectIntPair(ctok, i - cStart));
+                events.add(new Event(TokContextGenerator.NO_SPLIT, context));
+              }
+              if (tSpan.getEnd() != cSpan.getEnd()) {
+                String[] context =
+                  cg.getContext(
+                    new ObjectIntPair(ctok, tSpan.getEnd() - cStart));
+                events.add(new Event(TokContextGenerator.SPLIT, context));
+              }
+            }
+          }
+        }
       }
     }
   }
-  
+
   public boolean hasNext() {
-    return(eventIndex < events.size());
+    return (eventIndex < events.size());
   }
 
   public Event nextEvent() {
@@ -112,8 +117,8 @@ public class TokSpanEventStream implements EventStream {
     eventIndex++;
     if (eventIndex == events.size()) {
       events.clear();
-      eventIndex=0;
+      eventIndex = 0;
     }
-    return(e);
+    return (e);
   }
 }

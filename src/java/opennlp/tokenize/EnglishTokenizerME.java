@@ -29,33 +29,35 @@ import java.util.zip.GZIPInputStream;
  * A tokenizer which uses default English data for the maxent model.
  *
  * @author      Jason Baldridge
- * @version     $Revision: 1.1 $, $Date: 2003/03/07 03:46:25 $
+ * @version     $Revision: 1.2 $, $Date: 2003/04/07 05:05:40 $
  */
 public class EnglishTokenizerME extends TokenizerME {
-    private static final String modelFile = "data/EnglishTok.bin.gz";
+  private static final String modelFile = "data/EnglishTok.bin.gz";
 
-    public EnglishTokenizerME() {
-	super(getModel(modelFile));
-	ALPHA_NUMERIC_OPTIMIZATION=true;
-    }
+  public EnglishTokenizerME() {
+    super(getModel(modelFile));
+    setAlphaNumericOptimization(true);
+  }
 
-    private static MaxentModel getModel(String name) {
-	try {
-	    return
-		new BinaryGISModelReader(
-		    new DataInputStream(new GZIPInputStream(
-            EnglishTokenizerME.class.getResourceAsStream(name)))).getModel();
-	    
-	} catch (IOException ioe) {
-	    ioe.printStackTrace();
-	}
-	return null;
-    }
-	
+  private static MaxentModel getModel(String name) {
+    try {
+      return new BinaryGISModelReader(
+        new DataInputStream(
+          new GZIPInputStream(
+            EnglishTokenizerME.class.getResourceAsStream(name))))
+        .getModel();
 
-    public static void main(String[] args) {
-	String [] tokenSA = new EnglishTokenizerME().tokenize(args[0]);
-	for (int i=0; i<tokenSA.length; i++) System.out.println(tokenSA[i]);
     }
-    
+    catch (IOException ioe) {
+      ioe.printStackTrace();
+    }
+    return null;
+  }
+
+  public static void main(String[] args) {
+    String[] tokenSA = new EnglishTokenizerME().tokenize(args[0]);
+    for (int i = 0; i < tokenSA.length; i++)
+      System.out.println(tokenSA[i]);
+  }
+
 }
