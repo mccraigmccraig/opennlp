@@ -31,7 +31,7 @@ import java.util.*;
  * specifications.
  *
  * @author      Jason Baldridge
- * @version     $Revision: 1.11 $, $Date: 2001/11/30 14:35:08 $
+ * @version     $Revision: 1.12 $, $Date: 2002/01/02 13:44:45 $
  **/
 public class NLPDocument extends Document {
     public static final String WORD_LABEL = "w";
@@ -64,6 +64,10 @@ public class NLPDocument extends Document {
     **/
     public NLPDocument (String text) {
 	this();
+	addTextContent(text);
+    }
+
+    protected void addTextContent (String text) {
 	_textLength = text.length();
 	Element textEl = new Element("text");
 	String[] paragraphs, quasiWords;
