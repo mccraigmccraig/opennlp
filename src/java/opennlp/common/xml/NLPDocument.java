@@ -31,7 +31,7 @@ import java.util.*;
  * specifications.
  *
  * @author      Jason Baldridge
- * @version     $Revision: 1.16 $, $Date: 2002/02/11 12:27:20 $
+ * @version     $Revision: 1.17 $, $Date: 2002/02/11 13:01:29 $
  **/
 public class NLPDocument extends Document {
     public static final String WORD_LABEL = "w";
@@ -298,6 +298,7 @@ public class NLPDocument extends Document {
 		$tokChildren.addAll(endChildren);
 		startTok.removeChildren();
 		startTok.setChildren($tokChildren);
+		$childrenOfSentence.add(startTok);
 	    }
 	    else {
 		$childrenOfSentence.add($_);
