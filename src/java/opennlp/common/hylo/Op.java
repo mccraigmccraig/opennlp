@@ -20,7 +20,7 @@ package opennlp.common.hylo;
 
 import org.jdom.*;
 
-public abstract class Op extends WFF {
+public abstract class Op extends HyloFormula {
     protected String op;
     protected String modality;
 

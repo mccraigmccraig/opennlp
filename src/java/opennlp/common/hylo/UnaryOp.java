@@ -18,16 +18,17 @@
 
 package opennlp.common.hylo;
 
+import opennlp.common.synsem.*;
 import org.jdom.*;
 
 public class UnaryOp extends Op {
-    private WFF arg;
+    private LF arg;
     private String op;
     private String modality;
 
     public UnaryOp (Element e) {
 	super(e);	
-	arg = WFF.getWFF((Element)e.getChildren().get(0));
+	arg = HyloHelper.getLF((Element)e.getChildren().get(0));
     }
 
     public String toString () {

@@ -18,13 +18,14 @@
 
 package opennlp.common.hylo;
 
+import opennlp.common.synsem.*;
 import org.jdom.*;
 import java.util.*;
 
 public class NaryOp extends Op {
-    private WFF[] args;
+    private LF[] args;
 
-    public NaryOp (String o, String m, WFF[] a) {
+    public NaryOp (String o, String m, LF[] a) {
 	super(o,m);
 	args = a;
     }
@@ -32,14 +33,14 @@ public class NaryOp extends Op {
     public NaryOp (Element e) {
 	super(e);
 	List argElements = e.getChildren();
-	args = new WFF[argElements.size()];
+	args = new LF[argElements.size()];
 	for (int i=0; i<args.length; i++)
-	    args[i] = WFF.getWFF((Element)argElements.get(i));
+	    args[i] = HyloHelper.getLF((Element)argElements.get(i));
     }
 
-    public Op insertWFF (WFF formula) {
+    public Op insertLF (LF formula) {
 	NaryOp cp = this.copy();
-	cp.args = new WFF[args.length+1];
+	cp.args = new LF[args.length+1];
 	for (int i=0; i<args.length; i++)
 	    cp.args[i] = args[i];
 	cp.args[cp.args.length-1] = formula;

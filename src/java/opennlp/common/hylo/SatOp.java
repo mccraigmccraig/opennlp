@@ -18,21 +18,22 @@
 
 package opennlp.common.hylo;
 
+import opennlp.common.synsem.*;
 import org.jdom.*;
 import java.util.*;
 
-public class SatOp extends WFF {
-    protected WFF nominal;
-    protected WFF arg;
+public class SatOp extends HyloFormula {
+    protected Nominal _nominal;
+    protected LF _arg;
 
     public SatOp (Element e) {
 	List l = e.getChildren();
-	nominal = new Nominal((Element)l.get(0));
-	arg = WFF.getWFF((Element)l.get(1));
+	_nominal = new Nominal((Element)l.get(0));
+	_arg = HyloHelper.getLF((Element)l.get(1));
     }
 
     public String toString () {	
-	return "@_" + nominal + " " + arg;
+	return "@_" + _nominal + " " + _arg;
     }
 
 }

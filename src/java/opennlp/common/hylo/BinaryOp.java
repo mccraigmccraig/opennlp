@@ -18,13 +18,14 @@
 
 package opennlp.common.hylo;
 
+import opennlp.common.synsem.*;
 import org.jdom.*;
 import java.util.*;
 
 public class BinaryOp extends Op {
-    private WFF arg1, arg2;
+    private LF arg1, arg2;
 
-    public BinaryOp (String o, String m, WFF a1, WFF a2) {
+    public BinaryOp (String o, String m, LF a1, LF a2) {
 	super(o,m);
 	arg1 = a1;
 	arg2 = a2;
@@ -33,8 +34,8 @@ public class BinaryOp extends Op {
     public BinaryOp (Element e) {
 	super(e);
 	List argElements = e.getChildren();
-	arg1 = WFF.getWFF((Element)argElements.get(0));
-	arg2 = WFF.getWFF((Element)argElements.get(1));
+	arg1 = HyloHelper.getLF((Element)argElements.get(0));
+	arg2 = HyloHelper.getLF((Element)argElements.get(1));
     }
 
 

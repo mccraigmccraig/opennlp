@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////////
-// Copyright (C) 2000 Jason Baldridge
+// Copyright (C) 2001 Jason Baldridge
 // 
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
@@ -9,28 +9,29 @@
 // This library is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-// GNU General Public License for more details.
+// GNU Lesser General Public License for more details.
 // 
 // You should have received a copy of the GNU Lesser General Public
 // License along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 //////////////////////////////////////////////////////////////////////////////
 
-package opennlp.common.hylo;
+package opennlp.common.synsem;
 
-public class LogicVar extends WFF {
-    
-    private static int nextVarStamp = 0;
+import opennlp.common.unify.*;
 
-    private String varName = "";
-    private String stamp;
+/**
+ * An interface for objects which represent Logical Forms.
+ *
+ * @author      Jason Baldridge
+ * @version     $Revision: 1.1 $, $Date: 2001/12/29 00:56:05 $
+ */
 
-    public LogicVar () {
-	stamp = "v" + nextVarStamp++;
-    }
+public interface LF extends Unifiable {
 
-    public String toString () {	
-	return stamp;
-    }
+    /**
+     * Simplifies this LF though some evaluation formula.
+     */
+    public void reduce();
 
 }

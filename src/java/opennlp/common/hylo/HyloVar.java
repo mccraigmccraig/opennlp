@@ -18,43 +18,34 @@
 
 package opennlp.common.hylo;
 
-import org.jdom.*;
-import java.util.*;
+import opennlp.common.synsem.*;
+import opennlp.common.unify.*;
 
-public abstract class WFF {
-    public static HashMap varhash = new HashMap();
+public class HyloVar extends HyloFormula implements Variable {
+    
+    private String _name = "";
+    private int _index = 0;
 
-    public static WFF getWFF(Element e) {
-	String type = e.getName();
-	if (type.equals("op")) {
-	    return new NaryOp(e);
+    public HyloVar (String name) {
+	_name = name;
+    }
+
+    public String name () {
+	return _name;
+    }
+    
+    public Object unify (Object o, Substitution sub) throws UnifyFailure {
+	if (o instanceof LF) {
+	    sub.makeSubstitution(this, o);
+	    return o;
 	}
-	else if (type.equals("var")) {
-	    String varname = e.getAttributeValue("val");
-	    WFF v;
-	    if (varhash.containsKey(varname)) {
-		v = (WFF)varhash.get(varname);
-	    }
-	    else {
-		v = new LogicVar();
-		varhash.put(varname, v);
-	    }
-	    return v;
+	else {
+	    throw new UnifyFailure();
 	}
-	else if (type.equals("nominal")) {
-	    return new Nominal(e);
-	}
-	else if (type.equals("propsym")) {
-	    return new PropSym(e);
-	}
-	else if (type.equals("sat-op")) {
-	    return new SatOp(e);
-	}
-	else if (type.equals("lf")) {
-	    return getWFF((Element)e.getChildren().get(0));
-	}
-	System.out.println("Invalid WFF type: " + type);
-	return null;
+    }
+    
+    public String toString () {	
+	return _name+_index;
     }
 
 }

@@ -20,7 +20,7 @@ package opennlp.common.hylo;
 
 import org.jdom.*;
 
-public class Nominal extends WFF {
+public class Nominal extends HyloFormula {
     
     private String val;
 
