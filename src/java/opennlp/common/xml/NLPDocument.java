@@ -18,50 +18,53 @@
 
 package opennlp.common.xml;
 
-import java.io.*;
+import opennlp.common.util.*;
 import org.jdom.*;
 import org.jdom.input.*;
 import org.jdom.output.*;
+import java.io.*;
+
 
 /**
  * A class which wraps an XmlDocument inside and ensures that it fits OpenNLP
  * specifications.
  *
  * @author      Jason Baldridge
- * @version     $Revision: 1.3 $, $Date: 2001/11/16 14:18:47 $
+ * @version     $Revision: 1.4 $, $Date: 2001/11/27 17:19:38 $
  */
+public class NLPDocument extends Document {
 
-public abstract class NLPDocument {
-    protected Document nlpdoc;
-    abstract String getDTD();
-    
+   /**
+    * Constructor method.
+    * 
+    * Creates a NLPDocument object from a given text.
+    * It breaks the text into paragraphs and "quasiWords" 
+    * (chunks of text separated by white spaces).
+    */
     public NLPDocument(String text) {
-	String doc = getDTD() + "<NLPDOC>\n" +
-	    "<TEXT>\n" + text + "</TEXT>\n" + "</NLPDOC>\n";
-
-	try {
-            nlpdoc = new SAXBuilder(true).build(new StringReader(doc));
-	} catch (Exception e) {
-	    System.out.println("Invalid XML Document.");
-	    System.out.println(e.toString());
+	super();
+	
+	Element root = new Element("nlpDocument");
+	Element textEl = new Element("text");
+	String[] paragraphs, quasiWords;
+	    
+	paragraphs = PerlHelp.getParagraphs(text);
+	for (int i=0; i<paragraphs.length; i++) {
+	    Element paraEl = new Element("p");
+	    Element sentEl = new Element("s");
+	    quasiWords = PerlHelp.splitByWhitespace(paragraphs[i]);
+	    for (int j=0; j<quasiWords.length; j++) {
+		Element tokenEl = new Element("t");
+		Element wordEl = new Element("w");
+		wordEl.setText(quasiWords[j]);
+		tokenEl.addContent(wordEl);
+		sentEl.addContent(tokenEl);
+	    }
+	    paraEl.addContent(sentEl);
+	    textEl.addContent(paraEl);
 	}
-	
-    }
-
-    public Document getNLPDoc() { return nlpdoc; }
-    
-    public String toString() {
-	StringWriter sw = new StringWriter();
-         
-	  try { 
-	      new XMLOutputter("  ", true).output(nlpdoc, sw);
-	  }
-	  catch (Exception e) {
-	      System.out.println("Unable to print document.");
-	      System.out.println(e);
-	  } 
-	
-	return sw.toString();
+	root.addContent(textEl);
+	setRootElement(root);
     }
 
     
@@ -72,7 +75,7 @@ public abstract class NLPDocument {
      */
     public static Element createSENT(String sent) {
         int l = sent.length();
-        Element sentEl = new Element("SENT");
+        Element sentEl = new Element("s");
         if (l>0) {
             char delim = sent.charAt(l-1);
             if(delim == '.' || delim == '?' || delim == '!') {
@@ -93,16 +96,29 @@ public abstract class NLPDocument {
      * @param tok the string of text associated with this token.
      */
     public static Element createTOK(String tok) {
-        Element tokEl = new Element("TOK");
-        Element lexEl = new Element("LEX");
+        Element tokEl = new Element("t");
+        Element lexEl = new Element("w");
 	lexEl.setText(tok);
         tokEl.addContent(lexEl);
         return tokEl;
     }
 
+    public String toString() {
+        StringWriter sw = new StringWriter();
+	
+          try {
+              new XMLOutputter("  ", true).output(this, sw);
+          }
+          catch (Exception e) {
+              System.out.println("Unable to print document.");
+              System.out.println(e);
+          }
+	  
+	  return sw.toString();
+    }
 
     public static void main (String[] args) {
-	NLPDocument doc = new PreProcessDocument("Here is a sentence");
+	NLPDocument doc = new NLPDocument("Here is a sentence");
 	System.out.println(doc.toString());
     }
 }

@@ -1,3 +1,9 @@
+0.6.6
+-----
+Joao: changed NLPDocument. Extends org.jdom.Document. Now the constructor 
+method creates a NLPDocument object from a given text, breaking it into 
+paragraphs and "quasiWords" (chunks of text separated by white spaces). 
+
 0.6.5
 -----
 Summary: Minor bug fix, further updates to unification stuff.
