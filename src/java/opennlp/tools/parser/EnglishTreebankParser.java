@@ -198,6 +198,7 @@ public class EnglishTreebankParser {
     System.err.println("-i: Case insensitive tag dictionary.");
     System.err.println("-bs 20: Use a beam size of 20.");
     System.err.println("-ap 0.95: Advance outcomes in with at least 95% of the probability mass.");
+    System.err.println("-k 5: Show the top 5 parses.  This will also display their log-probablities.");
     System.exit(1);
   }
 
@@ -207,6 +208,8 @@ public class EnglishTreebankParser {
     }
     boolean useTagDictionary = false;
     boolean caseInsensitiveTagDictionary = false;
+    boolean showTopK = false;
+    int numParses = 1;
     int ai = 0;
     int beamSize = ParserME.defaultBeamSize;
     double advancePercentage = ParserME.defaultAdvancePercentage;
@@ -236,6 +239,22 @@ public class EnglishTreebankParser {
         if (args.length > ai+1) {
           try {
             advancePercentage=Double.parseDouble(args[ai+1]);
+            ai++;
+          }
+          catch(NumberFormatException nfe) {
+            System.err.println(nfe);
+            usage();
+          }
+      	}
+      	else {
+      	  usage();
+      	}
+      }
+      else if (args[ai].equals("-k")) {
+        showTopK = true;
+        if (args.length > ai+1) {
+          try {
+            numParses=Integer.parseInt(args[ai+1]);
             ai++;
           }
           catch(NumberFormatException nfe) {
@@ -290,11 +309,18 @@ public class EnglishTreebankParser {
             p.insert(new Parse(text, new Span(start, start + tok.length()), ParserME.TOK_NODE, 0));
             start += tok.length() + 1;
           }
-          p = parser.parse(p);
-          //System.out.print(p.getProb()+" ");
-          p.show();
+          Parse[] parses = parser.parse(p,numParses);
+          for (int pi=0,pn=parses.length;pi<pn;pi++) {
+            if (showTopK) {
+              System.out.print(pi+" "+parses[pi].getProb()+" ");
+            }
+            parses[pi].show();
+            System.out.println();
+          }
         }
-        System.out.println();
+        else {
+          System.out.println();
+        }
       }
     }
     catch (IOException e) {
