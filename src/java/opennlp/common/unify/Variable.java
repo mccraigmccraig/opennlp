@@ -9,7 +9,7 @@
 // This library is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-// GNU General Public License for more details.
+// GNU Lesser General Public License for more details.
 // 
 // You should have received a copy of the GNU Lesser General Public
 // License along with this program; if not, write to the Free Software
@@ -22,29 +22,15 @@ package opennlp.common.unify;
  * A variable that can stand for any Object.
  *
  * @author      Gann Bierner
- * @version     $Revision: 1.1 $, $Date: 2001/10/23 13:46:24 $
- */
-public interface Variable {
+ * @version     $Revision: 1.2 $, $Date: 2001/12/11 17:21:06 $
+ **/
+public interface Variable extends Unifiable {
 
     /**
-     * Returns the string representation of this variable
+     * Returns the name of this variable.
      *
-     * @return a string representation
-     */        
-    public String name();
+     * @return the variable's name
+     **/        
+    public String name ();
 
-    /**
-     * Returns all Objects that this variable cannot unify with
-     *
-     * @return a collection of categories
-     */        
-    public java.util.Collection cannotBe();
-    
-    /**
-     * Returns Objects which this Variable must ultimately must unify with
-     *
-     * @return a collection of categories
-     */        
-    public java.util.Collection mustBe();
-    
 }
