@@ -21,7 +21,7 @@ package opennlp.tools.util;
 /** Class for storing start and end integer offsets.  
 **/
 
-public class Span {
+public class Span implements Comparable {
 
   private int start;
   private int end;
@@ -57,9 +57,40 @@ public class Span {
     return(end-start);
   }
   
-  
+  /**
+   * Returns true is the specified span is contained by this span.  
+   * Identical spans are considered to contain each other. 
+   * @param s The span to compare with this span.
+   * @return true is the specified span is contained by this span; false otherwise. 
+   */
   public boolean contains(Span s) {
     return(start <= s.getStart() && s.getEnd() <= end);
+  }
+  
+  /**
+   * Returns true if the specified span intersects with this span.
+   * @param s The span to compare with this span. 
+   * @return true is the spans overlap; false otherwise. 
+   */
+  public boolean intersects(Span s) {
+    int sstart = s.getStart();
+    //either s's start is in this or this' start is in s
+    return(this.contains(s) || s.contains(this) || 
+	   (getStart() <= sstart && sstart < getEnd() ||
+	   sstart <= getStart() && getStart() < s.getEnd()));
+  }
+  
+  /**
+   * Returns true is the specified span crosses this span.
+   * @param s The span to compare with this span.
+   * @return true is the specified span overlaps this span and contains a non-overlapping section; false otherwise.
+   */
+  public boolean crosses(Span s) {
+    int sstart = s.getStart();
+    //either s's start is in this or this' start is in s
+    return(!this.contains(s) && !s.contains(this) && 
+	   (getStart() <= sstart && sstart < getEnd() ||
+	   sstart <= getStart() && getStart() < s.getEnd()));
   }
   
   public int compareTo(Object o) { 
