@@ -32,4 +32,13 @@ public interface BeamSearchContextGenerator extends ContextGenerator {
    * @return the context for the specified position in the specified sequence.
    */
   public String[] getContext(int index, List sequence, Sequence priorDecisions, Object[] additionalContext);
+  
+  /** Returns the context for the specified position in the specified sequence (list).  
+     * @param index The index of the sequence.
+     * @param sequence  The sequence of items over which the beam seeach is performed.
+     * @param priorDecisions The sequence of decisions made prior to the context for which this decision is being made.
+     * @param additionalContext Any addition context specific to a class implementing this interface.
+     * @return the context for the specified position in the specified sequence.
+     */
+  public String[] getContext(int index, Object[] sequence, String[] priorDecisions, Object[] additionalContext);
 }

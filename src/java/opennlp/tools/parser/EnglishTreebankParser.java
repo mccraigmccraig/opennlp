@@ -23,9 +23,10 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
-import java.util.Arrays;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.StringTokenizer;
 
 import opennlp.tools.util.Sequence;
@@ -74,15 +75,23 @@ public class EnglishTreebankParser {
     }
 
     public Sequence[] topKSequences(String[] sentence) {
-      return beam.bestSequences(K, Arrays.asList(sentence), null);
+      return beam.bestSequences(K, sentence, null);
     }
   }
 
   private static class EnglishTreebankChunker extends ChunkerME implements ParserChunker {
     private static final int K = 10;
-
+    private Map continueStartMap;
+    
     public EnglishTreebankChunker(String modelFile) throws IOException {
       super(new SuffixSensitiveGISModelReader(new File(modelFile)).getModel(), new ChunkContextGenerator(), 10);
+      continueStartMap = new HashMap(model.getNumOutcomes());
+      for (int oi=0,on=model.getNumOutcomes();oi<on;oi++) {
+        String outcome = model.getOutcome(oi);
+        if (outcome.startsWith(ParserME.CONT)){
+          continueStartMap.put(outcome,ParserME.START+outcome.substring(ParserME.CONT.length()));
+        }
+      }
     }
 
     public Sequence[] topKSequences(List sentence, List tags) {
@@ -90,11 +99,34 @@ public class EnglishTreebankParser {
     }
 
     public Sequence[] topKSequences(String[] sentence, String[] tags) {
-      return beam.bestSequences(K, Arrays.asList(sentence), new Object[] { Arrays.asList(tags)});
+      return beam.bestSequences(K, sentence, new Object[] { tags });
     }
 
+    protected boolean validOutcome(String outcome, String[] tagList) {
+      if (continueStartMap.containsKey(outcome)) {
+        int lti = tagList.length - 1;
+        if (lti == -1) {
+          return (false);
+        }
+        else {
+          String lastTag = tagList[lti];
+          if (lastTag.equals(outcome)) {
+             return true;
+          }
+          if (lastTag.equals(continueStartMap.get(outcome))) {
+            return true;
+          }
+          if (lastTag.equals(ParserME.OTHER)) {
+            return (false);
+          }
+          return false;
+        }
+      }
+      return (true);
+    }
+    
     protected boolean validOutcome(String outcome, Sequence sequence) {
-      if (outcome.startsWith(ParserME.CONT)) {
+      if (continueStartMap.containsKey(outcome)) {
         List tagList = sequence.getOutcomes();
         int lti = tagList.size() - 1;
         if (lti == -1) {
@@ -102,16 +134,16 @@ public class EnglishTreebankParser {
         }
         else {
           String lastTag = (String) tagList.get(lti);
+          if (lastTag.equals(outcome)) {
+             return true;
+          }
+          if (lastTag.equals(continueStartMap.get(outcome))) {
+            return true;
+          }
           if (lastTag.equals(ParserME.OTHER)) {
             return (false);
           }
-          String pred = outcome.substring(ParserME.CONT.length());
-          if (lastTag.startsWith(ParserME.START)) {
-            return lastTag.substring(ParserME.START.length()).equals(pred);
-          }
-          else if (lastTag.startsWith(ParserME.CONT)) {
-            return lastTag.substring(ParserME.CONT.length()).equals(pred);
-          }
+          return false;
         }
       }
       return (true);
@@ -146,8 +178,8 @@ public class EnglishTreebankParser {
     if (args.length == 0) {
       usage();
     }
-    boolean useTagDictionary=false;
-    boolean caseInsensitiveTagDictionary=false;
+    boolean useTagDictionary = false;
+    boolean caseInsensitiveTagDictionary = false;
     int ai = 0;
     while (args[ai].startsWith("-")) {
       if (args[ai].equals("-d")) {
@@ -164,14 +196,14 @@ public class EnglishTreebankParser {
       }
     }
     ParserME parser;
-    if (caseInsensitiveTagDictionary) { 
-      parser = EnglishTreebankParser.getParser(args[ai++],true,false);
+    if (caseInsensitiveTagDictionary) {
+      parser = EnglishTreebankParser.getParser(args[ai++], true, false);
     }
     else if (useTagDictionary) {
-      parser = EnglishTreebankParser.getParser(args[ai++],true,true);
+      parser = EnglishTreebankParser.getParser(args[ai++], true, true);
     }
     else {
-      parser = EnglishTreebankParser.getParser(args[ai++],false,false);
+      parser = EnglishTreebankParser.getParser(args[ai++], false, false);
     }
     BufferedReader in;
     if (ai == args.length) {

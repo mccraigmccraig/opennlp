@@ -42,6 +42,10 @@ public class ChunkContextGenerator implements ChunkerContextGenerator {
   public String[] getContext(int i, List toks, List preds, List tags) {
     return (getContext(i, toks.toArray(), (String[]) tags.toArray(new String[tags.size()]), (String[]) preds.toArray(new String[preds.size()])));
   }
+  
+  public String[] getContext(int i, Object[] words, String[] prevDecisions, Object[] ac) {
+    return(getContext(i,words,(String[]) ac[0],prevDecisions));
+  }
 
   /**
    * Returns the contexts for chunking of the specified index. 
