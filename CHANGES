@@ -6,6 +6,9 @@ Simplified the Lexicon and Rules interfaces and pushed the methods
 intended for generation into the ReversibleLexicon and ReversibleRules
 interfaces which extend Lexicon and Rules, respectively.
 
+Replaced com.sun.xml.tree and org.xml.sax with org.jdom, org.jdom.input and
+org.jdom.output in NLPDocument. Removed com.sun.xml.tree and org.xml.sax from 
+class PreProcessDocument. xml.jar is no longer used.
 
 
 0.6.0
