@@ -1,0 +1,50 @@
+This file briefly describes some of the libraries which are used by
+OpenNLP. For libraries which are distributed under the terms of the
+Apache Software License, please see the file ASL in this directory
+for details.
+
+------------------------------------------------------------------------
+ant.jar 
+
+The Jakarta Ant Build System, version 1.4
+Homepage: http://jakarta.apache.org/ant/
+License: Apache Software License
+
+A Java based build tool. It is supported by crimson.jar and jaxp.jar,
+and license information for those is included in this directory.
+
+
+------------------------------------------------------------------------
+jdom.jar
+
+JDOM, version 1.0 beta 7
+Homepage: http://www.jdom.org
+License: see jdom.license
+
+A complete, Java-based solution for accessing, manipulating, and
+outputting XML data from Java code
+
+
+------------------------------------------------------------------------
+xerces.jar
+
+The Xerces Java Parser for XML, version 1.4.3
+Homepage: http://xml.apache.org/xerces-j/
+License: Apache Software License
+
+Java parser for XML.
+
+
+------------------------------------------------------------------------
+xml.jar
+
+XML functionality from Sun
+Homepage: http://java.sun.com/xml/, ???
+License: unknown
+
+This provided some of the XML stuff OpenNLP needed ages ago, which is
+now being replaced by JDOM functionality.  This should be gone by the
+next version.  We checked that the license of xml.jar is compatible
+with the LGPL a long time ago, but I cannot even find anything
+concrete now (xml.jar is 2+ years old and is quite outdated).
+

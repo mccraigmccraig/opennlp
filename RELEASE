@@ -1,0 +1,31 @@
+0.6.0
+-----
+A bunch of changes have happened since 0.4.0, but were unfortunately
+not documented in this file during that time.  Here are the major
+changes:
+
+The various interfaces were broken up and placed into directories
+such as "generate" and "structure" reflecting their grouping.
+
+A number of the classes in the opennlp.common.structure package were
+redesigned to be less specific to categorial grammar
+
+A new package opennlp.common.hylo was added with the beginnings for
+Java structures representing terms of hybrid logics.
+
+The class opennlp.common.xml.SchemaBasedValidator was added for
+making it easy to validate an XML file against an XML Schema.
+
+OpenNLP now uses Ant to build, and the directory structure has been
+changed considerably to facilitate the creation of the distribution
+files and to ensure that source code and supporting libraries are
+always provided with the distribution.
+
+
+0.4.0
+-----
+* First release version separated from Grok!
+* Addition of XML and preprocessing interfaces.
+* Cleaned up many interfaces in main package so that they had fewer
+  Grok specific methods.
+* Documentation of the interfaces (= API documentation)
