@@ -23,6 +23,7 @@ import opennlp.maxent.*;
 import opennlp.common.morph.MorphAnalyzer;
 import opennlp.common.util.Pair;
 import opennlp.common.util.PerlHelp;
+import opennlp.common.util.Sequence;
 
 import java.util.*;
 
@@ -30,7 +31,7 @@ import java.util.*;
  * A context generator for the POS Tagger.
  *
  * @author      Gann Bierner
- * @version     $Revision: 1.2 $, $Date: 2003/11/05 03:50:36 $
+ * @version     $Revision: 1.3 $, $Date: 2003/12/05 05:36:01 $
  */
 
 public class POSContextGenerator implements ContextGenerator {
@@ -59,9 +60,9 @@ public class POSContextGenerator implements ContextGenerator {
 	    o=((Pair)o).a;
 	}
 	Object[] data = (Object[])o;
-	List ls = (List)data[0];
-	List tags = (List)data[1];
-	int pos = ((Integer)data[2]).intValue();
+	List ls = (List)data[1];
+	List tags = ((Sequence)data[2]).getOutcomes();
+	int pos = ((Integer)data[0]).intValue();
 
 	String next, nextnext, lex, prev, prevprev;
 	String tagprev, tagprevprev;
