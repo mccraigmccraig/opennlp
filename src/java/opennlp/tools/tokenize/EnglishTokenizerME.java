@@ -21,17 +21,23 @@ package opennlp.tools.tokenize;
 import java.io.File;
 import java.io.IOException;
 
+import opennlp.maxent.MaxentModel;
 import opennlp.maxent.io.SuffixSensitiveGISModelReader;
 
 /**
  * A tokenizer which uses default English data for the maxent model.
  *
  * @author      Jason Baldridge and Tom Morton
- * @version     $Revision: 1.2 $, $Date: 2004/04/07 17:28:37 $
+ * @version     $Revision: 1.3 $, $Date: 2004/07/06 02:55:00 $
  */
 public class EnglishTokenizerME extends TokenizerME  {
   public EnglishTokenizerME(String name) throws IOException  {
     super((new SuffixSensitiveGISModelReader(new File(name))).getModel());
+    setAlphaNumericOptimization(true);
+  }
+  
+  public EnglishTokenizerME(MaxentModel model) throws IOException {
+    super(model);
     setAlphaNumericOptimization(true);
   }
 
