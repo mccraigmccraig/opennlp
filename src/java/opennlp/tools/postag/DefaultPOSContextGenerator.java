@@ -29,7 +29,7 @@ import opennlp.tools.util.Sequence;
  * A context generator for the POS Tagger.
  *
  * @author      Gann Bierner
- * @version     $Revision: 1.5 $, $Date: 2004/04/30 17:04:39 $
+ * @version     $Revision: 1.6 $, $Date: 2004/06/11 20:55:10 $
  */
 
 public class DefaultPOSContextGenerator implements POSContextGenerator {
@@ -59,7 +59,7 @@ public class DefaultPOSContextGenerator implements POSContextGenerator {
 
   protected static String[] getSuffixes(String lex) {
     String[] suffs = new String[4];
-    for (int li = 0, ll = PREFIX_LENGTH; li < ll; li++) {
+    for (int li = 0, ll = SUFFIX_LENGTH; li < ll; li++) {
       suffs[li] = lex.substring(Math.max(lex.length() - li - 1, 0));
     }
     return suffs;
