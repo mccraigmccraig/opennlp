@@ -1,4 +1,4 @@
-<!-- $Id: build.xml,v 1.15 2001/12/11 22:27:29 jasonbaldridge Exp $ -->
+<!-- $Id: build.xml,v 1.16 2001/12/27 14:53:01 jasonbaldridge Exp $ -->
 <!-- This build file based on the JDOM build.xml file. -->
 
 <project default="package" basedir=".">
@@ -17,7 +17,7 @@
 
     <property name="build.compiler" value="classic"/>
     <property name="debug" value="on"/>
-    <property name="optimize" value="on"/>
+    <property name="optimize" value="off"/>
     <property name="deprecation" value="on"/>
 
     <property name="src.dir" value="./src/java"/>
