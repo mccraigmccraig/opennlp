@@ -1,5 +1,13 @@
 0.8.3
 -----
+Added EnglishClosedClassTags (formerly from
+opennlp.grok.preprocess.postag) to opennlp.common.english. (Jason)
+
+Moved FilterFcn from opennlp.common.unify to
+opennlp.common.util. (Jason)
+
+Made MorphAnalyzer an interface that does not extend Pipelink, and
+added new methods getPrefixes() and getSuffixes(). (Jason)
 
 Removed dependency on gnu-regexp (finally) by getting rid of regexps
 in the BasicEnglishAffixes class. (Jason)
