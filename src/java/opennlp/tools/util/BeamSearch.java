@@ -32,7 +32,6 @@ public class BeamSearch {
   protected int size;
   private static final Object[] EMPTY_ADDITIONAL_CONTEXT = new Object[0];
   private double[] probs;
-  private String out;
   private Cache contextsCache;
   private static final int zeroLog = -100000;
 
@@ -71,9 +70,6 @@ public class BeamSearch {
     Heap prev = new TreeHeap(size);
     Heap next = new  TreeHeap(size);
     Heap tmp;
-    if (contextsCache != null) {
-      //contextsCache.clear();
-    }
     prev.add(new Sequence());
     if (additionalContext == null) {
       additionalContext = EMPTY_ADDITIONAL_CONTEXT;
@@ -106,11 +102,22 @@ public class BeamSearch {
         for (int p = 0; p < scores.length; p++) {
           if (scores[p] < min)
             continue; //only advance first "size" outcomes
-          out = model.getOutcome(p);
+          String out = model.getOutcome(p);
           if (validSequence(i, sequence, outcomes, out)) {
             Sequence ns = new Sequence(top, out, scores[p]);
             if (ns.getScore() > minSequenceScore) {
               next.add(ns);
+            }
+          }
+        }
+        if (next.size() == 0) {//if no advanced sequences, advance all valid
+          for (int p = 0; p < scores.length; p++) {
+            String out = model.getOutcome(p);
+            if (validSequence(i, sequence, outcomes, out)) {
+              Sequence ns = new Sequence(top, out, scores[p]);
+              if (ns.getScore() > minSequenceScore) {
+                next.add(ns);
+              }
             }
           }
         }
