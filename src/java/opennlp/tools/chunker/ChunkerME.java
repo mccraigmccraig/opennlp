@@ -20,11 +20,10 @@ package opennlp.tools.chunker;
 import java.util.Arrays;
 import java.util.List;
 
-import opennlp.common.util.BeamSearch;
-import opennlp.common.util.Sequence;
-import opennlp.maxent.ContextGenerator;
 import opennlp.maxent.GISModel;
 import opennlp.maxent.MaxentModel;
+import opennlp.tools.util.BeamSearch;
+import opennlp.tools.util.Sequence;
 
 /**
  * @author Tom Morton
@@ -33,7 +32,7 @@ import opennlp.maxent.MaxentModel;
 public class ChunkerME implements Chunker {
 
   protected MaxentModel _npModel;
-  protected ContextGenerator _contextGen;
+  protected ChunkerContextGenerator _contextGen;
   private int beamSize;
   protected BeamSearch beam;
   private Sequence bestSequence;
@@ -42,11 +41,11 @@ public class ChunkerME implements Chunker {
     this(mod, new DefaultChunkerContextGenerator(), 10);
   }
 
-  public ChunkerME(MaxentModel mod, ContextGenerator cg) {
+  public ChunkerME(MaxentModel mod, ChunkerContextGenerator cg) {
     this(mod, cg, 10);
   }
 
-  public ChunkerME(MaxentModel mod, ContextGenerator cg, int beamSize) {
+  public ChunkerME(MaxentModel mod, ChunkerContextGenerator cg, int beamSize) {
     _npModel = mod;
     _contextGen = cg;
     this.beamSize = beamSize;
@@ -76,7 +75,7 @@ public class ChunkerME implements Chunker {
   }
 
   class ChunkBeamSearch extends BeamSearch {
-    public ChunkBeamSearch(int size, ContextGenerator cg, MaxentModel model) {
+    public ChunkBeamSearch(int size, ChunkerContextGenerator cg, MaxentModel model) {
       super(size, cg, model);
     }
 

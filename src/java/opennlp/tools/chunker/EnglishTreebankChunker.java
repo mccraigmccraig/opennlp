@@ -21,10 +21,9 @@ import java.io.File;
 import java.io.IOException;
 import java.util.List;
 
-import opennlp.common.util.Sequence;
-import opennlp.maxent.ContextGenerator;
 import opennlp.maxent.MaxentModel;
 import opennlp.maxent.io.SuffixSensitiveGISModelReader;
+import opennlp.tools.util.Sequence;
 
 /** This is a chunker based on the CONLL chunking task which uses Penn Treebank constituents as the basis for the chunks.
  *   See   http://cnts.uia.ac.be/conll2000/chunking/ for data and task definition.
@@ -40,11 +39,11 @@ public class EnglishTreebankChunker extends ChunkerME {
     super(mod);
   }
 
-  public EnglishTreebankChunker(MaxentModel mod, ContextGenerator cg) {
+  public EnglishTreebankChunker(MaxentModel mod, ChunkerContextGenerator cg) {
     super(mod, cg);
   }
 
-  public EnglishTreebankChunker(MaxentModel mod, ContextGenerator cg, int beamSize) {
+  public EnglishTreebankChunker(MaxentModel mod, ChunkerContextGenerator cg, int beamSize) {
     super(mod, cg, beamSize);
   }
 
