@@ -1,3 +1,35 @@
+0.9.0
+-----
+Summary: Moved sentence, tokenization, and pos tagging out of grok and into
+main opennlp package and retrained models.
+
+General:
+Added Span class to util for token training.
+
+Remove Pipelink dependicies from above packages in order to minimize 
+dependicies
+
+Sentence Detection:
+Retrained to create new data/EnglishSD.bin.gz
+
+Tokenization:
+Changed tokenization features.
+
+Removed possesive hack since trained model now correctly tokenizes
+these constructions.
+
+TokSpanEventStream allows tokenizer to be trained with offsets.
+
+Added ALPHA_NUMERIC_OPTIMAZATION flag so this can be turned off for
+other types of tokenization.
+
+Retrain to create new data/EnglishTok.bin.gz
+
+POS:
+Create POSEventStream for training.
+Retrained to create new data/EnglishPOS.bin.gz
+
+
 0.8.5
 -----
 
