@@ -40,7 +40,5 @@ public interface ParserChunker extends Chunker {
    * @param tags The pos-tags for the specified sentence.
    * @return the top k chunk sequences for the specified sentence.
    */
-  public Sequence[] topKSequences(String[] sentence, String[] tags);
-  
-
+  public Sequence[] topKSequences(String[] sentence, String[] tags, double minSequenceScore);
 }
