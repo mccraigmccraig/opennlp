@@ -9,28 +9,22 @@
 // This library is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-// GNU General Public License for more details.
+// GNU Lesser General Public License for more details.
 // 
 // You should have received a copy of the GNU Lesser General Public
 // License along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 //////////////////////////////////////////////////////////////////////////////
-
 package opennlp.common.unify;
-
-import opennlp.common.structure.*;
 
 /**
  * Specifies how variable are to be replaced to make two objects unify.  
  *
  * @author      Gann Bierner & Jason Baldridge
- * @version     $Revision: 1.1 $, $Date: 2001/10/23 13:46:24 $
+ * @version     $Revision: 1.2 $, $Date: 2001/11/22 15:04:50 $
  */
 public interface Substitution {
-    public boolean fail();
-    public Substitution setFail();
     public boolean makeSubstitution(Variable var, Object o);
     public Object getValue(Variable var);
     public Object fill(Object o);
-    
 }

@@ -27,9 +27,12 @@ import java.util.*;
  * unify.  Most of this will change so it is not documented at this time.
  *
  * @author      Gann Bierner
- * @version     $Revision: 1.1 $, $Date: 2001/10/23 13:46:24 $
+ * @version     $Revision: 1.2 $, $Date: 2001/11/22 15:04:50 $
  */
 public interface CategorySubstitution extends Substitution {
+    public boolean fail();
+    public Substitution setFail();
+
     public CategorySubstitution copy();
     public void addFeatIndex(int i, Object o);
     public void addFeatIndex(Integer i, Object o);

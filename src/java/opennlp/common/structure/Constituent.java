@@ -27,7 +27,7 @@ import java.io.*;
  * Lexical information associated with a particular word or phrase
  *
  * @author      Gann Bierner
- * @version     $Revision: 1.1 $, $Date: 2001/10/23 13:46:24 $
+ * @version     $Revision: 1.2 $, $Date: 2001/11/22 15:04:50 $
  */
 public interface Constituent extends Serializable {
 
@@ -115,6 +115,6 @@ public interface Constituent extends Serializable {
     public void setCurPos(int i);
     public String getRule();
     public void setRule(String r);
-    public CategorySubstitution getSubst();
-    public void setSubst(CategorySubstitution s);
+    public Substitution getSubst();
+    public void setSubst(Substitution s);
 }
