@@ -18,26 +18,28 @@
 
 package opennlp.tools.postag;
 
-import opennlp.maxent.*;
-import opennlp.tools.util.Pair;
-import opennlp.tools.util.Sequence;
-
-
-import java.io.*;
-
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.Reader;
+import java.io.StringReader;
 import java.util.ArrayList;
-import java.util.Map;
 import java.util.HashMap;
-import java.util.Set;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.Map;
+import java.util.Set;
 import java.util.StringTokenizer;
+
+import opennlp.maxent.Counter;
+import opennlp.maxent.Event;
+import opennlp.maxent.EventCollector;
+import opennlp.tools.util.Pair;
 
 /**
  * An event generator for the maxent POS Tagger.
  *
  * @author      Gann Bierner
- * @version     $Revision: 1.3 $, $Date: 2004/02/04 15:43:57 $
+ * @version     $Revision: 1.4 $, $Date: 2004/08/13 17:21:30 $
  */
 
 public class POSEventCollector implements EventCollector {
@@ -139,8 +141,7 @@ public class POSEventCollector implements EventCollector {
 		ArrayList tags = new ArrayList();
 		
 		for (int i=0; i<tokens.size(); i++) {
-		    Object[] params = {tokens, tags, new Integer(i)};
-		    String[] context = cg.getContext(i,tokens,new Sequence(tags),null);
+		    String[] context = cg.getContext(i,tokens.toArray(),(String[]) tags.toArray(new String[tags.size()]),null);
 		    Event e = new Event((String)outcomes.get(i), context);
 		    tags.add(outcomes.get(i));
 		    elist.add(e);
