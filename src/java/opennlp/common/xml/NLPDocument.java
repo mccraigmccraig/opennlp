@@ -31,7 +31,7 @@ import java.util.*;
  * specifications.
  *
  * @author      Jason Baldridge
- * @version     $Revision: 1.13 $, $Date: 2002/02/08 12:17:50 $
+ * @version     $Revision: 1.14 $, $Date: 2002/02/11 11:26:35 $
  **/
 public class NLPDocument extends Document {
     public static final String WORD_LABEL = "w";
@@ -202,6 +202,22 @@ public class NLPDocument extends Document {
      **/
     public List getTokenElements () {
 	return getTokenElements(_root);
+    }
+
+    /**
+     * Grabs all token elements of the specified type in this document.
+     **/
+    public List getTokenElementsByType (String type) {
+	List allTokens = getTokenElements(_root);
+	List toksByType = new ArrayList();
+	for (Iterator allTokIt = allTokens.iterator(); allTokIt.hasNext();) {
+	    Element tokEl = (Element)allTokIt.next();
+	    String tokType = tokEl.getAttributeValue("type");
+	    if (tokType != null && tokType.equals(type)) {
+		toksByType.add(tokEl);
+	    }
+	}
+	return toksByType;
     }
 
     /**
