@@ -27,6 +27,6 @@ import org.jdom.*;
  * both Modality labels and variables over Modality labels.
  *
  * @author      Jason Baldridge
- * @version     $Revision: 1.1 $, $Date: 2002/02/05 11:50:29 $
+ * @version     $Revision: 1.2 $, $Date: 2002/02/07 17:52:02 $
  **/
-public interface Mode extends LF, Indexed {}
+public interface Mode extends LF {}

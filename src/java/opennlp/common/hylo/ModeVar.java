@@ -21,32 +21,32 @@ package opennlp.common.hylo;
 import opennlp.common.synsem.*;
 import opennlp.common.unify.*;
 
-public class NominalVar extends HyloVar implements Nominal {
+public class ModeVar extends HyloVar implements Mode {
     
     private static int UNIQUE_STAMP = 0;
     
-    public NominalVar () {
-	super("NV"+UNIQUE_STAMP++);
+    public ModeVar () {
+	super("MV"+UNIQUE_STAMP++);
     }
     
-    public NominalVar (String name) {
+    public ModeVar (String name) {
 	super(name);
     }
 
-    protected NominalVar (String name, int index) {
+    protected ModeVar (String name, int index) {
 	super(name, index);
     }
     
 
     public LF copy () {
-	return new NominalVar(_name, _index);
+	return new ModeVar(_name, _index);
     }
 
     
     public boolean equals (Object o) {
-	if (o instanceof NominalVar
-	    && _index == ((NominalVar)o)._index
-	    && _name.equals(((NominalVar)o)._name)) {
+	if (o instanceof ModeVar
+	    && _index == ((ModeVar)o)._index
+	    && _name.equals(((ModeVar)o)._name)) {
 	    return true;
 	} else {
 	    return false;
@@ -54,13 +54,13 @@ public class NominalVar extends HyloVar implements Nominal {
     }
     
     public Unifiable unify (Unifiable u, Substitution sub) throws UnifyFailure {
-	if (u instanceof NominalAtom) {
+	if (u instanceof ModeLabel) {
 	    return sub.makeSubstitution(this, u);
-	} else if (u instanceof NominalVar) {
-	    NominalVar u_nv = (NominalVar)u;
+	} else if (u instanceof ModeVar) {
+	    ModeVar u_nv = (ModeVar)u;
 	    if (!equals(u_nv)) {
-		NominalVar $nv =
-		    new NominalVar(_name+u_nv._name, _index+u_nv._index);
+		ModeVar $nv =
+		    new ModeVar(_name+u_nv._name, _index+u_nv._index);
 		sub.makeSubstitution(this, $nv);
 		sub.makeSubstitution(u_nv, $nv);
 		return $nv;

@@ -26,31 +26,16 @@ import org.jdom.*;
  * A modality label.
  *
  * @author      Jason Baldridge
- * @version     $Revision: 1.1 $, $Date: 2002/02/05 11:50:29 $
+ * @version     $Revision: 1.2 $, $Date: 2002/02/07 17:52:02 $
  **/
 public final class ModeLabel extends HyloAtom implements Mode {
 
-    protected int _index = 0;
-    
     public ModeLabel (String n) {
 	super(n);
     }
 
-    public ModeLabel (String n, int index) {
-	this(n);
-	setIndex(index);
-    }
-
     public ModeLabel (Element e) {
 	super(e);
-    }
-
-    public int getIndex () {
-	return _index;
-    }
-
-    public void setIndex (int index) {
-	_index = index;
     }
 
     public LF copy () {
@@ -59,21 +44,23 @@ public final class ModeLabel extends HyloAtom implements Mode {
 
     public Unifiable unify (Unifiable u, Substitution sub)
 	throws UnifyFailure {
-
 	if (u instanceof HyloFormula) {
-	    if (u instanceof ModeLabel && equals(u)) {
-		return copy();
+	    if (u instanceof ModeLabel) {
+		if (equals(u)) {
+		    return copy();
+		} else {
+		    throw new UnifyFailure();
+		}
+	    } else {
+		return super.unify(u,sub);
 	    }
-	    return super.unify(u,sub);
 	} else {
 	    throw new UnifyFailure();
 	}
     }
     
     public boolean equals (Object o) {
-	if (o instanceof ModeLabel
-	    && _name.equals(((ModeLabel)o)._name) 
-	    && _index == ((ModeLabel)o)._index) {
+	if (o instanceof ModeLabel && _name.equals(((ModeLabel)o)._name)) {
 	    return true;
 	} else {
 	    return false;

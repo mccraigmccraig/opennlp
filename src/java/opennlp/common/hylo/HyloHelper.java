@@ -42,8 +42,10 @@ public class HyloHelper {
 	    return new Box(e);
 	} else if (type.equals("d")) {
 	    return new Diamond(e);
-	} else if (type.equals("modlabel")) {
+	} else if (type.equals("mode")) {
 	    return new ModeLabel(e);
+	} else if (type.equals("modevar")) {
+	    return new ModeVar(e.getAttributeValue("n"));
 	} else if (type.equals("lf")) {
 	    return getLF((Element)e.getChildren().get(0));
 	}
