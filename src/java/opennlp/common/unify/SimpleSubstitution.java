@@ -18,14 +18,13 @@
 
 package opennlp.common.unify;
 
-import opennlp.common.structure.*;
 import java.util.*;
 
 /**
  * Simple implementation of Substitution interface.
  *
  * @author      Jason Baldridge
- * @version     $Revision: 1.4 $, $Date: 2001/12/19 11:32:17 $
+ * @version     $Revision: 1.5 $, $Date: 2002/01/05 17:13:21 $
  */
 public class SimpleSubstitution extends HashMap implements Substitution {
 
