@@ -20,6 +20,8 @@ package opennlp.tools.postag;
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
+import java.io.InputStreamReader;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -76,6 +78,14 @@ public class POSDictionary {
     else {
       //System.err.println(java.util.Arrays.asList((String[]) dictionary.get(word.toLowerCase())));
       return (String[]) dictionary.get(word.toLowerCase());
+    }
+  }
+  
+  public static void main(String[] args) throws IOException {
+    POSDictionary dict = new POSDictionary(args[0]);
+    BufferedReader in = new BufferedReader(new InputStreamReader(System.in));
+    for (String line = in.readLine();line != null;line = in.readLine()) {
+      System.out.println(Arrays.asList(dict.getTags(line)));
     }
   }
 
