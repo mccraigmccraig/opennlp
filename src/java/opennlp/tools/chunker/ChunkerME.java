@@ -79,7 +79,7 @@ public class ChunkerME implements Chunker {
   
   /* inherieted javadoc */
   public String[] chunk(Object[] toks, String[] tags) {
-    bestSequence = beam.bestSequence(Arrays.asList(toks), new Object[] { Arrays.asList(tags)});
+    bestSequence = beam.bestSequence(Arrays.asList(toks), new Object[] {tags});
     List c = bestSequence.getOutcomes();
     return (String[]) c.toArray(new String[c.size()]);
   }
