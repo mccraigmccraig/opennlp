@@ -34,10 +34,12 @@ public class NameFinderEventStream implements EventStream {
   private DataStream data;
   private Event[] events;
   private NameContextGenerator cg;
+  /** A mapping between tokens and the name tag assigned to them previously. */
   private Map prevTags;
-  private int ei;
-  private List prevLineTokens;
-  private List prevLineOutcomes;
+  /** The index into the array of events. */
+  private int eventIndex;
+  /** The last line read in from the data file. */
+  private String line;
   
   /**
    * Creates a new event stream based on the specified data stream.
@@ -55,10 +57,11 @@ public class NameFinderEventStream implements EventStream {
   public NameFinderEventStream(DataStream d, NameContextGenerator cg) {
     this.data = d;
     this.cg = cg;
-    ei = 0;
+    eventIndex = 0;
     prevTags = new HashMap();
+    // prime events with first line of data stream.
     if (data.hasNext()) {
-      String line = (String) d.nextToken();
+      line = (String) d.nextToken();
       if (line.equals("")) {
         prevTags.clear();
       }
@@ -71,13 +74,10 @@ public class NameFinderEventStream implements EventStream {
     }
   }
 
+  /** Adds name events for the specified sentence.
+   * @param sentence The sentence for which name events should be added.
+   */
   private void addEvents(String sentence) {
-    if (prevLineTokens != null) {
-      for (int ti=0,tl=prevLineTokens.size();ti<tl;ti++) {
-        //System.out.println("addEvents: "+prevLineTokens.get(ti).toString()+" -> "+prevLineOutcomes.get(ti));
-        prevTags.put(prevLineTokens.get(ti).toString(),prevLineOutcomes.get(ti));
-      }
-    }
     String[] parts = sentence.split(" ");
     String outcome = NameFinderME.OTHER;
     List toks = new ArrayList();
@@ -101,32 +101,38 @@ public class NameFinderEventStream implements EventStream {
     for (int ti = 0, tl = toks.size(); ti < tl; ti++) {
       events[ti] = new Event((String) outcomes.get(ti), cg.getContext(ti, toks, outcomes, prevTags));
     }
-    prevLineTokens = toks;
-    prevLineOutcomes = outcomes;
+    for (int ti=0,tl=toks.size();ti<tl;ti++) {
+      prevTags.put(toks.get(ti),outcomes.get(ti));
+    }
   }
 
   public Event nextEvent() {
-    if (ei == events.length) {
-      String line = (String) data.nextToken();
-      if (line.equals("")) {
-        prevTags.clear();
-        prevLineTokens = null;
-        prevLineOutcomes = null;
-        if (data.hasNext()) {
-          line = (String) data.nextToken();
-        }
-        else {
-          return null;
-        }
-      }
+    if (eventIndex == events.length) {
       addEvents(line);
-      ei = 0;
+      eventIndex = 0;
+      line = null;
     }
-    return ((Event) events[ei++]);
+    return ((Event) events[eventIndex++]);
   }
 
   public boolean hasNext() {
-    return (ei < events.length || data.hasNext());
+    if (eventIndex < events.length) {
+      return true;
+    }
+    else if (line != null) { // previous result has not been consumed
+      return true;
+    }
+    //find next non-blank line
+    while (data.hasNext()) {
+      line = (String) data.nextToken();
+      if (line.equals("")) {
+        prevTags.clear();
+      }
+      else {
+        return true;
+      }
+    }
+    return false;
   }
   
   public static final void main(String[] args) throws java.io.IOException {
