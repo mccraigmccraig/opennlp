@@ -25,12 +25,21 @@ public class Sequence implements Comparable {
   private double score = 0;
   private List outcomes;
   private List probs;
+  private static final Double ONE = new Double(1);
 
   /** Creates a new sequence of outcomes. */
   public Sequence() {
     outcomes = new ArrayList();
     probs = new ArrayList();
-  };
+  }
+
+  public Sequence(List outcomes) {
+    this.outcomes = outcomes;
+    this.probs = new ArrayList(outcomes.size());
+    for (int oi=0,ol=outcomes.size();oi<ol;oi++) {
+      probs.add(ONE);
+    }
+  }
 
   public int compareTo(Object o) {
     Sequence s = (Sequence) o;
@@ -41,7 +50,6 @@ public class Sequence implements Comparable {
     else
       return -1;
   }
-
 
   /** Returns a copy of the this sequence.
    * @return a copy of this sequence.
