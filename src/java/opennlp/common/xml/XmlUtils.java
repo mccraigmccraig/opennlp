@@ -25,7 +25,7 @@ import java.util.*;
  * Utilities for manipulating XML based objects.
  *
  * @author      Jason Baldridge
- * @version     $Revision: 1.5 $, $Date: 2001/11/16 15:48:25 $
+ * @version     $Revision: 1.6 $, $Date: 2001/11/16 17:30:32 $
  */
 
 public class XmlUtils {
@@ -81,7 +81,10 @@ public class XmlUtils {
 	return sb.toString();
     }
 
-
+    /**
+     * Replace one element by another, in the position that the old one
+     * occupied in the parent element.
+     */ 
     public static void replace (Element old, Element replacement) {
 	Element parent = old.getParent();
         List children = parent.getChildren();
@@ -92,6 +95,43 @@ public class XmlUtils {
 	parent.setChildren(children);
     }
 
+    /**
+     * Replace several elements by a single one, in the position that the old
+     * ones occupied in the parent element.
+     *
+     * @param old The Element that is the first in the sequential list of
+     *            other Elements to be replaced.
+     * @param replacement The Element to replace the old Elements.
+     * @param oldElementsToSkip The number of elements to replace, not
+     *        including the one specified in the parameter <code>old</code>.
+     */ 
+    public static void replace (Element old,
+				Element replacement,
+				int oldElementsToSkip) {
+	Element parent = old.getParent();
+        List children = parent.getChildren();
+	List $children = new ArrayList(children.size()-oldElementsToSkip);
+	for (ListIterator i=children.listIterator(); i.hasNext();) {
+	    Object $_ = i.next();
+	    if ($_ == old) {
+		$children.add(replacement);
+		// eat up the number of elements to skip so that they are not
+		// added to the child list
+		for (;oldElementsToSkip>0; oldElementsToSkip--)
+		    i.next();
+	    }
+	    else {
+		$children.add($_);
+	    }
+	}
+	parent.setChildren($children);
+    }
+
+    
+    /**
+     * Replace one element by several new elements, in the position that the
+     * old one occupied in the parent element.
+     */ 
     public static void replace (Element old, List replacements) {
 	Element parent = old.getParent();
         List children = parent.getChildren();
