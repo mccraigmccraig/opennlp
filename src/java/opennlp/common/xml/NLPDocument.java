@@ -31,7 +31,7 @@ import java.util.*;
  * specifications.
  *
  * @author      Jason Baldridge
- * @version     $Revision: 1.18 $, $Date: 2002/02/11 13:04:56 $
+ * @version     $Revision: 1.19 $, $Date: 2002/02/11 14:18:56 $
  **/
 public class NLPDocument extends Document {
     public static final String WORD_LABEL = "w";
@@ -277,6 +277,9 @@ public class NLPDocument extends Document {
     }
 
     public void join (Element startTok, Element endTok) {
+	if (startTok == endTok) {
+	    return;
+	}
 	Element parentSentence = startTok.getParent();
 	if (endTok.getParent() != parentSentence) {
 	    return;
