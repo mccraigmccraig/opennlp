@@ -21,58 +21,32 @@ package opennlp.common.hylo;
 import opennlp.common.synsem.*;
 import opennlp.common.unify.*;
 
-public class HyloVar extends HyloFormula implements Variable, Indexed {
-    
-    protected final String _name;
-    protected int _index;
-    protected int _hashCode;
+public class NominalVar extends HyloVar implements Nominal {
     
     private static int UNIQUE_STAMP = 0;
     
-    public HyloVar () {
-	this("HLV"+UNIQUE_STAMP++);
+    public NominalVar () {
+	super("HLV"+UNIQUE_STAMP++);
     }
     
-    public HyloVar (String name) {
-	this(name, 0);
+    public NominalVar (String name) {
+	super(name);
     }
 
-    protected HyloVar (String name, int index) {
-	_name = name;
-	_index = index;
-	_hashCode = _name.hashCode() + _index;
+    protected NominalVar (String name, int index) {
+	super(name, index);
     }
     
-    public String name () {
-	return _name;
-    }
 
     public LF copy () {
-	return new HyloVar(_name, _index);
+	return new NominalVar(_name, _index);
     }
 
-
-    public int getIndex () {
-	return _index;
-    }
-
-    public void setIndex (int index) {
-	_hashCode += index - _index;
-	_index = index;
-    }
-
-    public boolean occurs (Variable var) {
-	return equals(var);
-    }
-
-    public int hashCode () {
-	return _hashCode;
-    }
     
     public boolean equals (Object o) {
-	if (o instanceof HyloVar
-	    && _index == ((HyloVar)o)._index
-	    && _name.equals(((HyloVar)o)._name)) {
+	if (o instanceof NominalVar
+	    && _index == ((NominalVar)o)._index
+	    && _name.equals(((NominalVar)o)._name)) {
 	    return true;
 	} else {
 	    return false;
@@ -80,13 +54,20 @@ public class HyloVar extends HyloFormula implements Variable, Indexed {
     }
     
     public Unifiable unify (Unifiable u, Substitution sub) throws UnifyFailure {
-	if (u instanceof LF) {
-	    if (u.occurs(this)) {
-		throw new UnifyFailure();
-	    }
+	if (u instanceof NominalAtom) {
 	    return sub.makeSubstitution(this, u);
-	}
-	else {
+	} else if (u instanceof NominalVar) {
+	    NominalVar u_nv = (NominalVar)u;
+	    if (!equals(u_nv)) {
+		NominalVar $nv =
+		    new NominalVar(_name+u_nv._name, _index+u_nv._index);
+		sub.makeSubstitution(this, $nv);
+		sub.makeSubstitution(u_nv, $nv);
+		return $nv;
+	    } else {
+		return this.copy();
+	    }
+	} else {
 	    throw new UnifyFailure();
 	}
     }

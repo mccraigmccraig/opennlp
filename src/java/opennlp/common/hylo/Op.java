@@ -53,6 +53,10 @@ public class Op extends HyloFormula {
 	return _name;
     }
 
+    public List getArguments () {
+	return _args;
+    }
+    
     public void addArgument (LF formula) {
 	_args.add(formula);
     }
@@ -113,6 +117,26 @@ public class Op extends HyloFormula {
 	}
     }
 
+    public Unifiable unify (Unifiable u, Substitution s) throws UnifyFailure {
+	if (u instanceof HyloFormula) {
+	    Op $op = (Op)copy();
+	    if (u instanceof Op
+		&& (_name.equals("conj") || _name.equals("disj"))
+		&& _name.equals(((Op)u)._name)) {
+
+		for (Iterator addArgs=((Op)u).getArguments().iterator();
+		     addArgs.hasNext();) {
+		    $op.addArgument(((LF)addArgs.next()).copy());
+		}
+	    } else {
+		$op.addArgument(((LF)u).copy());
+	    }
+	    return $op;
+	} else {
+	    throw new UnifyFailure();
+	}
+    }
+    
     public Unifiable fill (Substitution sub) {
 	List $args = new ArrayList();
 	for (Iterator argsIt = _args.iterator(); argsIt.hasNext();) {

@@ -26,7 +26,7 @@ import opennlp.common.unify.*;
  * representing data structures for hybrid logic.
  *
  * @author      Jason Baldridge
- * @version     $Revision: 1.5 $, $Date: 2002/01/07 15:10:33 $
+ * @version     $Revision: 1.6 $, $Date: 2002/01/18 18:02:54 $
  **/
 public abstract class HyloFormula implements LF {
 
@@ -50,7 +50,14 @@ public abstract class HyloFormula implements LF {
      *         this Unifiable with the Object
      */
     public Unifiable unify (Unifiable u, Substitution s) throws UnifyFailure {
-	throw new UnifyFailure();
+	
+	if (u instanceof Op) {
+	    return u.unify(this, s);
+	} else if (u instanceof HyloFormula) {
+	    return new Op("conj", copy(), ((LF)u).copy());
+	} else {
+	    throw new UnifyFailure();
+	}
     }
 
     
@@ -72,9 +79,7 @@ public abstract class HyloFormula implements LF {
      *            the Object
      * @return the Object o, unmodified 
      **/
-    public void unifyCheck (Unifiable u) throws UnifyFailure {
-	throw new UnifyFailure();
-    }
+    public void unifyCheck (Unifiable u) throws UnifyFailure {}
 
 
     /**

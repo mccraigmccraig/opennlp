@@ -32,8 +32,10 @@ public class HyloHelper {
 	    return new Modal(e);
 	} else if (type.equals("var")) {
 	    return new HyloVar(e.getAttributeValue("n"));
+	} else if (type.equals("nomvar")) {
+	    return new NominalVar(e.getAttributeValue("n"));
 	} else if (type.equals("nom")) {
-	    return new Nominal(e);
+	    return new NominalAtom(e);
 	} else if (type.equals("prop")) {
 	    return new Proposition(e);
 	} else if (type.equals("satop")) {

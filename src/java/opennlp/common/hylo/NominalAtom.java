@@ -19,14 +19,47 @@
 package opennlp.common.hylo;
 
 import opennlp.common.synsem.*;
-import opennlp.common.unify.*;
 import org.jdom.*;
 
 /**
- * A interface for hybrid logic nominals, to allow polymorphism for
- * both Nominal atoms and Nominal variables.
+ * A hybrid logic nominal, an atomic formula which holds true at exactly one
+ * point in a model.
  *
  * @author      Jason Baldridge
- * @version     $Revision: 1.5 $, $Date: 2002/01/18 18:02:54 $
+ * @version     $Revision: 1.1 $, $Date: 2002/01/18 18:02:54 $
  **/
-public interface Nominal extends LF, Indexed {}
+public class NominalAtom extends HyloAtom implements Nominal {
+
+    protected int _index = 0;
+    
+    public NominalAtom (String n) {
+	super(n);
+    }
+
+    public NominalAtom (Element e) {
+	super(e);
+    }
+
+    public int getIndex () {
+	return _index;
+    }
+
+    public void setIndex (int index) {
+	_index = index;
+	_name += index;
+    }
+
+    public LF copy () {
+	return new NominalAtom(_name);
+    }
+
+    public boolean equals (Object o) {
+	if (o instanceof NominalAtom
+	    && _name == ((NominalAtom)o)._name) {
+	    return true;
+	} else {
+	    return false;
+	}
+    }
+
+}

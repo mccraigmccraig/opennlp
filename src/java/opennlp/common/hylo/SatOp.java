@@ -28,16 +28,25 @@ import java.util.*;
  * a particular point named by a nominal.
  *
  * @author      Jason Baldridge
- * @version     $Revision: 1.7 $, $Date: 2002/01/07 18:12:03 $
+ * @version     $Revision: 1.8 $, $Date: 2002/01/18 18:02:54 $
  **/
 public class SatOp extends HyloFormula {
     protected Nominal _nominal;
     protected LF _arg;
 
     public SatOp (Element e) {
-	List l = e.getChildren();
-	_nominal = new Nominal((Element)l.get(0));
-	_arg = HyloHelper.getLF((Element)l.get(1));
+	String nom = e.getAttributeValue("nom");
+	if (nom != null) {
+	    _nominal = new NominalAtom(nom);
+	} else {
+	    nom = e.getAttributeValue("nomvar");
+	    if (nom != null) {
+		_nominal = new NominalVar(nom);
+	    } else {
+		_nominal = new NominalVar();
+	    }
+	}    
+	_arg = HyloHelper.getLF((Element)e.getChildren().get(0));
     }
 
     public SatOp (Nominal nom, LF arg) {
@@ -56,7 +65,7 @@ public class SatOp extends HyloFormula {
     }
 
     public boolean occurs (Variable var) {
-	return (_arg.occurs(var));
+	return (_nominal.occurs(var) || _arg.occurs(var));
     }
 
     public boolean equals (Object o){
@@ -69,23 +78,27 @@ public class SatOp extends HyloFormula {
 	}
     }
     
-    public void unifyCheck (Unifiable u) throws UnifyFailure {
-	if (u instanceof SatOp) {
-	    _nominal.unifyCheck(((SatOp)u)._nominal);
-	    _arg.unifyCheck(((SatOp)u)._arg);
-	} else {
+    public Unifiable unify (Unifiable u, Substitution sub)
+	throws UnifyFailure {
+
+	if (!(u instanceof HyloFormula)) {
 	    throw new UnifyFailure();
+	} else {
+	    if (u instanceof SatOp) {
+		try {
+		    Nominal $nom =
+			(Nominal)Unifier.unify(_nominal,
+					       ((SatOp)u)._nominal, sub);
+		    LF $arg = (LF)Unifier.unify(_arg,((SatOp)u)._arg, sub);
+		    return new SatOp($nom, $arg);
+		} catch (UnifyFailure uf) {}
+	    }
+	    return new Op("conj", copy(), ((LF)u).copy());
 	}
     }
 
     public Unifiable fill (Substitution sub) {
-	if (_arg instanceof Variable) {
-	    LF $arg = (LF)sub.getValue((Variable)_arg);
-	    if ($arg != null) {
-		return new SatOp(_nominal, $arg);
-	    }
-	}
-	return new SatOp(_nominal, _arg);
+	return new SatOp((Nominal)_nominal.fill(sub), (LF)_arg.fill(sub));
     }
 
     public String toString () {	
