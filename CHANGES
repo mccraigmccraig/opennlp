@@ -1,6 +1,9 @@
 0.6.7
 -----
 
+Created a class NLPDocumentBuilder in order to build NLPDocuments from 
+different input sources (String, Reader or File). (Joao)
+
 Simplified the Category, Variable, Parser, and RuleGroup interfaces. (Jason)
 
 Added opennlp.common.synsem.Sign as a replacement for Constituent.
