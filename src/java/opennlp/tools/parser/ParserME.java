@@ -18,7 +18,9 @@
 package opennlp.tools.parser;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Iterator;
+import java.util.Map;
 import java.util.SortedSet;
 import java.util.TreeSet;
 
@@ -73,8 +75,13 @@ public class ParserME {
   /** Outcome used when a constituent is incomplete. */
   public static final String INCOMPLETE = "i";
 
+  private static final String TOP_START = START + TOP_NODE;
+  private int topStartIndex;
+  private Map startTypeMap;
+  private Map contTypeMap;
+
   public ParserME(MaxentModel buildModel, MaxentModel checkModel, ParserTagger tagger, ParserChunker chunker, HeadRules headRules) {
-    this.tagger = tagger;
+    this.tagger = tagger; 
     this.chunker = chunker;
     this.buildModel = buildModel;
     this.checkModel = checkModel;
@@ -86,6 +93,20 @@ public class ParserME {
     odh = new TreeSet();
     ndh = new TreeSet();
     parses = new TreeSet();
+    startTypeMap = new HashMap();
+    contTypeMap = new HashMap();
+    for (int boi = 0, bon = buildModel.getNumOutcomes(); boi < bon; boi++) {
+      String outcome = buildModel.getOutcome(boi);
+      if (outcome.startsWith(START)) {
+        //System.err.println("startMap "+outcome+"->"+outcome.substring(START.length()));
+        startTypeMap.put(outcome, outcome.substring(START.length()));
+      }
+      else if (outcome.startsWith(CONT)) {
+        //System.err.println("contMap "+outcome+"->"+outcome.substring(CONT.length()));
+        contTypeMap.put(outcome, outcome.substring(CONT.length()));
+      }
+    }
+    topStartIndex = buildModel.getIndex(TOP_START);
   }
 
   /**
@@ -174,7 +195,7 @@ public class ParserME {
 
   private void advanceTop(Parse p) {
     buildModel.eval(buildContextGenerator.getContext(new Object[] { p.getChildren(), ZERO }), bprobs);
-    p.prob += Math.log(bprobs[buildModel.getIndex(START + TOP_NODE)]);
+    p.prob += Math.log(bprobs[topStartIndex]);
     checkModel.eval(checkContextGenerator.getContext(new Object[] { p.getChildren(), TOP_NODE, ZERO, ZERO }), cprobs);
     p.prob += Math.log(cprobs[checkModel.getIndex(COMPLETE)]);
     p.setType(TOP_NODE);
@@ -211,7 +232,7 @@ public class ParserME {
       // chunk
       String words[] = new String[p.getChildren().size()];
       String ptags[] = new String[words.length];
-      double probs[] = new double[words.length]; 
+      double probs[] = new double[words.length];
       Parse sp = null;
       for (int i = 0, il = p.getChildren().size(); i < il; i++) {
         sp = (Parse) p.getChildren().get(i);
@@ -234,7 +255,7 @@ public class ParserME {
           if (j != tags.length) {
             newParses[si].prob += Math.log(probs[j]);
           }
-          if (j != tags.length && tags[j].startsWith(CONT)) { // if continue just update end
+          if (j != tags.length && tags[j].startsWith(CONT)) { // if continue just update end chunking tag don't use contTypeMap
             end = j;
           }
           else { //make previous constituent if it exists
@@ -257,7 +278,7 @@ public class ParserME {
               newParses[si].insert(new Parse(p1.getText(), new Span(p1.getSpan().getStart(), p2.getSpan().getEnd()), type, 1, headRules.getHead(cons, type)));
             }
             if (j != tags.length) { //update for new constituent
-              if (tags[j].startsWith(START)) {
+              if (tags[j].startsWith(START)) { // don't use startTypeMap these are chunk tags
                 type = tags[j].substring(START.length());
                 start = j;
                 end = j;
@@ -298,17 +319,17 @@ public class ParserME {
             bprobs[max] = 0; //zero out so new max can be found
             String tag = buildModel.getOutcome(max);
             //System.out.println("trying "+tag+" "+bprobSum+" lst="+lst);
-            if (tag.equals(START + TOP_NODE)) { // can't have top until complete
+            if (max == topStartIndex) { // can't have top until complete
               continue;
             }
             //System.err.println(i+" "+tag+" "+bprob);
-            if (tag.startsWith(START)) { //update last start
+            if (startTypeMap.containsKey(tag)) { //update last start
               lsi = i;
               lastStart = part;
-              lst = tag.substring(START.length());
+              lst = (String) startTypeMap.get(tag);
             }
-            else if (tag.startsWith(CONT)) {
-              if (lastStart == null || !lst.equals(tag.substring(CONT.length()))) {
+            else if (contTypeMap.containsKey(tag)) {
+              if (lastStart == null || !lst.equals(contTypeMap.get(tag))) {
                 continue; //Cont must match previous start or continue
               }
             }
@@ -362,8 +383,8 @@ public class ParserME {
           newParsesList.toArray(newParses);
           break;
         }
-        else if (part.getLabel().startsWith(START)) {
-          lst = part.getLabel().substring(START.length());
+        else if (startTypeMap.containsKey(part.getLabel())) {
+          lst = (String) startTypeMap.get(part.getLabel());
           lastStart = part;
           lsi = i;
           //System.err.println("lastStart "+i+" "+lastStart.label+" "+lastStart.prob);
@@ -402,10 +423,10 @@ public class ParserME {
         build = true;
       }
       else if (args[argIndex].equals("-check")) {
-        check=true;
+        check = true;
       }
       else {
-        System.err.println("Invalid option "+args[argIndex]);
+        System.err.println("Invalid option " + args[argIndex]);
         System.exit(1);
       }
       argIndex++;
