@@ -735,6 +735,9 @@ public abstract class MaxentResolver extends AbstractResolver {
       if (exactMatchFeature != null) {
         featureSet.add(exactMatchFeature);
       }
+      else if (entityMention.getParse().isCoordinatedNounPhrase() && !mention.getParse().isCoordinatedNounPhrase()) {
+        featureSet.add("cmix");
+      }
       else {
         String mentionStrip = stripNp(mention);
         String entityMentionStrip = stripNp(entityMention);
@@ -742,9 +745,6 @@ public abstract class MaxentResolver extends AbstractResolver {
           if (isSubstring(mentionStrip, entityMentionStrip)) {
             featureSet.add("substring");
           }
-        }
-        if (entityMention.getParse().isCoordinatedNounPhrase() && !mention.getParse().isCoordinatedNounPhrase()) {
-          featureSet.add("cmix");
         }
       }
       Parse[] xtoks = entityMention.getTokens();
