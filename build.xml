@@ -1,4 +1,4 @@
-<!-- $Id: build.xml,v 1.4 2001/10/24 16:45:39 jasonbaldridge Exp $ -->
+<!-- $Id: build.xml,v 1.5 2001/10/30 11:37:27 jasonbaldridge Exp $ -->
 <!-- This build file based on the JDOM build.xml file. -->
 
 <project default="package" basedir=".">
@@ -39,6 +39,13 @@
     <filter token="date" value="${TODAY}"/>
     <filter token="log" value="true"/>
     <filter token="verbose" value="true"/>
+
+    <path id="build.classpath">
+      <pathelement location="${lib.dir}/jdom.jar"/>
+      <pathelement location="${lib.dir}/xerces.jar"/>
+      <pathelement location="${lib.dir}/xml.jar"/>
+    </path>
+
 
   </target>
 
@@ -94,6 +101,7 @@
     <javac srcdir="${build.src}"
            destdir="${build.dest}"
            debug="${debug}"
+           classpathref="build.classpath"
            optimize="${optimize}"/>
   </target>
 
