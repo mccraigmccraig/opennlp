@@ -8,7 +8,7 @@ package opennlp.dictionary.wordnet;
  * @author     Mike Atkinson (mratkinson)
  * @since      0.1.0
  * @created    21 March 2002
- * @version    $Id: WNGlobal.java,v 1.2 2002/03/21 23:53:04 mratkinson Exp $
+ * @version    $Id: WNGlobal.java,v 1.3 2002/03/21 23:57:02 mratkinson Exp $
  */
 public class WNGlobal {
     /**
@@ -22,7 +22,7 @@ public class WNGlobal {
     /**
      *  Lexicographer file names, Lexicographer numbers are equals to their index
      *  in the array.
-     *  <olstart=0>
+     *  <ol start=0>
      *    <li> "adj.all"</li>
      *    <li> "adj.pert"</li>
      *    <li> "adv.all"</li>
