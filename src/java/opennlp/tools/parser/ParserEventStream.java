@@ -21,12 +21,12 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
-import opennlp.tools.util.Sequence;
-import opennlp.maxent.ContextGenerator;
 import opennlp.maxent.DataStream;
 import opennlp.maxent.Event;
 import opennlp.maxent.EventStream;
+import opennlp.tools.chunker.ChunkerContextGenerator;
 import opennlp.tools.postag.DefaultPOSContextGenerator;
+import opennlp.tools.postag.POSContextGenerator;
 
 /**
  * Wrapper class for one of four parser event streams.  The particular event stram is specified 
@@ -36,7 +36,10 @@ import opennlp.tools.postag.DefaultPOSContextGenerator;
  */
 public class ParserEventStream implements EventStream {
 
-  private ContextGenerator cg;
+  private BuildContextGenerator bcg;
+  private CheckContextGenerator kcg;
+  private ChunkerContextGenerator ccg;
+  private POSContextGenerator tcg;
   private DataStream data;
   private Event[] events;
   private int ei;
@@ -51,16 +54,16 @@ public class ParserEventStream implements EventStream {
    */
   public ParserEventStream(DataStream d, HeadRules rules, EventTypeEnum etype) {
     if (etype == EventTypeEnum.BUILD) {
-      this.cg = new BuildContextGenerator();
+      this.bcg = new BuildContextGenerator();
     }
     else if (etype == EventTypeEnum.CHECK) {
-      this.cg = new CheckContextGenerator();
+      this.kcg = new CheckContextGenerator();
     }
     else if (etype == EventTypeEnum.CHUNK) {
-      this.cg = new ChunkContextGenerator();
+      this.ccg = new ChunkContextGenerator();
     }
     else if (etype == EventTypeEnum.TAG) {
-      this.cg = new DefaultPOSContextGenerator();
+      this.tcg = new DefaultPOSContextGenerator();
     }
     this.rules = rules;
     this.etype = etype;
@@ -158,7 +161,7 @@ public class ParserEventStream implements EventStream {
         }
         c.setLabel(outcome);
         if (etype == EventTypeEnum.BUILD) {
-          events.add(new Event(outcome, cg.getContext(new Object[] { chunks, new Integer(ci)})));
+          events.add(new Event(outcome, bcg.getContext(chunks, ci)));
         }
         int start = ci - 1;
         while (start >= 0 && ((Parse) chunks.get(start)).getParent() == parent) {
@@ -166,7 +169,7 @@ public class ParserEventStream implements EventStream {
         }
         if (lastChild(c, parent)) {
           if (etype == EventTypeEnum.CHECK) {
-            events.add(new Event(ParserME.COMPLETE, cg.getContext(new Object[] { chunks, type, new Integer(start + 1), new Integer(ci)})));
+            events.add(new Event(ParserME.COMPLETE, kcg.getContext( chunks, type, start + 1, ci)));
           }
           //perform reduce
           chunks.remove(ci);
@@ -181,7 +184,7 @@ public class ParserEventStream implements EventStream {
         }
         else {
           if (etype == EventTypeEnum.CHECK) {
-            events.add(new Event(ParserME.INCOMPLETE, cg.getContext(new Object[] { chunks, type, new Integer(start + 1), new Integer(ci)})));
+            events.add(new Event(ParserME.INCOMPLETE, kcg.getContext(chunks, type, start + 1, ci)));
           }
         }
       }
@@ -217,9 +220,8 @@ public class ParserEventStream implements EventStream {
         }
       }
     }
-    Sequence s = new Sequence(preds);
     for (int ti = 0, tl = toks.size(); ti < tl; ti++) {
-      events.add(new Event((String) preds.get(ti), cg.getContext(new Object[] { new Integer(ti), toks, s, tags })));
+      events.add(new Event((String) preds.get(ti), ccg.getContext(ti, toks.toArray(), (String[]) tags.toArray(new String[tags.size()]), (String[]) preds.toArray(new String[preds.size()]))));
     }
   }
 
@@ -240,9 +242,8 @@ public class ParserEventStream implements EventStream {
         }
       }
     }
-    Sequence s = new Sequence(preds);
     for (int ti = 0, tl = toks.size(); ti < tl; ti++) {
-      events.add(new Event((String) preds.get(ti), cg.getContext(new Object[] { new Integer(ti), toks, s })));
+      events.add(new Event((String) preds.get(ti), tcg.getContext(ti, toks.toArray(), (String[]) preds.toArray(new String[preds.size()]), null)));
     }
   }
 
