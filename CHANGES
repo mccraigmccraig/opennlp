@@ -1,6 +1,11 @@
-0.6.1
+0.6.2
 -----
 Improved the build system for easier homepage updates.
+
+Simplified the Lexicon and Rules interfaces and pushed the methods
+intended for generation into the ReversibleLexicon and ReversibleRules
+interfaces which extend Lexicon and Rules, respectively.
+
 
 
 0.6.0
