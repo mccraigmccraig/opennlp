@@ -50,7 +50,8 @@ public class HyloVar extends HyloFormula implements Variable, Indexed {
     public LF copy () {
 	return new HyloVar(_name, _index);
     }
-    
+
+
     public int getIndex () {
 	return _index;
     }
