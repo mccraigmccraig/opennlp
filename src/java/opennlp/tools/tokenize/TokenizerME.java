@@ -46,7 +46,7 @@ import java.util.regex.Pattern;
  * homepage: <http://www.cis.upenn.edu/~jcreynar>.
  *
  * @author      Tom Morton
- * @version $Revision: 1.5 $, $Date: 2004/06/11 20:58:08 $
+ * @version $Revision: 1.6 $, $Date: 2004/07/06 02:54:05 $
  */
 
 public class TokenizerME implements Tokenizer {
@@ -211,7 +211,8 @@ public class TokenizerME implements Tokenizer {
   }
 
   public static void train(EventStream evc, File output) throws IOException {
-    GISModel tokModel = opennlp.maxent.GIS.trainModel(100, new TwoPassDataIndexer(evc, 10));
+    GIS.SMOOTHING=true;
+    GISModel tokModel = opennlp.maxent.GIS.trainModel(100, new TwoPassDataIndexer(evc, 5));
     new SuffixSensitiveGISModelWriter(tokModel, output).persist();
   }
 
