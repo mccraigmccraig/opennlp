@@ -19,8 +19,8 @@ package opennlp.tools.parser;
 
 import java.util.List;
 
-import opennlp.common.util.Sequence;
 import opennlp.tools.chunker.Chunker;
+import opennlp.tools.util.Sequence;
 
 public interface ParserChunker extends Chunker {
   public Sequence[] topKSequences(List sentence, List tags);

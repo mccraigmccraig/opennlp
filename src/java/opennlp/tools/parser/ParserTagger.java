@@ -19,8 +19,8 @@ package opennlp.tools.parser;
 
 import java.util.List;
 
-import opennlp.common.util.Sequence;
 import opennlp.tools.postag.POSTagger;
+import opennlp.tools.util.Sequence;
 
 public interface ParserTagger extends  POSTagger {
 

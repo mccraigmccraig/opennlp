@@ -22,12 +22,12 @@ import java.util.Iterator;
 import java.util.SortedSet;
 import java.util.TreeSet;
 
-import opennlp.common.util.Sequence;
-import opennlp.common.util.Span;
 import opennlp.maxent.ContextGenerator;
 import opennlp.maxent.GISModel;
 import opennlp.maxent.MaxentModel;
 import opennlp.maxent.TwoPassDataIndexer;
+import opennlp.tools.util.Sequence;
+import opennlp.tools.util.Span;
 
 public class ParserME {
   private static int M = 20;

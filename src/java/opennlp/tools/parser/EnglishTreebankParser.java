@@ -27,11 +27,11 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.StringTokenizer;
 
-import opennlp.common.util.Sequence;
-import opennlp.common.util.Span;
+import opennlp.tools.util.Sequence;
+import opennlp.tools.util.Span;
 import opennlp.maxent.io.SuffixSensitiveGISModelReader;
 import opennlp.tools.chunker.ChunkerME;
-import opennlp.tools.postag.POSContextGenerator;
+import opennlp.tools.postag.DefaultPOSContextGenerator;
 import opennlp.tools.postag.POSTaggerME;
 
 public class EnglishTreebankParser extends ParserME {
@@ -62,7 +62,7 @@ public class EnglishTreebankParser extends ParserME {
     private static final int K = 10;
 
     public EnglishTreebankPOSTagger(String modelFile) throws IOException {
-      super(10, new SuffixSensitiveGISModelReader(new File(modelFile)).getModel(), new POSContextGenerator());
+      super(10, new SuffixSensitiveGISModelReader(new File(modelFile)).getModel(), new DefaultPOSContextGenerator());
     }
     public Sequence[] topKSequences(List sentence) {
       return beam.bestSequences(K, sentence, null);

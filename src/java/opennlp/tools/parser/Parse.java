@@ -17,7 +17,7 @@
 //////////////////////////////////////////////////////////////////////////////   
 package opennlp.tools.parser;
 
-import opennlp.common.util.Span;
+import opennlp.tools.util.Span;
 
 import java.util.List;
 import java.util.ArrayList;

@@ -20,14 +20,14 @@ package opennlp.tools.parser;
 import java.util.ArrayList;
 import java.util.List;
 
-import opennlp.common.util.Sequence;
-import opennlp.maxent.ContextGenerator;
+import opennlp.tools.chunker.ChunkerContextGenerator;
+import opennlp.tools.util.Sequence;
 
 /**
  * @author Tom Morton
  *
  */
-public class ChunkContextGenerator implements ContextGenerator {
+public class ChunkContextGenerator implements ChunkerContextGenerator {
 
   private static final String EOS = "eos";
 
@@ -35,8 +35,12 @@ public class ChunkContextGenerator implements ContextGenerator {
     Object[] data = (Object[]) o;
     return (getContext(((Integer) data[0]).intValue(), (List) data[1], (List) data[3], ((Sequence) data[2]).getOutcomes()));
   }
+  
+  public String[] getContext(int i, List toks, Sequence s, Object[] ac) {
+    return getContext(i,toks,s.getOutcomes(),(List) ac[0]); 
+  }
 
-  public String[] getContext(int i, List toks, List tags, List preds) {
+  public String[] getContext(int i, List toks, List preds, List tags) {
     return (getContext(i, toks.toArray(), (String[]) tags.toArray(new String[tags.size()]), (String[]) preds.toArray(new String[preds.size()])));
   }
 

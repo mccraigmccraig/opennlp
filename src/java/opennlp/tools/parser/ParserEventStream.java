@@ -21,12 +21,12 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
-import opennlp.common.util.Sequence;
+import opennlp.tools.util.Sequence;
 import opennlp.maxent.ContextGenerator;
 import opennlp.maxent.DataStream;
 import opennlp.maxent.Event;
 import opennlp.maxent.EventStream;
-import opennlp.tools.postag.POSContextGenerator;
+import opennlp.tools.postag.DefaultPOSContextGenerator;
 
 public class ParserEventStream implements EventStream {
 
@@ -48,7 +48,7 @@ public class ParserEventStream implements EventStream {
       this.cg = new ChunkContextGenerator();
     }
     else if (etype == EventTypeEnum.TAG) {
-      this.cg = new POSContextGenerator();
+      this.cg = new DefaultPOSContextGenerator();
     }
     this.rules = rules;
     this.etype = etype;
