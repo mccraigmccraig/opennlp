@@ -544,18 +544,28 @@ public class ParserME {
   public static GISModel train(opennlp.maxent.EventStream es, int iterations, int cut) throws java.io.IOException {
     return opennlp.maxent.GIS.trainModel(iterations, new TwoPassDataIndexer(es, cut));
   }
+  
+  private static void usage() {
+    System.err.println("Usage: ParserME -[tag|chunk|build|check|fun] trainingFile headRules tagModelFile chunkModelFile buildModelFile checkModelFile [iterations cutoff]");
+    System.err.println();
+    System.err.println("Training file should be one sentence per line where each line consists of a Penn Treebank Style parse");
+    System.err.println("-tag Just build the tagging model.");
+    System.err.println("-chunk Just build the chunking model.");
+    System.err.println("-build Just build the build model");
+    System.err.println("-check Just build the check model");
+    System.err.println("-fun Predict function tags");
+  }
 
   public static void main(String[] args) throws java.io.IOException {
     if (args.length < 4) {
-      System.err.println("Usage: ParserME -[tag|chunk|build|check] trainingFile headRules tagModelFile chunkModelFile buildModelFile checkModelFile [iterations cutoff]");
-      System.err.println();
-      System.err.println("Training file should be one sentence per line where each line consists of a Penn Treebank Style parse");
+      usage();
       System.exit(1);
     }
     boolean tag = false;
     boolean chunk = false;
     boolean build = false;
     boolean check = false;
+    boolean fun = false;
     boolean all = true;
     int argIndex = 0;
     while (args[argIndex].startsWith("-")) {
@@ -572,8 +582,16 @@ public class ParserME {
       else if (args[argIndex].equals("-check")) {
         check = true;
       }
+      else if (args[argIndex].equals("-fun")) {
+        fun = true;
+      }
+      else if (args[argIndex].equals("--")) {
+        argIndex++;
+        break;
+      }
       else {
         System.err.println("Invalid option " + args[argIndex]);
+        usage();
         System.exit(1);
       }
       argIndex++;
@@ -590,6 +608,9 @@ public class ParserME {
     if (args.length > argIndex) {
       iterations = Integer.parseInt(args[argIndex++]);
       cutoff = Integer.parseInt(args[argIndex++]);
+    }
+    if (fun) {
+      Parse.useFunctionTags(true);
     }
 
     if (tag || all) {

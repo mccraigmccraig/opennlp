@@ -51,6 +51,8 @@ public class Parse implements Cloneable, Comparable {
   private StringBuffer derivation;
   /** The pattern used to find the base constituent label of a Penn Treebank labeled constituent. */
   private static Pattern typePattern = Pattern.compile("^([^ =-]+)");
+  /** The pattern used to find the function tags. */ 
+  private static Pattern funTypePattern = Pattern.compile("^[^-]+-([^ =-]+)");
   /** The patter used to identify tokens in Penn Treebank labeled constituents. */
   private static Pattern tokenPattern = Pattern.compile("^[^ ()]+ ([^ ()]+)\\s*\\)");
   
@@ -58,6 +60,8 @@ public class Parse implements Cloneable, Comparable {
   private Set prevPunctSet;
   /** The set of punctuation parses which are between this parse and the subsequent parse. */
   private Set nextPunctSet;
+  
+  private static boolean useFunctionTags;
 
   protected Object clone() {
     try {
@@ -74,6 +78,9 @@ public class Parse implements Cloneable, Comparable {
     }
   }
   
+  public static void useFunctionTags(boolean uft) {
+    useFunctionTags = uft;
+  }
 
   
   public Parse(String text, Span span, String type, double p) {
@@ -377,7 +384,15 @@ public class Parse implements Cloneable, Comparable {
     else {
       Matcher typeMatcher = typePattern.matcher(rest);
       if (typeMatcher.find()) {
-        return typeMatcher.group(1);
+        String type = typeMatcher.group(1); 
+        if (useFunctionTags) {
+          Matcher funMatcher = funTypePattern.matcher(rest);
+          if (funMatcher.find()) {
+            String ftag = funMatcher.group(1);
+            type = type+"-"+ftag;
+          }
+        }
+        return type;
       }
     }
     return null;
