@@ -23,7 +23,7 @@ import opennlp.common.util.*;
  * A feature structure containing attributes and their associated values.
  *
  * @author      Jason Baldridge and Gann Bierner
- * @version     $Revision: 1.4 $, $Date: 2002/04/25 14:43:47 $
+ * @version     $Revision: 1.5 $, $Date: 2002/08/14 14:57:50 $
  */
 public interface FeatureStructure extends Unifiable {
 
@@ -142,6 +142,6 @@ public interface FeatureStructure extends Unifiable {
 
     public int getIndex ();
     public void setIndex (int index);
-    public int getInheritorIndex ();
-    public void setInheritorIndex (int inheritorIndex);
+    public int getIndexToInheritFrom ();
+    public void setIndexToInheritFrom (int inheritorIndex);
 }
