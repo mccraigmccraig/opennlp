@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////////
-// Copyright (C) 2002 NASA Research Institute for Advanced Computer Science
+// Copyright (C) 2002 Research Institute for Advanced Computer Science
 // 
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
@@ -25,13 +25,14 @@ import org.xml.sax.*;
  * A utility for validating an XML document with respect to an XML Schema.
  *
  * @author      Jason Baldridge
- * @version     $Revision: 1.2 $, $Date: 2002/02/08 12:17:50 $
+ * @version     $Revision: 1.3 $, $Date: 2002/08/19 11:07:17 $
  */
 public class SchemaBasedValidator {
     private SAXParser parser = new SAXParser();
     private ValidityErrorHandler errorTracker = new ValidityErrorHandler();
     private boolean isVerbose = true;
     private File schema;
+    private String messageString = ""; //8.16.02 sce
 
     /**
      * Two-arg constructor sets the verbosity of the validator and calls the
@@ -109,7 +110,8 @@ public class SchemaBasedValidator {
 
 	int numErrors = errorTracker.getNumOfErrors();
 	if (numErrors == 0) {
-	    printMessage("'" + file + "' is valid with repect to schema '"
+	    //8.16.02  sce   spelling of 'repect' --> 'respect'
+	    printMessage("'" + file + "' is valid with respect to schema '" 
 			 + schema.getName() + "'.");
 	    return true;
 	}
@@ -126,9 +128,16 @@ public class SchemaBasedValidator {
 
     // helper method to print output only if this validator is verbose
     private void printMessage (String message) {
+	messageString = errorTracker.getMessageString();//8.16.02 sce
+	messageString = messageString + message;//8.16.02 sce
 	if (isVerbose) System.out.println(message);
     }
 
+
+    //8.9.02 sce
+    public String getMessageString() {
+	return messageString;
+    }
 
     /**
      * Command line method to check the validity of a document with respect to

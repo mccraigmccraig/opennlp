@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////////
-// Copyright (C) 2002 NASA Research Institute for Advanced Computer Science
+// Copyright (C) 2002 Research Institute for Advanced Computer Science
 // 
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
@@ -26,12 +26,14 @@ import org.xml.sax.*;
  * error. 
  *
  * @author      Jason Baldridge
- * @version     $Revision: 1.2 $, $Date: 2002/02/08 12:17:50 $
+ * @version     $Revision: 1.3 $, $Date: 2002/08/19 11:07:17 $
  */
 public class ValidityErrorHandler implements ErrorHandler {
     private int numOfErrorsReported = 0;
 
     private boolean isVerbose = true;
+
+    private String messageString = ""; //8.9.02 sce
 
     public void setVerbose (boolean _isVerbose) {
 	isVerbose = _isVerbose;
@@ -96,7 +98,14 @@ public class ValidityErrorHandler implements ErrorHandler {
 	sb.append(":\n\t");
 	sb.append(ex.getMessage());
 
+	messageString = messageString + "\n" + sb.toString();//8.9.02 sce
 	return sb.toString();
+    }
+    
+    //8.9.02  sce
+    public String getMessageString() {
+	return messageString;
     }
 
 }
+
