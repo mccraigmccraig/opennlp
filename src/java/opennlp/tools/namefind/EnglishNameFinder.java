@@ -134,7 +134,7 @@ public class EnglishNameFinder extends NameFinderME {
       String[] tokens = tokenize(line);
       for (int fi = 0, fl = finders.length; fi < fl; fi++) {
         finderTags[fi] = finders[fi].find(tokens, Collections.EMPTY_MAP);
-        System.err.println(names[fi] + " " + java.util.Arrays.asList(finderTags[fi]));
+        //System.err.println(names[fi] + " " + java.util.Arrays.asList(finderTags[fi]));
       }
       for (int ti = 0, tl = tokens.length; ti < tl; ti++) {
         for (int fi = 0, fl = finders.length; fi < fl; fi++) {
@@ -146,14 +146,13 @@ public class EnglishNameFinder extends NameFinderME {
                   finderTags[fi][ti - 1].equals(NameFinderME.CONTINUE))) {
               System.out.print(" </" + names[fi] + ">");
             }
-            System.out.print(" ");
           }
           //check for start tags
           if (finderTags[fi][ti].equals(NameFinderME.START)) {
-            System.out.print("<" + names[fi] + ">");
+            System.out.print(" <" + names[fi] + ">");
           }
         }
-        System.out.print(tokens[ti]);
+        System.out.print(" "+tokens[ti]);
       }
       //final end tags
       if (tokens.length != 0) {
