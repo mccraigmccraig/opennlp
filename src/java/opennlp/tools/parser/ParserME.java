@@ -20,6 +20,7 @@ package opennlp.tools.parser;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 import java.util.SortedSet;
 import java.util.TreeSet;
@@ -150,13 +151,8 @@ public class ParserME {
     completeIndex = checkModel.getIndex(COMPLETE);
     incompleteIndex = checkModel.getIndex(INCOMPLETE);
   }
-
-  /**
-   * Returns a parse for the specified parse of tokens.
-   * @param p A flat parse containing only tokens and a root node, p. 
-   * @return A full parse of the specified tokens or the flat chunks of the tokens if a fullparse could not be found.
-   */
-  public Parse parse(Parse p) {
+  
+  public Parse[] parse(Parse p, int numParses) {
   	if (createDerivationString) p.setDerivation(new StringBuffer(100));
     odh.clear();
     ndh.clear();
@@ -226,30 +222,32 @@ public class ParserME {
         break;
       }
     }
-    //int pi = 1;
-
-    //System.err.println(parses.size()+" parses");
-
-    /*  convert to use iterator
-    int pc = 1;
-    for (Iterator pi = parses.iterator(); pi.hasNext(); pc++) {
-      Parse tp = (Parse) pi.next();
-      System.out.print(pc + " " + tp.getProb() + " ");
-      tp.show();
-      System.out.println();
-    }
-    System.out.println();
-    */
-    Parse r;
     if (parses.size() == 0) {
       System.err.println("Couldn't find parse for: " + p);
       //r = (Parse) odh.first(); 
-      r = guess;
+      return new Parse[] {guess};
+    }
+    else if (numParses == 1){
+      return new Parse[] {(Parse) parses.first()};
     }
     else {
-      r = (Parse) parses.first();
+      List topParses = new ArrayList(numParses);
+      while(!parses.isEmpty() && topParses.size() < numParses) {
+        Parse tp = (Parse) parses.first();
+        topParses.add(tp);
+        parses.remove(tp);
+      }
+      return (Parse[]) topParses.toArray(new Parse[topParses.size()]);
     }
-    return (r);
+  }
+
+  /**
+   * Returns a parse for the specified parse of tokens.
+   * @param p A flat parse containing only tokens and a root node, p. 
+   * @return A full parse of the specified tokens or the flat chunks of the tokens if a fullparse could not be found.
+   */
+  public Parse parse(Parse p) {
+    return parse(p,1)[0];
   }
 
   private void advanceTop(Parse p) {
