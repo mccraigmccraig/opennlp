@@ -49,12 +49,38 @@ public class Span {
     return(end);
   }
 
+  /** 
+   * Returns the length of this span.
+   * @return the length of the span.
+   */
   public int length() {
     return(end-start);
   }
   
+  
   public boolean contains(Span s) {
     return(start <= s.getStart() && s.getEnd() <= end);
+  }
+  
+  public int compareTo(Object o) { 
+    Span s = (Span) o;
+    if (getStart() < s.getStart()) {
+      return(-1);
+    }
+    else if (getStart() == s.getStart()) {
+      if (getEnd() > s.getEnd()) {
+        return(-1);
+      }
+      else if (getEnd() < s.getEnd()) {
+        return(1);
+      }
+      else {
+        return(0);
+      }
+    }
+    else {
+      return(1);
+    }
   }
 
   public String toString() {
