@@ -37,22 +37,23 @@ import opennlp.tools.parser.ParserME;
 import opennlp.tools.util.Span;
 
 /**
- * This class perform coreference over tree-bank style parses.  
- * It requires that named-entity information also be provided.  
- * This information can be added to the parse using the -parse 
- * option with EnglishNameFinder.
+ * This class perform coreference for treebank style parses.  
+ * It will only perform coreference over constituents defined in the trees and
+ * will not generate new constituents for pre-nominal entities or sub entities in 
+ * simple coordinated noun phrases.  This linker requires that named-entity information also be provided.  
+ * This information can be added to the parse using the -parse option with EnglishNameFinder.
  */
-public class TreebankLinker extends DefaultLinker {
+public class EnglishTreebankLinker extends DefaultLinker {
   
-  public TreebankLinker(String project, LinkerMode mode) throws IOException {
+  public EnglishTreebankLinker(String project, LinkerMode mode) throws IOException {
     super(project,mode);
   }
   
-  public TreebankLinker(String project, LinkerMode mode, boolean useDiscourseModel) throws IOException {
+  public EnglishTreebankLinker(String project, LinkerMode mode, boolean useDiscourseModel) throws IOException {
     super(project,mode,useDiscourseModel);
   } 
   
-  public TreebankLinker(String project, LinkerMode mode, boolean useDiscourseModel, double fixedNonReferentialProbability) throws IOException {
+  public EnglishTreebankLinker(String project, LinkerMode mode, boolean useDiscourseModel, double fixedNonReferentialProbability) throws IOException {
     super(project,mode,useDiscourseModel,fixedNonReferentialProbability);
   }
   
@@ -68,7 +69,7 @@ public class TreebankLinker extends DefaultLinker {
   
   public static void main(String[] args) throws IOException {
     if (args.length == 0) {
-      System.err.println("Usage: TreebankLinker model_directory < parses");
+      System.err.println("Usage: EnglishTreebankLinker model_directory < parses");
       System.exit(1);
     }
     BufferedReader in;
@@ -80,7 +81,7 @@ public class TreebankLinker extends DefaultLinker {
     else {
       in = new BufferedReader(new FileReader(args[ai]));
     }
-    Linker treebankLinker = new TreebankLinker(dataDir,LinkerMode.TEST);
+    Linker treebankLinker = new EnglishTreebankLinker(dataDir,LinkerMode.TEST);
     int sentenceNumber = 0;
     List document = new ArrayList();
     List parses = new ArrayList();
