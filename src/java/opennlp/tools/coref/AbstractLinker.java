@@ -133,18 +133,7 @@ public abstract class AbstractLinker implements Linker {
     }
     DiscourseEntity de = checkForMerges(discourseModel, entities);
     if (validEntity) {
-      if (useDiscourseModel){
-        updateExtent(discourseModel, mention, de);
-      }
-      else {
-        updateExtentNoModel(discourseModel,mention,de);
-      }
-    }
-    else {
-      if (mention.getParse() != null) {
-        //:TODO Check regression test to see if this does anything.
-        //mention.getParse().removeEntityId();
-      }
+      updateExtent(discourseModel, mention, de,useDiscourseModel);
     }
   }
   
@@ -152,40 +141,48 @@ public abstract class AbstractLinker implements Linker {
     return headFinder;
   }
   
-  protected void updateExtentNoModel(DiscourseModel dm, MentionContext mention, DiscourseEntity entity) {
-    if (entity != null) {
-      DiscourseEntity newEntity = new DiscourseEntity(mention,mention.getGender(),mention.getGenderProb(),mention.getNumber(),mention.getNumberProb());
-      dm.addEntity(newEntity);
-      newEntity.setId(entity.getId());
-    }
-    else {
-      DiscourseEntity newEntity = new DiscourseEntity(mention,mention.getGender(),mention.getGenderProb(),mention.getNumber(),mention.getNumberProb());
-      dm.addEntity(newEntity);
-    }
-  }
-
-  protected void updateExtent(DiscourseModel dm, MentionContext mention, DiscourseEntity entity) {
-    if (entity != null) {
-      //System.err.println("AbstractLinker.updateExtent: addingExtent: "+econtext.toText());
-      if (entity.getGenderProbability() < mention.getGenderProb()) {
-        entity.setGender(mention.getGender()); 
-        entity.setGenderProbability(mention.getGenderProb());
-      } 
-      if (entity.getNumberProbability() < mention.getNumberProb()){
-        entity.setNumber(mention.getNumber());
-        entity.setNumberProbability(mention.getNumberProb());
+  /**
+   * Updates the specified discourse model with the specified mention as coreferent with the specified entity. 
+   * @param dm The discourse model
+   * @param mention The mention to be added to the specified entity.
+   * @param entity The entity which is mentioned by the specified mention.  
+   * @param useDiscourseModel Whether the mentions should be kept as an entiy or simply co-indexed.
+   */
+  protected void updateExtent(DiscourseModel dm, MentionContext mention, DiscourseEntity entity, boolean useDiscourseModel) {
+    if (useDiscourseModel) {
+      if (entity != null) {
+        //System.err.println("AbstractLinker.updateExtent: addingExtent:
+        // "+econtext.toText());
+        if (entity.getGenderProbability() < mention.getGenderProb()) {
+          entity.setGender(mention.getGender());
+          entity.setGenderProbability(mention.getGenderProb());
+        }
+        if (entity.getNumberProbability() < mention.getNumberProb()) {
+          entity.setNumber(mention.getNumber());
+          entity.setNumberProbability(mention.getNumberProb());
+        }
+        entity.addExtent(mention);
+        dm.mentionEntity(entity);
       }
-      entity.addExtent(mention);
-      dm.mentionEntity(entity);
+      else {
+        //System.err.println("AbstractLinker.updateExtent: creatingExtent:
+        // "+econtext.toText()+" "+econtext.gender+" "+econtext.number);
+        entity = new DiscourseEntity(mention, mention.getGender(), mention.getGenderProb(), mention.getNumber(), mention.getNumberProb());
+        dm.addEntity(entity);
+      }
     }
     else {
-      //System.err.println("AbstractLinker.updateExtent: creatingExtent: "+econtext.toText()+" "+econtext.gender+" "+econtext.number);
-      entity = new DiscourseEntity(mention,mention.getGender(),mention.getGenderProb(),mention.getNumber(),mention.getNumberProb());
-      dm.addEntity(entity);
+      if (entity != null) {
+        DiscourseEntity newEntity = new DiscourseEntity(mention, mention.getGender(), mention.getGenderProb(), mention.getNumber(), mention.getNumberProb());
+        dm.addEntity(newEntity);
+        newEntity.setId(entity.getId());
+      }
+      else {
+        DiscourseEntity newEntity = new DiscourseEntity(mention, mention.getGender(), mention.getGenderProb(), mention.getNumber(), mention.getNumberProb());
+        dm.addEntity(newEntity);
+      }
     }
-    
     //System.err.println(de1);
-
   }
 
   protected DiscourseEntity checkForMerges(DiscourseModel dm, DiscourseEntity[] des) {
@@ -206,28 +203,6 @@ public abstract class AbstractLinker implements Linker {
     return (de1);
   }
 
-  /* resolves coreference and returns list of extents 
-      @return list of extents
-   */
-  /*
-  public List getExtents(Parse d,int startId) {
-    List entities = getEntities(d);
-    int es=entities.size();
-    List extents = new ArrayList();
-    int entId=startId;
-    for (int ei=0;ei<es;ei++) {
-      DiscourseEntity de = (DiscourseEntity) entities.get(ei);
-      for (Iterator xi=de.getExtents();xi.hasNext();) {
-  ExtentContext ec = (ExtentContext) xi.next();
-  ec.parse.setEntityId(entId);
-  extents.add(ec.parse);
-      }
-      entId++;
-    }
-    return(extents);
-  }
-  */
-
   public DiscourseEntity[] getEntities(Extent[] mentions) {
     MentionContext[] extentContexts = this.constructMentionContexts(mentions);
     DiscourseModel dm = new DiscourseModel();
@@ -247,7 +222,7 @@ public abstract class AbstractLinker implements Linker {
       resolvers[ri].train();
     }
   }
-
+  
   public Extent[] getMentions(Parse sentence) {
     return (mentionFinder.getMentions(sentence));
   }
