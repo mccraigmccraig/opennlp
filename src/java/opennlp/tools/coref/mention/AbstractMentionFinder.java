@@ -135,7 +135,7 @@ public abstract class AbstractMentionFinder implements MentionFinder {
     return (allToken && hasConjunction);
   }
 
-  private void collectCoordinatedNounPhrases(Parse np, List entities) {
+  private void collectCoordinatedNounPhraseMentions(Parse np, List entities) {
     //System.err.println("collectCoordNp: "+np);
     List npTokens = np.getTokens();
     boolean inCoordinatedNounPhrase = false;
@@ -284,7 +284,7 @@ public abstract class AbstractMentionFinder implements MentionFinder {
           collectPrenominalNamedEntities(np, mentions);
         }
         if (collectCoordinatedNounPhrases) {
-          collectCoordinatedNounPhrases(np, mentions);
+          collectCoordinatedNounPhraseMentions(np, mentions);
         }
         collectPossesivePronouns(np, mentions);
       }
