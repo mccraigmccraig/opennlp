@@ -22,6 +22,7 @@ import java.util.List;
 
 import opennlp.maxent.GISModel;
 import opennlp.maxent.MaxentModel;
+import opennlp.maxent.TwoPassDataIndexer;
 import opennlp.tools.util.BeamSearch;
 import opennlp.tools.util.Sequence;
 
@@ -93,7 +94,7 @@ public class ChunkerME implements Chunker {
   }
 
   public static GISModel train(opennlp.maxent.EventStream es, int iterations, int cut) throws java.io.IOException {
-    return opennlp.maxent.GIS.trainModel(es, iterations, cut);
+    return opennlp.maxent.GIS.trainModel(iterations, new TwoPassDataIndexer(es, cut));
   }
 
   /**

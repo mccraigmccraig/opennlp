@@ -29,6 +29,7 @@ import opennlp.maxent.GIS;
 import opennlp.maxent.GISModel;
 import opennlp.maxent.MaxentModel;
 import opennlp.maxent.PlainTextByLineDataStream;
+import opennlp.maxent.TwoPassDataIndexer;
 import opennlp.maxent.io.SuffixSensitiveGISModelWriter;
 import opennlp.tools.util.BeamSearch;
 import opennlp.tools.util.Sequence;
@@ -40,7 +41,7 @@ public class NameFinderME implements NameFinder {
   private Sequence bestSequence;
   private int beamSize;
   private BeamSearch beam;
-  
+
   public static final String START = "start";
   public static final String CONTINUE = "cont";
   public static final String OTHER = "other";
@@ -110,31 +111,35 @@ public class NameFinderME implements NameFinder {
   public double[] probs() {
     return bestSequence.getProbs();
   }
-  
+
   public static GISModel train(EventStream es, int iterations, int cut) throws IOException {
-      return GIS.trainModel(es, iterations, cut);
-    }
-  
+    return opennlp.maxent.GIS.trainModel(iterations, new TwoPassDataIndexer(es, cut));
+  }
+
   public static void main(String[] args) throws IOException {
-  try {
-    File inFile = new File(args[0]);
-    File outFile = new File(args[1]);
-    GISModel mod;
+    if (args.length == 0) {
+      System.err.println("usage: NameFinderME training_file model");
+      System.exit(1);
+    }
+    try {
+      File inFile = new File(args[0]);
+      File outFile = new File(args[1]);
+      GISModel mod;
 
-    EventStream es = new NameFinderEventStream(new PlainTextByLineDataStream(new FileReader(inFile)));
-    if (args.length > 3)
-      mod = train(es, Integer.parseInt(args[2]), Integer.parseInt(args[3]));
-    else
-      mod = train(es, 100, 5);
+      EventStream es = new NameFinderEventStream(new PlainTextByLineDataStream(new FileReader(inFile)));
+      if (args.length > 3)
+        mod = train(es, Integer.parseInt(args[2]), Integer.parseInt(args[3]));
+      else
+        mod = train(es, 100, 5);
 
-    System.out.println("Saving the model as: " + args[1]);
-    new SuffixSensitiveGISModelWriter(mod, outFile).persist();
+      System.out.println("Saving the model as: " + args[1]);
+      new SuffixSensitiveGISModelWriter(mod, outFile).persist();
+
+    }
+    catch (Exception e) {
+      e.printStackTrace();
+    }
 
   }
-  catch (Exception e) {
-    e.printStackTrace();
-  }
-    
-  }
-  
+
 }
