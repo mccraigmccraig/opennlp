@@ -31,7 +31,7 @@ import java.util.*;
  * specifications.
  *
  * @author      Jason Baldridge
- * @version     $Revision: 1.17 $, $Date: 2002/02/11 13:01:29 $
+ * @version     $Revision: 1.18 $, $Date: 2002/02/11 13:04:56 $
  **/
 public class NLPDocument extends Document {
     public static final String WORD_LABEL = "w";
@@ -286,8 +286,8 @@ public class NLPDocument extends Document {
 	for (ListIterator i=childrenOfSentence.listIterator(); i.hasNext();) {
 	    Object $_ = i.next();
 	    if ($_ == startTok) {
-		List tokChildren = startTok.getChildren();
 		List $tokChildren = new ArrayList();
+		$tokChildren.addAll(startTok.getChildren());
 		while (($_ = i.next()) != endTok) {
 		    List nextChildren = ((Element)$_).getChildren();
 		    ((Element)$_).removeChildren();
