@@ -30,6 +30,13 @@ import opennlp.tools.util.Sequence;
   */
 public class DefaultChunkerContextGenerator implements ChunkerContextGenerator {
 
+  /**
+   * Creates the default context generator a chunker.
+   */
+  public DefaultChunkerContextGenerator() {
+    super();
+  }
+  
   /* inherieted java doc */
   public String[] getContext(Object o) {
     Object[] data = (Object[]) o;
