@@ -18,7 +18,9 @@
 package opennlp.tools.parser;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
+import java.util.Set;
 
 import opennlp.maxent.ContextGenerator;
 
@@ -47,16 +49,16 @@ public class CheckContextGenerator implements ContextGenerator {
     StringBuffer feat = new StringBuffer(20);
     feat.append("s").append(i).append("=");
     if (p != null) {
-      feat.append(p.getHead().toString()).append("|").append(type).append("|").append(p.getHead().getType());
+      feat.append(p.getHead().toString()).append("|").append(type).append("|").append(p.getType());
     }
     else {
-      feat.append(EOS).append("|").append(type).append("|").append(EOS);
+      feat.append(EOS).append("|").append(type);
     }
     features.add(feat.toString());
     feat.setLength(0);
     feat.append("s").append(i).append("*=");
     if (p != null) {
-      feat.append(type).append("|").append(p.getHead().getType());
+      feat.append(type).append("|").append(p.getType());
     }
     else {
       feat.append(type).append("|").append(EOS);
@@ -87,6 +89,16 @@ public class CheckContextGenerator implements ContextGenerator {
     feat.append("ci*l*=").append(type).append(",").append(p1.getType()).append(",").append(p2.getType());
     features.add(feat.toString());
   }
+  
+  private String surrondPunct(String type, Parse punct, int i) {
+    StringBuffer feat = new StringBuffer(20);
+    feat.append(i).append("=");
+    if (type != null) {
+      feat.append(type).append("|");
+    }
+    feat.append(punct.getType());
+    return (feat.toString());
+  }
 
   /**
    * Returns predictive context for deciding whether the specified constituents between the specified start and end index 
@@ -109,14 +121,26 @@ public class CheckContextGenerator implements ContextGenerator {
     checkcons(pstart, "begin", type, features);
     checkcons(pend, "last", type, features);
     StringBuffer production = new StringBuffer(20);
-    production.append(type).append("->");
+    StringBuffer punctProduction = new StringBuffer(20);
+    production.append("p=").append(type).append("->");
+    punctProduction.append("pp=").append(type).append("->");
     for (int pi = start; pi < end; pi++) {
       Parse p = constituents[pi];
       checkcons(p, pend, type, features);
       production.append(p.getType()).append(",");
+      punctProduction.append(p.getType()).append(",");
+      Set nextPunct = p.getNextPunctuationSet();
+      if (nextPunct != null) {
+        for (Iterator pit=nextPunct.iterator();pit.hasNext();) {
+          Parse punct = (Parse) pit.next();
+          punctProduction.append(punct.getType()).append(",");
+        }
+      }
     }
     production.append(pend.getType());
+    punctProduction.append(pend.getType());
     features.add(production.toString());
+    features.add(punctProduction.toString());
     Parse p_2 = null;
     Parse p_1 = null;
     Parse p1 = null;
@@ -137,6 +161,20 @@ public class CheckContextGenerator implements ContextGenerator {
     surround(p_2, -2, type, features);
     surround(p1, 1, type, features);
     surround(p2, 2, type, features);
+
+    if (constituents[start].getPreviousPunctuationSet() != null) {
+      for (Iterator pi=constituents[start].getPreviousPunctuationSet().iterator();pi.hasNext();) {
+        Parse punct = (Parse) pi.next(); 
+        features.add("sp"+this.surrondPunct(type,punct,-1));
+      }
+    }
+    if (constituents[end].getNextPunctuationSet() != null) {
+      for (Iterator pi=constituents[end].getNextPunctuationSet().iterator();pi.hasNext();) {
+        Parse punct = (Parse) pi.next(); 
+        features.add("sp"+this.surrondPunct(type,punct,1));
+      }
+    }
+
     return ((String[]) features.toArray(new String[features.size()]));
   }
 }

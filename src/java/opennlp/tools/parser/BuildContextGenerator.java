@@ -18,6 +18,7 @@
 package opennlp.tools.parser;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 
 import opennlp.maxent.ContextGenerator;
@@ -42,6 +43,37 @@ public class BuildContextGenerator implements ContextGenerator {
     Object[] params = (Object[]) o;
     return getContext((Parse[]) params[0], ((Integer) params[1]).intValue());
   }
+
+  /**
+   * Creates punctuation feature for the specified parse and the specified punctuation at the specfied index.
+   * @param p The parse whichi is being considered.
+   * @param punct The punctuation which is in context.
+   * @param i The index of the punctuation with relative to the parse.
+   * @param backoff Whether lexical information should be included.
+   * @return Punctuation feature for the specified parse and the specified punctuation at the specfied index.
+   */
+  private String punct(Parse p, Parse punct, int i, boolean backoff) {
+    StringBuffer feat = new StringBuffer(20);
+    if (backoff) {
+      feat.append(i).append("*=");
+    }
+    else {
+      feat.append(i).append("=");
+    }
+    feat.append(punct.getType());
+    if (p != null) {
+      feat.append("|");
+      //if (i < 0) {
+      //  feat.append(p.getLabel()).append("|");
+      //}
+      feat.append(p.getType());
+      if (!backoff) {
+        feat.append("|").append(p.getHead().toString());
+      }
+    }
+    return (feat.toString());
+  }
+
 
   private String cons(Parse p, int i) {
     StringBuffer feat = new StringBuffer(20);
@@ -72,7 +104,7 @@ public class BuildContextGenerator implements ContextGenerator {
     }
     return (feat.toString());
   }
-
+  
   /**
    * Returns the predictive context used to determine how constituent at the specified index 
    * should be combined with other contisuents. 
@@ -163,7 +195,35 @@ public class BuildContextGenerator implements ContextGenerator {
     features.add(consp0 + "," + consbop1 + "," + consbop2);
     features.add(consbop0 + "," + consbop1 + "," + consbop2);
 
+    
+    
     // punct
+    //punct(0,1)
+    if (constituents[index].getNextPunctuationSet() != null) {
+      //System.err.println("BuildContextGenerator.getContext: hasNextPunct: "+constituents[index]+" "+constituents[index].getNextPunctuationSet());
+      for (Iterator pi=constituents[index].getNextPunctuationSet().iterator();pi.hasNext();) {
+        Parse punct = (Parse) pi.next(); 
+        features.add("p"+punct(null,punct,1,false));
+        features.add("p"+punct(constituents[index],punct,1,false));
+        features.add("p"+punct(constituents[index],punct,1,true));
+      }
+    }
+    //punct(-1,0)
+    if (constituents[index].getPreviousPunctuationSet() != null) {
+      //System.err.println("BuildContextGenerator.getContext: hasPrevPunct: "+constituents[index].getPreviousPunctuationSet()+" "+constituents[index]);
+      for (Iterator pi=constituents[index].getPreviousPunctuationSet().iterator();pi.hasNext();) {
+        Parse punct = (Parse) pi.next(); 
+        features.add("p"+punct(null,punct,-1,false));
+        features.add("p"+punct(constituents[index],punct,-1,false));
+        features.add("p"+punct(constituents[index],punct,-1,true));
+      }      
+    }
+    
+    //punct(-1),cons(0,1)
+    //cons(-1),punct(-1),cons(0);
+    //cons(-1,0),punct(1)
+    
+    
     String p0Word = p0.toString();
     if (p0Word.equals("-RRB-")) {
       for (int pi = index - 1; pi >= 0; pi--) {

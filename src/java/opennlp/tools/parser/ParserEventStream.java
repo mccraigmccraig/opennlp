@@ -18,9 +18,8 @@
 package opennlp.tools.parser;
 
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Iterator;
 import java.util.List;
+import java.util.Set;
 
 import opennlp.maxent.DataStream;
 import opennlp.maxent.Event;
@@ -45,6 +44,7 @@ public class ParserEventStream implements EventStream {
   private Event[] events;
   private int ei;
   private HeadRules rules;
+  private Set punctSet;
   private EventTypeEnum etype;
 
   /**
@@ -67,6 +67,7 @@ public class ParserEventStream implements EventStream {
       this.tcg = new DefaultPOSContextGenerator();
     }
     this.rules = rules;
+    punctSet = rules.getPunctuationTags();
     this.etype = etype;
     data = d;
     ei = 0;
@@ -120,13 +121,25 @@ public class ParserEventStream implements EventStream {
     return (Parse[]) chunks.toArray(new Parse[chunks.size()]);
   }
 
-  private static boolean firstChild(Parse c, Parse parent) {
-    return parent.getChildren()[0] == c;
+  /**
+   * Returns true if the specified child is the first child of the specified parent.
+   * @param child The child parse.
+   * @param parent The parent parse.
+   * @return true if the specified child is the first child of the specified parent; false otherwise.
+   */
+  private boolean firstChild(Parse child, Parse parent) {
+    return ParserME.collapsePunctuation(parent.getChildren(),punctSet)[0] == child;
   }
 
-  private static boolean lastChild(Parse c, Parse parent) {
-    Parse[] kids = parent.getChildren();
-    return (kids[kids.length - 1] == c);
+  /**
+   * Returns true if the specified child is the last child of the specified parent.
+   * @param child The child parse.
+   * @param parent The parent parse.
+   * @return true if the specified child is the last child of the specified parent; false otherwise.
+   */
+  private boolean lastChild(Parse child, Parse parent) {
+    Parse[] kids = ParserME.collapsePunctuation(parent.getChildren(),punctSet);
+    return (kids[kids.length - 1] == child);
   }
 
   private void addNewEvents() {
@@ -143,7 +156,7 @@ public class ParserEventStream implements EventStream {
       addChunkEvents(events, chunks);
     }
     else {
-      addParseEvents(events, chunks);
+      addParseEvents(events, ParserME.collapsePunctuation(chunks,punctSet));
     }
     this.events = (Event[]) events.toArray(new Event[events.size()]);
   }
@@ -191,6 +204,9 @@ public class ParserEventStream implements EventStream {
             }
             //insert reduced node
             reducedChunks[reduceStart]=parent;
+            //propagate punctuation sets
+            parent.setPrevPunctuation(chunks[reduceStart].getPreviousPunctuationSet());
+            parent.setNextPunctuation(chunks[reduceEnd].getNextPunctuationSet());
             //insert nodes after reduction
             int ri=reduceStart+1;
             for (int rci=reduceEnd+1;rci<chunks.length;rci++) {

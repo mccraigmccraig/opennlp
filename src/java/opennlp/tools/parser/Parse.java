@@ -53,6 +53,11 @@ public class Parse implements Cloneable, Comparable {
   private static Pattern typePattern = Pattern.compile("^([^ =-]+)");
   /** The patter used to identify tokens in Penn Treebank labeled constituents. */
   private static Pattern tokenPattern = Pattern.compile("^[^ ()]+ ([^ ()]+)\\s*\\)");
+  
+  /** The set of punctuation parses which are between this parse and the previous parse. */
+  private Set prevPunctSet;
+  /** The set of punctuation parses which are between this parse and the subsequent parse. */
+  private Set nextPunctSet;
 
   protected Object clone() {
     try {
@@ -101,6 +106,60 @@ public class Parse implements Cloneable, Comparable {
    */
   public String getType() {
     return type;
+  }
+  
+  /**
+   * Returns the set of punctuation parses that occur immediately before this parse.
+   * @return the set of punctuation parses that occur immediately before this parse.
+   */
+  public Set getPreviousPunctuationSet() {
+    return prevPunctSet;
+  }
+  
+  /**
+   * Designates that the specifed punctuation should is prior to this parse.
+   * @param The punctuation.
+   */
+  public void addPreviousPunctuation(Parse punct) {
+    if (this.prevPunctSet == null) {
+      this.prevPunctSet = new HashSet();
+    }
+    prevPunctSet.add(punct);
+  }
+  
+  /**
+   * Returns the set of punctuation parses that occur immediately after this parse.
+   * @return the set of punctuation parses that occur immediately after this parse.
+   */
+  public Set getNextPunctuationSet() {
+    return nextPunctSet;
+  }
+  
+  /**
+   * Designates that the specifed punctuation follows this parse.
+   * @param punct The punctuation set.
+   */
+  public void addNextPunctuation(Parse punct) {
+    if (this.nextPunctSet == null) {
+      this.nextPunctSet = new HashSet();
+    }
+    nextPunctSet.add(punct);
+  }
+  
+  /**
+   * Sets the set of punctuation tags which follow this parse.
+   * @param punctSet The set of puncuation tags which follow this parse.
+   */
+  public void setNextPunctuation(Set punctSet) {
+    this.nextPunctSet = punctSet;
+  }
+  
+  /**
+   * Sets the set of punctuation tags which preceed this parse.
+   * @param punctSet The set of puncuation tags which preceed this parse.
+   */
+  public void setPrevPunctuation(Set punctSet) {
+    this.prevPunctSet = punctSet;
   }
 
   /**
@@ -154,7 +213,7 @@ public class Parse implements Cloneable, Comparable {
     if (!type.equals(ParserME.TOK_NODE)) {
       System.out.print("(");
       System.out.print(type +" ");
-      //System.out.print(label+" ");
+      System.out.print(label+" ");
       //System.out.print(head+" ");
       //System.out.print(df.format(prob)+" ");
     }

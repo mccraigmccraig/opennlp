@@ -22,6 +22,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.SortedSet;
 import java.util.TreeSet;
 
@@ -63,6 +64,7 @@ public class ParserME {
   private CheckContextGenerator checkContextGenerator;
 
   private HeadRules headRules;
+  private Set punctSet;
 
   private double[] bprobs;
   private double[] cprobs;
@@ -93,7 +95,7 @@ public class ParserME {
   private int incompleteIndex;
   
   private boolean createDerivationString = false;
-  private boolean debugOn = false;
+  private boolean debugOn = true;
   
   /**
    * Creates a new parser using the specified models and head rules.
@@ -131,6 +133,7 @@ public class ParserME {
     this.buildContextGenerator = new BuildContextGenerator();
     this.checkContextGenerator = new CheckContextGenerator();
     this.headRules = headRules;
+    this.punctSet = headRules.getPunctuationTags();
     odh = new TreeSet();
     ndh = new TreeSet();
     parses = new TreeSet();
@@ -150,16 +153,23 @@ public class ParserME {
     topStartIndex = buildModel.getIndex(TOP_START);
     completeIndex = checkModel.getIndex(COMPLETE);
     incompleteIndex = checkModel.getIndex(INCOMPLETE);
+    
   }
   
-  public Parse[] parse(Parse p, int numParses) {
-  	if (createDerivationString) p.setDerivation(new StringBuffer(100));
+  /**
+   * Returns the specified number of parses for the specified tokens. 
+   * @param tokens A parse containing the tokens with a single parent node.
+   * @param numParses The number of parses desired.
+   * @return the specified number of parses for the specified tokens.
+   */
+  public Parse[] parse(Parse tokens, int numParses) {
+  	if (createDerivationString) tokens.setDerivation(new StringBuffer(100));
     odh.clear();
     ndh.clear();
     parses.clear();
     int i = 0; //derivation length
-    int maxDerivationLength = 2 * p.getChildCount() + 3;
-    odh.add(p);
+    int maxDerivationLength = 2 * tokens.getChildCount() + 3;
+    odh.add(tokens);
     Parse guess = null;
     double bestComplete = -100000; //approximating -infinity/0 in ln domain
     while (parses.size() < M && i < maxDerivationLength) {
@@ -198,7 +208,6 @@ public class ParserME {
           }
           if (nd != null) {
             for (int k = 0, kl = nd.length; k < kl; k++) {
-              //System.out.println("k="+k+" of "+nd.length);
               if (nd[k].complete()) {
                 advanceTop(nd[k]);
                 if (nd[k].getProb() > bestComplete) {
@@ -223,8 +232,10 @@ public class ParserME {
       }
     }
     if (parses.size() == 0) {
-      System.err.println("Couldn't find parse for: " + p);
-      //r = (Parse) odh.first(); 
+      System.err.println("Couldn't find parse for: " + tokens);
+      //Parse r = (Parse) odh.first();
+      //r.show();
+      //System.out.println();
       return new Parse[] {guess};
     }
     else if (numParses == 1){
@@ -243,11 +254,11 @@ public class ParserME {
 
   /**
    * Returns a parse for the specified parse of tokens.
-   * @param p A flat parse containing only tokens and a root node, p. 
+   * @param tokens The root node of a flat parse containing only tokens. 
    * @return A full parse of the specified tokens or the flat chunks of the tokens if a fullparse could not be found.
    */
-  public Parse parse(Parse p) {
-    return parse(p,1)[0];
+  public Parse parse(Parse tokens) {
+    return parse(tokens,1)[0];
   }
 
   private void advanceTop(Parse p) {
@@ -258,7 +269,13 @@ public class ParserME {
     p.setType(TOP_NODE);
   }
 
-  
+  private int mapParseIndex(int index, Parse[] nonPunctParses, Parse[] parses) {
+    int parseIndex = index;
+    while (parses[parseIndex] != nonPunctParses[index]) {
+      parseIndex++;
+    }
+    return parseIndex;
+  }
 
   /** Advances the specified parse and returns the an array advanced parses whose probability accounts for
    * more than the speicficed amount of probability mass, Q.
@@ -277,7 +294,8 @@ public class ParserME {
     int advanceNodeIndex;
     /** The node which will be labeled in this iteration of advancing the parse. */
     Parse advanceNode=null;
-    Parse[] children = p.getChildren();
+    Parse[] originalChildren = p.getChildren();
+    Parse[] children = collapsePunctuation(originalChildren,punctSet);
     int numNodes = children.length;
     //determines which node needs to be labeled and prior labels.
     for (advanceNodeIndex = 0; advanceNodeIndex < numNodes; advanceNodeIndex++) {
@@ -292,6 +310,7 @@ public class ParserME {
         //System.err.println("lastStart "+i+" "+lastStart.label+" "+lastStart.prob);
       }
     }
+    int originalAdvanceIndex = mapParseIndex(advanceNodeIndex,children,originalChildren);
     ArrayList newParsesList = new ArrayList(buildModel.getNumOutcomes());
     //call build
     buildModel.eval(buildContextGenerator.getContext(children, advanceNodeIndex), bprobs);
@@ -328,12 +347,12 @@ public class ParserME {
       }
       Parse newParse1 = (Parse) p.clone(); //clone parse
       if (createDerivationString) newParse1.getDerivation().append(max).append("-");
-      newParse1.setChild(advanceNodeIndex,tag); //replace constituent labeled
+      
+      newParse1.setChild(originalAdvanceIndex,tag); //replace constituent labeled
       newParse1.addProb(Math.log(bprob));
       //check
       checkModel.eval(checkContextGenerator.getContext(newParse1.getChildren(), lastStartType, lastStartIndex, advanceNodeIndex), cprobs);
-      //System.out.println("check "+cprobs[completeIndex]+"
-      // "+cprobs[incompleteIndex]);
+      //System.out.println("check "+cprobs[completeIndex]+" "+cprobs[incompleteIndex]);
       Parse newParse2 = newParse1;
       if (cprobs[completeIndex] > q) { //make sure a reduce is likely
         newParse2 = (Parse) newParse1.clone();
@@ -359,7 +378,13 @@ public class ParserME {
           }
         }
         if (!flat) { //flat chunks are done by chunker
-          newParse2.insert(new Parse(p.getText(), new Span(lastStartNode.getSpan().getStart(), advanceNode.getSpan().getEnd()), lastStartType, cprobs[1], headRules.getHead(cons, lastStartType)));
+          if (lastStartIndex == 0 && advanceNodeIndex == numNodes-1) { //check for top node to include end and begining punctuation
+            //System.err.println("ParserME.advanceParses: reducing entire span: "+new Span(lastStartNode.getSpan().getStart(), advanceNode.getSpan().getEnd())+" "+lastStartType+" "+java.util.Arrays.asList(children));
+            newParse2.insert(new Parse(p.getText(), p.getSpan(), lastStartType, cprobs[1], headRules.getHead(cons, lastStartType)));
+          }
+          else {
+            newParse2.insert(new Parse(p.getText(), new Span(lastStartNode.getSpan().getStart(), advanceNode.getSpan().getEnd()), lastStartType, cprobs[1], headRules.getHead(cons, lastStartType)));
+          }
           newParsesList.add(newParse2);
         }
       }
@@ -483,6 +508,36 @@ public class ParserME {
       }
     }
     return newParses;
+  }
+  
+  public static Parse[] collapsePunctuation(Parse[] chunks, Set punctSet) {
+    List collapsedParses = new ArrayList(chunks.length);
+    int lastNonPunct = -1;
+    int nextNonPunct = -1;
+    for (int ci=0,cn=chunks.length;ci<cn;ci++) {
+      if (punctSet.contains(chunks[ci].getType())) {
+        if (lastNonPunct >= 0) {
+          chunks[lastNonPunct].addNextPunctuation(chunks[ci]);
+        }
+        for (nextNonPunct=ci+1;nextNonPunct<cn;nextNonPunct++) {
+          if (!punctSet.contains(chunks[nextNonPunct].getType())) {
+            break;
+          }
+        }
+        if (nextNonPunct < cn) {
+          chunks[nextNonPunct].addPreviousPunctuation(chunks[ci]);
+        }
+      }
+      else {
+        collapsedParses.add(chunks[ci]);
+        lastNonPunct = ci;
+      }
+    }
+    if (collapsedParses.size() == chunks.length) {
+      return chunks;
+    }
+    //System.err.println("collapsedPunctuation: collapsedParses"+collapsedParses);
+    return (Parse[]) collapsedParses.toArray(new Parse[collapsedParses.size()]);
   }
 
   public static GISModel train(opennlp.maxent.EventStream es, int iterations, int cut) throws java.io.IOException {

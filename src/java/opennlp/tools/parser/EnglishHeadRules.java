@@ -17,8 +17,10 @@
 //////////////////////////////////////////////////////////////////////////////   
 package opennlp.tools.parser;
 
+import java.util.HashSet;
 import java.util.Map;
 import java.util.HashMap;
+import java.util.Set;
 import java.util.StringTokenizer;
 import java.io.*;
 
@@ -29,13 +31,25 @@ import java.io.*;
 public class EnglishHeadRules implements HeadRules {
   
   private Map headRules;
+  private Set punctSet;
   
   public EnglishHeadRules(String ruleDir) throws IOException {
     readHeadRules(ruleDir);
+    punctSet = new HashSet();
+    punctSet = new HashSet();
+    punctSet.add(".");
+    punctSet.add(",");
+    punctSet.add("``");
+    punctSet.add("''");
+    punctSet.add(":");
   }
   
   public EnglishHeadRules(Map ruleMap) {
     headRules = ruleMap;
+  }
+  
+  public Set getPunctuationTags() {
+    return punctSet;
   }
   
   public Parse getHead(Parse[] constituents, String type) {
