@@ -18,13 +18,13 @@
 
 package opennlp.common.parse;
 
-import opennlp.common.structure.*;
+import opennlp.common.synsem.*;
     
 /**
  * A set of rules that describe how lexical items should be combined
  *
  * @author      Gann Bierner
- * @version     $Revision: 1.2 $, $Date: 2001/12/11 15:13:03 $
+ * @version     $Revision: 1.3 $, $Date: 2001/12/11 22:23:53 $
  */
 public interface RuleGroup {
 
@@ -33,7 +33,7 @@ public interface RuleGroup {
      *
      * @param words the lexical items to combine
      */
-    public java.util.List applyAllRules (Constituent[] words);
+    public java.util.List applyAllRules (Sign[] inputs);
     
     
 }
