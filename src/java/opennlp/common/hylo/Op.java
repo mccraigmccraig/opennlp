@@ -41,7 +41,18 @@ public class Op extends HyloFormula {
 	_name = name;
 	_args = args;
     }
+
+    public Op (String name, LF first, LF second) {
+	_name = name;
+	_args = new ArrayList();
+	_args.add(first);
+	_args.add(second);
+    }
     
+    public String getName () {
+	return _name;
+    }
+
     public void addArgument (LF formula) {
 	_args.add(formula);
     }
@@ -119,12 +130,14 @@ public class Op extends HyloFormula {
 	    sb.append(opString);
 	    sb.append(_args.get(0).toString());
 	} else {
+	    sb.append('(');
 	    Iterator argsIt = _args.iterator();
 	    sb.append(argsIt.next().toString());
 	    for (; argsIt.hasNext(); ) {
 		sb.append(' ').append(opString).append(' ');
 		sb.append(argsIt.next().toString());
 	    }
+	    sb.append(')');
 	}
 	return sb.toString();
     }
