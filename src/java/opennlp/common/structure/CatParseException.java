@@ -25,9 +25,9 @@ package opennlp.common.structure;
  * fails to "become" a category.  For instance, an XML representation.
  *
  * @author      Gann Bierner
- * @version     $Revision: 1.1 $, $Date: 2001/10/23 13:46:24 $
+ * @version     $Revision: 1.2 $, $Date: 2001/11/29 13:24:15 $
  */
-public class CatParseException extends Exception {
+public class CatParseException extends opennlp.common.NLPException {
     /** the category that has failed to be parsed */
     protected String cat;
 

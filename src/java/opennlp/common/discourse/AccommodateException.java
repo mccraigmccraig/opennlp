@@ -24,10 +24,10 @@ import opennlp.common.synsem.*;
  * Raised when there is an a semantic expression that cannot be accomodated.
  *
  * @author      Jason Baldridge
- * @version     $Revision: 1.1 $, $Date: 2001/10/23 13:46:24 $
+ * @version     $Revision: 1.2 $, $Date: 2001/11/29 13:24:15 $
  */
 
-public class AccommodateException extends Exception {
+public class AccommodateException extends opennlp.common.NLPException {
     /** The semantic form that failed to be accommodated */
     protected Denoter notAccommodated;
 
