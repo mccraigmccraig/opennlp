@@ -22,7 +22,6 @@ import java.util.*;
 import opennlp.maxent.ContextGenerator;
 import opennlp.maxent.MaxentModel;
 
-
 /** Performs k-best search over sequence.  This is besed on the description in
   * Ratnaparkhi (1998), PhD diss, Univ. of Pennsylvania. 
  */
@@ -42,13 +41,14 @@ public class BeamSearch {
     this.cg = cg;
     this.model = model;
   }
-
+  
   /** Returns the best sequence of outcomes based on model for this object.
-   * @param sequence The input sequence.
-   * @param context An Object[] of additional context.  This is passed to the context generator blindly with the assumption that the context are appropiate.
-   * @return The top ranked sequence of outcomes.
-   */
-  public Sequence bestSequence(List sequence, Object context) {
+     * @param numSequences The maximum number of sequences to be returned.
+     * @param sequence The input sequence.
+     * @param context An Object[] of additional context.  This is passed to the context generator blindly with the assumption that the context are appropiate.
+     * @return An array of the top ranked sequences of outcomes.
+     */
+  public Sequence[] bestSequences(int numSequences,List sequence, Object context) {
     int n = sequence.size();
     SortedSet prev = new TreeSet();
     SortedSet next = new TreeSet();
@@ -96,7 +96,21 @@ public class BeamSearch {
       prev = next;
       next = tmp;
     }
-    return (Sequence) prev.first();
+    int numSeq = Math.min(numSequences,prev.size());
+    List topSequences = new ArrayList(numSeq);
+    for (Iterator si=prev.iterator();numSeq>= 0;numSeq--) {
+      topSequences.add(si.next());
+    }
+    return (Sequence[]) topSequences.toArray(new Sequence[topSequences.size()]);
+  }
+
+  /** Returns the best sequence of outcomes based on model for this object.
+   * @param sequence The input sequence.
+   * @param context An Object[] of additional context.  This is passed to the context generator blindly with the assumption that the context are appropiate.
+   * @return The top ranked sequence of outcomes.
+   */
+  public Sequence bestSequence(List sequence, Object context) {
+    return bestSequences(1,sequence,context)[0];
   }
 
   /** Determines wheter a particular continuation of a sequence is valid.  
