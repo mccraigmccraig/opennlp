@@ -22,6 +22,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.regex.Pattern;
 
+import opennlp.tools.util.Cache;
 import opennlp.tools.util.Sequence;
 
 
@@ -43,14 +44,28 @@ public class DefaultNameContextGenerator implements NameContextGenerator {
   private Pattern allCaps;
   private Pattern capPeriod;
   private Pattern initialCap;
-
+  
+  private Cache contextsCache;
+  private Object wordsKey;
+  private int pi = -1;
+  private List prevStaticFeatures;
 
   /**
    * Creates a name context generator.
    */
   public DefaultNameContextGenerator() {
+    this(0);
+  }
+
+  /**
+   * Creates a name context generator with the specified cach size.
+   */
+  public DefaultNameContextGenerator(int cacheSize) {
     super();
     initPatterns();
+    if (cacheSize > 0) {
+      contextsCache = new Cache(cacheSize);
+    }
   }
 
   private void initPatterns() {
@@ -96,7 +111,6 @@ public class DefaultNameContextGenerator implements NameContextGenerator {
    * @return the context for finding names at the specified index.
    */
   public String[] getContext(int i, Object[] toks, String[] preds, Map prevTags) {
-    List features = getStaticFeatures(toks,i,prevTags);
     String po=NameFinderME.OTHER;
     String ppo=NameFinderME.OTHER;
     if (i > 1){
@@ -105,12 +119,42 @@ public class DefaultNameContextGenerator implements NameContextGenerator {
     if (i > 0) {
       po = preds[i-1];
     }
-    features.add("po="+po);
-    features.add("pow="+po+toks[i]);
-    features.add("powf="+po+wordFeature(toks[i].toString()));
-    features.add("ppo="+ppo);
-    //System.err.println("getContext: "+i+" "+toks[i]+" "+features);
-    return (String[]) features.toArray(new String[features.size()]);
+    String cacheKey = i+po+ppo;
+    if (contextsCache != null) {
+      if (wordsKey == toks){
+        String[] cachedContexts = (String[]) contextsCache.get(cacheKey);    
+        if (cachedContexts != null) {
+          return cachedContexts;
+        }
+      }
+      else {
+        contextsCache.clear();
+        wordsKey = toks;
+      }
+    }
+    List features;
+    if (wordsKey == toks && i == pi) {
+      features =prevStaticFeatures; 
+    }
+    else {
+      features = getStaticFeatures(toks,i,prevTags);
+      pi=i;
+      prevStaticFeatures=features;
+    }
+    
+    int fn = features.size();
+    String[] contexts = new String[fn+4];
+    for (int fi=0;fi<fn;fi++) {
+      contexts[fi]=(String) features.get(fi);
+    }
+    contexts[fn]="po="+po;
+    contexts[fn+1]="pow="+po+toks[i];
+    contexts[fn+2]="powf="+po+wordFeature(toks[i].toString());
+    contexts[fn+3]="ppo="+ppo;
+    if (contextsCache != null) {
+      contextsCache.put(cacheKey,contexts);
+    }
+    return contexts;
   }
 
   /**
