@@ -107,24 +107,18 @@ public class EnglishHeadRules implements HeadRules {
     BufferedReader str = new BufferedReader(new FileReader(file));
     String line;
     headRules = new HashMap(30);
-    try {
-      while ((line = str.readLine()) != null) {
-        StringTokenizer st = new StringTokenizer(line);
-        String num = st.nextToken();
-        String type = st.nextToken();
-        String dir = st.nextToken();
-        String[] tags = new String[Integer.parseInt(num)];
-        int ti = 0;
-        while (st.hasMoreTokens()) {
-          tags[ti] = st.nextToken();
-          ti++;
-        }
-        headRules.put(type, new HeadRule(dir.equals("1"), tags));
+    while ((line = str.readLine()) != null) {
+      StringTokenizer st = new StringTokenizer(line);
+      String num = st.nextToken();
+      String type = st.nextToken();
+      String dir = st.nextToken();
+      String[] tags = new String[Integer.parseInt(num)];
+      int ti = 0;
+      while (st.hasMoreTokens()) {
+        tags[ti] = st.nextToken();
+        ti++;
       }
-    }
-    catch (IOException e) {
-      System.err.println(e);
-      throw (new RuntimeException("Can't read head rules from: " + file));
+      headRules.put(type, new HeadRule(dir.equals("1"), tags));
     }
   }
 
