@@ -34,17 +34,3 @@ License: Apache Software License
 
 Java parser for XML.
 
-
-------------------------------------------------------------------------
-xml.jar
-
-XML functionality from Sun
-Homepage: http://java.sun.com/xml/, ???
-License: unknown
-
-This provided some of the XML stuff OpenNLP needed ages ago, which is
-now being replaced by JDOM functionality.  This should be gone by the
-next version.  We checked that the license of xml.jar is compatible
-with the LGPL a long time ago, but I cannot even find anything
-concrete now (xml.jar is 2+ years old and is quite outdated).
-
