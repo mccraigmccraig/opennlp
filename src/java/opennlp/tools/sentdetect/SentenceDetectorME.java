@@ -39,7 +39,7 @@ import java.util.ArrayList;
  * string to determine if they signify the end of a sentence.
  *
  * @author      Jason Baldridge and Tom Morton
- * @version     $Revision: 1.10 $, $Date: 2004/11/03 19:00:26 $
+ * @version     $Revision: 1.11 $, $Date: 2005/04/04 04:17:37 $
  */
 
 public class SentenceDetectorME implements SentenceDetector {
@@ -242,7 +242,7 @@ public class SentenceDetectorME implements SentenceDetector {
   /**
    * <p>Trains a new sentence detection model.</p>
    *
-   * <p>Usage: java opennlp.grok.preprocess.sentdetect.SentenceDetectorME data_file new_model_name (iterations cutoff)?</p>
+   * <p>Usage: opennlp.tools.sentdetect.SentenceDetectorME data_file new_model_name (iterations cutoff)?</p>
    *
    */
   public static void main(String[] args) throws IOException {
