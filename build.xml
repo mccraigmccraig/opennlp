@@ -1,4 +1,4 @@
-<!-- $Id: build.xml,v 1.8 2001/11/19 02:18:29 ericdf Exp $ -->
+<!-- $Id: build.xml,v 1.9 2001/11/20 15:12:47 jasonbaldridge Exp $ -->
 <!-- This build file based on the JDOM build.xml file. -->
 
 <project default="package" basedir=".">
@@ -41,9 +41,9 @@
     <filter token="verbose" value="true"/>
 
     <path id="build.classpath">
+      <pathelement location="${lib.dir}/gnu-regexp.jar"/>
       <pathelement location="${lib.dir}/jdom.jar"/>
       <pathelement location="${lib.dir}/xerces.jar"/>
-      <pathelement location="${lib.dir}/gnu-regexp.jar"/>
     </path>
 
 
@@ -124,6 +124,7 @@
     <jlink outfile="${build.dir}/${name}-exe-${version}.jar">
       <mergefiles>
         <pathelement path="${build.dir}/${name}-${DSTAMP}.jar"/>
+	<pathelement path="lib/gnu-regexp.jar"/>
 	<pathelement path="lib/jdom.jar"/>
 	<pathelement path="lib/xerces.jar"/>
   <pathelement path="lib/gnu-regexp.jar"/>
