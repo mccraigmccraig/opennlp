@@ -25,7 +25,6 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.StringTokenizer;
 
-import opennlp.common.english.BasicEnglishAffixes;
 import opennlp.common.util.Sequence;
 import opennlp.common.util.Span;
 import opennlp.maxent.io.SuffixSensitiveGISModelReader;
@@ -61,7 +60,7 @@ public class EnglishTreebankParser extends ParserME {
     private static final int K = 10;
 
     public EnglishTreebankPOSTagger(String modelFile) throws IOException {
-      super(10, new SuffixSensitiveGISModelReader(new File(modelFile)).getModel(), new POSContextGenerator(new BasicEnglishAffixes()));
+      super(10, new SuffixSensitiveGISModelReader(new File(modelFile)).getModel(), new POSContextGenerator());
     }
     public Sequence[] topKSequences(List sentence) {
       return beam.bestSequences(K, sentence, null);
