@@ -11,7 +11,7 @@ import java.util.Set;
 import java.util.HashSet;
 
 public class Search {
-   private static String Id = "$Id: Search.java,v 1.2 2002/03/21 22:42:49 mratkinson Exp $";
+   private static String Id = "$Id: Search.java,v 1.3 2002/03/26 19:09:11 mratkinson Exp $";
 
    // For adjectives, indicates synset type.
    
@@ -20,19 +20,19 @@ public class Search {
    public final static int INDIRECT_ANT= 2;	// indrect antonyms (similar).
    public final static int PERTAINYM	= 3;	// no antonyms or similars (pertainyms).
    
-   // Flags for printsynset().
+   // Flags for printSynset().
    
    public final static int ALLWORDS	   = 0;	// print all words.
-   public final static int SKIP_ANTS	= 0;	// skip printing antonyms in printsynset().
-   public final static int PRINT_ANTS	= 1;	// print antonyms in printsynset().
+   public final static int SKIP_ANTS	= 0;	// skip printing antonyms in printSynset().
+   public final static int PRINT_ANTS	= 1;	// print antonyms in printSynset().
    public final static int SKIP_MARKER	= 0;	// skip printing adjective marker.
    public final static int PRINT_MARKER= 1;	// print adjective marker.
    
-   // Trace types used by printspaces() to determine print sytle.
+   // Trace types used by printSpaces() to determine print sytle.
    
-   public final static int TRACEP		= 1;	// traceptrs.
-   public final static int TRACEC		= 2;	// tracecoords().
-   public final static int TRACEI		= 3;	// traceinherit().
+   public final static int TRACEP		= 1;	// tracePtrs.
+   public final static int TRACEC		= 2;	// traceCoords().
+   public final static int TRACEI		= 3;	// traceInherit().
    
    public final static int DEFON       = 1;
    public final static int DEFOFF      = 0;
@@ -43,13 +43,13 @@ public class Search {
    public  boolean prflag;
    public  int sense, prlexid;
    public  boolean overflag = false;     // set when output buffer overflows.
-   public  StringBuffer  searchbuffer = new StringBuffer(1024*64);
+   public  StringBuffer  searchBuffer = new StringBuffer(1024*64);
    public  int lastholomero;	       // keep track of last holo/meronym printed.
    public final static int TMPBUFSIZE =1024*10;
-   public  String tmpbuf;	               // general purpose printing buffer.
-   public  String  wdbuf;	               // general purpose word buffer.
+   public  String tmpBuf;	               // general purpose printing buffer.
+   public  String wordbuf;	               // general purpose word buffer.
    public  String  msgbuf;	       // buffer for constructing error messages.
-   public  int adj_marker;
+   public  int adjMarker;
    private BinSearch binSearcher;
    private WNUtil wnUtil;
    private WNrtl wnRtl;
@@ -67,32 +67,32 @@ public class Search {
     *  Input word must be exact match of string in database.
     */
    
-   public Index index_lookup(String word, int dbase) {
+   public Index indexLookup(String word, int dbase) {
       Index idx = null;
       RandomAccessFile fp;
       String line;
       
-      if ((fp = wnRtl.indexfps[dbase]) == null) {
-         msgbuf="WordNet library error: "+WNGlobal.partnames[dbase]+" indexfile not open";
-         WordNet.display_message(msgbuf);
+      if ((fp = wnRtl.indexFiles[dbase]) == null) {
+         msgbuf="WordNet library error: "+WNGlobal.partNames[dbase]+" indexfile not open";
+         WordNet.displayMessage(msgbuf);
          return null;
       }
       
-      if ((line = binSearcher.bin_search(word, fp)) != null) {
-         idx = parse_index( binSearcher.getLastBinSearchOffset(), dbase, line);
+      if ((line = binSearcher.binSearch(word, fp)) != null) {
+         idx = parseIndex( binSearcher.getLastBinSearchOffset(), dbase, line);
       } 
       return idx;
    }
 
    /** This function parses an entry from an index file into an Index data
     * structure. It takes the byte offset and file number, and optionally the
-    * line. If the line is null, parse_index will get the line from the file.
-    * If the line is non-null, parse_index won't look at the file, but it still
+    * line. If the line is null, parseIndex will get the line from the file.
+    * If the line is non-null, parseIndex won't look at the file, but it still
     * needs the dbase and offset parameters to be set, so it can store them in
     * the Index struct.
     */
 
-   public Index parse_index(long offset, int dbase, String  line) {
+   public Index parseIndex(long offset, int dbase, String  line) {
        String[] splitLine = wnUtil.split(line," \n");
        //for (int i=0; i<splitLine.length; i++) {
        //    System.out.println("splitLine["+i+"]="+splitLine[i]);
@@ -100,31 +100,31 @@ public class Search {
        Index idx = null;
    
        if (line==null) {
-         line = binSearcher.read_index( offset, wnRtl.indexfps[dbase] );
+         line = binSearcher.read_index( offset, wnRtl.indexFiles[dbase] );
        }
        
        idx = new Index();
    
        // set offset of entry in index file
-       idx.idxoffset = offset;
+       idx.indexOffset = offset;
        
-       idx.wd="";
+       idx.word="";
        idx.pos="";
-       idx.tagged_cnt = 0;
-       idx.sense_cnt=0;
+       idx.taggedCount = 0;
+       idx.senseCount=0;
        idx.offset=null;
        idx.ptruse=null;
        
        // get the word
        
        int n=0;
-       idx.wd = splitLine[n++];
+       idx.word = splitLine[n++];
        
        // get the part of speech.
        idx.pos = splitLine[n++];
    
        // get the collins count.
-       idx.sense_cnt = Integer.parseInt(splitLine[n++]);
+       idx.senseCount = Integer.parseInt(splitLine[n++]);
        
        // get the number of pointers types.
        idx.ptruse = new int[Integer.parseInt(splitLine[n++])];
@@ -132,18 +132,18 @@ public class Search {
        if (idx.ptruse.length>0) {
           // get the pointers types.
           for (int j=0; j < idx.ptruse.length; j++) {
-             idx.ptruse[j] = wnUtil.getptrtype(splitLine[n++]);
+             idx.ptruse[j] = wnUtil.getPointerType(splitLine[n++]);
           }
        }
        
        // get the number of offsets.
        int off_cnt = Integer.parseInt(splitLine[n++]);
        
-       if ("1.6".equals(WNGlobal.wnrelease) || "1.7".equals(WNGlobal.wnrelease)) {
+       if ("1.6".equals(WNGlobal.wnRelease) || "1.7".equals(WNGlobal.wnRelease)) {
           // get the number of senses that are tagged.
-          idx.tagged_cnt = Integer.parseInt(splitLine[n++]);
+          idx.taggedCount = Integer.parseInt(splitLine[n++]);
        } else {
-          idx.tagged_cnt = -1;
+          idx.taggedCount = -1;
        }
        
        // make space for the offsets.
@@ -161,7 +161,7 @@ public class Search {
     * hyphens, strip hyphens and underscores, strip periods.
     */
 
-   public Index getindex(String searchstr, int dbase) {
+   public Index getIndex(String searchstr, int dbase) {
       Index idx;
       String[] strings = new String[WNConsts.MAX_FORMS]; // vector of search strings.
       Index[] offsets = new Index[WNConsts.MAX_FORMS];
@@ -174,7 +174,7 @@ public class Search {
       if (searchstr != null) {
       
           int offset = 0;
-          wnUtil.strtolower(searchstr);
+          wnUtil.strToLower(searchstr);
           for (int i = 0; i < WNConsts.MAX_FORMS; i++) {
              strings[i] = searchstr;
              offsets[i] = null;
@@ -203,11 +203,11 @@ public class Search {
           // Get offset of first entry.  Then eliminate duplicates
           // and get offsets of unique strings.
           
-          offsets[0] = index_lookup(strings[0], dbase);
+          offsets[0] = indexLookup(strings[0], dbase);
           
           for (int i = 1; i < WNConsts.MAX_FORMS; i++) {
              if (!(strings[0].equals(strings[i]))) {
-                offsets[i] = index_lookup(strings[i], dbase);
+                offsets[i] = indexLookup(strings[i], dbase);
              }
           }
       
@@ -227,24 +227,24 @@ public class Search {
     *  entry in data structure.
     */
 
-   public SynSet read_synset(int dbase, long boffset, String word) {
+   public SynSet readSynset(int dbase, long boffset, String word) {
        try {
             SynsetKey key = new SynsetKey(dbase, boffset, word);
             SynSet synset = (SynSet)synsetCache.get(key);
             if (synset != null) {
                 return synset;
             }
-            RandomAccessFile fp = wnRtl.datafps[dbase];
+            RandomAccessFile fp = wnRtl.dataFiles[dbase];
             
             if (fp == null) {
-                msgbuf = "WordNet library error: "+WNGlobal.partnames[dbase]+" datafile not open";
-                WordNet.display_message(msgbuf);
+                msgbuf = "WordNet library error: "+WNGlobal.partNames[dbase]+" datafile not open";
+                WordNet.displayMessage(msgbuf);
                 return null;
             }
             
             fp.seek(boffset);	// position file to byte offset requested.
             
-            synset = parse_synset(fp, dbase, word); // parse synset and return.
+            synset = parseSynset(fp, dbase, word); // parse synset and return.
             synsetCache.put(key, synset);
             return synset;
        } catch (Exception e) {
@@ -278,13 +278,13 @@ public class Search {
     *  in data structure.
     */
 
-   public SynSet parse_synset(RandomAccessFile fp, int dbase, String word) {
+   public SynSet parseSynset(RandomAccessFile fp, int dbase, String word) {
        try {
             String tbuf;
             String ptrtok;
             byte[] tmpptr = new byte[WNConsts.LINEBUF];
             int foundpert = 0;
-            String wdnum;
+            String wordnum;
         
             long loc = fp.getFilePointer();
             int size = Search.fgets(fp, tmpptr);
@@ -302,16 +302,16 @@ public class Search {
             synptr.pos = "";
             synptr.wcount = 0;
             synptr.words = null;
-            synptr.whichword = 0;
+            synptr.whichWord = 0;
             synptr.pointers=null;
             synptr.frames = null;
             synptr.defn = "";
             synptr.nextss = null;
-            synptr.nextform = null;
-            synptr.searchtype = -1;
-            synptr.ptrlist = null;
-            synptr.headword = null;
-            synptr.headsense = 0;
+            synptr.nextForm = null;
+            synptr.searchType = -1;
+            synptr.ptrList = null;
+            synptr.headWord = null;
+            synptr.headSense = 0;
             
             String[] splitLine = wnUtil.split(line," \n");
             int n=0;
@@ -321,7 +321,7 @@ public class Search {
             // sanity check - make sure starting file offset matches first field
             if (synptr.hereiam != loc) {
                    msgbuf = "WordNet library error: no synset at location "+loc;
-                   WordNet.display_message(msgbuf);
+                   WordNet.displayMessage(msgbuf);
                    return null;
             }
             
@@ -345,8 +345,8 @@ public class Search {
               synptr.words[i] = splitLine[n++];
               
               /// is this the word we're looking for? 
-              if (word!=null && word.equals(wnUtil.strtolower(splitLine[n-1]))) {
-                 synptr.whichword = i+1;
+              if (word!=null && word.equals(wnUtil.strToLower(splitLine[n-1]))) {
+                 synptr.whichWord = i+1;
               }
               synptr.lexid[i] = Integer.parseInt(splitLine[n++], 16);
            }
@@ -360,13 +360,13 @@ public class Search {
               for (int i = 0; i < ptrcount; i++) {
                // get the pointer type
                synptr.pointers[i] = new SynSet.Pointer();
-               synptr.pointers[i].ptrtyp = wnUtil.getptrtype(splitLine[n++]);
+               synptr.pointers[i].ptrType = wnUtil.getPointerType(splitLine[n++]);
                // For adjectives, set the synset type if it has a direct
                // antonym
                if (dbase == WNConsts.ADJ && synptr.sstype == DONT_KNOW) {
-                    if (synptr.pointers[i].ptrtyp == WNConsts.ANTPTR) {
+                    if (synptr.pointers[i].ptrType == WNConsts.ANTPTR) {
                         synptr.sstype = DIRECT_ANT;
-                    } else if (synptr.pointers[i].ptrtyp == WNConsts.PERTPTR) {
+                    } else if (synptr.pointers[i].ptrType == WNConsts.PERTPTR) {
                         foundpert = 1;
                     }
                }
@@ -378,11 +378,11 @@ public class Search {
                synptr.pointers[i].ppos = wnUtil.getpos(splitLine[n++].charAt(0));
               
                // get the lexp to/from restrictions
-               wdnum= splitLine[n].substring(0,2);
-               synptr.pointers[i].pfrm = Integer.parseInt(wdnum, 16);
+               wordnum= splitLine[n].substring(0,2);
+               synptr.pointers[i].pfrm = Integer.parseInt(wordnum, 16);
               
-               wdnum= splitLine[n++].substring(2,4);
-               synptr.pointers[i].pto = Integer.parseInt(wdnum, 16);
+               wordnum= splitLine[n++].substring(2,4);
+               synptr.pointers[i].pto = Integer.parseInt(wordnum, 16);
               }
            }
               
@@ -426,7 +426,7 @@ public class Search {
     
           // Can't do earlier - calls indexlookup which messes up strtok calls
           for (int i = 0; i < synptr.wcount; i++) {
-             synptr.wnsns[i] = getsearchsense(synptr, i + 1);
+             synptr.wnsns[i] = getSearchSense(synptr, i + 1);
           }
     
           return synptr;
@@ -440,39 +440,39 @@ public class Search {
 /** Recursive search algorithm to trace a pointer tree
  */
 
-public void traceptrs(SynSet synptr, int ptrtyp, int dbase, int depth) {
+public void tracePtrs(SynSet synptr, int ptrType, int dbase, int depth) {
     int extraindent = 0;
     SynSet cursyn;
     String prefix="";
     String tbuf;
 
-    interface_doevents();
-    if (wnRtl.abortsearch) {
+    interfaceDoEvents();
+    if (wnRtl.abortSearch) {
 	return;
     }
 
-    if (ptrtyp < 0) {
-	ptrtyp = -ptrtyp;
+    if (ptrType < 0) {
+	ptrType = -ptrType;
 	extraindent = 2;
     }
     
     for (int i = 0; i < synptr.pointers.length; i++) {
-	if ((synptr.pointers[i].ptrtyp == ptrtyp) &&
+	if ((synptr.pointers[i].ptrType == ptrType) &&
 	   ((synptr.pointers[i].pfrm == 0) ||
-	    (synptr.pointers[i].pfrm == synptr.whichword))) {
+	    (synptr.pointers[i].pfrm == synptr.whichWord))) {
 
 	    if (!prflag) {	// print sense number and synset
-		printsns(synptr, sense + 1);
+		printSenses(synptr, sense + 1);
 		prflag = true;
 	    }
-	    printspaces(TRACEP, depth + extraindent);
+	    printSpaces(TRACEP, depth + extraindent);
 
-	    switch(ptrtyp) {
+	    switch(ptrType) {
                 case WNConsts.PERTPTR:
                     if (dbase == WNConsts.ADV) {
-                        prefix = "Derived from "+WNGlobal.partnames[synptr.pointers[i].ppos]+" ";
+                        prefix = "Derived from "+WNGlobal.partNames[synptr.pointers[i].ppos]+" ";
                     } else {
-                        prefix = "Pertains to "+WNGlobal.partnames[synptr.pointers[i].ppos]+" ";
+                        prefix = "Pertains to "+WNGlobal.partNames[synptr.pointers[i].ppos]+" ";
                     }
                     break;
                 case WNConsts.ANTPTR:
@@ -507,115 +507,115 @@ public void traceptrs(SynSet synptr, int ptrtyp, int dbase, int depth) {
 	    }
 
 	    // Read synset pointed to
-	    cursyn=read_synset(synptr.pointers[i].ppos, synptr.pointers[i].ptroff, "");
+	    cursyn=readSynset(synptr.pointers[i].ppos, synptr.pointers[i].ptroff, "");
 
 	    // For Pertainyms and Participles pointing to a specific
 	    //   sense, indicate the sense then retrieve the synset
 	    //   pointed to and other info as determined by type.
 	    //   Otherwise, just print the synset pointed to.
 
-	    if ((ptrtyp == WNConsts.PERTPTR || ptrtyp == WNConsts.PPLPTR) &&
+	    if ((ptrType == WNConsts.PERTPTR || ptrType == WNConsts.PPLPTR) &&
 		synptr.pointers[i].pto != 0) {
 		tbuf = " (Sense "+cursyn.wnsns[synptr.pointers[i].pto - 1]+")"+WNGlobal.lineSeparator;
-		printsynset(prefix, cursyn, tbuf, DEFOFF, synptr.pointers[i].pto,
+		printSynset(prefix, cursyn, tbuf, DEFOFF, synptr.pointers[i].pto,
 			    SKIP_ANTS, PRINT_MARKER);
-		if (ptrtyp == WNConsts.PPLPTR) { // adjective pointing to verb
-		    printsynset("      =>", cursyn, WNGlobal.lineSeparator,
+		if (ptrType == WNConsts.PPLPTR) { // adjective pointing to verb
+		    printSynset("      =>", cursyn, WNGlobal.lineSeparator,
 				DEFON, ALLWORDS, PRINT_ANTS, PRINT_MARKER);
-		    traceptrs(cursyn, WNConsts.HYPERPTR, wnUtil.getpos(cursyn.pos.charAt(0)), 0);
+		    tracePtrs(cursyn, WNConsts.HYPERPTR, wnUtil.getpos(cursyn.pos.charAt(0)), 0);
 		} else if (dbase == WNConsts.ADV) { // adverb pointing to adjective
-		    printsynset("      =>", cursyn, WNGlobal.lineSeparator, DEFON, ALLWORDS, 
+		    printSynset("      =>", cursyn, WNGlobal.lineSeparator, DEFON, ALLWORDS, 
 				((wnUtil.getsstype(cursyn.pos.charAt(0)) == WNConsts.SATELLITE)
 				 ? SKIP_ANTS : PRINT_ANTS), PRINT_MARKER);
 //#ifdef FOOP
- 		    traceptrs(cursyn, WNConsts.HYPERPTR, wnUtil.getpos(cursyn.pos.charAt(0)), 0);
+ 		    tracePtrs(cursyn, WNConsts.HYPERPTR, wnUtil.getpos(cursyn.pos.charAt(0)), 0);
 //#endif
 		} else {	// adjective pointing to noun
-		    printsynset("      =>", cursyn, WNGlobal.lineSeparator,
+		    printSynset("      =>", cursyn, WNGlobal.lineSeparator,
 				DEFON, ALLWORDS, PRINT_ANTS, PRINT_MARKER);
-		    traceptrs(cursyn, WNConsts.HYPERPTR, wnUtil.getpos(cursyn.pos.charAt(0)), 0);
+		    tracePtrs(cursyn, WNConsts.HYPERPTR, wnUtil.getpos(cursyn.pos.charAt(0)), 0);
 		}
-	    } else if (ptrtyp == WNConsts.ANTPTR && dbase != WNConsts.ADJ && synptr.pointers[i].pto != 0) {
+	    } else if (ptrType == WNConsts.ANTPTR && dbase != WNConsts.ADJ && synptr.pointers[i].pto != 0) {
 		tbuf = " (Sense "+cursyn.wnsns[synptr.pointers[i].pto - 1]+")"+WNGlobal.lineSeparator;
-		printsynset(prefix, cursyn, tbuf, DEFOFF, synptr.pointers[i].pto,
+		printSynset(prefix, cursyn, tbuf, DEFOFF, synptr.pointers[i].pto,
 			    SKIP_ANTS, PRINT_MARKER);
-		printsynset("      =>", cursyn, WNGlobal.lineSeparator, DEFON, ALLWORDS,
+		printSynset("      =>", cursyn, WNGlobal.lineSeparator, DEFON, ALLWORDS,
 			    PRINT_ANTS, PRINT_MARKER);
 	    } else {
-		printsynset(prefix, cursyn, WNGlobal.lineSeparator, DEFON, ALLWORDS,
+		printSynset(prefix, cursyn, WNGlobal.lineSeparator, DEFON, ALLWORDS,
 			    PRINT_ANTS, PRINT_MARKER);
             }
 
 	    // For HOLONYMS and MERONYMS, keep track of last one
 	    //   printed in buffer so results can be truncated later.
 
-	    if (ptrtyp >= WNConsts.ISMEMBERPTR && ptrtyp <= WNConsts.HASPARTPTR) {
-		lastholomero = searchbuffer.length();
+	    if (ptrType >= WNConsts.ISMEMBERPTR && ptrType <= WNConsts.HASPARTPTR) {
+		lastholomero = searchBuffer.length();
             }
 
 	    if (depth>0) {
-		depth = depthcheck(depth, cursyn);
-		traceptrs(cursyn, ptrtyp, wnUtil.getpos(cursyn.pos.charAt(0)), (depth+1));
+		depth = depthCheck(depth, cursyn);
+		tracePtrs(cursyn, ptrType, wnUtil.getpos(cursyn.pos.charAt(0)), (depth+1));
 
 	    }
        }
     }
 }
 
-public void tracecoords(SynSet synptr, int ptrtyp, int dbase, int depth) {
+public void traceCoords(SynSet synptr, int ptrType, int dbase, int depth) {
     SynSet cursyn;
 
-    interface_doevents();
-    if (wnRtl.abortsearch) {
+    interfaceDoEvents();
+    if (wnRtl.abortSearch) {
 	return;
     }
 
     for (int i = 0; i < synptr.pointers.length; i++) {
-	if ((synptr.pointers[i].ptrtyp == WNConsts.HYPERPTR) &&
+	if ((synptr.pointers[i].ptrType == WNConsts.HYPERPTR) &&
 	   ((synptr.pointers[i].pfrm == 0) ||
-	    (synptr.pointers[i].pfrm == synptr.whichword))) {
+	    (synptr.pointers[i].pfrm == synptr.whichWord))) {
 	    
 	    if (!prflag) {
-		printsns(synptr, sense + 1);
+		printSenses(synptr, sense + 1);
 		prflag = true;
 	    }
-	    printspaces(TRACEC, depth);
+	    printSpaces(TRACEC, depth);
 
-	    cursyn = read_synset(synptr.pointers[i].ppos, synptr.pointers[i].ptroff, "");
+	    cursyn = readSynset(synptr.pointers[i].ppos, synptr.pointers[i].ptroff, "");
 
-	    printsynset(". ", cursyn, WNGlobal.lineSeparator, DEFON, ALLWORDS,
+	    printSynset(". ", cursyn, WNGlobal.lineSeparator, DEFON, ALLWORDS,
 			SKIP_ANTS, PRINT_MARKER);
 
-	    traceptrs(cursyn, ptrtyp, wnUtil.getpos(cursyn.pos.charAt(0)), depth);
+	    tracePtrs(cursyn, ptrType, wnUtil.getpos(cursyn.pos.charAt(0)), depth);
 	    
 	    if (depth>0) {
-		depth = depthcheck(depth, cursyn);
-		tracecoords(cursyn, ptrtyp, wnUtil.getpos(cursyn.pos.charAt(0)), (depth+1));
+		depth = depthCheck(depth, cursyn);
+		traceCoords(cursyn, ptrType, wnUtil.getpos(cursyn.pos.charAt(0)), (depth+1));
 	    }
 	}
     }
 }
 
-public void tracenomins(SynSet synptr, int dbase) {
+public void traceNomins(SynSet synptr, int dbase) {
     int j;
     int idx=0;
     SynSet cursyn;
     int[] prlist = new int[32];
 
-    interface_doevents();
-    if (wnRtl.abortsearch) {
+    interfaceDoEvents();
+    if (wnRtl.abortSearch) {
 	return;
     }
 
     for (int i = 0; i < synptr.pointers.length; i++) {
-	if ((synptr.pointers[i].ptrtyp >= WNConsts.NOMIN_START) &&
-	    (synptr.pointers[i].ptrtyp <= WNConsts.NOMIN_END)) {
+	if ((synptr.pointers[i].ptrType >= WNConsts.NOMIN_START) &&
+	    (synptr.pointers[i].ptrType <= WNConsts.NOMIN_END)) {
 
 	    if (!prflag) {
-		printsns(synptr, sense + 1);
+		printSenses(synptr, sense + 1);
 		prflag = true;
 	    }
-	    cursyn = read_synset(synptr.pointers[i].ppos, synptr.pointers[i].ptroff, "");
+	    cursyn = readSynset(synptr.pointers[i].ppos, synptr.pointers[i].ptroff, "");
 
 	    for (j = 0; j < idx; j++) {
 		if (synptr.pointers[i].ptroff == prlist[j]) {
@@ -625,8 +625,8 @@ public void tracenomins(SynSet synptr, int dbase) {
 
 	    if (j == idx) {
 		prlist[idx++] = synptr.pointers[i].ptroff;
-		printspaces(TRACEP, 0);
-		printsynset("<. ", cursyn, WNGlobal.lineSeparator, DEFON, ALLWORDS,
+		printSpaces(TRACEP, 0);
+		printSynset("<. ", cursyn, WNGlobal.lineSeparator, DEFON, ALLWORDS,
 			    SKIP_ANTS, PRINT_MARKER);
 	    }
 
@@ -638,57 +638,57 @@ public void tracenomins(SynSet synptr, int dbase) {
  *  and PART info.
  */
 
-public void traceinherit(SynSet synptr, int ptrbase, int dbase, int depth) {
+public void traceInherit(SynSet synptr, int ptrbase, int dbase, int depth) {
     SynSet cursyn;
 
-    interface_doevents();
-    if (wnRtl.abortsearch) {
+    interfaceDoEvents();
+    if (wnRtl.abortSearch) {
 	return;
     }
     
     for (int i=0; i<synptr.pointers.length; i++) {
-	if ((synptr.pointers[i].ptrtyp == WNConsts.HYPERPTR) &&
+	if ((synptr.pointers[i].ptrType == WNConsts.HYPERPTR) &&
 	   ((synptr.pointers[i].pfrm == 0) ||
-	    (synptr.pointers[i].pfrm == synptr.whichword))) {
+	    (synptr.pointers[i].pfrm == synptr.whichWord))) {
 	    
 	    if (!prflag) {
-		printsns(synptr, sense + 1);
+		printSenses(synptr, sense + 1);
 		prflag = true;
 	    }
-	    printspaces(TRACEI, depth);
+	    printSpaces(TRACEI, depth);
 	    
-	    cursyn = read_synset(synptr.pointers[i].ppos, synptr.pointers[i].ptroff, "");
+	    cursyn = readSynset(synptr.pointers[i].ppos, synptr.pointers[i].ptroff, "");
 
-	    printsynset("=> ", cursyn, WNGlobal.lineSeparator, DEFON, ALLWORDS, SKIP_ANTS, PRINT_MARKER);
+	    printSynset("=> ", cursyn, WNGlobal.lineSeparator, DEFON, ALLWORDS, SKIP_ANTS, PRINT_MARKER);
 	    
-	    traceptrs(cursyn, ptrbase, WNConsts.NOUN, depth);
-	    traceptrs(cursyn, ptrbase + 1, WNConsts.NOUN, depth);
-	    traceptrs(cursyn, ptrbase + 2, WNConsts.NOUN, depth);
+	    tracePtrs(cursyn, ptrbase, WNConsts.NOUN, depth);
+	    tracePtrs(cursyn, ptrbase + 1, WNConsts.NOUN, depth);
+	    tracePtrs(cursyn, ptrbase + 2, WNConsts.NOUN, depth);
 	    
 	    if (depth>0) {
-		depth = depthcheck(depth, cursyn);
-		traceinherit(cursyn, ptrbase, wnUtil.getpos(cursyn.pos.charAt(0)), (depth+1));
+		depth = depthCheck(depth, cursyn);
+		traceInherit(cursyn, ptrbase, wnUtil.getpos(cursyn.pos.charAt(0)), (depth+1));
 	    }
 	}
     }
 
     // Truncate search buffer after last holo/meronym printed */
-    searchbuffer.setLength(lastholomero);
+    searchBuffer.setLength(lastholomero);
 }
 
-public void partsall(SynSet synptr, int ptrtyp) {
+public void partsAll(SynSet synptr, int ptrType) {
     //int hasptr = 0;
     
-    int ptrbase = (ptrtyp == WNConsts.HMERONYM) ? WNConsts.HASMEMBERPTR : WNConsts.ISMEMBERPTR;
+    int ptrbase = (ptrType == WNConsts.HMERONYM) ? WNConsts.HASMEMBERPTR : WNConsts.ISMEMBERPTR;
     
     // First, print out the MEMBER, STUFF, PART info for this synset
 
     for (int i = 0; i < 3; i++) {
-	if (HasPtr(synptr, ptrbase + i)!=0) {
-	    traceptrs(synptr, ptrbase + i, WNConsts.NOUN, 1);
+	if (hasPtr(synptr, ptrbase + i)!=0) {
+	    tracePtrs(synptr, ptrbase + i, WNConsts.NOUN, 1);
 	}
-	interface_doevents();
-	if (wnRtl.abortsearch) {
+	interfaceDoEvents();
+	if (wnRtl.abortSearch) {
 	    return;
         }
     }
@@ -696,13 +696,13 @@ public void partsall(SynSet synptr, int ptrtyp) {
     // Print out MEMBER, STUFF, PART info for hypernyms on
     // HMERONYM search only.
 
-    if (ptrtyp == WNConsts.HMERONYM) {
-	lastholomero = searchbuffer.length();
-	traceinherit(synptr, ptrbase, WNConsts.NOUN, 1);
+    if (ptrType == WNConsts.HMERONYM) {
+	lastholomero = searchBuffer.length();
+	traceInherit(synptr, ptrbase, WNConsts.NOUN, 1);
     }
 }
 
-public void traceadjant(SynSet synptr) {
+public void traceAdjant(SynSet synptr) {
     SynSet newsynptr;
     int anttype = DIRECT_ANT;
     SynSet simptr, antptr;
@@ -712,16 +712,16 @@ public void traceadjant(SynSet synptr) {
     // either direct or indirect antonyms (not valid for pertainyms).
     
     if (synptr.sstype == DIRECT_ANT || synptr.sstype == INDIRECT_ANT) {
-	printsns(synptr, sense + 1);
-	printbuffer(WNGlobal.lineSeparator);
+	printSenses(synptr, sense + 1);
+	printBuffer(WNGlobal.lineSeparator);
 	
 	// if indirect, get cluster head.
 	
 	if (synptr.sstype == INDIRECT_ANT) {
 	    anttype = INDIRECT_ANT;
             int i=0;
-	    while (synptr.pointers[i].ptrtyp != WNConsts.SIMPTR) i++;
-	    newsynptr = read_synset(WNConsts.ADJ, synptr.pointers[i].ptroff, "");
+	    while (synptr.pointers[i].ptrType != WNConsts.SIMPTR) i++;
+	    newsynptr = readSynset(WNConsts.ADJ, synptr.pointers[i].ptroff, "");
 	} else {
 	    newsynptr = synptr;
         }
@@ -731,28 +731,28 @@ public void traceadjant(SynSet synptr) {
 	
 	for (int i = 0; i < newsynptr.pointers.length; i++) {
 
-	    if (newsynptr.pointers[i].ptrtyp == WNConsts.ANTPTR &&
+	    if (newsynptr.pointers[i].ptrType == WNConsts.ANTPTR &&
 		((anttype == DIRECT_ANT &&
-		  newsynptr.pointers[i].pfrm == newsynptr.whichword) ||
+		  newsynptr.pointers[i].pfrm == newsynptr.whichWord) ||
 		 (anttype == INDIRECT_ANT))) {
 		
 		// Read the antonym's synset and print it.  if a
 		// direct antonym, print it's satellites.
 		
-		antptr = read_synset(WNConsts.ADJ, newsynptr.pointers[i].ptroff, "");
+		antptr = readSynset(WNConsts.ADJ, newsynptr.pointers[i].ptroff, "");
     
 		if (anttype == DIRECT_ANT) {
-		    printsynset("", antptr, WNGlobal.lineSeparator, DEFON, ALLWORDS,
+		    printSynset("", antptr, WNGlobal.lineSeparator, DEFON, ALLWORDS,
 				PRINT_ANTS, PRINT_MARKER);
 		    for (int j = 0; j < antptr.pointers.length; j++) {
-			if (antptr.pointers[j].ptrtyp == WNConsts.SIMPTR) {
-			    simptr = read_synset(WNConsts.ADJ, antptr.pointers[j].ptroff, "");
-			    printsynset(similar, simptr, WNGlobal.lineSeparator, DEFON,
+			if (antptr.pointers[j].ptrType == WNConsts.SIMPTR) {
+			    simptr = readSynset(WNConsts.ADJ, antptr.pointers[j].ptroff, "");
+			    printSynset(similar, simptr, WNGlobal.lineSeparator, DEFON,
 					ALLWORDS, SKIP_ANTS, PRINT_MARKER);
 			}
 		    }
 		} else {
-		    printantsynset(antptr, WNGlobal.lineSeparator, anttype, DEFON);
+		    printAntSynset(antptr, WNGlobal.lineSeparator, anttype, DEFON);
                 }
 	    }
 	}
@@ -763,9 +763,9 @@ public void traceadjant(SynSet synptr) {
 /** Fetch the given example sentence from the example file and print it out.
  */
 
-public void getexample(String offset, String wd) {
-    if (wnRtl.vsentfilefp != null) {
-        String line = binSearcher.bin_search(offset, wnRtl.vsentfilefp);
+public void getExample(String offset, String word) {
+    if (wnRtl.verbSentenceFile != null) {
+        String line = binSearcher.binSearch(offset, wnRtl.verbSentenceFile);
 	if (line != null) {
 	    for (int i=0; i<line.length(); i++) {
                 if (line.charAt(i)==' ') {
@@ -774,9 +774,9 @@ public void getexample(String offset, String wd) {
                 }
             }
 
-	    printbuffer("          EX: ");
-	    printbuffer(line);
-	    printbuffer(wd);
+	    printBuffer("          EX: ");
+	    printBuffer(line);
+	    printBuffer(word);
 	}
     }
 }
@@ -784,21 +784,21 @@ public void getexample(String offset, String wd) {
 /** Find the example sentence references in the example sentence index file.
  */
 
-public boolean findexample(SynSet synptr) {
+public boolean findExample(SynSet synptr) {
     boolean found = false;
     
-    if (wnRtl.vidxfilefp != null) {
-	int wdnum = synptr.whichword - 1;
+    if (wnRtl.verbSentenceIndexFile != null) {
+	int wordnum = synptr.whichWord - 1;
 
-        String tbuf = synptr.words[wdnum]+"%"+wnUtil.getpos(synptr.pos.charAt(0))+":"+
-                synptr.fnum+":"+synptr.lexid[wdnum]+"::";
+        String tbuf = synptr.words[wordnum]+"%"+wnUtil.getpos(synptr.pos.charAt(0))+":"+
+                synptr.fnum+":"+synptr.lexid[wordnum]+"::";
 
-        String temp = binSearcher.bin_search(tbuf, wnRtl.vidxfilefp);
+        String temp = binSearcher.binSearch(tbuf, wnRtl.verbSentenceIndexFile);
 	if (temp != null) {
 
 	    // skip over sense key and get sentence numbers.
 
-	    temp += synptr.words[wdnum].length() + 11;
+	    temp += synptr.words[wordnum].length() + 11;
 	    tbuf = temp;
 
        int i=0;
@@ -811,7 +811,7 @@ public boolean findexample(SynSet synptr) {
 
        String[] strings = wnUtil.split(tbuf.substring(i+1), ",\n");
 	    for (i=0; i<strings.length; i++) {
-		getexample(strings[i], synptr.words[wdnum]);
+		getExample(strings[i], synptr.words[wordnum]);
 	    }
 	    found = true;
 	}
@@ -819,52 +819,52 @@ public boolean findexample(SynSet synptr) {
     return found;
 }
 
-public void printframe(SynSet synptr, boolean prsynset) {
+public void printFrame(SynSet synptr, boolean prsynset) {
 
     if (prsynset) {
-	printsns(synptr, sense + 1);
+	printSenses(synptr, sense + 1);
     }
     
-    if (!findexample(synptr)) {
+    if (!findExample(synptr)) {
 	for (int i = 0; i < synptr.frames.length; i++) {
-	    if ((synptr.frames[i].frmto == synptr.whichword) ||
+	    if ((synptr.frames[i].frmto == synptr.whichWord) ||
 		(synptr.frames[i].frmto == 0)) {
-		if (synptr.frames[i].frmto == synptr.whichword) {
-		    printbuffer("          => ");
+		if (synptr.frames[i].frmto == synptr.whichWord) {
+		    printBuffer("          => ");
                 } else {
-		    printbuffer("          *> ");
+		    printBuffer("          *> ");
                 }
-		printbuffer(WNGlobal.frametext[synptr.frames[i].frmid]);
-		printbuffer(WNGlobal.lineSeparator);
+		printBuffer(WNGlobal.frameText[synptr.frames[i].frmid]);
+		printBuffer(WNGlobal.lineSeparator);
 	    }
 	}
     }
 }
 
-public void printseealso(SynSet synptr) {
+public void printSeeAlso(SynSet synptr) {
     SynSet cursyn;
     boolean first = true;
-    boolean svwnsnsflag;
+    boolean svwnsnsFlag;
     String firstline = "          Also See. ";
     String otherlines = "; ";
     String prefix = firstline;
 
-    // Find all SEEALSO pointers from the searchword and print the
+    // Find all SEEALSO pointers from the searchWord and print the
     //   word or synset pointed to.
 
     for (int i = 0; i < synptr.pointers.length; i++) {
-	if ((synptr.pointers[i].ptrtyp == WNConsts.SEEALSOPTR) &&
+	if ((synptr.pointers[i].ptrType == WNConsts.SEEALSOPTR) &&
 	    ((synptr.pointers[i].pfrm == 0) ||
-	     (synptr.pointers[i].pfrm == synptr.whichword))) {
+	     (synptr.pointers[i].pfrm == synptr.whichWord))) {
 
-	    cursyn = read_synset(synptr.pointers[i].ppos, synptr.pointers[i].ptroff, "");
+	    cursyn = readSynset(synptr.pointers[i].ppos, synptr.pointers[i].ptroff, "");
 
-	    svwnsnsflag = wnRtl.wnsnsflag;
-	    wnRtl.wnsnsflag = true;
-	    printsynset(prefix, cursyn, "", DEFOFF,
+	    svwnsnsFlag = wnRtl.wnsnsFlag;
+	    wnRtl.wnsnsFlag = true;
+	    printSynset(prefix, cursyn, "", DEFOFF,
 			synptr.pointers[i].pto == 0 ? ALLWORDS : synptr.pointers[i].pto,
 			SKIP_ANTS, SKIP_MARKER);
-	    wnRtl.wnsnsflag = svwnsnsflag;
+	    wnRtl.wnsnsFlag = svwnsnsFlag;
 
 
 	    if (first) {
@@ -874,7 +874,7 @@ public void printseealso(SynSet synptr) {
 	}
     }
     if (!first) {
-	printbuffer(WNGlobal.lineSeparator);
+	printBuffer(WNGlobal.lineSeparator);
     }
 }
 
@@ -884,12 +884,12 @@ private static String[] freqcats = {
 	"extremely rare","very rare","rare","uncommon","common",
 	"familiar","very familiar","extremely familiar"
 };
-public void freq_word(Index index) {
+public void frequencyOfWord(Index index) {
     int familiar=0;
     int cnt;
 
     if (index!=null) {
-	cnt = index.sense_cnt;
+	cnt = index.senseCount;
 	if (cnt == 0) { familiar = 0; }
 	if (cnt == 1) { familiar = 1; }
 	if (cnt == 2) { familiar = 2; }
@@ -899,24 +899,31 @@ public void freq_word(Index index) {
 	if (cnt >= 17 && cnt <= 32) { familiar = 6; }
 	if (cnt > 32 ) familiar = 7;
 	
-	tmpbuf = WNGlobal.lineSeparator+index.wd+" used as "+
+	tmpBuf = WNGlobal.lineSeparator+index.word+" used as "+
                  a_an[wnUtil.getpos(index.pos.charAt(0))]+" is "+
                  freqcats[familiar]+" (polysemy count = "+cnt+")"+
                  WNGlobal.lineSeparator;
-	printbuffer(tmpbuf);
+	printBuffer(tmpBuf);
     }
 }
 
 public static int fgets(RandomAccessFile file, byte[] line_buf) {
     //int n=0;
     try {
-        int size=file.read(line_buf);
-        for (int i=0; i<size; i++) {
-            if (line_buf[i]=='\n' || line_buf[i]=='\r') {
-                return i;
+        int start =0;
+        int len = line_buf.length>>2;
+        for (int x=0; x<4; x++) {
+            int size = file.read(line_buf, start, len);
+            if (size==0) { return -1; }
+            for (int i=0; i<size; i++) {
+                byte c = line_buf[start+i];
+                if (c=='\n' || c=='\r') {
+                    return start+i;
+                }
             }
+            start += len;
         }
-        return (size>0) ? size : -1;
+        return -1;
     } catch (java.io.IOException e) {
         e.printStackTrace();
         return -1;
@@ -926,7 +933,7 @@ public static int fgets(RandomAccessFile file, byte[] line_buf) {
     }
 }
 
-public void wngrep (String word_passed, int pos) {
+public void wnGrep (String word_passed, int pos) {
     try {
        RandomAccessFile inputfile;
        int wordlen, linelen, loc;
@@ -935,11 +942,11 @@ public void wngrep (String word_passed, int pos) {
        int count = 0;
        int size;
     
-       inputfile = wnRtl.indexfps[pos];
+       inputfile = wnRtl.indexFiles[pos];
        if (inputfile == null) {
           msgbuf = "WordNet library error: Can't perform compounds " +
-                   "search because "+WNGlobal.partnames[pos]+" index file is not open"+WNGlobal.lineSeparator;
-          WordNet.display_message (msgbuf);
+                   "search because "+WNGlobal.partNames[pos]+" index file is not open"+WNGlobal.lineSeparator;
+          WordNet.displayMessage (msgbuf);
           return;
        }
        inputfile.seek(0);
@@ -967,14 +974,14 @@ public void wngrep (String word_passed, int pos) {
                 ((line.charAt(loc + wordlen) == '-') || (line.charAt(loc + wordlen) == '_')))
              ) {
                 line.replace('_', ' ');
-                tmpbuf = line+WNGlobal.lineSeparator;
-                printbuffer (tmpbuf);
+                tmpBuf = line+WNGlobal.lineSeparator;
+                printBuffer (tmpBuf);
                 break;
              }
           }
           if (count++ % 2000 == 0) {
-             interface_doevents ();
-             if (wnRtl.abortsearch) {
+             interfaceDoEvents ();
+             if (wnRtl.abortSearch) {
                  break;
              }
           }
@@ -1021,30 +1028,30 @@ public void relatives(Index idx, int dbase) {
 
     switch(dbase) {
         case WNConsts.NOUN:
-            findsisters(idx);
-            interface_doevents();
-            if (wnRtl.abortsearch) {
+            findSisters(idx);
+            interfaceDoEvents();
+            if (wnRtl.abortSearch) {
                 break;
             }
-            findtwins(idx);
-            interface_doevents();
-            if (wnRtl.abortsearch) {
+            findTwins(idx);
+            interfaceDoEvents();
+            if (wnRtl.abortSearch) {
                 break;
             }
-            findcousins(idx);
-            interface_doevents();
-            if (wnRtl.abortsearch) {
+            findCousins(idx);
+            interfaceDoEvents();
+            if (wnRtl.abortSearch) {
                 break;
             }
-            printrelatives(idx, WNConsts.NOUN);
+            printRelatives(idx, WNConsts.NOUN);
             break;
         case WNConsts.VERB:
-            findverbgroups(idx);
-            interface_doevents();
-            if (wnRtl.abortsearch) {
+            findVerbGroups(idx);
+            interfaceDoEvents();
+            if (wnRtl.abortSearch) {
                 break;
             }
-            printrelatives(idx, WNConsts.VERB);
+            printRelatives(idx, WNConsts.VERB);
             break;
         default:
             break;
@@ -1055,20 +1062,20 @@ public void relatives(Index idx, int dbase) {
 /** Look for 'twins' - synsets with 3 or more words in common.
  */
 
-public int word_idx(String wd, String wdtable[], int nwords) {
-     for ( ; --nwords >= 0 && !(wd.equals(wdtable[nwords])); )
+public int wordIdx(String word, String wordtable[], int nwords) {
+     for ( ; --nwords >= 0 && !(word.equals(wordtable[nwords])); )
 	  ;
      return nwords;
 }
 
-public int add_word(String wd, String wdtable[], int nwords) {
-     wdtable[nwords] = wd;
+public int addWord(String word, String wordtable[], int nwords) {
+    wordtable[nwords] = word;
      return nwords;
 }
 
 public final static int MAXWRDS = 300;
 
-public void findtwins(Index idx) {
+public void findTwins(Index idx) {
      String[] words = new String[MAXWRDS];
      Set[] s = new HashSet[WNConsts.MAXSENSE];
      int nwords =0;
@@ -1078,15 +1085,15 @@ public void findtwins(Index idx) {
      }
      for (int i = 0; i < idx.offset.length; i++) {
 
-	  SynSet synset = read_synset(WNConsts.NOUN, idx.offset[i], "");
+	  SynSet synset = readSynset(WNConsts.NOUN, idx.offset[i], "");
 
 	  s[i] = new HashSet(MAXWRDS);
 	  if (synset.wcount >=  3) {
 	       for (int j = 0; j < synset.wcount; j++) {
-		    String buf = wnUtil.strtolower(synset.words[j]);
-		    int k = word_idx(buf, words, nwords);
+		    String buf = wnUtil.strToLower(synset.words[j]);
+		    int k = wordIdx(buf, words, nwords);
 		    if (k < 0) {
-			 k = add_word(buf, words, nwords);
+			 k = addWord(buf, words, nwords);
 			 if (nwords >= MAXWRDS) {
                              throw new NullPointerException("");
                          }
@@ -1103,7 +1110,7 @@ public void findtwins(Index idx) {
              Set n = new HashSet(s[i]);
              n.retainAll(s[j]);
              if (n.size() >= 3) {
-	         add_relatives(WNConsts.NOUN, idx, j, i);
+	         addRelatives(WNConsts.NOUN, idx, j, i);
              }
          }
      }
@@ -1114,7 +1121,7 @@ private Hypers[] hypers = new Hypers[HASHTABSIZE];
 
 /** Look for 'sisters' - senses of the search word with a common parent.
  */
-public void findsisters(Index idx) {
+public void findSisters(Index idx) {
      int id = 0;
      Set[] syns = new HashSet[WNConsts.MAXSENSE];
 
@@ -1125,14 +1132,14 @@ public void findsisters(Index idx) {
      // Read all synsets and list all hyperptrs.
 
      for (int i = 0; i < idx.offset.length; i++) {
-	  SynSet synset = read_synset(WNConsts.NOUN, idx.offset[i], idx.wd);
+	  SynSet synset = readSynset(WNConsts.NOUN, idx.offset[i], idx.word);
 	  if (synset==null) {
               throw new NullPointerException("");
           }
 	  syns[i] = new HashSet(4*WNConsts.MAXSENSE);
 	  
 	  for (int j = 0; j < synset.pointers.length; j++) {
-	       if (synset.pointers[j].ptrtyp == WNConsts.HYPERPTR) { 
+	       if (synset.pointers[j].ptrType == WNConsts.HYPERPTR) { 
 		    int l = hash(synset.pointers[j].ptroff);
 		    for ( ; hypers[l] == null || hypers[l].off != synset.pointers[j].ptroff; l++) {
 			 if (hypers[l] == null) {
@@ -1156,7 +1163,7 @@ public void findsisters(Index idx) {
                Set n = new HashSet(syns[i]);
                n.retainAll(syns[j]);
 	       if (!n.isEmpty()) {
-	           add_relatives(WNConsts.NOUN, idx, i, j);
+	           addRelatives(WNConsts.NOUN, idx, i, j);
                }
          }
      }
@@ -1167,9 +1174,9 @@ public void findsisters(Index idx) {
  * Return index of topnode if it exists.
  */
 
-public int find_topnode( int offset) {
+public int findTopnode( int offset) {
      // test to see whether the Cousin files exist (they do not for 1.7)
-     if (wnRtl.cousinfp==null) {  return -1; }
+     if (wnRtl.cousinFile==null) {  return -1; }
 
      int hashval = hash(offset);
 
@@ -1189,9 +1196,9 @@ public int find_topnode( int offset) {
 /** Return an empty slot for <offset> to be placed in.
  */
 
-public int new_topnode( int offset) {
+public int newTopnode( int offset) {
      // test to see whether the Cousin files exist (they do not for 1.7)
-     if (wnRtl.cousinfp==null) {  return -1; }
+     if (wnRtl.cousinFile==null) {  return -1; }
         
      int hashval = hash(offset);
 
@@ -1208,7 +1215,7 @@ public int new_topnode( int offset) {
      return -1;		// table is full
 }
 
-public void add_topnode(int index, int id, Set s,  int offset) {
+public void addTopnode(int index, int id, Set s,  int offset) {
     if ((index >= 0) && (index < HASHTABSIZE)) {
 	cousintops[index].rels   = s;
 	cousintops[index].topnum = id;
@@ -1216,7 +1223,7 @@ public void add_topnode(int index, int id, Set s,  int offset) {
     }
 }
 
-public void clear_topnodes() {
+public void clearTopnodes() {
     for (int i = 0; i < HASHTABSIZE; i++) {
 	cousintops[i].offset = 0;
     }
@@ -1225,38 +1232,38 @@ public void clear_topnodes() {
 /** Read cousin.tops file (one time only) and store in different form.
  */
 
-private boolean read_cousintops_done = false;
-public int read_cousintops() {
+private boolean readCousintops_done = false;
+public int readCousintops() {
    try {
         int id = 0;
         int top1, top2;
         int tidx1, tidx2;
         
-        if (read_cousintops_done) { return 0; }
+        if (readCousintops_done) { return 0; }
         
         // test to see whether the Cousin files exist (they do not for 1.7)
-        if (wnRtl.cousinfp==null) {  return 0; }
+        if (wnRtl.cousinFile==null) {  return 0; }
         
-        wnRtl.cousinfp.seek(0);
-        clear_topnodes();
+        wnRtl.cousinFile.seek(0);
+        clearTopnodes();
         
         top1=1;
         while (top1>0) {
             top1=0; top2=0;
-            if ((tidx1 = find_topnode(top1)) < 0) {
-                if ((tidx1 = new_topnode(top1)) != -1) {
-                    add_topnode(tidx1, id++, new HashSet(MAXTOPS), top1);
+            if ((tidx1 = findTopnode(top1)) < 0) {
+                if ((tidx1 = newTopnode(top1)) != -1) {
+                    addTopnode(tidx1, id++, new HashSet(MAXTOPS), top1);
                 } else {
-                    WordNet.display_message("WordNet library error: cannot create topnode table for grouped sarches");
+                    WordNet.displayMessage("WordNet library error: cannot create topnode table for grouped sarches");
                     return -1;
                 }
             }
          
-            if ((tidx2 = find_topnode(top2)) < 0) {
-                if ((tidx2 = new_topnode(top2)) != -1) {
-                    add_topnode(tidx2, id++, new HashSet(MAXTOPS), top2);
+            if ((tidx2 = findTopnode(top2)) < 0) {
+                if ((tidx2 = newTopnode(top2)) != -1) {
+                    addTopnode(tidx2, id++, new HashSet(MAXTOPS), top2);
                 } else {
-                    WordNet.display_message("WordNet library error: cannot create topnode table for grouped sarches");
+                    WordNet.displayMessage("WordNet library error: cannot create topnode table for grouped sarches");
                     return -1;
                 }
             }
@@ -1264,7 +1271,7 @@ public int read_cousintops() {
             cousintops[tidx1].rels.add(new Integer( cousintops[tidx2].topnum) );
             cousintops[tidx2].rels.add(new Integer( cousintops[tidx1].topnum) );
         }
-        read_cousintops_done = true;
+        readCousintops_done = true;
         return 0;
    } catch (Exception e) {
        e.printStackTrace();
@@ -1280,43 +1287,43 @@ private static abstract class TraceHyperPtr {
  */
 private static class RecordTopnode extends TraceHyperPtr {
     public void fn(Search searcher, int hyperptr, Object cp) {
-         searcher.record_topnode(hyperptr, (Set[])cp);
+         searcher.recordTopnode(hyperptr, (Set[])cp);
     }
 }
 
-public void record_topnode( int hyperptr, Set[] sets) {
+public void recordTopnode( int hyperptr, Set[] sets) {
      if (sets==null) {
          throw new NullPointerException("sets should not be null");
      }
-     int i = find_topnode(hyperptr);
+     int i = findTopnode(hyperptr);
      if (i >= 0) {
 	 sets[0].add(new Integer(cousintops[i].topnum) );
 	 sets[1].addAll(cousintops[i].rels);
      }
 }
 
-public void findcousins(Index idx) {
+public void findCousins(Index idx) {
      SynSet synset;
      Set[][] syns_tops = new HashSet[WNConsts.MAXSENSE][2];
      
      if (idx==null) {
          throw new NullPointerException("idx should not be null");
      }
-     if (read_cousintops() != 0)
+     if (readCousintops() != 0)
 	 return;
 
      // First read all the synsets.
 
      int nsyns;
      for (nsyns = 0; nsyns < idx.offset.length; nsyns++) { // why -1 in orig?
-	  synset = read_synset(WNConsts.NOUN, idx.offset[nsyns], "");
+	  synset = readSynset(WNConsts.NOUN, idx.offset[nsyns], "");
 	  syns_tops[nsyns][0] = new HashSet(MAXTOPS);
 	  syns_tops[nsyns][1] = new HashSet(MAXTOPS);
 
-	  record_topnode(idx.offset[nsyns], syns_tops[nsyns]);
+	  recordTopnode(idx.offset[nsyns], syns_tops[nsyns]);
 
           
-	  trace_hyperptrs(synset, new RecordTopnode(),  syns_tops[nsyns], 1);
+	  traceHyperptrs(synset, new RecordTopnode(),  syns_tops[nsyns], 1);
      }
      
      for (int i = 0; i < nsyns; i++) {
@@ -1324,7 +1331,7 @@ public void findcousins(Index idx) {
              Set n = new HashSet(syns_tops[i][0]);
              n.retainAll(syns_tops[j][1]);
 	       if (!n.isEmpty()) {
-		    add_relatives(WNConsts.NOUN, idx, i, j);
+		    addRelatives(WNConsts.NOUN, idx, i, j);
                }
          }
      }
@@ -1334,24 +1341,24 @@ public void findcousins(Index idx) {
 /** Trace through HYPERPTRs up to MAXDEPTH, running `fn()' on each one.
  */ 
 
-public void trace_hyperptrs(SynSet synptr, TraceHyperPtr tracer, Object cp, int depth) {
+public void traceHyperptrs(SynSet synptr, TraceHyperPtr tracer, Object cp, int depth) {
      SynSet s;
      
      if (depth >= WNConsts.MAXDEPTH) {
 	  return;
      }
      for (int i = 0; i < synptr.pointers.length; i++)
-	  if (synptr.pointers[i].ptrtyp == WNConsts.HYPERPTR) {
+	  if (synptr.pointers[i].ptrType == WNConsts.HYPERPTR) {
 	       tracer.fn(this, synptr.pointers[i].ptroff, cp);
 	       
-	       s = read_synset(synptr.pointers[i].ppos, synptr.pointers[i].ptroff, "");
-	       trace_hyperptrs(s, tracer, cp, depth+1);
+	       s = readSynset(synptr.pointers[i].ppos, synptr.pointers[i].ptroff, "");
+	       traceHyperptrs(s, tracer, cp, depth+1);
 	  }
 }
 
 
 
-public void findverbgroups(Index idx) {
+public void findVerbGroups(Index idx) {
      SynSet synset;
 
      if (idx==null) {
@@ -1362,17 +1369,17 @@ public void findverbgroups(Index idx) {
      
      for (int i = 0; i < idx.offset.length; i++) {
 
-	 synset = read_synset(WNConsts.VERB, idx.offset[i], idx.wd);
+	 synset = readSynset(WNConsts.VERB, idx.offset[i], idx.word);
 	
 	 // Look for VERBGROUP ptr(s) for this sense.  If found,
 	 // create group for senses, or add to existing group.
 
 	 for (int j = 0; j < synset.pointers.length; j++) {
-	       if (synset.pointers[j].ptrtyp == WNConsts.VERBGROUP) {
+	       if (synset.pointers[j].ptrType == WNConsts.VERBGROUP) {
 		   // Need to find sense number for ptr offset.
 		   for (int k = 0; k < idx.offset.length; k++) {
 		       if (synset.pointers[j].ptroff == idx.offset[k]) {
-			   add_relatives(WNConsts.VERB, idx, i, k);
+			   addRelatives(WNConsts.VERB, idx, i, k);
 			   break;
 		       }
 		   }
@@ -1381,11 +1388,11 @@ public void findverbgroups(Index idx) {
      }
 }
 
-public void add_relatives(int pos, Index idx, int rel1, int rel2)
+public void addRelatives(int pos, Index idx, int rel1, int rel2)
 {
     RelGrp rel, last, r;
     // First make sure that senses are not on the excpetion list.
-    if (pos == WNConsts.NOUN && groupexc(idx.offset[rel1], idx.offset[rel2])) {
+    if (pos == WNConsts.NOUN && groupExceptions(idx.offset[rel1], idx.offset[rel2])) {
 	return;
     }
 
@@ -1421,12 +1428,12 @@ public void add_relatives(int pos, Index idx, int rel1, int rel2)
 }
 
 
-public boolean groupexc( int off1,  int off2) {
-    if (wnRtl.cousinexcfp==null) {
+public boolean groupExceptions( int off1,  int off2) {
+    if (wnRtl.cousinExcFile==null) {
         return false;
     }
     String buf = "" + (off1 < off2 ? off1 : off2);
-    String searchResult = binSearcher.bin_search(buf, wnRtl.cousinexcfp);
+    String searchResult = binSearcher.binSearch(buf, wnRtl.cousinExcFile);
     if (searchResult != null) {
          buf =""+(off2 > off1 ? off2 : off1);
          String linebuf = searchResult.substring(9,searchResult.length()-1); // don't copy key
@@ -1455,7 +1462,7 @@ public RelGrp mkrellist()
 
 
 
-public void printrelatives(Index idx, int dbase) {
+public void printRelatives(Index idx, int dbase) {
     SynSet synptr;
     RelGrp rel;
     int[] outsenses = new int[WNConsts.MAXSENSE];
@@ -1470,23 +1477,23 @@ public void printrelatives(Index idx, int dbase) {
 	for (int i = 0; i < idx.offset.length; i++) {
 	    if (rel.senses[i]!=0 && outsenses[i]==0) {
 		flag = true;
-		synptr = read_synset(dbase, idx.offset[i], "");
-		printsns(synptr, i + 1);
-		traceptrs(synptr, WNConsts.HYPERPTR, dbase, 0);
+		synptr = readSynset(dbase, idx.offset[i], "");
+		printSenses(synptr, i + 1);
+		tracePtrs(synptr, WNConsts.HYPERPTR, dbase, 0);
 		outsenses[i] = 1;
 	    }
 	}
 	if (flag) {
-	    printbuffer("--------------"+WNGlobal.lineSeparator);
+	    printBuffer("--------------"+WNGlobal.lineSeparator);
         }
     }
 
     for (int i = 0; i < idx.offset.length; i++) {
 	if (outsenses[i]==0) {
-	    synptr = read_synset(dbase, idx.offset[i], "");
-	    printsns(synptr, i + 1);
-	    traceptrs(synptr, WNConsts.HYPERPTR, dbase, 0);
-	    printbuffer("--------------"+WNGlobal.lineSeparator);
+	    synptr = readSynset(dbase, idx.offset[i], "");
+	    printSenses(synptr, i + 1);
+	    tracePtrs(synptr, WNConsts.HYPERPTR, dbase, 0);
+	    printBuffer("--------------"+WNGlobal.lineSeparator);
 	}
     }
 }
@@ -1495,11 +1502,11 @@ public void printrelatives(Index idx, int dbase) {
 /**
  * Search code interfaces to WordNet database.
  *
- * findtheinfo() - print search results and return ptr to output buffer
- * findtheinfo_ds() - return search results in linked list data structrure
+ * findTheInfo() - print search results and return ptr to output buffer
+ * findTheInfo_ds() - return search results in linked list data structrure
 */
 
-public String findtheinfo(String searchstr, int dbase, int ptrtyp, int whichsense) {
+public String findTheInfo(String searchstr, int dbase, int ptrType, int whichsense) {
     SynSet cursyn;
     Index idx = null;
     int depth = 0;
@@ -1511,73 +1518,73 @@ public String findtheinfo(String searchstr, int dbase, int ptrtyp, int whichsens
     // Initializations -
     // clear output buffer, search results structure, flags.
 
-    searchbuffer.setLength(0);
+    searchBuffer.setLength(0);
 
-    wnRtl.wnresults = new SearchResults();
-    wnRtl.wnresults.numforms = wnRtl.wnresults.printcnt = 0;
-    wnRtl.wnresults.searchbuf = searchbuffer.toString();
-    wnRtl.wnresults.searchds = null;
+    wnRtl.wnResults = new SearchResults();
+    wnRtl.wnResults.numForms = wnRtl.wnResults.printCount = 0;
+    wnRtl.wnResults.searchBuf = searchBuffer.toString();
+    wnRtl.wnResults.searchDs = null;
 
-    wnRtl.abortsearch = false;
+    wnRtl.abortSearch = false;
     boolean overflag = false;
     
     for (int i = 0; i < WNConsts.MAXSENSE; i++) {
 	offsets[i] = 0;
     }
 
-    switch (ptrtyp) {
+    switch (ptrType) {
     case WNConsts.OVERVIEW:
 	WNOverview(searchstr, dbase);
 	break;
     case WNConsts.FREQ:
-	while ((idx = getindex(searchstr, dbase)) != null) {
+	while ((idx = getIndex(searchstr, dbase)) != null) {
 	    searchstr = null;
-	    wnRtl.wnresults.senseCount[wnRtl.wnresults.numforms] = idx.offset.length;
-	    freq_word(idx);
-	    wnRtl.wnresults.numforms++;
+	    wnRtl.wnResults.senseCount[wnRtl.wnResults.numForms] = idx.offset.length;
+	    frequencyOfWord(idx);
+	    wnRtl.wnResults.numForms++;
 	}
 	break;
     case WNConsts.WNGREP:
-	wngrep(searchstr, dbase);
+	wnGrep(searchstr, dbase);
 	break;
     case WNConsts.WNESCORT:
-	searchbuffer.setLength(0);
-        searchbuffer.append("Sentences containing "+searchstr+" will be displayed in the Escort window.");
+	searchBuffer.setLength(0);
+        searchBuffer.append("Sentences containing "+searchstr+" will be displayed in the Escort window.");
 	break;
     case WNConsts.RELATIVES:
     case WNConsts.VERBGROUP:
-	while ((idx = getindex(searchstr, dbase)) != null) {
+	while ((idx = getIndex(searchstr, dbase)) != null) {
 	    searchstr = null;
-	    wnRtl.wnresults.senseCount[wnRtl.wnresults.numforms] = idx.offset.length;
+	    wnRtl.wnResults.senseCount[wnRtl.wnResults.numForms] = idx.offset.length;
 	    relatives(idx, dbase);
-	    wnRtl.wnresults.numforms++;
+	    wnRtl.wnResults.numForms++;
 	}
 	break;
     default:
 
 	// If negative search type, set flag for recursive search
-	if (ptrtyp < 0) {
-	    ptrtyp = -ptrtyp;
+	if (ptrType < 0) {
+	    ptrType = -ptrType;
 	    depth = 1;
 	}
-	bufstart = searchbuffer.length();
+	bufstart = searchBuffer.length();
 	offsetcnt = 0;
 
 	// look at all spellings of word
 
-	while ((idx = getindex(searchstr, dbase)) != null) {
+	while ((idx = getIndex(searchstr, dbase)) != null) {
 
-	    searchstr = null;	// clear out for next call to getindex()
-	    wnRtl.wnresults.senseCount[wnRtl.wnresults.numforms] = idx.offset.length;
-	    wnRtl.wnresults.outSenseCount[wnRtl.wnresults.numforms] = 0;
+	    searchstr = null;	// clear out for next call to getIndex()
+	    wnRtl.wnResults.senseCount[wnRtl.wnResults.numForms] = idx.offset.length;
+	    wnRtl.wnResults.outSenseCount[wnRtl.wnResults.numForms] = 0;
 
 	    // Print extra sense msgs if looking at all senses
 	    if (whichsense == WNConsts.ALLSENSES) {
-		printbuffer(
+		printBuffer(
 "                                                                         "+WNGlobal.lineSeparator);
             }
 
-	    // Go through all of the searchword's senses in the
+	    // Go through all of the searchWord's senses in the
 	    //   database and perform the search requested.
 
 	    for (sense = 0; sense < idx.offset.length; sense++) {
@@ -1595,85 +1602,85 @@ public String findtheinfo(String searchstr, int dbase, int ptrtyp, int whichsens
 		    }
 		    if (!skipit) {
 		    	offsets[offsetcnt++] = idx.offset[sense];
-		    	cursyn = read_synset(dbase, idx.offset[sense], idx.wd);
-		    	switch(ptrtyp) {
+		    	cursyn = readSynset(dbase, idx.offset[sense], idx.word);
+		    	switch(ptrType) {
 		    	case WNConsts.ANTPTR:
                             if (dbase == WNConsts.ADJ) {
-			    	traceadjant(cursyn);
+			    	traceAdjant(cursyn);
                             } else {
-			    	traceptrs(cursyn, WNConsts.ANTPTR, dbase, depth);
+			    	tracePtrs(cursyn, WNConsts.ANTPTR, dbase, depth);
                             }
 			    break;
 		   	 
 		    	case WNConsts.COORDS:
-			    tracecoords(cursyn, WNConsts.HYPOPTR, dbase, depth);
+			    traceCoords(cursyn, WNConsts.HYPOPTR, dbase, depth);
 			    break;
 		   	 
 		    	case WNConsts.FRAMES:
-			    printframe(cursyn, true);
+			    printFrame(cursyn, true);
 			    break;
 			    
 		    	case WNConsts.MERONYM:
-			    traceptrs(cursyn, WNConsts.HASMEMBERPTR, dbase, depth);
-			    traceptrs(cursyn, WNConsts.HASSTUFFPTR, dbase, depth);
-			    traceptrs(cursyn, WNConsts.HASPARTPTR, dbase, depth);
+			    tracePtrs(cursyn, WNConsts.HASMEMBERPTR, dbase, depth);
+			    tracePtrs(cursyn, WNConsts.HASSTUFFPTR, dbase, depth);
+			    tracePtrs(cursyn, WNConsts.HASPARTPTR, dbase, depth);
 			    break;
 			    
 		    	case WNConsts.HOLONYM:
-			    traceptrs(cursyn, WNConsts.ISMEMBERPTR, dbase, depth);
-			    traceptrs(cursyn, WNConsts.ISSTUFFPTR, dbase, depth);
-			    traceptrs(cursyn, WNConsts.ISPARTPTR, dbase, depth);
+			    tracePtrs(cursyn, WNConsts.ISMEMBERPTR, dbase, depth);
+			    tracePtrs(cursyn, WNConsts.ISSTUFFPTR, dbase, depth);
+			    tracePtrs(cursyn, WNConsts.ISPARTPTR, dbase, depth);
 			    break;
 			   	 
 		    	case WNConsts.HMERONYM:
-			    partsall(cursyn, WNConsts.HMERONYM);
+			    partsAll(cursyn, WNConsts.HMERONYM);
 			    break;
 			   	 
 		    	case WNConsts.HHOLONYM:
-			    partsall(cursyn, WNConsts.HHOLONYM);
+			    partsAll(cursyn, WNConsts.HHOLONYM);
 			    break;
 			   	 
 		    	case WNConsts.SEEALSOPTR:
-			    printseealso(cursyn);
+			    printSeeAlso(cursyn);
 			    break;
 	
 //#ifdef FOOP
 			case WNConsts.PPLPTR:
-			    traceptrs(cursyn, ptrtyp, dbase, depth);
-			    traceptrs(cursyn, WNConsts.PPLPTR, dbase, depth);
+			    tracePtrs(cursyn, ptrType, dbase, depth);
+			    tracePtrs(cursyn, WNConsts.PPLPTR, dbase, depth);
 			    break;
 //#endif
 		    
 		    	case WNConsts.SIMPTR:
 		    	case WNConsts.SYNS:
 		    	case WNConsts.HYPERPTR:
-			    printsns(cursyn, sense + 1);
+			    printSenses(cursyn, sense + 1);
 			    prflag = true;
 		    
-			    traceptrs(cursyn, ptrtyp, dbase, depth);
+			    tracePtrs(cursyn, ptrType, dbase, depth);
 		    
 			    if (dbase == WNConsts.ADJ) {
-			    	traceptrs(cursyn, WNConsts.PERTPTR, dbase, depth);
-			    	traceptrs(cursyn, WNConsts.PPLPTR, dbase, depth);
+			    	tracePtrs(cursyn, WNConsts.PERTPTR, dbase, depth);
+			    	tracePtrs(cursyn, WNConsts.PPLPTR, dbase, depth);
 			    } else if (dbase == WNConsts.ADV) {
-			    	traceptrs(cursyn, WNConsts.PERTPTR, dbase, depth);
+			    	tracePtrs(cursyn, WNConsts.PERTPTR, dbase, depth);
 			    }
 
-			    if (wnRtl.saflag)	{ // print SEE ALSO pointers.
-			    	printseealso(cursyn);
+			    if (wnRtl.saFlag)	{ // print SEE ALSO pointers.
+			    	printSeeAlso(cursyn);
                             }
 			    
-			    if (dbase == WNConsts.VERB && wnRtl.frflag) {
-			    	printframe(cursyn, false);
+			    if (dbase == WNConsts.VERB && wnRtl.frFlag) {
+			    	printFrame(cursyn, false);
                             }
 			    break;
 
 			case WNConsts.NOMINALIZATIONS:
-			    tracenomins(cursyn, dbase);
+			    traceNomins(cursyn, dbase);
 			    break;
 
 		    	default:
-			    traceptrs(cursyn, ptrtyp, dbase, depth);
+			    tracePtrs(cursyn, ptrType, dbase, depth);
 			    break;
 
 		    	} // end switch
@@ -1683,8 +1690,8 @@ public String findtheinfo(String searchstr, int dbase, int ptrtyp, int whichsens
 		} // end if (whichsense)
 
 		if (!skipit) {
-		    interface_doevents();
-		    if ((whichsense == sense + 1) || wnRtl.abortsearch || overflag) {
+		    interfaceDoEvents();
+		    if ((whichsense == sense + 1) || wnRtl.abortSearch || overflag) {
 		    	break;	// break out of loop - we're done
                     }
 		}
@@ -1694,87 +1701,87 @@ public String findtheinfo(String searchstr, int dbase, int ptrtyp, int whichsens
 	    // Done with an index entry - patch in number of senses output.
 
 	    if (whichsense == WNConsts.ALLSENSES) {
-		int i = wnRtl.wnresults.outSenseCount[wnRtl.wnresults.numforms];
+		int i = wnRtl.wnResults.outSenseCount[wnRtl.wnResults.numForms];
 		if (i == idx.offset.length && i == 1) {
-		    tmpbuf = WNGlobal.lineSeparator+"1 sense of "+ idx.wd;
+		    tmpBuf = WNGlobal.lineSeparator+"1 sense of "+ idx.word;
 		} else if (i == idx.offset.length) {
-		    tmpbuf = WNGlobal.lineSeparator+i+" senses of "+idx.wd;
+		    tmpBuf = WNGlobal.lineSeparator+i+" senses of "+idx.word;
 		} else if (i > 0) {	// printed some senses
-		    tmpbuf = WNGlobal.lineSeparator+i+" of "+idx.offset.length+" senses of "+idx.wd;
+		    tmpBuf = WNGlobal.lineSeparator+i+" of "+idx.offset.length+" senses of "+idx.word;
                 }
 
-		// Find starting offset in searchbuffer for this index
+		// Find starting offset in searchBuffer for this index
 		// entry and patch string in.  Then update bufstart
-		// to end of searchbuffer for start of next index entry.
+		// to end of searchBuffer for start of next index entry.
 
 		if (i > 0) {
-		    if (wnRtl.wnresults.numforms > 0) {
-			searchbuffer.insert(bufstart++, WNGlobal.lineSeparator).insert(bufstart, tmpbuf.toString());
+		    if (wnRtl.wnResults.numForms > 0) {
+			searchBuffer.insert(bufstart++, WNGlobal.lineSeparator).insert(bufstart, tmpBuf.toString());
 		    } else {
-		        searchbuffer.insert(bufstart, tmpbuf.toString());
+		        searchBuffer.insert(bufstart, tmpBuf.toString());
                     }
-		    bufstart = searchbuffer.length();
+		    bufstart = searchBuffer.length();
 		}
 	    }
 
-	    interface_doevents();
-	    if (overflag || wnRtl.abortsearch) {
+	    interfaceDoEvents();
+	    if (overflag || wnRtl.abortSearch) {
 		break;		// break out of while (idx) loop.
             }
 
-	    wnRtl.wnresults.numforms++;
+	    wnRtl.wnResults.numForms++;
 
 	} // end while (idx)
 
     } // end switch
 
-    interface_doevents();
-    if (wnRtl.abortsearch) {
-	printbuffer(WNGlobal.lineSeparator+"Search Interrupted...");
+    interfaceDoEvents();
+    if (wnRtl.abortSearch) {
+	printBuffer(WNGlobal.lineSeparator+"Search Interrupted...");
     } else if (overflag) {
-        searchbuffer.setLength(0);
-	searchbuffer.append("Search too large.  Narrow search and try again..."+WNGlobal.lineSeparator);
+        searchBuffer.setLength(0);
+	searchBuffer.append("Search too large.  Narrow search and try again..."+WNGlobal.lineSeparator);
     }
 
     // replace underscores with spaces before returning.
 
-    return searchbuffer.toString().replace('_', ' ');
+    return searchBuffer.toString().replace('_', ' ');
 }
 
-public SynSet findtheinfo_ds(String searchstr, int dbase, int ptrtyp, int whichsense) {
+public SynSet findTheInfo_ds(String searchstr, int dbase, int ptrType, int whichsense) {
     Index idx;
     SynSet cursyn;
     SynSet synlist = null, lastsyn = null;
     int depth = 0;
     boolean newsense = false;
 
-    wnRtl.wnresults.numforms = 0;
-    wnRtl.wnresults.printcnt = 0;
+    wnRtl.wnResults.numForms = 0;
+    wnRtl.wnResults.printCount = 0;
 
-    while ((idx = getindex(searchstr, dbase)) != null) {
+    while ((idx = getIndex(searchstr, dbase)) != null) {
 
 	searchstr = null;	// clear out for next call.
 	newsense = true;
 	
-	if (ptrtyp < 0) {
-	    ptrtyp = -ptrtyp;
+	if (ptrType < 0) {
+	    ptrType = -ptrType;
 	    depth = 1;
 	}
 
-	wnRtl.wnresults.senseCount[wnRtl.wnresults.numforms] = idx.offset.length;
-	wnRtl.wnresults.outSenseCount[wnRtl.wnresults.numforms] = 0;
-	wnRtl.wnresults.searchbuf = null;
-	wnRtl.wnresults.searchds = null;
+	wnRtl.wnResults.senseCount[wnRtl.wnResults.numForms] = idx.offset.length;
+	wnRtl.wnResults.outSenseCount[wnRtl.wnResults.numForms] = 0;
+	wnRtl.wnResults.searchBuf = null;
+	wnRtl.wnResults.searchDs = null;
 
-	// Go through all of the searchword's senses in the
+	// Go through all of the searchWord's senses in the
 	// database and perform the search requested.
 	
 	for (sense = 0; sense < idx.offset.length; sense++) {
 	    if (whichsense == WNConsts.ALLSENSES || whichsense == sense + 1) {
-		cursyn = read_synset(dbase, idx.offset[sense], idx.wd);
+		cursyn = readSynset(dbase, idx.offset[sense], idx.word);
 		if (lastsyn!=null) {
 		    if (newsense) {
-			lastsyn.nextform = cursyn;
+			lastsyn.nextForm = cursyn;
 		    } else {
 			lastsyn.nextss = cursyn;
                     }
@@ -1784,8 +1791,8 @@ public SynSet findtheinfo_ds(String searchstr, int dbase, int ptrtyp, int whichs
                 }
 		newsense = false;
 	    
-		cursyn.searchtype = ptrtyp;
-		cursyn.ptrlist = traceptrs_ds(cursyn, ptrtyp, 
+		cursyn.searchType = ptrType;
+		cursyn.ptrList = tracePtrs_ds(cursyn, ptrType, 
 					       wnUtil.getpos(cursyn.pos.charAt(0)),
 					       depth);
 	    
@@ -1796,14 +1803,14 @@ public SynSet findtheinfo_ds(String searchstr, int dbase, int ptrtyp, int whichs
                 }
 	    }
 	}
-	wnRtl.wnresults.numforms++;
+	wnRtl.wnResults.numForms++;
 
-	if (ptrtyp == WNConsts.COORDS) {	// clean up by removing hypernym.
-	    lastsyn = synlist.ptrlist;
-	    synlist.ptrlist = lastsyn.ptrlist;
+	if (ptrType == WNConsts.COORDS) {	// clean up by removing hypernym.
+	    lastsyn = synlist.ptrList;
+	    synlist.ptrList = lastsyn.ptrList;
 	}
     }
-    wnRtl.wnresults.searchds = synlist;
+    wnRtl.wnResults.searchDs = synlist;
     return synlist;
 }
 
@@ -1811,9 +1818,9 @@ public SynSet findtheinfo_ds(String searchstr, int dbase, int ptrtyp, int whichs
  * in linked list of data structures.
  */
 
-public SynSet traceptrs_ds(SynSet synptr, int ptrtyp, int dbase, int depth) {
+public SynSet tracePtrs_ds(SynSet synptr, int ptrType, int dbase, int depth) {
     SynSet cursyn, synlist = null, lastsyn = null;
-    int tstptrtyp;
+    int tstptrType;
     boolean docoords;
     
     // If synset is a satellite, find the head word of its
@@ -1821,31 +1828,31 @@ public SynSet traceptrs_ds(SynSet synptr, int ptrtyp, int dbase, int depth) {
 
     if (wnUtil.getsstype(synptr.pos.charAt(0)) == WNConsts.SATELLITE) {
 	for (int i = 0; i < synptr.pointers.length; i++)
-	    if (synptr.pointers[i].ptrtyp == WNConsts.SIMPTR) {
-		cursyn = read_synset(synptr.pointers[i].ppos,
+	    if (synptr.pointers[i].ptrType == WNConsts.SIMPTR) {
+		cursyn = readSynset(synptr.pointers[i].ppos,
 				      synptr.pointers[i].ptroff,
 				      "");
-		synptr.headword = cursyn.words[0];
-		synptr.headsense = cursyn.lexid[0];
+		synptr.headWord = cursyn.words[0];
+		synptr.headSense = cursyn.lexid[0];
 		break;
 	    }
     }
 
-    if (ptrtyp == WNConsts.COORDS) {
-	tstptrtyp = WNConsts.HYPERPTR;
+    if (ptrType == WNConsts.COORDS) {
+	tstptrType = WNConsts.HYPERPTR;
 	docoords = true;
     } else {
-	tstptrtyp = ptrtyp;
+	tstptrType = ptrType;
 	docoords = false;
     }
 
     for (int i = 0; i < synptr.pointers.length; i++) {
-	if ((synptr.pointers[i].ptrtyp == tstptrtyp) &&
+	if ((synptr.pointers[i].ptrType == tstptrType) &&
 	   ((synptr.pointers[i].pfrm == 0) ||
-	    (synptr.pointers[i].pfrm == synptr.whichword))) {
+	    (synptr.pointers[i].pfrm == synptr.whichWord))) {
 	    
-	    cursyn=read_synset(synptr.pointers[i].ppos, synptr.pointers[i].ptroff, "");
-	    cursyn.searchtype = ptrtyp;
+	    cursyn=readSynset(synptr.pointers[i].ppos, synptr.pointers[i].ptroff, "");
+	    cursyn.searchType = ptrType;
 
 	    if (lastsyn!=null) {
 		lastsyn.nextss = cursyn;
@@ -1856,12 +1863,12 @@ public SynSet traceptrs_ds(SynSet synptr, int ptrtyp, int dbase, int depth) {
 	    lastsyn = cursyn;
 
 	    if (depth>0) {
-		depth = depthcheck(depth, cursyn);
-		cursyn.ptrlist = traceptrs_ds(cursyn, ptrtyp,
+		depth = depthCheck(depth, cursyn);
+		cursyn.ptrList = tracePtrs_ds(cursyn, ptrType,
 					       wnUtil.getpos(cursyn.pos.charAt(0)),
 					       (depth+1));
 	    } else if (docoords) {
-		cursyn.ptrlist = traceptrs_ds(cursyn, WNConsts.HYPOPTR, WNConsts.NOUN, 0);
+		cursyn.ptrList = tracePtrs_ds(cursyn, WNConsts.HYPOPTR, WNConsts.NOUN, 0);
 	    }
 	}
     }
@@ -1876,23 +1883,24 @@ public void WNOverview(String searchstr, int pos) {
     String cpstring = searchstr;
     int bufstart;
     int offsetcnt;
-    boolean svdflag, skipit;
+    boolean svdFlag;
+    boolean skipit = false;
     int offsets[] = new int[WNConsts.MAXSENSE];
 
     cpstring = searchstr;
-    bufstart = searchbuffer.length();
+    bufstart = searchBuffer.length();
     for (int i = 0; i < WNConsts.MAXSENSE; i++) {
 	offsets[i] = 0;
     }
     offsetcnt = 0;
 
     StringBuffer sb = new StringBuffer(4096);
-    while ((idx = getindex(cpstring, pos)) != null) {
-	cpstring = null;	// clear for next call to getindex().
-	wnRtl.wnresults.senseCount[wnRtl.wnresults.numforms++] = idx.offset.length;
-	wnRtl.wnresults.outSenseCount[wnRtl.wnresults.numforms] = 0;
+    while ((idx = getIndex(cpstring, pos)) != null) {
+	cpstring = null;	// clear for next call to getIndex().
+	wnRtl.wnResults.senseCount[wnRtl.wnResults.numForms++] = idx.offset.length;
+	wnRtl.wnResults.outSenseCount[wnRtl.wnResults.numForms] = 0;
 
-	printbuffer(
+	printBuffer(
 "                                                                                                   "+WNGlobal.lineSeparator);
 
 	// Print synset for each sense.  If requested, precede
@@ -1900,7 +1908,7 @@ public void WNOverview(String searchstr, int pos) {
 
 	for (sense = 0; sense < idx.offset.length; sense++) {
             sb.setLength(0);
-            skipit = false;
+            //skipit = false;
 	    for (int i = 0;  i < offsetcnt && !skipit; i++) {
 		if (offsets[i] == idx.offset[sense]) {
 		    skipit = true;
@@ -1909,80 +1917,80 @@ public void WNOverview(String searchstr, int pos) {
 
 	    if (!skipit) {
 		offsets[offsetcnt++] = idx.offset[sense];
-		cursyn = read_synset(pos, idx.offset[sense], idx.wd);
-		if (idx.tagged_cnt != -1 && ((sense + 1) <= idx.tagged_cnt)) {
+		cursyn = readSynset(pos, idx.offset[sense], idx.word);
+		if (idx.taggedCount != -1 && ((sense + 1) <= idx.taggedCount)) {
 		    sb.append(sense + 1).append(". (");
-                    sb.append(wnUtil.GetTagcnt(idx, sense + 1)).append(") ");
+                    sb.append(wnUtil.getTagCount(idx, sense + 1)).append(") ");
 		} else {
 		    sb.append(sense + 1).append(". ");
 		}
 
-		svdflag = wnRtl.dflag;
-		wnRtl.dflag = true;
-                tmpbuf = sb.toString();
-		printsynset(tmpbuf, cursyn, WNGlobal.lineSeparator, DEFON, ALLWORDS,
+		svdFlag = wnRtl.dFlag;
+		wnRtl.dFlag = true;
+                tmpBuf = sb.toString();
+		printSynset(tmpBuf, cursyn, WNGlobal.lineSeparator, DEFON, ALLWORDS,
 			    SKIP_ANTS, SKIP_MARKER);
-		wnRtl.dflag = svdflag;
-		wnRtl.wnresults.outSenseCount[wnRtl.wnresults.numforms]++;
-		wnRtl.wnresults.printcnt++;
+		wnRtl.dFlag = svdFlag;
+		wnRtl.wnResults.outSenseCount[wnRtl.wnResults.numForms]++;
+		wnRtl.wnResults.printCount++;
 
 	    }
 	}
 
 	// Print sense summary message.
 
-	int i = wnRtl.wnresults.outSenseCount[wnRtl.wnresults.numforms];
+	int i = wnRtl.wnResults.outSenseCount[wnRtl.wnResults.numForms];
 
 	if (i > 0) {
             sb.setLength(0);
 	    if (i == 1) {
-		sb.append(WNGlobal.lineSeparator).append("The ").append(WNGlobal.partnames[pos]).append(" ");
-                sb.append(idx.wd).append(" has 1 sense");
+		sb.append(WNGlobal.lineSeparator).append("The ").append(WNGlobal.partNames[pos]).append(" ");
+                sb.append(idx.word).append(" has 1 sense");
 	    } else {
-		sb.append(WNGlobal.lineSeparator).append("The ").append(WNGlobal.partnames[pos]).append(" ");
-                sb.append(idx.wd).append(" has ").append(i).append(" senses");
+		sb.append(WNGlobal.lineSeparator).append("The ").append(WNGlobal.partNames[pos]).append(" ");
+                sb.append(idx.word).append(" has ").append(i).append(" senses");
             }
-	    if (idx.tagged_cnt > 0) {
-		sb.append(" (first ").append(idx.tagged_cnt).append(" from tagged texts)").append(WNGlobal.lineSeparator);
-	    } else if (idx.tagged_cnt == 0) {
+	    if (idx.taggedCount > 0) {
+		sb.append(" (first ").append(idx.taggedCount).append(" from tagged texts)").append(WNGlobal.lineSeparator);
+	    } else if (idx.taggedCount == 0) {
 		sb.append(" (no senses from tagged texts)").append(WNGlobal.lineSeparator);
             }
 
-	    searchbuffer.insert(bufstart, sb.toString());
-	    bufstart = searchbuffer.length();
+	    searchBuffer.insert(bufstart, sb.toString());
+	    bufstart = searchBuffer.length();
 	} else {
-	    searchbuffer.setLength(bufstart);
+	    searchBuffer.setLength(bufstart);
         }
 
-	wnRtl.wnresults.numforms++;
+	wnRtl.wnResults.numForms++;
     }
 }
 
 /** Do requested search on synset passed, returning output in buffer.
  */
 
-public StringBuffer do_trace(SynSet synptr, int ptrtyp, int dbase, int depth) {
-    searchbuffer.setLength(0);	// clear output buffer.
-    traceptrs(synptr, ptrtyp, dbase, depth);
-    return searchbuffer;
+public StringBuffer doTrace(SynSet synptr, int ptrType, int dbase, int depth) {
+    searchBuffer.setLength(0);	// clear output buffer.
+    tracePtrs(synptr, ptrType, dbase, depth);
+    return searchBuffer;
 }
 
 /** Set bit for each search type that is valid for the search word
  * passed and return bit mask.
  */
   
-public int is_defined(String searchstr, int dbase) {
+public int isDefined(String searchstr, int dbase) {
     Index index;
     int retval = 0;
 
-    wnRtl.wnresults.numforms = wnRtl.wnresults.printcnt = 0;
-    wnRtl.wnresults.searchbuf = null;
-    wnRtl.wnresults.searchds = null;
+    wnRtl.wnResults.numForms = wnRtl.wnResults.printCount = 0;
+    wnRtl.wnResults.searchBuf = null;
+    wnRtl.wnResults.searchDs = null;
 
-    while ((index = getindex(searchstr, dbase)) != null) {
-	searchstr = null;	// clear out for next getindex() call.
+    while ((index = getIndex(searchstr, dbase)) != null) {
+	searchstr = null;	// clear out for next getIndex() call.
 
-	wnRtl.wnresults.senseCount[wnRtl.wnresults.numforms] = index.offset.length;
+	wnRtl.wnResults.senseCount[wnRtl.wnResults.numForms] = index.offset.length;
 	
 	// set bits that must be true for all words.
 	
@@ -2015,10 +2023,10 @@ public int is_defined(String searchstr, int dbase) {
 	    retval |= (1<<WNConsts.RELATIVES);
 
 	    // check for inherited holonyms and meronyms.
-	    if ((HasHoloMero(index, WNConsts.HMERONYM))>0) {
+	    if ((hasHoloMero(index, WNConsts.HMERONYM))>0) {
 		retval |= (1<<WNConsts.HMERONYM);
             }
-	    if ((HasHoloMero(index, WNConsts.HHOLONYM))>0) {
+	    if ((hasHoloMero(index, WNConsts.HHOLONYM))>0) {
 		retval |= (1<<WNConsts.HHOLONYM);
             }
 
@@ -2037,7 +2045,7 @@ public int is_defined(String searchstr, int dbase) {
 	    retval |= (1<<WNConsts.RELATIVES) | (1<<WNConsts.FRAMES);
 	}
 
-	wnRtl.wnresults.numforms++;
+	wnRtl.wnResults.numForms++;
     }
     return retval;
 }
@@ -2046,21 +2054,21 @@ public int is_defined(String searchstr, int dbase) {
  *  meronyms or holonyms.
  */
 
-public int HasHoloMero(Index index, int ptrtyp) {
+public int hasHoloMero(Index index, int ptrType) {
     SynSet synset, psynset;
     int found=0;
     int ptrbase;
 
-    ptrbase = (ptrtyp == WNConsts.HMERONYM) ? WNConsts.HASMEMBERPTR : WNConsts.ISMEMBERPTR;
+    ptrbase = (ptrType == WNConsts.HMERONYM) ? WNConsts.HASMEMBERPTR : WNConsts.ISMEMBERPTR;
     
     for (int i = 0; i < index.offset.length; i++) {
-	synset = read_synset(WNConsts.NOUN, index.offset[i], "");
+	synset = readSynset(WNConsts.NOUN, index.offset[i], "");
 	for (int j = 0; j < synset.pointers.length; j++) {
-	    if (synset.pointers[j].ptrtyp == WNConsts.HYPERPTR) {
-		psynset = read_synset(WNConsts.NOUN, synset.pointers[j].ptroff, "");
-		found += HasPtr(psynset, ptrbase);
-		found += HasPtr(psynset, ptrbase + 1);
-		found += HasPtr(psynset, ptrbase + 2);
+	    if (synset.pointers[j].ptrType == WNConsts.HYPERPTR) {
+		psynset = readSynset(WNConsts.NOUN, synset.pointers[j].ptroff, "");
+		found += hasPtr(psynset, ptrbase);
+		found += hasPtr(psynset, ptrbase + 1);
+		found += hasPtr(psynset, ptrbase + 2);
 
 	    }
 	}
@@ -2068,9 +2076,9 @@ public int HasHoloMero(Index index, int ptrtyp) {
     return found;
 }
 
-public int HasPtr(SynSet synptr, int ptrtyp) {
+public int hasPtr(SynSet synptr, int ptrType) {
     for (int i = 0; i < synptr.pointers.length; i++) {
-        if (synptr.pointers[i].ptrtyp == ptrtyp) {
+        if (synptr.pointers[i].ptrType == ptrType) {
 	    return(1);
 	}
     }
@@ -2082,25 +2090,25 @@ public int HasPtr(SynSet synptr, int ptrtyp) {
  *  Return 0 if word is not in WordNet.
  */
 
-public int in_wn(String word, int pos) {
+public int inWN(String word, int pos) {
     int retval = 0;
 
     if (pos == WNConsts.ALL_POS) {
 	for (int i = 1; i < WNConsts.NUMPARTS + 1; i++) {
-	    if (wnRtl.indexfps[i] != null && binSearcher.bin_search(word, wnRtl.indexfps[i]) != null) {
+	    if (wnRtl.indexFiles[i] != null && binSearcher.binSearch(word, wnRtl.indexFiles[i]) != null) {
 		retval |= (1<<i);
             }
         }
-    } else if (wnRtl.indexfps[pos] != null && binSearcher.bin_search(word,wnRtl.indexfps[pos]) != null) {
+    } else if (wnRtl.indexFiles[pos] != null && binSearcher.binSearch(word,wnRtl.indexFiles[pos]) != null) {
 	    retval |= (1<<pos);
     }
     return retval;
 }
 
-public int depthcheck(int depth, SynSet synptr) {
+public int depthCheck(int depth, SynSet synptr) {
     if (depth >= WNConsts.MAXDEPTH) {
 	msgbuf = "WordNet library error: Error Cycle detected"+WNGlobal.lineSeparator+"   "+synptr.words[0];
-	WordNet.display_message(msgbuf);
+	WordNet.displayMessage(msgbuf);
 	depth = -1;		// reset to get one more trace then quit.
     }
     return depth;
@@ -2109,17 +2117,17 @@ public int depthcheck(int depth, SynSet synptr) {
 /** Strip off () enclosed comments from a word.
  */
 
-public String deadjify(String word) {
-    adj_marker = WNConsts.UNKNOWN_MARKER; // default if not adj or unknown.
+public String deadJify(String word) {
+    adjMarker = WNConsts.UNKNOWN_MARKER; // default if not adj or unknown.
     
     for (int y=0; y<word.length(); y++) {
 	if (word.charAt(y) == '(') {
 	    if ("(a)".equals(word.substring(y,y+2))) {
-		adj_marker = WNConsts.ATTRIBUTIVE;
+		adjMarker = WNConsts.ATTRIBUTIVE;
 	    } else if ("(ip)".equals(word.substring(y,y+3))) {
-		adj_marker = WNConsts.IMMED_POSTNOMINAL;
+		adjMarker = WNConsts.IMMED_POSTNOMINAL;
             } else if ("(p)".equals(word.substring(y,y+2))) {
-		adj_marker = WNConsts.PREDICATIVE;
+		adjMarker = WNConsts.PREDICATIVE;
             }
 	    word = word.substring(y);
             break;
@@ -2128,10 +2136,10 @@ public String deadjify(String word) {
     return word;
 }
 
-public int getsearchsense(SynSet synptr, int whichword) {
-    wdbuf = synptr.words[whichword - 1].replace(' ', '_');
-    wnUtil.strtolower(wdbuf);
-    Index idx = index_lookup(wdbuf, wnUtil.getpos(synptr.pos.charAt(0)));    
+public int getSearchSense(SynSet synptr, int whichWord) {
+   wordbuf = synptr.words[whichWord - 1].replace(' ', '_');
+    wnUtil.strToLower(wordbuf);
+    Index idx = indexLookup(wordbuf, wnUtil.getpos(synptr.pos.charAt(0)));    
     if (idx != null) {
 	for (int i = 0; i < idx.offset.length; i++)
 	    if (idx.offset[i] == synptr.hereiam) {
@@ -2141,7 +2149,7 @@ public int getsearchsense(SynSet synptr, int whichword) {
     return 0;
 }
 
-public void printsynset(String head, SynSet synptr, String tail, int definition, int wdnum, int antflag, int markerflag) {
+public void printSynset(String head, SynSet synptr, String tail, int definition, int wordnum, int antflag, int markerflag) {
     StringBuffer tbuf = new StringBuffer(1024*16);
 
     tbuf.append(head);		// print head.
@@ -2149,45 +2157,45 @@ public void printsynset(String head, SynSet synptr, String tail, int definition,
     // Precede synset with additional information as indiecated
     // by flags.
 
-    if (wnRtl.offsetflag)		// print synset offset.
+    if (wnRtl.offsetFlag)		// print synset offset.
 	tbuf.append("{").append(synptr.hereiam).append("} ");
-    if (wnRtl.fileinfoflag) {		// print lexicographer file information.
-	tbuf.append("<").append(WNGlobal.lexfiles[synptr.fnum]).append("> ");
+    if (wnRtl.fileInfoFlag) {		// print lexicographer file information.
+	tbuf.append("<").append(WNGlobal.lexFiles[synptr.fnum]).append("> ");
 	prlexid = 1;		// print lexicographer id after word.
     } else
 	prlexid = 0;
     
-    if (wdnum!=0) {			// print only specific word asked for.
-	catword(tbuf, synptr, wdnum - 1, markerflag, antflag);
+    if (wordnum!=0) {			// print only specific word asked for.
+	catWord(tbuf, synptr, wordnum - 1, markerflag, antflag);
     } else {			// print all words in synset.
-	int wdcnt = synptr.wcount;
-        for (int i = 0; i < wdcnt; i++) {
-	    catword(tbuf, synptr, i, markerflag, antflag);
-	    if (i < wdcnt - 1) {
+	int wordcnt = synptr.wcount;
+        for (int i = 0; i <wordcnt; i++) {
+	    catWord(tbuf, synptr, i, markerflag, antflag);
+	    if (i < wordcnt - 1) {
 		tbuf.append(", ");
             }
 	}
     }
-    if (definition!=0 && wnRtl.dflag && synptr.defn!=null) {
+    if (definition!=0 && wnRtl.dFlag && synptr.defn!=null) {
 	tbuf.append(" -- ");
 	tbuf.append(synptr.defn);
     }
     
     tbuf.append(tail);
-    printbuffer(tbuf.toString());
+    printBuffer(tbuf.toString());
 }
 
-public void printantsynset(SynSet synptr, String tail, int anttype, int definition) {
+public void printAntSynset(SynSet synptr, String tail, int anttype, int definition) {
     StringBuffer tbuf = new StringBuffer(1024*16);
     String str;
     boolean first = true;
 
 
-    if (wnRtl.offsetflag) {
+    if (wnRtl.offsetFlag) {
 	tbuf.append("{").append(synptr.hereiam).append("} ");
     }
-    if (wnRtl.fileinfoflag) {
-	tbuf.append("<").append(WNGlobal.lexfiles[synptr.fnum]).append("> ");
+    if (wnRtl.fileInfoFlag) {
+	tbuf.append("<").append(WNGlobal.lexFiles[synptr.fnum]).append("> ");
 	prlexid = 1;
     } else {
 	prlexid = 0;
@@ -2196,13 +2204,13 @@ public void printantsynset(SynSet synptr, String tail, int anttype, int definiti
     // print anotnyms from cluster head (of indirect ant)
     
     tbuf.append("INDIRECT (VIA ");
-    int wdcnt = synptr.wcount;
-    for (int i = 0; i < wdcnt; i++) {
+    int wordcnt = synptr.wcount;
+    for (int i = 0; i < wordcnt; i++) {
 	if (first) {
-	    str = printant(WNConsts.ADJ, synptr, i + 1, "%s", ", ");
+	    str = printAnt(WNConsts.ADJ, synptr, i + 1, "%s", ", ");
 	    first = false;
 	} else {
-	    str = printant(WNConsts.ADJ, synptr, i + 1, ", %s", ", ");
+	    str = printAnt(WNConsts.ADJ, synptr, i + 1, ", %s", ", ");
         }
 	if (str!=null) {
 	    tbuf.append(str);
@@ -2212,24 +2220,24 @@ public void printantsynset(SynSet synptr, String tail, int anttype, int definiti
     
     // now print synonyms from cluster head (of indirect ant).
     
-    wdcnt = synptr.wcount;
-    for (int i = 0; i < wdcnt; i++) {
-	catword(tbuf, synptr, i, SKIP_MARKER, SKIP_ANTS);
-	if (i < wdcnt - 1) {
+   wordcnt = synptr.wcount;
+    for (int i = 0; i < wordcnt; i++) {
+	catWord(tbuf, synptr, i, SKIP_MARKER, SKIP_ANTS);
+	if (i < wordcnt - 1) {
 	    tbuf.append(", ");
         }
     }
     
-    if (wnRtl.dflag && synptr.defn!=null && definition!=0) {
+    if (wnRtl.dFlag && synptr.defn!=null && definition!=0) {
 	tbuf.append(" -- ");
 	tbuf.append(synptr.defn);
     }
     
     tbuf.append(tail);
-    printbuffer(tbuf.toString());
+    printBuffer(tbuf.toString());
 }
 
-   public void catword(StringBuffer buf, SynSet synptr, int wdnum, int adjmarker, int antflag) {
+   public void catWord(StringBuffer buf, SynSet synptr, int wordnum, int adjmarker, int antflag) {
       String vs = " (vs. %s)";
       String[] markers = {
               "",			// UNKNOWN_MARKER
@@ -2238,16 +2246,16 @@ public void printantsynset(SynSet synptr, String tail, int anttype, int definiti
               "(predicate)",		// PREDICATIVE
       };
       
-      buf.append(deadjify(synptr.words[wdnum]));
+      buf.append(deadJify(synptr.words[wordnum]));
       
       // Print additional lexicographer information and WordNet sense
       // number as indicated by flags.
       
-      if (prlexid!=0 && (synptr.lexid[wdnum] != 0)) {
-          buf.append(synptr.lexid[wdnum]);
+      if (prlexid!=0 && (synptr.lexid[wordnum] != 0)) {
+          buf.append(synptr.lexid[wordnum]);
       }
-      if (wnRtl.wnsnsflag) {
-          buf.append(synptr.wnsns[wdnum]);
+      if (wnRtl.wnsnsFlag) {
+          buf.append(synptr.wnsns[wordnum]);
       }
    
       // For adjectives, append adjective marker if present, and
@@ -2255,51 +2263,51 @@ public void printantsynset(SynSet synptr, String tail, int anttype, int definiti
    
       if (wnUtil.getpos(synptr.pos.charAt(0)) == WNConsts.ADJ) {
          if (adjmarker == PRINT_MARKER) {
-             buf.append(markers[adj_marker]); 
+             buf.append(markers[adjMarker]); 
          }
          if (antflag == PRINT_ANTS) {
-             buf.append(printant(WNConsts.ADJ, synptr, wdnum + 1, vs, ""));
+             buf.append(printAnt(WNConsts.ADJ, synptr, wordnum + 1, vs, ""));
          }
       }
    }
 
-public String printant(int dbase, SynSet synptr, int wdnum, String template, String tail) {
-   int wdoff;
+public String printAnt(int dbase, SynSet synptr, int wordnum, String template, String tail) {
+   int wordoff;
    StringBuffer retbuf = new StringBuffer(1024*16);
    boolean first = true;
 
     
     // Go through all the pointers looking for anotnyms from the word
-    //   indicated by wdnum.  When found, print all the antonym's
-    //   antonym pointers which point back to wdnum.
+    //   indicated by.wordnum.  When found, print all the antonym's
+    //   antonym pointers which point back to.wordnum.
     
    for (int i = 0; i < synptr.pointers.length; i++) {
-       if (synptr.pointers[i].ptrtyp == WNConsts.ANTPTR && synptr.pointers[i].pfrm == wdnum) {
+       if (synptr.pointers[i].ptrType == WNConsts.ANTPTR && synptr.pointers[i].pfrm == wordnum) {
 
-           SynSet psynptr = read_synset(dbase, synptr.pointers[i].ptroff, "");
+           SynSet psynptr = readSynset(dbase, synptr.pointers[i].ptroff, "");
 
 	   for (int j = 0; j < psynptr.pointers.length; j++) {
-              if (    psynptr.pointers[j].ptrtyp == WNConsts.ANTPTR &&
-                      psynptr.pointers[j].pto == wdnum &&
+              if (    psynptr.pointers[j].ptrType == WNConsts.ANTPTR &&
+                      psynptr.pointers[j].pto == wordnum &&
                       psynptr.pointers[j].ptroff == synptr.hereiam) {
       
-                wdoff = (psynptr.pointers[j].pfrm!=0) ? (psynptr.pointers[j].pfrm - 1) : 0;
+               wordoff = (psynptr.pointers[j].pfrm!=0) ? (psynptr.pointers[j].pfrm - 1) : 0;
       
                 // Construct buffer containing formatted antonym,
                 // then add it onto end of return buffer.
       
-                String tmp = deadjify(psynptr.words[wdoff]);
+                String tmp = deadJify(psynptr.words[wordoff]);
                 StringBuffer tbuf = new StringBuffer(tmp.length()+1024);
                 tbuf.append(tmp);
       
                 // Print additional lexicographer information and
                 // WordNet sense number as indicated by flags.
          
-                if (prlexid>0 && (psynptr.lexid[wdoff] != 0)) {
-                   tbuf.append(psynptr.lexid[wdoff]);
+                if (prlexid>0 && (psynptr.lexid[wordoff] != 0)) {
+                   tbuf.append(psynptr.lexid[wordoff]);
                 }
-                if (wnRtl.wnsnsflag) {
-                   tbuf.append("#").append(psynptr.wnsns[wdoff]);
+                if (wnRtl.wnsnsFlag) {
+                   tbuf.append("#").append(psynptr.wnsns[wordoff]);
                 }
                 if (!first) {
                     retbuf.append(tail);
@@ -2320,63 +2328,63 @@ public String printant(int dbase, SynSet synptr, int wdnum, String template, Str
    return retbuf.toString();
 }
 
-   public void printbuffer(String string) {
-      if (overflag) {
-         return;
-      }
-      if (searchbuffer.length() + string.length() >= WNConsts.SEARCHBUF) {
-         overflag = true;
-      } else { 
-         searchbuffer.append(string);
-      }
+   public void printBuffer(String string) {
+      //if (overflag) {
+      //   return;
+      //}
+      //if (searchBuffer.length() + string.length() >= WNConsts.SEARCHBUF) {
+      //   overflag = true;
+      //} else { 
+         searchBuffer.append(string);
+      //}
    }
 
-   public void printsns(SynSet synptr, int sense) {
-      printsense(synptr, sense);
-      printsynset("", synptr, WNGlobal.lineSeparator, DEFON, ALLWORDS, PRINT_ANTS, PRINT_MARKER);
+   public void printSenses(SynSet synptr, int sense) {
+      printSense(synptr, sense);
+      printSynset("", synptr, WNGlobal.lineSeparator, DEFON, ALLWORDS, PRINT_ANTS, PRINT_MARKER);
    }
    
-   public void printsense(SynSet synptr, int sense) {
+   public void printSense(SynSet synptr, int sense) {
       String tbuf;
    
       // Append lexicographer filename after Sense # if flag is set.
    
-      if (wnRtl.fnflag) {
-         tbuf = WNGlobal.lineSeparator+"Sense "+sense+" in file \""+WNGlobal.lexfiles[synptr.fnum]+"\""+WNGlobal.lineSeparator;
+      if (wnRtl.fnFlag) {
+         tbuf = WNGlobal.lineSeparator+"Sense "+sense+" in file \""+WNGlobal.lexFiles[synptr.fnum]+"\""+WNGlobal.lineSeparator;
       } else {
          tbuf = WNGlobal.lineSeparator+"Sense "+sense+WNGlobal.lineSeparator;
       }
    
-      printbuffer(tbuf);
+      printBuffer(tbuf);
    
       // update counters.
-      wnRtl.wnresults.outSenseCount[wnRtl.wnresults.numforms]++; 
-      wnRtl.wnresults.printcnt++;
+      wnRtl.wnResults.outSenseCount[wnRtl.wnResults.numForms]++; 
+      wnRtl.wnResults.printCount++;
    }
 
-   public void printspaces(int trace, int depth) {
+   public void printSpaces(int trace, int depth) {
    
       for (int j = 0; j < depth; j++) {
-         printbuffer("    ");
+         printBuffer("    ");
       }
       switch(trace) {
-         case TRACEP:		// traceptrs(), tracenomins().
+         case TRACEP:		// tracePtrs(), traceNomins().
             if (depth!=0) {
-               printbuffer("   ");
+               printBuffer("   ");
             } else {
-               printbuffer("       ");
+               printBuffer("       ");
             }
             break;
             
-         case TRACEC:		// tracecoords().
+         case TRACEC:		// traceCoords().
             if (depth==0) {
-               printbuffer("    ");
+               printBuffer("    ");
             }
             break;
             
-         case TRACEI:			// traceinherit().
+         case TRACEI:			// traceInherit().
             if (depth==0) {
-               printbuffer(WNGlobal.lineSeparator+"    ");
+               printBuffer(WNGlobal.lineSeparator+"    ");
             }
             break;
       }
@@ -2386,9 +2394,9 @@ public String printant(int dbase, SynSet synptr, int wdnum, String template, Str
     *  the user wants to stop the search.
     */
    
-   public void interface_doevents () {
-      // FIXME if (interface_doevents_func != null) {
-      // FIXME    interface_doevents_func ();
+   public void interfaceDoEvents () {
+      // FIXME if (interfaceDoEvents_func != null) {
+      // FIXME    interfaceDoEvents_func ();
       // FIXME }
    }
    
