@@ -31,12 +31,14 @@ import opennlp.maxent.IntegerPool;
  * Created: Sat Oct 27 11:46:46 2001
  *
  * @author Eric D. Friedman
- * @version $Id: DefaultEndOfSentenceScanner.java,v 1.1 2003/11/05 03:31:04 tsmorton Exp $
+ * @version $Id: DefaultEndOfSentenceScanner.java,v 1.2 2004/01/27 22:09:16 tsmorton Exp $
  */
 
 public class DefaultEndOfSentenceScanner implements EndOfSentenceScanner {
 
     protected static final IntegerPool INT_POOL = new IntegerPool(500);
+    
+    public static final char[] eosCharacters =  {'.','?','!'};
     
     /**
      * Creates a new <code>DefaultEndOfSentenceScanner</code> instance.
@@ -62,9 +64,9 @@ public class DefaultEndOfSentenceScanner implements EndOfSentenceScanner {
             case '.':
             case '?':
             case '!':
-            case '"':
-            case '\'':
-            case ')':
+            //case '"':
+            //case '\'':
+            //case ')':
                 l.add(INT_POOL.get(i));
                 break;
             default:
