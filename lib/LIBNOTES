@@ -6,12 +6,12 @@ for details.
 ------------------------------------------------------------------------
 ant.jar 
 
-The Jakarta Ant Build System, version 1.4
+The Jakarta Ant Build System, version 1.5
 Homepage: http://jakarta.apache.org/ant/
 License: Apache Software License
 
-A Java based build tool. It is supported by crimson.jar and jaxp.jar,
-and license information for those is included in this directory.
+A Java based build tool. It is supported by xml-apis and license
+information for that is included in this directory.
 
 
 ------------------------------------------------------------------------

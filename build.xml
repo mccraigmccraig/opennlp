@@ -1,4 +1,4 @@
-<!-- $Id: build.xml,v 1.26 2002/06/05 17:15:14 jasonbaldridge Exp $ -->
+<!-- $Id: build.xml,v 1.27 2002/08/19 14:11:13 jasonbaldridge Exp $ -->
 <!-- This build file based on the JDOM build.xml file. -->
 
 <project name="OpenNLP" default="package" basedir=".">
@@ -15,7 +15,7 @@
 
     <echo message="----------- ${Name} ${version} [${year}] ------------"/>
 
-    <property name="build.compiler" value="classic"/>
+    <property name="build.compiler" value="modern"/>
     <property name="debug" value="on"/>
     <property name="optimize" value="off"/>
     <property name="deprecation" value="on"/>
@@ -40,7 +40,7 @@
     <filter token="verbose" value="true"/>
 
     <path id="build.classpath">
-      <pathelement location="${lib.dir}/gnu-regexp.jar"/>
+      <pathelement location="${lib.dir}/opennlp.jar"/>
       <pathelement location="${lib.dir}/jdom.jar"/>
       <pathelement location="${lib.dir}/xerces.jar"/>
     </path>
