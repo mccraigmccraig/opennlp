@@ -1,1 +1,1 @@
-Main-Class: opennlp.dictionary.WordNet
+Main-Class: opennlp.dictionary.wordnet.WordNet
