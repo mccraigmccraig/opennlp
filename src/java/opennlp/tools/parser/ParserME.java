@@ -57,7 +57,7 @@ public class ParserME {
   public static final String TOP_NODE = "TOP";
   public static final String TOK_NODE = "TK";
 
-  private static final Integer ZERO = new Integer(0);
+  public static final Integer ZERO = new Integer(0);
 
   /** Prefix for outcomes starting a constituent. */
   public static final String START = "S-";
@@ -65,7 +65,7 @@ public class ParserME {
   public static final String CONT = "C-";
   /** Outcome for token which is not contained in a basal constituent. */
   public static final String OTHER = "O";
-  
+
   /** Outcome used when a constituent is complete. */
   public static final String COMPLETE = "c";
   /** Outcome used when a constituent is incomplete. */
@@ -87,21 +87,21 @@ public class ParserME {
   }
 
   public Parse parse(Parse p) {
-    TreeSet tmp;
     p.derivation = new StringBuffer(100);
     odh.clear();
     ndh.clear();
     parses.clear();
     int i = 0; //derivation length
     int maxDerivationLength = 2 * p.getChildren().size() + 3;
+    System.err.println("maxDerivationLength=" + maxDerivationLength);
     odh.add(p);
     Parse guess = null;
     double bestComplete = -100; //approximating -infinity in ln domain
     while (parses.size() < M && i < maxDerivationLength) {
       ndh = new TreeSet();
       if (odh.size() > 0) {
-        int j =0;
-        for (Iterator pi=odh.iterator();pi.hasNext() && j < K; j++) { // foearch derivation
+        int j = 0;
+        for (Iterator pi = odh.iterator(); pi.hasNext() && j < K; j++) { // foearch derivation
           Parse tp = (Parse) pi.next();
           if (tp.prob < bestComplete) {
             break;
@@ -109,14 +109,14 @@ public class ParserME {
           if (guess == null && i == 2) {
             guess = tp;
           }
-          
-          System.out.print(i+" "+j+" "+tp.derivation+" "+tp.prob+" ");
+
+          System.out.print(i + " " + j + " " + tp.derivation + " " + tp.prob + " ");
           tp.show();
           System.out.println();
-          
+
           Parse[] nd = advance(tp, Q, i);
           if (nd != null) {
-            for (int k = 0,kl = nd.length;k<kl; k++) {
+            for (int k = 0, kl = nd.length; k < kl; k++) {
               //System.out.println("k="+k+" of "+nd.length);
               if (nd[k].complete()) {
                 advanceTop(nd[k]);
@@ -141,8 +141,7 @@ public class ParserME {
         break;
       }
     }
-    Parse r = null;
-    int pi = 1;
+    //int pi = 1;
 
     //System.err.println(parses.size()+" parses");
 
@@ -154,40 +153,30 @@ public class ParserME {
       System.out.println();
     }
     else {
-      while (parses.size() > 0 && pi <= 20) {
-        //System.out.println("parses.size()="+parses.size());
-        System.out.print(pi + " ");
-        if (r == null) {
-          r = (Parse) parses.first();
-          System.out.print(r.getTagSequenceProb() + " ");
-          r.show();
-        }
-        else {
-          Parse tp = (Parse) parses.first();
-          System.out.print(tp.getTagSequenceProb() + " ");
-          tp.show();
-        }
-        System.out.println();
-        pi++;
-      }
+    */
+    int pc = 1;
+    for (Iterator pi = parses.iterator(); pi.hasNext(); pc++) {
+      Parse tp = (Parse) pi.next();
+      System.out.print(pc + " " + tp.getProb() + " ");
+      tp.show();
+      System.out.println();
     }
     System.out.println();
-    */
-    
-    if (parses.size() != 0) {
-      r = (Parse) parses.first();
+
+    Parse r;
+    if (parses.size() == 0) {
+      System.err.println("Couldn't find parse for: " + p);
+      r = guess;
     }
     else {
-      r = guess;
-      System.err.println("Couldn't find parse for: "+p);
-    	 
+      r = (Parse) parses.first();
     }
     return (r);
   }
 
   private void advanceTop(Parse p) {
     buildModel.eval(buildContextGenerator.getContext(new Object[] { p.getChildren(), ZERO }), bprobs);
-    p.prob += Math.log(bprobs[buildModel.getIndex(START+TOP_NODE)]);
+    p.prob += Math.log(bprobs[buildModel.getIndex(START + TOP_NODE)]);
     checkModel.eval(checkContextGenerator.getContext(new Object[] { p.getChildren(), TOP_NODE, ZERO, ZERO }), cprobs);
     p.prob += Math.log(cprobs[checkModel.getIndex(COMPLETE)]);
     p.setType(TOP_NODE);
@@ -231,7 +220,7 @@ public class ParserME {
       }
       Sequence[] cs = chunker.topKSequences(words, ptags);
       newParses = new Parse[cs.length];
-      for (int si = 0,sl=cs.length; si < sl; si++) {
+      for (int si = 0, sl = cs.length; si < sl; si++) {
         newParses[si] = (Parse) p.clone(); //copies top level
         newParses[si].derivation.append(si).append(".");
         String[] tags = (String[]) cs[si].getOutcomes().toArray(new String[words.length]);
@@ -309,7 +298,7 @@ public class ParserME {
             bprobs[max] = 0; //zero out so new max can be found
             String tag = buildModel.getOutcome(max);
             //System.out.println("trying "+tag+" "+bprobSum+" lst="+lst);
-            if (tag.equals(START+TOP_NODE)) { // can't have top until complete
+            if (tag.equals(START + TOP_NODE)) { // can't have top until complete
               continue;
             }
             //System.err.println(i+" "+tag+" "+bprob);
@@ -389,17 +378,42 @@ public class ParserME {
   }
 
   public static GISModel train(opennlp.maxent.EventStream es, int iterations, int cut) throws java.io.IOException {
-    return opennlp.maxent.GIS.trainModel(iterations, new TwoPassDataIndexer(es,cut));
+    return opennlp.maxent.GIS.trainModel(iterations, new TwoPassDataIndexer(es, cut));
   }
 
   public static void main(String[] args) throws java.io.IOException {
     if (args.length < 4) {
-      System.err.println("Usage: ParserME trainingFile headRules tagModelFile chunkModelFile buildModelFile checkModelFile [iterations cutoff]");
+      System.err.println("Usage: ParserME -[tag|chunk|build|check] trainingFile headRules tagModelFile chunkModelFile buildModelFile checkModelFile [iterations cutoff]");
       System.err.println();
       System.err.println("Training file should be one sentence per line where each line consists of a Penn Treebank Style parse");
       System.exit(1);
     }
+    boolean tag = false;
+    boolean chunk = false;
+    boolean build = false;
+    boolean check = false;
+    boolean all = true;
     int argIndex = 0;
+    while (args[argIndex].startsWith("-")) {
+      all = false;
+      if (args[argIndex].equals("-tag")) {
+        tag = true;
+      }
+      else if (args[argIndex].equals("-chunk")) {
+        chunk = true;
+      }
+      else if (args[argIndex].equals("-build")) {
+        build = true;
+      }
+      else if (args[argIndex].equals("-check")) {
+        check=true;
+      }
+      else {
+        System.err.println("Invalid option "+args[argIndex]);
+        System.exit(1);
+      }
+      argIndex++;
+    }
     java.io.File inFile = new java.io.File(args[argIndex++]);
     String headRulesFile = args[argIndex++];
     HeadRules rules = new HeadRules(headRulesFile);
@@ -413,27 +427,38 @@ public class ParserME {
       iterations = Integer.parseInt(args[argIndex++]);
       cutoff = Integer.parseInt(args[argIndex++]);
     }
-    
-    opennlp.maxent.EventStream tes = new ParserEventStream(new opennlp.maxent.PlainTextByLineDataStream(new java.io.FileReader(inFile)), rules, EventTypeEnum.TAG);
-    GISModel tagModel = train(tes,iterations, cutoff);
-    System.out.println("Saving the model as: " + tagFile);
-    new opennlp.maxent.io.SuffixSensitiveGISModelWriter(tagModel, tagFile).persist();
-    /*
-    opennlp.maxent.EventStream ces = new ParserEventStream(new opennlp.maxent.PlainTextByLineDataStream(new java.io.FileReader(inFile)), rules, EventTypeEnum.CHUNK);
-    GISModel chunkModel = train(ces, iterations, cutoff);
-    System.out.println("Saving the model as: " + chunkFile);
-    new opennlp.maxent.io.SuffixSensitiveGISModelWriter(chunkModel, chunkFile).persist();
-    
-    opennlp.maxent.EventStream bes = new ParserEventStream(new opennlp.maxent.PlainTextByLineDataStream(new java.io.FileReader(inFile)), rules, EventTypeEnum.BUILD);
-    GISModel buildModel = train(bes, iterations, cutoff);
-    System.out.println("Saving the model as: " + buildFile);
-    new opennlp.maxent.io.SuffixSensitiveGISModelWriter(buildModel, buildFile).persist();
-    
-    opennlp.maxent.EventStream  kes = new ParserEventStream(new opennlp.maxent.PlainTextByLineDataStream(new java.io.FileReader(inFile)), rules, EventTypeEnum.CHECK);
-    GISModel checkModel = train(kes, iterations,cutoff);
-    System.out.println("Saving the model as: " + checkFile);
-    new opennlp.maxent.io.SuffixSensitiveGISModelWriter(checkModel, checkFile).persist();
-     */
+
+    if (tag || all) {
+      System.err.println("Training tagger");
+      opennlp.maxent.EventStream tes = new ParserEventStream(new opennlp.maxent.PlainTextByLineDataStream(new java.io.FileReader(inFile)), rules, EventTypeEnum.TAG);
+      GISModel tagModel = train(tes, iterations, cutoff);
+      System.out.println("Saving the tagger model as: " + tagFile);
+      new opennlp.maxent.io.SuffixSensitiveGISModelWriter(tagModel, tagFile).persist();
+    }
+
+    if (chunk || all) {
+      System.err.println("Training chunker");
+      opennlp.maxent.EventStream ces = new ParserEventStream(new opennlp.maxent.PlainTextByLineDataStream(new java.io.FileReader(inFile)), rules, EventTypeEnum.CHUNK);
+      GISModel chunkModel = train(ces, iterations, cutoff);
+      System.out.println("Saving the chunker model as: " + chunkFile);
+      new opennlp.maxent.io.SuffixSensitiveGISModelWriter(chunkModel, chunkFile).persist();
+    }
+
+    if (build || all) {
+      System.err.println("Training builder");
+      opennlp.maxent.EventStream bes = new ParserEventStream(new opennlp.maxent.PlainTextByLineDataStream(new java.io.FileReader(inFile)), rules, EventTypeEnum.BUILD);
+      GISModel buildModel = train(bes, iterations, cutoff);
+      System.out.println("Saving the build model as: " + buildFile);
+      new opennlp.maxent.io.SuffixSensitiveGISModelWriter(buildModel, buildFile).persist();
+    }
+
+    if (check || all) {
+      System.err.println("Training checker");
+      opennlp.maxent.EventStream kes = new ParserEventStream(new opennlp.maxent.PlainTextByLineDataStream(new java.io.FileReader(inFile)), rules, EventTypeEnum.CHECK);
+      GISModel checkModel = train(kes, iterations, cutoff);
+      System.out.println("Saving the check model as: " + checkFile);
+      new opennlp.maxent.io.SuffixSensitiveGISModelWriter(checkModel, checkFile).persist();
+    }
 
   }
 }
