@@ -1,4 +1,4 @@
-<!-- $Id: build.xml,v 1.7 2001/11/19 02:15:59 ericdf Exp $ -->
+<!-- $Id: build.xml,v 1.8 2001/11/19 02:18:29 ericdf Exp $ -->
 <!-- This build file based on the JDOM build.xml file. -->
 
 <project default="package" basedir=".">
@@ -126,6 +126,7 @@
         <pathelement path="${build.dir}/${name}-${DSTAMP}.jar"/>
 	<pathelement path="lib/jdom.jar"/>
 	<pathelement path="lib/xerces.jar"/>
+  <pathelement path="lib/gnu-regexp.jar"/>
       </mergefiles>
       <addfiles>
         <pathelement path="META-INF"/>
