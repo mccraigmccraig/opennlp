@@ -1,4 +1,4 @@
-<!-- $Id: build.xml,v 1.1 2001/10/23 13:46:24 jasonbaldridge Exp $ -->
+<!-- $Id: build.xml,v 1.2 2001/10/23 13:56:09 jasonbaldridge Exp $ -->
 <!-- This build file based on the JDOM build.xml file. -->
 
 <project default="package" basedir=".">
@@ -10,7 +10,7 @@
     <tstamp/>
     <property name="Name" value="OpenNLP"/>
     <property name="name" value="opennlp"/>
-    <property name="version" value="0.6.0"/>
+    <property name="version" value="0.6.1"/>
     <property name="year" value="2001"/>
 
     <echo message="----------- ${Name} ${version} [${year}] ------------"/>
@@ -80,7 +80,7 @@
     <mkdir dir="${build.dest}"/>
 
     <!-- copy src files -->
-    <copy todir="${build.src}" filtering="on">
+    <copy todir="${build.src}" >
       <fileset dir="${src.dir}"/>
     </copy>
 
@@ -104,7 +104,24 @@
   <target name="package" depends="compile">
     <jar jarfile="${build.dir}/${name}-${version}.jar"
          basedir="${build.dest}" />
+  </target>
 
+
+  <!-- =================================================================== -->
+  <!-- Creates Jar file with all other needed jars built in.               -->
+  <!-- =================================================================== -->
+  <target name="standalone" depends="compile">
+    <jar jarfile="${build.dir}/${name}-${DSTAMP}.jar"
+         basedir="${build.dest}" />
+    <jlink outfile="${build.dir}/${name}-${version}.jar">
+      <mergefiles>
+        <pathelement path="${build.dir}/${name}-${DSTAMP}.jar"/>
+	<pathelement path="lib/jdom.jar"/>
+	<pathelement path="lib/xml.jar"/>
+	<pathelement path="lib/xerces.jar"/>
+      </mergefiles>
+    </jlink>
+    <delete file="${build.dir}/${name}-${DSTAMP}.jar" />
   </target>
 
 
@@ -119,6 +136,20 @@
     <gzip src="${name}-${version}-src.tar" 
           zipfile="../${name}-${version}-src.tgz" />
     <delete file="${name}-${version}-src.tar" />
+  </target>
+
+
+  <!-- =================================================================== -->
+  <!-- Creates the homepage                                                -->
+  <!-- =================================================================== -->
+  <target name="homepage" depends="init,javadoc">
+    <tar tarfile="${name}-homepage.tar"
+         basedir="./docs/"
+         includes="**"
+         excludes="**/CVS" />
+    <gzip src="${name}-homepage.tar"
+          zipfile="${name}-homepage.tgz" />
+    <delete file="${name}-homepage.tar" />
   </target>
 
 
