@@ -24,14 +24,13 @@ import opennlp.common.morph.MorphAnalyzer;
 import opennlp.common.util.Pair;
 import opennlp.common.util.PerlHelp;
 
-import java.io.*;
 import java.util.*;
 
 /**
  * A context generator for the POS Tagger.
  *
  * @author      Gann Bierner
- * @version     $Revision: 1.1 $, $Date: 2003/11/05 03:31:04 $
+ * @version     $Revision: 1.2 $, $Date: 2003/11/05 03:50:36 $
  */
 
 public class POSContextGenerator implements ContextGenerator {
