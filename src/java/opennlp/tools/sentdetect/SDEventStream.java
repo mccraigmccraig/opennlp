@@ -17,12 +17,14 @@
 //////////////////////////////////////////////////////////////////////////////   
 package opennlp.tools.sentdetect;
 
+import java.io.InputStreamReader;
 import java.util.Iterator;
 
 import opennlp.maxent.ContextGenerator;
 import opennlp.maxent.DataStream;
 import opennlp.maxent.Event;
 import opennlp.maxent.EventStream;
+import opennlp.maxent.PlainTextByLineDataStream;
 import opennlp.tools.util.Pair;
 
 /**
@@ -35,7 +37,7 @@ import opennlp.tools.util.Pair;
  *
  * @author      Jason Baldridge
  * @author      Eric D. Friedman
- * @version     $Revision: 1.2 $, $Date: 2004/01/26 14:15:50 $
+ * @version     $Revision: 1.3 $, $Date: 2004/01/27 22:12:07 $
  */
 public class SDEventStream implements EventStream {
     private DataStream data;
@@ -52,7 +54,7 @@ public class SDEventStream implements EventStream {
      * @param d a <code>DataStream</code> value
      */
     public SDEventStream(DataStream d) {
-        this(d,new DefaultEndOfSentenceScanner(), new SDContextGenerator());
+      this(d,new DefaultEndOfSentenceScanner(), new SDContextGenerator(DefaultEndOfSentenceScanner.eosCharacters));
     }
     
     /**
@@ -60,15 +62,18 @@ public class SDEventStream implements EventStream {
      * sentence endings.
      */
     public SDEventStream (DataStream d, EndOfSentenceScanner s) {
-        this(d,s,new SDContextGenerator());
+      this(d,s,new SDContextGenerator(DefaultEndOfSentenceScanner.eosCharacters));
     }
 
     public SDEventStream(DataStream d, EndOfSentenceScanner s, ContextGenerator cg) {
         data = d;
         scanner = s;
         this.cg = cg;
-        if (data.hasNext()) addNewEvents((String)data.nextToken());
-        if (data.hasNext()) next = (String)data.nextToken();
+        if (data.hasNext()) {
+          String current = (String) data.nextToken();
+          if (data.hasNext()) next = (String)data.nextToken();
+          addNewEvents(current);
+        } 
     }
 
     public Event nextEvent () {
@@ -84,6 +89,7 @@ public class SDEventStream implements EventStream {
         StringBuffer sb = sBuffer;
         sb.append(s.trim());        
         int sentEndPos = sb.length()-1;
+        //add following word to sb
         if(next !=null && !s.equals("")) {
             int posAfterFirstWordInNext = next.indexOf(" ");
             if (posAfterFirstWordInNext != -1) {
@@ -120,11 +126,19 @@ public class SDEventStream implements EventStream {
         }
 
         while (null == head && next != null) {
-            addNewEvents(next);
-            if (data.hasNext())	next = (String)data.nextToken();
-            else next = null;
+          String current = next;
+          if (data.hasNext()) next = (String)data.nextToken();
+          else next = null;
+          addNewEvents(current);
         }
         return (null != head);
+    }
+    
+    public static void main(String[] args) {
+      EventStream es =  new SDEventStream(new PlainTextByLineDataStream(new InputStreamReader(System.in)));
+      while(es.hasNext()) {
+        System.out.println(es.nextEvent());
+      }
     }
  
 }
