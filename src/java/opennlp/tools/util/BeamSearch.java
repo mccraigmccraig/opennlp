@@ -20,6 +20,7 @@ package opennlp.tools.util;
 import java.util.*;
 
 import opennlp.maxent.MaxentModel;
+import opennlp.tools.util.Cache;
 
 /** Performs k-best search over sequence.  This is besed on the description in
   * Ratnaparkhi (1998), PhD diss, Univ. of Pennsylvania. 
@@ -32,6 +33,8 @@ public class BeamSearch {
   private static final Object[] EMPTY_ADDITIONAL_CONTEXT = new Object[0];
   private double[] probs;
   private String out;
+  private Cache contextsCache;
+  private static final int zeroLog = -100000;
 
   /** Creates new search object. 
    * @param size The size of the beam (k).
@@ -39,24 +42,38 @@ public class BeamSearch {
    * @param model the model for assigning probabilities to the sequence outcomes.
    */
   public BeamSearch(int size, BeamSearchContextGenerator cg, MaxentModel model) {
+    this(size,cg,model,0);
+  }
+  
+  public BeamSearch(int size, BeamSearchContextGenerator cg, MaxentModel model, int cacheSize) {
     this.size = size;
     this.cg = cg;
     this.model = model;
     this.probs = new double[model.getNumOutcomes()];
+    if (cacheSize > 0) {
+      contextsCache = new Cache(cacheSize);
+    }
+  }
+  
+  public Sequence[] bestSequences(int numSequences, Object[] sequence, Object[] additionalContext) {
+    return bestSequences(numSequences, sequence, additionalContext, zeroLog);
   }
 
   /** Returns the best sequence of outcomes based on model for this object.
    * @param numSequences The maximum number of sequences to be returned.
    * @param sequence The input sequence.
    * @param additionalContext An Object[] of additional context.  This is passed to the context generator blindly with the assumption that the context are appropiate.
+   * @param minSequenceScore A lower bound on the score of a returned sequence. 
    * @return An array of the top ranked sequences of outcomes.
    */
-  public Sequence[] bestSequences(int numSequences, Object[] sequence, Object[] additionalContext) {
+  public Sequence[] bestSequences(int numSequences, Object[] sequence, Object[] additionalContext, double minSequenceScore) {
     int n = sequence.length;
     Heap prev = new TreeHeap(size);
     Heap next = new  TreeHeap(size);
     Heap tmp;
-
+    if (contextsCache != null) {
+      //contextsCache.clear();
+    }
     prev.add(new Sequence());
     if (additionalContext == null) {
       additionalContext = EMPTY_ADDITIONAL_CONTEXT;
@@ -68,74 +85,33 @@ public class BeamSearch {
         Sequence top = (Sequence) prev.extract();
         List tmpOutcomes = top.getOutcomes();
         String[] outcomes = (String[]) tmpOutcomes.toArray(new String[tmpOutcomes.size()]);
-        double[] scores = model.eval(cg.getContext(i, sequence, outcomes, additionalContext), probs);
+        String[] contexts = cg.getContext(i, sequence, outcomes, additionalContext);
+        double[] scores;
+        if (contextsCache != null) {
+          scores = (double[]) contextsCache.get(contexts);
+          if (scores == null) {
+            scores = model.eval(contexts, probs);
+            contextsCache.put(contexts,scores);
+          }
+        }
+        else {
+          scores = model.eval(contexts, probs);
+        }
         double[] temp_scores = new double[scores.length];
-
         for (int c = 0; c < scores.length; c++) {
           temp_scores[c] = scores[c];
         }
         Arrays.sort(temp_scores);
-        double min = temp_scores[Math.min(scores.length - 1, size)];
-
+        double min = temp_scores[Math.max(0,scores.length-size)];
         for (int p = 0; p < scores.length; p++) {
           if (scores[p] < min)
             continue; //only advance first "size" outcomes
           out = model.getOutcome(p);
           if (validSequence(i, sequence, outcomes, out)) {
-            next.add(new Sequence(top, out, scores[p]));
-          }
-        }
-      }
-      //    make prev = next; and re-init next (we reuse existing prev set once we clear it)
-      prev.clear();
-      tmp = prev;
-      prev = next;
-      next = tmp;
-    }
-    int numSeq = Math.min(numSequences, prev.size());
-    Sequence[] topSequences = new Sequence[numSeq];
-    int seqIndex = 0;
-    for (; seqIndex < numSeq; seqIndex++) {
-      topSequences[seqIndex] = (Sequence) prev.extract();
-    }
-    return topSequences;
-  }
-
-  /** Returns the best sequence of outcomes based on model for this object.
-     * @param numSequences The maximum number of sequences to be returned.
-     * @param sequence The input sequence.
-     * @param additionalContext An Object[] of additional context.  This is passed to the context generator blindly with the assumption that the context are appropiate.
-     * @return An array of the top ranked sequences of outcomes.
-     */
-  public Sequence[] bestSequences(int numSequences, List sequence, Object[] additionalContext) {
-    int n = sequence.size();
-    Heap prev = new TreeHeap(size);
-    Heap next = new TreeHeap(size);
-    Heap tmp;
-    prev.add(new Sequence());
-    if (additionalContext == null) {
-      additionalContext = EMPTY_ADDITIONAL_CONTEXT;
-    }
-    for (int i = 0; i < n; i++) {
-      int sz = Math.min(size, prev.size());
-      int sc = 0;
-      for (; prev.size() > 0 && sc < sz; sc++) {
-        Sequence top = (Sequence) prev.extract();
-        double[] scores = model.eval(cg.getContext(i, sequence, top, additionalContext),probs);
-        double[] temp_scores = new double[scores.length];
-
-        for (int c = 0; c < scores.length; c++) {
-          temp_scores[c] = scores[c];
-        }
-        Arrays.sort(temp_scores);
-        double min = temp_scores[Math.min(scores.length - 1, size)];
-
-        for (int p = 0; p < scores.length; p++) {
-          if (scores[p] < min)
-            continue; //only advance first "size" outcomes
-          out = model.getOutcome(p);
-          if (validSequence(i, sequence, top, out)) {
-            next.add(new Sequence(top, out, scores[p]));
+            Sequence ns = new Sequence(top, out, scores[p]);
+            if (ns.getScore() > minSequenceScore) {
+              next.add(ns);
+            }
           }
         }
       }
@@ -160,7 +136,7 @@ public class BeamSearch {
    * @return The top ranked sequence of outcomes.
    */
   public Sequence bestSequence(List sequence, Object[] additionalContext) {
-    return bestSequences(1, sequence, additionalContext)[0];
+    return bestSequences(1, sequence.toArray(), additionalContext)[0];
   }
   
   /** Returns the best sequence of outcomes based on model for this object.
@@ -169,7 +145,7 @@ public class BeamSearch {
     * @return The top ranked sequence of outcomes.
     */
   public Sequence bestSequence(Object[] sequence, Object[] additionalContext) {
-    return bestSequences(1, sequence, additionalContext)[0];
+    return bestSequences(1, sequence, additionalContext,0)[0];
   }
 
   /** Determines wheter a particular continuation of a sequence is valid.  
