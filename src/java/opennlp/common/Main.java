@@ -22,15 +22,26 @@ package opennlp.common;
  * call to the opennlp.common.xml.SchemaBasedValidator class.
  *
  * @author      Jason Baldridge
- * @version     $Revision: 1.1 $, $Date: 2001/11/09 15:23:48 $
+ * @version     $Revision: 1.2 $, $Date: 2001/11/26 11:14:32 $
  */
 public class Main {
 
     /**
-     * Calls the main method of the <code>SchemaBasedValidator</code> class.
+     * Prints a message to the would-be executor telling them that the
+     * executable exists as a standalone jar more than an exectuable
+     * as such.  
      */
     public static void main (String[] args) throws Exception {
-	opennlp.common.xml.SchemaBasedValidator.main(args);
+	System.out.println(
+       "\n********************************************************************\n"
+     + "The \"executable\" jar of OpenNLP Common does not currently execute\n"
+     + "anything except this message.  It exists only so that there is a jar\n"
+     + "of the package which contains all of the other jar dependencies\n"
+     + "needed by the API so that users can download it and be able to use\n"
+     + "it to build OpenNLP applications without hunting down the other jars.\n"
+     + "********************************************************************\n"
+        );
+	
     }
 
 }
