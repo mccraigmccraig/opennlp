@@ -138,7 +138,10 @@ public class EnglishTreebankParser extends ParserME {
           p.insert(new Parse(line, new Span(start, start + tok.length()), ParserME.TOK_NODE, 0));
           start += tok.length() + 1;
         }
-        parser.parse(p).show();System.out.println();
+        p = parser.parse(p);
+        System.out.print(p.getProb()+" ");
+        p.show();
+        System.out.println();
       }
     }
     catch (IOException e) {
