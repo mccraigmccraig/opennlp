@@ -19,17 +19,16 @@
 package opennlp.tools.postag;
 
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
 import java.util.regex.Pattern;
 
-import opennlp.tools.util.Sequence;
+import opennlp.tools.util.Cache;
 
 /**
  * A context generator for the POS Tagger.
  *
  * @author      Gann Bierner
- * @version     $Revision: 1.6 $, $Date: 2004/06/11 20:55:10 $
+ * @author      Tom Morton
+ * @version     $Revision: 1.7 $, $Date: 2004/08/13 16:56:55 $
  */
 
 public class DefaultPOSContextGenerator implements POSContextGenerator {
@@ -41,12 +40,23 @@ public class DefaultPOSContextGenerator implements POSContextGenerator {
 
   private static Pattern hasCap = Pattern.compile("[A-Z]");
   private static Pattern hasNum = Pattern.compile("[0-9]");
+  
+  private Cache contextsCache;
+  private Object wordsKey;
 
-  public DefaultPOSContextGenerator() {}
+  public DefaultPOSContextGenerator() {
+    this(0);
+  }
+  
+  public DefaultPOSContextGenerator(int cacheSize) {
+    if (cacheSize > 0) {
+      contextsCache = new Cache(cacheSize);
+    }
+  }
 
   public String[] getContext(Object o) {
     Object[] data = (Object[]) o;
-    return getContext(((Integer) data[0]).intValue(), (List) data[1], (Sequence) data[2], null);
+    return getContext(((Integer) data[0]).intValue(), (Object[]) data[1], (String[]) data[2], null);
   }
 
   protected static String[] getPrefixes(String lex) {
@@ -65,25 +75,28 @@ public class DefaultPOSContextGenerator implements POSContextGenerator {
     return suffs;
   }
 
-  public String[] getContext(int pos, List tokens, Sequence s, Object[] ac) {
-    return getContext(pos, tokens, s.getOutcomes());
-  }
-
   public String[] getContext(int index, Object[] sequence, String[] priorDecisions, Object[] additionalContext) {
-    return getContext(index,Arrays.asList(sequence),Arrays.asList(priorDecisions));
+    return getContext(index,sequence,priorDecisions);
   }  
 
-  public String[] getContext(int pos, List tokens, List tags) {
+  /**
+   * Returns the context for making a pos tag decision at the specified token index given the specified tokens and previous tags.
+   * @param index The index of the token for which the context is provided. 
+   * @param tokens The tokens in the sentence.
+   * @param tags The tags assigned to the previous words in the sentence. 
+   * @return The context for making a pos tag decision at the specified token index given the specified tokens and previous tags.
+   */
+  public String[] getContext(int index, Object[] tokens, String[] tags) {
     String next, nextnext, lex, prev, prevprev;
     String tagprev, tagprevprev;
     tagprev = tagprevprev = null;
     next = nextnext = lex = prev = prevprev = null;
 
-    lex = tokens.get(pos).toString();
-    if (tokens.size() > pos + 1) {
-      next = tokens.get(pos + 1).toString();
-      if (tokens.size() > pos + 2)
-        nextnext = tokens.get(pos + 2).toString();
+    lex = tokens[index].toString();
+    if (tokens.length > index + 1) {
+      next = tokens[index + 1].toString();
+      if (tokens.length > index + 2)
+        nextnext = tokens[index + 2].toString();
       else
         nextnext = SE; // Sentence End
 
@@ -92,13 +105,13 @@ public class DefaultPOSContextGenerator implements POSContextGenerator {
       next = SE; // Sentence End
     }
 
-    if (pos - 1 >= 0) {
-      prev =  tokens.get(pos - 1).toString();
-      tagprev =  tags.get(pos - 1).toString();
+    if (index - 1 >= 0) {
+      prev =  tokens[index - 1].toString();
+      tagprev =  tags[index - 1].toString();
 
-      if (pos - 2 >= 0) {
-        prevprev = tokens.get(pos - 2).toString();
-        tagprevprev = tags.get(pos - 2).toString();
+      if (index - 2 >= 0) {
+        prevprev = tokens[index - 2].toString();
+        tagprevprev = tags[index - 2].toString();
       }
       else {
         prevprev = SB; // Sentence Beginning
@@ -107,7 +120,18 @@ public class DefaultPOSContextGenerator implements POSContextGenerator {
     else {
       prev = SB; // Sentence Beginning
     }
-
+    String cacheKey = index+tagprev+tagprevprev;
+    if (contextsCache != null) {
+      if (wordsKey == tokens){
+        String[] cachedContexts = (String[]) contextsCache.get(cacheKey);    
+        if (cachedContexts != null) {
+          return cachedContexts;
+        }
+      }
+      else {
+        
+      }
+    }
     ArrayList e = new ArrayList();
 
     // add the word itself
@@ -156,7 +180,11 @@ public class DefaultPOSContextGenerator implements POSContextGenerator {
         e.add("nn=" + nextnext);
       }
     }
-    return (String[]) e.toArray(new String[e.size()]);
+    String[] contexts = (String[]) e.toArray(new String[e.size()]);
+    if (contextsCache != null) {
+      contextsCache.put(cacheKey,contexts);
+    }
+    return (contexts);
   }
   
 }
