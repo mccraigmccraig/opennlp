@@ -4,6 +4,12 @@ Joao: changed NLPDocument. Extends org.jdom.Document. Now the constructor
 method creates a NLPDocument object from a given text, breaking it into 
 paragraphs and "quasiWords" (chunks of text separated by white spaces). 
 
+Jason: Added many new methods to NLPDocument to make access to
+different kinds of Elements easier.  Removed RawToXml and
+PreProcessDocument classes.
+
+Jason: All exceptions in opennlp.common now extend NLPException.
+
 0.6.5
 -----
 Summary: Minor bug fix, further updates to unification stuff.
