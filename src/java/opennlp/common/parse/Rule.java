@@ -26,12 +26,27 @@ import opennlp.common.unify.*;
  * Interface for categorial rules.
  *
  * @author Gann Bierner and Jason Baldridge
- * @version $Revision: 1.1 $, $Date: 2002/02/21 13:20:29 $
+ * @version $Revision: 1.2 $, $Date: 2002/02/21 16:01:35 $
  */
-
 public interface Rule {
 
+    /**
+     * Apply this rule to some input categories.
+     *
+     * @param inputs the input categories to try to combine
+     * @return the Category resulting from using this Rule to combine the
+     *         inputs
+     * @exception UnifyFailure if the inputs cannot be combined by this Rule
+     **/
     public Category applyRule (Category[] inputs) throws UnifyFailure;
 
+    /**
+     * The number of arguments this rule takes.  For example, the arity of the
+     * forward application rule of categorial grammar (X/Y Y => Y) is 2.
+     *
+     * @return the number of arguments this rule takes
+     **/
+    public int arity();
+    
 }
 

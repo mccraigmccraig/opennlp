@@ -24,7 +24,7 @@ import opennlp.common.synsem.*;
  * A set of rules that describe how lexical items should be combined
  *
  * @author      Gann Bierner
- * @version     $Revision: 1.5 $, $Date: 2002/02/21 13:20:29 $
+ * @version     $Revision: 1.6 $, $Date: 2002/02/21 16:01:35 $
  */
 public interface RuleGroup {
 
@@ -40,7 +40,7 @@ public interface RuleGroup {
      *
      * @param words the lexical items to combine
      */
-    public java.util.List applyAllRules (Sign[] inputs);
+    public java.util.List applyRules (Sign[] inputs);
     
     
 }
