@@ -23,14 +23,13 @@ import java.util.List;
 
 import opennlp.common.morph.MorphAnalyzer;
 import opennlp.common.util.PerlHelp;
-import opennlp.tools.util.Pair;
 import opennlp.tools.util.Sequence;
 
 /**
  * A context generator for the POS Tagger.
  *
  * @author      Gann Bierner
- * @version     $Revision: 1.1 $, $Date: 2004/01/26 14:14:38 $
+ * @version     $Revision: 1.2 $, $Date: 2004/02/04 15:43:57 $
  */
 
 public class DefaultPOSContextGenerator implements POSContextGenerator {
@@ -167,30 +166,4 @@ public class DefaultPOSContextGenerator implements POSContextGenerator {
     }
     return (String[]) e.toArray(new String[e.size()]);
   }
-
-  public static void main(String[] args) {
-
-    DefaultPOSContextGenerator gen = new DefaultPOSContextGenerator();
-    String[] lexA = { "the", "stories", "about", "well-heeled", "communities", "and", "developers" };
-    String[] tagsA = { "DT", "NNS", "IN", "JJ", "NNS", "CC", "NNS" };
-    ArrayList lex = new ArrayList();
-    ArrayList tags = new ArrayList();
-    for (int i = 0; i < lexA.length; i++) {
-      lex.add(lexA[i]);
-      tags.add(tagsA[i]);
-    }
-
-    Object[] a = { lex, tags, new Integer(2)};
-    Object[] b = { lex, tags, new Integer(0)};
-
-    String[] ans1 = gen.getContext(new Pair(a, Boolean.FALSE));
-    String[] ans2 = gen.getContext(b);
-
-    for (int i = 0; i < ans1.length; i++)
-      System.out.println(ans1[i]);
-    System.out.println();
-    for (int i = 0; i < ans2.length; i++)
-      System.out.println(ans2[i]);
-  }
-
 }

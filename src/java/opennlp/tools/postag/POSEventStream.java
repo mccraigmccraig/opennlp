@@ -19,7 +19,6 @@
 package opennlp.tools.postag;
 
 import opennlp.maxent.EventStream;
-import opennlp.maxent.ContextGenerator;
 import opennlp.maxent.DataStream;
 import opennlp.maxent.Event;
 import opennlp.maxent.EventCollector;
@@ -33,7 +32,7 @@ import java.io.StringReader;
 
 public class POSEventStream implements EventStream {
 
-  ContextGenerator cg;
+  POSContextGenerator cg;
   DataStream data;
   Event[] events;
   int ei;
@@ -42,7 +41,7 @@ public class POSEventStream implements EventStream {
     this(d, new DefaultPOSContextGenerator());
   }
 
-  public POSEventStream(DataStream d, ContextGenerator cg) {
+  public POSEventStream(DataStream d, POSContextGenerator cg) {
     this.cg = cg;
     data = d;
     int ei = 0;
@@ -70,6 +69,13 @@ public class POSEventStream implements EventStream {
     //String sentence = "the_DT stories_NNS about_IN well-heeled_JJ communities_NNS and_CC developers_NNS";
     EventCollector ec = new POSEventCollector(new StringReader(sentence), cg);
     events = ec.getEvents();
+  }
+
+  public static void main(String[] args) {
+    EventStream es = new POSEventStream(new opennlp.maxent.PlainTextByLineDataStream(new java.io.InputStreamReader(System.in)));
+    while (es.hasNext()) {
+      System.out.println(es.nextEvent());
+    }
   }
 
 }
