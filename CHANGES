@@ -3,6 +3,8 @@
 
 Removed xSpan methods from Category interface. (Jason)
 
+Added Rule interface to opennlp.common.parse package. (Jason)
+
 
 0.8.2
 -----
