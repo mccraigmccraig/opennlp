@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////////
-// Copyright (C) 2001 Jason Baldridge and Gann Bierner
+// Copyright (C) 2002 Jason Baldridge and Gann Bierner
 // 
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
@@ -23,7 +23,7 @@ package opennlp.common.unify;
  * it to another feature.
  *
  * @author      Jason Baldridge
- * @version     $Revision: 1.3 $, $Date: 2001/12/19 11:32:17 $
+ * @version     $Revision: 1.4 $, $Date: 2002/02/08 12:17:50 $
  **/
 public interface Feature {
 

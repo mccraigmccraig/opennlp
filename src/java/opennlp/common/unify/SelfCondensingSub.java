@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////////
-// Copyright (C) 2001 Jason Baldridge
+// Copyright (C) 2002 Jason Baldridge
 // 
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
@@ -26,7 +26,7 @@ import java.util.*;
  * made.
  *
  * @author      Jason Baldridge
- * @version $Revision: 1.3 $, $Date: 2002/01/07 15:10:33 $ 
+ * @version $Revision: 1.4 $, $Date: 2002/02/08 12:17:50 $ 
 */
 public class SelfCondensingSub extends HashMap implements Substitution {
 

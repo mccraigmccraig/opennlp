@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////////
-// Copyright (C) 2000 Jason Baldridge and Gann Bierner
+// Copyright (C) 2002 Jason Baldridge and Gann Bierner
 // 
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
@@ -22,7 +22,7 @@ package opennlp.common.unify;
  * An interface for classes that may be unified.
  *
  * @author      Gann Bierner
- * @version     $Revision: 1.8 $, $Date: 2002/01/20 17:45:25 $
+ * @version     $Revision: 1.9 $, $Date: 2002/02/08 12:17:50 $
  **/
 public interface Unifiable {
 

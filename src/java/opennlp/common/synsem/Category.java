@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////////
-// Copyright (C) 2000 Jason Baldridge and Gann Bierner
+// Copyright (C) 2002 Jason Baldridge and Gann Bierner
 // 
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
@@ -29,7 +29,7 @@ import opennlp.common.util.*;
  * trees or whatnot), they should not feel inhibited by the name category.
  *
  * @author      Gann Bierner
- * @version     $Revision: 1.1 $, $Date: 2002/01/05 16:12:05 $
+ * @version     $Revision: 1.2 $, $Date: 2002/02/08 12:17:50 $
  */
 public interface Category extends Unifiable, Mutable, java.io.Serializable {
 

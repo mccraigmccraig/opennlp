@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////////
-// Copyright (C) 2001 Jason Baldridge and Gann Bierner
+// Copyright (C) 2002 Jason Baldridge and Gann Bierner
 //
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
@@ -9,7 +9,7 @@
 // This library is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-// GNU General Public License for more details.
+// GNU Lesser General Public License for more details.
 //
 // You should have received a copy of the GNU Lesser General Public
 // License along with this program; if not, write to the Free Software
@@ -28,7 +28,7 @@ import java.util.*;
  * gnu.regexp.
  *
  * @author      Jason Baldridge
- * @version     $Revision: 1.9 $, $Date: 2002/02/05 20:16:24 $
+ * @version     $Revision: 1.10 $, $Date: 2002/02/08 12:17:50 $
  */
 public final class PerlHelp {
 

@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////////
-// Copyright (C) 2001 Artifactus Limited
+// Copyright (C) 2002 Artifactus Limited
 // 
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
@@ -25,7 +25,7 @@ import java.util.*;
  * Utilities for manipulating XML based objects.
  *
  * @author      Jason Baldridge
- * @version     $Revision: 1.11 $, $Date: 2002/01/10 16:02:19 $
+ * @version     $Revision: 1.12 $, $Date: 2002/02/08 12:17:50 $
  */
 
 public class XmlUtils {

@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////////
-// Copyright (C) 2001 Artifactus Limited
+// Copyright (C) 2002 Artifactus Limited
 // 
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
@@ -22,7 +22,7 @@ package opennlp.common;
  * call to the opennlp.common.xml.SchemaBasedValidator class.
  *
  * @author      Jason Baldridge
- * @version     $Revision: 1.2 $, $Date: 2001/11/26 11:14:32 $
+ * @version     $Revision: 1.3 $, $Date: 2002/02/08 12:17:50 $
  */
 public class Main {
 

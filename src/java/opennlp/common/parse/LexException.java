@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////////
-// Copyright (C) 2000 Jason Baldridge and Gann Bierner
+// Copyright (C) 2002 Jason Baldridge and Gann Bierner
 // 
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
@@ -22,7 +22,7 @@ package opennlp.common.parse;
  * Any exception thrown if something wrong happens in the lexicon.
  *
  * @author      Gann Bierner
- * @version     $Revision: 1.2 $, $Date: 2001/11/29 13:24:15 $
+ * @version     $Revision: 1.3 $, $Date: 2002/02/08 12:17:50 $
  */
 public class LexException extends opennlp.common.NLPException {
     /** some message */

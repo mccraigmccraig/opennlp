@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////////
-// Copyright (C) 2000 Jason Baldridge and Gann Bierner
+// Copyright (C) 2002 Jason Baldridge and Gann Bierner
 // 
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
@@ -29,7 +29,7 @@ import java.net.*;
  * A pipeline of components that process NLPDocuments.
  *
  * @author      Gann Bierner
- * @version     $Revision: 1.2 $, $Date: 2002/01/02 16:33:48 $
+ * @version     $Revision: 1.3 $, $Date: 2002/02/08 12:17:50 $
  **/
 public class Pipeline {
 

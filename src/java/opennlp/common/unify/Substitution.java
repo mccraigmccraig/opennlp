@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////////
-// Copyright (C) 2000 Jason Baldridge and Gann Bierner
+// Copyright (C) 2002 Jason Baldridge and Gann Bierner
 // 
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
@@ -23,7 +23,7 @@ import java.util.*;
  * Specifies how variable are to be replaced to make two objects unify.  
  *
  * @author      Gann Bierner & Jason Baldridge
- * @version     $Revision: 1.6 $, $Date: 2002/01/07 15:10:33 $
+ * @version     $Revision: 1.7 $, $Date: 2002/02/08 12:17:50 $
  */
 public interface Substitution {
 

@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////////
-// Copyright (C) 2000 Jason Baldridge and Gann Bierner
+// Copyright (C) 2002 Jason Baldridge and Gann Bierner
 // 
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
@@ -22,7 +22,7 @@ package opennlp.common;
  * Parent class for all NLPExceptions.
  *
  * @author      Jason Baldridge
- * @version     $Revision: 1.2 $, $Date: 2002/01/02 15:24:38 $
+ * @version     $Revision: 1.3 $, $Date: 2002/02/08 12:17:50 $
  */
 public class NLPException extends Exception {
 
