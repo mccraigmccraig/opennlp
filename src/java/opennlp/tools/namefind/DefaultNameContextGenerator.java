@@ -82,7 +82,17 @@ public class DefaultNameContextGenerator implements NameContextGenerator {
   }
 
   public String[] getContext(int i, Object[] toks, String[] preds, Map prevTags) {
-    List features = getStaticFeatures(toks,i);
+    List features = getStaticFeatures(toks,i,prevTags);
+    String po=NameFinderME.OTHER;
+    String ppo=NameFinderME.OTHER;
+    if (i > 1){
+      ppo = preds[i-2];
+    }
+    if (i > 0) {
+      po = preds[i-1];
+    }
+    features.add("po="+po);
+    features.add("ppo="+ppo);
     return (String[]) features.toArray(new String[features.size()]);
   }
 
@@ -98,7 +108,7 @@ public class DefaultNameContextGenerator implements NameContextGenerator {
     * @return a list of the features for <code>toks[i]</code> that can
     * be safely cached.
     */
-  private List getStaticFeatures(Object[] toks, int i) {
+  private List getStaticFeatures(Object[] toks, int i, Map prevTags) {
     List feats = new ArrayList();
     feats.add("def");
 
@@ -108,6 +118,9 @@ public class DefaultNameContextGenerator implements NameContextGenerator {
     String wf = wordFeature(toks[i].toString());
     feats.add("wf=" + wf);
     feats.add("w&wf=" + w + "," + wf);
+    
+    String pt = (String) prevTags.get(toks[i].toString());
+    feats.add("pd="+pt);
     if (i == 0) {
       feats.add("df=it");
     }
@@ -164,6 +177,7 @@ public class DefaultNameContextGenerator implements NameContextGenerator {
     //tokenFeatureCache.put(toks[i],Lists.shallowClone(feats));
     return (feats);
   }
+  
 
   /**
     * Return the most relevant feature for a given word.  This method

@@ -11,11 +11,13 @@ import opennlp.maxent.EventStream;
 
 public class NameFinderEventStream implements EventStream {
 
-  DataStream data;
-  Event[] events;
-  NameContextGenerator cg;
-  Map prevTags;
-  int ei;
+  private DataStream data;
+  private Event[] events;
+  private NameContextGenerator cg;
+  private Map prevTags;
+  private int ei;
+  private List prevLineTokens;
+  private List prevLineOutcomes;
 
   public NameFinderEventStream(DataStream d) {
     this(d, new DefaultNameContextGenerator());
@@ -41,6 +43,12 @@ public class NameFinderEventStream implements EventStream {
   }
 
   private void addEvents(String sentence) {
+    if (prevLineTokens != null) {
+      for (int ti=0,tl=prevLineTokens.size();ti<tl;ti++) {
+        //System.out.println("addEvents: "+prevLineTokens.get(ti).toString()+" -> "+prevLineOutcomes.get(ti));
+        prevTags.put(prevLineTokens.get(ti).toString(),prevLineOutcomes.get(ti));
+      }
+    }
     String[] parts = sentence.split(" ");
     String outcome = NameFinderME.OTHER;
     List toks = new ArrayList();
@@ -64,11 +72,25 @@ public class NameFinderEventStream implements EventStream {
     for (int ti = 0, tl = toks.size(); ti < tl; ti++) {
       events[ti] = new Event((String) outcomes.get(ti), cg.getContext(ti, toks, outcomes, prevTags));
     }
+    prevLineTokens = toks;
+    prevLineOutcomes = outcomes;
   }
 
   public Event nextEvent() {
     if (ei == events.length) {
-      addEvents((String) data.nextToken());
+      String line = (String) data.nextToken();
+      if (line.equals("")) {
+        prevTags.clear();
+        prevLineTokens = null;
+        prevLineOutcomes = null;
+        if (data.hasNext()) {
+          line = (String) data.nextToken();
+        }
+        else {
+          return null;
+        }
+      }
+      addEvents(line);
       ei = 0;
     }
     return ((Event) events[ei++]);
@@ -76,5 +98,18 @@ public class NameFinderEventStream implements EventStream {
 
   public boolean hasNext() {
     return (ei < events.length || data.hasNext());
+  }
+  
+  public static final void main(String[] args) throws java.io.IOException {
+    if (args.length == 0) {
+      System.err.println("Usage: NameFinderEventStream trainfiles");
+      System.exit(1);
+    }
+    for (int ai=0,al=args.length;ai<al;ai++) {
+      EventStream es = new NameFinderEventStream(new opennlp.maxent.PlainTextByLineDataStream(new java.io.FileReader(args[ai])));
+      while(es.hasNext()) {
+        System.out.println(es.nextEvent());
+      }
+    }
   }
 }
