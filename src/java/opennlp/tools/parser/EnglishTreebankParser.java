@@ -167,7 +167,7 @@ public class EnglishTreebankParser {
   }
 
   private static void usage() {
-    System.err.println("Usage: EnglishTreebankParser [-i] dataDirectory < tokenized_sentences");
+    System.err.println("Usage: EnglishTreebankParser -[id] -bs -ap dataDirectory < tokenized_sentences");
     System.err.println("dataDirectory: Directory containing parser models.");
     System.err.println("-d: Use tag dictionary.");
     System.err.println("-i: Case insensitive tag dictionary.");
