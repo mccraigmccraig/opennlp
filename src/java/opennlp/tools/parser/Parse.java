@@ -27,7 +27,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 //import java.text.DecimalFormat;
 
-/** Class for holding constitents. */
+/** Datastructure for holding parse constitents. */
 public class Parse implements Cloneable, Comparable {
   private String text;
   private Span span;
@@ -37,10 +37,8 @@ public class Parse implements Cloneable, Comparable {
   private String label;
   private Parse parent;
 
-  //private static DecimalFormat df = new DecimalFormat("#.###");
-  /* these are added to */
-  double prob;
-  StringBuffer derivation;
+  private double prob;
+  private StringBuffer derivation;
 
   private static Pattern typePattern = Pattern.compile("^([^ =-]+)");
   private static Pattern tokenPattern = Pattern.compile("^[^ ()]+ ([^ ()]+)\\s*\\)");
@@ -59,7 +57,9 @@ public class Parse implements Cloneable, Comparable {
       throw new InternalError();
     }
   }
+  
 
+  
   public Parse(String text, Span span, String type, double p) {
     this.text = text;
     this.span = span;
@@ -76,38 +76,50 @@ public class Parse implements Cloneable, Comparable {
     this.head = h;
   }
 
-  public void setType(String t) {
-    type = t;
+  /**
+   * Set the type of this constituent to the specified type.
+   * @param type The type of this constituent.
+   */
+  public void setType(String type) {
+    this.type = type;
   }
 
+  /**
+   * Returns the constituent label for this node of the parse.
+   * @return The constituent label for this node of the parse.
+   */
   public String getType() {
     return type;
   }
 
-  // Assumes that c is contained in this
-  public void insert(Parse c) {
-    Span ic = c.span;
+  /**
+   * Inserts the specified constituent into this parse based on its text span.  This
+   * method assumes that the sepecifed constituent can be inserted into this parse.
+   * @param constituent The constituent to be inserted.
+   */
+  public void insert(Parse constituent) {
+    Span ic = constituent.span;
     if (span.contains(ic)) {
       //double oprob=c.prob;
-      int i;
-      int ps = parts.size();
-      for (i = 0; i < ps; i++) {
-        Parse subPart = (Parse) parts.get(i);
+      int pi=0;
+      int pn = parts.size();
+      for (; pi < pn; pi++) {
+        Parse subPart = (Parse) parts.get(pi);
         Span sp = subPart.span;
-        if (sp.getStart() > ic.getEnd()) {
+        if (sp.getStart() >= ic.getEnd()) {
           break;
         }
         // c Contains subPart
         else if (ic.contains(sp)) {
-          parts.remove(i);
-          i--;
-          c.parts.add(subPart);
-          subPart.setParent(c);
-          ps = parts.size();
+          parts.remove(pi);
+          pi--;
+          constituent.parts.add(subPart);
+          subPart.setParent(constituent);
+          pn = parts.size();
         }
       }
-      parts.add(i, c);
-      c.setParent(this);
+      parts.add(pi, constituent);
+      constituent.setParent(this);
       //prob*=oprob;
     }
     else {
@@ -115,12 +127,15 @@ public class Parse implements Cloneable, Comparable {
     }
   }
 
+  /**
+   * Displays this parse using Penn Treebank-style formatting. 
+   */
   public void show() {
     int start;
     start = span.getStart();
     if (!type.equals(ParserME.TOK_NODE)) {
       System.out.print("(");
-      System.out.print(type + " ");
+      System.out.print(type +" ");
       //System.out.print(label+" ");
 
       //System.out.print(head+" ");
@@ -130,7 +145,7 @@ public class Parse implements Cloneable, Comparable {
       Parse c = (Parse) i.next();
       Span s = c.span;
       if (start < s.getStart()) {
-        // System.out.println("pre "+start+" "+s.getStart());
+        //System.out.println("pre "+start+" "+s.getStart());
         System.out.print(text.substring(start, s.getStart()));
       }
       c.show();
@@ -142,6 +157,10 @@ public class Parse implements Cloneable, Comparable {
     }
   }
 
+  /**
+   * Returns the probability associed with the pos-tag sequence assigned to this parse.
+   * @return The probability associed with the pos-tag sequence assigned to this parse.
+   */
   public double getTagSequenceProb() {
     //System.err.println("Parse.getTagSequenceProb: "+type+" "+this);
     if (parts.size() == 1 && ((Parse) parts.get(0)).type.equals(ParserME.TOK_NODE)) {
@@ -149,7 +168,7 @@ public class Parse implements Cloneable, Comparable {
       return (Math.log(prob));
     }
     else if (parts.size() == 0) {
-      System.err.println("Parse.getTagSequenceProb: Wrong basecase!");
+      System.err.println("Parse.getTagSequenceProb: Wrong base case!");
       return (0.0);
     }
     else {
@@ -161,6 +180,10 @@ public class Parse implements Cloneable, Comparable {
     }
   }
 
+  /** 
+   * Returns whether this parse is complete.
+   * @return Returns true if the parse contains a single top-most node.
+   */
   public boolean complete() {
     return (parts.size() == 1);
   }
@@ -169,34 +192,71 @@ public class Parse implements Cloneable, Comparable {
     return (text.substring(span.getStart(), span.getEnd()));
   }
 
+  /**
+   * Returns the text of the sentence over which this parse was formed. 
+   * @return The text of the sentence over which this parse was formed.
+   */
   public String getText() {
     return text;
   }
 
+  /**
+   * Returns the character offsets for this constituent.
+   * @return The character offsets for this constituent.
+   */
   public Span getSpan() {
     return span;
   }
 
+  /**
+   * Returns the log of the product of the probability associated with all the decisions which formed this constituent.
+   * @return The log of the product of the probability associated with all the decisions which formed this constituent.
+   */
   public double getProb() {
     return prob;
   }
+  
+  /**
+   * Adds the specified probability log to this current log for this parse.
+   * @param logProb The probaility of an action performed on this parse.
+   */
+  public void addProb(double logProb) {
+    this.prob+=logProb;
+  }
 
+  /**
+   * Returns the child constituents of this constiuent. 
+   * @return The child constituents of this constiuent.
+   */
   public List getChildren() {
     return parts;
   }
 
+  /** Returns the head constituent associated with this constituent.
+   * @return The head constituent associated with this constituent.
+   */
   public Parse getHead() {
     return head;
   }
 
+  /**
+   * Returns the label assigned to this parse node during parsing 
+   * which specifies how this node will be formed into a constituent.
+   * @return The outcome label assigned to this node during parsing.  
+   */
   public String getLabel() {
     return label;
   }
 
+  /**
+   * Assigns this parse the specified label.
+   * @param label A label indicating the constituent this parse node will become part of.
+   */
   public void setLabel(String label) {
     this.label = label;
   }
 
+  
   private static String getType(String rest) {
     if (rest.startsWith("-LCB-")) {
       return "-LCB-";
@@ -277,14 +337,26 @@ public class Parse implements Cloneable, Comparable {
     return p;
   }
 
+  /**
+   * Returns the parent parse node of this constituent.
+   * @return The parent parse node of this constituent.
+   */
   public Parse getParent() {
     return parent;
   }
 
+  /**
+   * Specifies the parent parse node for this constituent.
+   * @param parent The parent parse node for this constituent.
+   */
   public void setParent(Parse parent) {
     this.parent = parent;
   }
 
+  /**
+   * Indicates wether this parse node is a pos-tag.
+   * @return true if this node is a pos-tag, false otherwise.
+   */
   public boolean isPosTag() {
     return (parts.size() == 1 && ((Parse) parts.get(0)).getType().equals(ParserME.TOK_NODE));
   }
@@ -298,6 +370,22 @@ public class Parse implements Cloneable, Comparable {
       return 1;
     }
     return 0;
+  }
+  
+  /**
+   * Returns the derivation string for this parse if one has been created.
+   * @return the derivation string for this parse or null if no derivation string has been created.
+   */
+  public StringBuffer getDerivation() {
+    return derivation;
+  }
+  
+  /**
+   * Specifies the derivation string to be associated with this parse.
+   * @param derivation The derivation string to be associated with this parse.
+   */
+  public void setDerivation(StringBuffer derivation) {
+    this.derivation = derivation;
   }
 
   public static void main(String[] args) throws java.io.IOException {
