@@ -15,27 +15,18 @@
 // License along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 //////////////////////////////////////////////////////////////////////////////
-
 package opennlp.common;
 
 /**
- * Parent class for all NLPExceptions.
+ * Exception for problems in a pipeline.
  *
- * @author      Jason Baldridge
- * @version     $Revision: 1.2 $, $Date: 2002/01/02 15:24:38 $
- */
-public class NLPException extends Exception {
+ * @author      Gann Bierner
+ * @version     $Revision: 1.1 $, $Date: 2002/01/02 15:24:38 $
+ **/
+public class PipelineException extends NLPException {
 
-    protected String _message = "";
-
-    public NLPException () {}
-
-    public NLPException (String m) {
-	_message = m;
-    }
-
-    public String toString () {
-	return _message;
+    public PipelineException (String str) {
+	super(str);
     }
 
 }
