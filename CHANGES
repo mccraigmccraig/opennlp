@@ -1,3 +1,25 @@
+1.1.0
+
+Summary
+=======
+This is mostly a parser performance release.  However there are some bug fixes as well.
+
+General
+=======
+Modified BeamSearch to be more efficient and take parameters to allow for early cut-off
+of pathes.
+Fixed bug where beam was larger than the number of outcomes.
+Fixed bug where the beam was being made larger because array was sorted the other way.
+Changed beam to alway advance some path to prevent pos-tagger from not returning a
+sequence if the tag dictionary only contains an unlikly tag.
+
+Parser
+======
+Fixed bug in chunker context generation.
+Change code to use specific context generator rather than most general interface.
+Changed chunking phase to stop chunk sequences which will never make the top K.
+Other general optimizations.
+
 1.0.0
 -----
 These changes represent what went into this release since many of these 

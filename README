@@ -104,12 +104,12 @@ single argument which is the location of the model for this component.
 The exceptions are the parser which requires a  model directory, and
 the namefinder which takes a list of models.
 
-sentence detector:	opennlp.tools.sentdetect.EnglishSentenceDetectorME
-tokenizer: 		opennlp.tools.tokenize.EnglishTokenizerME
-pos-tagger:		opennlp.tools.postag.EnglishPOSTaggerME
-chunker:		opennlp.tools.chunker.EnglishTreebankChunker
-name finder:		opennlp.tools.namefinder.EnglishNameFinder
-parser:			opennlp.tools.parser.EnglishTreebankParser
+sentence detector:  opennlp.tools.sentdetect.EnglishSentenceDetectorME
+tokenizer:          opennlp.tools.tokenize.EnglishTokenizerME
+pos-tagger:         opennlp.tools.postag.EnglishPOSTaggerME
+chunker:            opennlp.tools.chunker.EnglishTreebankChunker
+name finder:        opennlp.tools.namefinder.EnglishNameFinder
+parser:             opennlp.tools.parser.EnglishTreebankParser
 
 Examples: This is not a recomendation that you run the tools this way.  It's
 in fact very inefficient.  However, this should give you an idea of what the
@@ -132,13 +132,13 @@ java opennlp.tools.sentdetect.EnglishSentenceDetectorME
   opennlp.models/sentdetect/EnglishSD.bin.gz < text | 
 java opennlp.tools.tokenize.EnglishTokenizerME 
    opennlp.models/tokenize/EnglishTok.bin.gz | 
-java -mx300M opennlp.tools.parser.EnglishTreebankParser
+java -Xmx450m opennlp.tools.parser.EnglishTreebankParser
   opennlp.models/parser
     
 Name Finding:
 java opennlp.tools.sentdetect.EnglishSentenceDetectorME 
   opennlp.models/sentdetect/EnglishSD.bin.gz < text |
-java -mx500M opennlp.tools.namefind.EnglishNameFinder 
+java -Xmx600m opennlp.tools.namefind.EnglishNameFinder 
   opennlp.models/namefind/*.bin.gz
 
 Training the Tools
@@ -147,12 +147,12 @@ The main of the following classes can be used to train new models.
 Look at the usage messages for these classes you are interested in
 training new models.
 
-sentence detector:	opennlp.tools.sentdetect.SentenceDetectorME
-tokenizer: 		opennlp.tools.tokenize.TokenizerME
-pos-tagger: 		opennlp.tools.postag.POSTaggerME
-chunker: 		opennlp.tools.chunker.ChunkerME
-name finder: 		opennlp.tools.namefind.NameFinderME
-parser: 		opennlp.tools.parser.ParserME
+sentence detector:  opennlp.tools.sentdetect.SentenceDetectorME
+tokenizer:          opennlp.tools.tokenize.TokenizerME
+pos-tagger:         opennlp.tools.postag.POSTaggerME
+chunker:            opennlp.tools.chunker.ChunkerME
+name finder:        opennlp.tools.namefind.NameFinderME
+parser:             opennlp.tools.parser.ParserME
 
 Bug Reports
 ===========
