@@ -30,7 +30,6 @@ import opennlp.common.util.Sequence;
 import opennlp.common.util.Span;
 import opennlp.maxent.io.SuffixSensitiveGISModelReader;
 import opennlp.tools.chunker.ChunkerME;
-import opennlp.tools.chunker.DefaultChunkerContextGenerator;
 import opennlp.tools.postag.POSContextGenerator;
 import opennlp.tools.postag.POSTaggerME;
 
@@ -42,11 +41,11 @@ public class EnglishTreebankParser extends ParserME {
    */
   public EnglishTreebankParser(String dataDir) throws IOException {
     super(
-          new SuffixSensitiveGISModelReader(new File(dataDir+"build")).getModel(),
-          new SuffixSensitiveGISModelReader(new File("check")).getModel(),
-          new EnglishTreebankPOSTagger(dataDir + "tag"),
-          new EnglishTreebankChunker(dataDir + "chunk"),
-          new HeadRules(dataDir + "head_rules"));
+          new SuffixSensitiveGISModelReader(new File(dataDir+"/build.bin.gz")).getModel(),
+          new SuffixSensitiveGISModelReader(new File(dataDir+"/check.bin.gz")).getModel(),
+          new EnglishTreebankPOSTagger(dataDir + "/tag.bin.gz"),
+          new EnglishTreebankChunker(dataDir + "/chunk.bin.gz"),
+          new HeadRules(dataDir + "/head_rules"));
     /*
     super(
       new SuffixSensitiveGISModelReader(new File(dataDir + "/parser/EnglishParserBuild.bin.gz")).getModel(),
@@ -77,7 +76,7 @@ public class EnglishTreebankParser extends ParserME {
     private static final int K = 10;
 
     public EnglishTreebankChunker(String modelFile) throws IOException {
-      super(new SuffixSensitiveGISModelReader(new File(modelFile)).getModel(), new DefaultChunkerContextGenerator(), 10);
+      super(new SuffixSensitiveGISModelReader(new File(modelFile)).getModel(), new ChunkContextGenerator(), 10);
     }
 
     public Sequence[] topKSequences(List sentence, List tags) {
@@ -108,8 +107,12 @@ public class EnglishTreebankParser extends ParserME {
           if (lastTag.equals(ParserME.OTHER)) {
             return (false);
           }
-          if (!lastTag.substring(ParserME.START.length()).equals(outcome.substring(ParserME.CONT.length()))) {
-            return (false);
+          String pred =  outcome.substring(ParserME.CONT.length());
+          if (lastTag.startsWith(ParserME.START)) {
+            return lastTag.substring(ParserME.START.length()).equals(pred);
+          }
+          else if (lastTag.startsWith(ParserME.CONT)) {
+            return lastTag.substring(ParserME.CONT.length()).equals(pred);
           }
         }
       }
@@ -120,6 +123,7 @@ public class EnglishTreebankParser extends ParserME {
   public static void main(String[] args) throws IOException {
     if (args.length != 1) {
       System.err.println("Usage: EnglishTreebankParser dataDirectory < sentences");
+      System.exit(1);
     }
     int ai = 0;
     ParserME parser = new EnglishTreebankParser(args[ai++]);
