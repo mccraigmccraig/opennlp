@@ -17,10 +17,10 @@
 //////////////////////////////////////////////////////////////////////////////
 package opennlp.tools.util;
 
-import java.util.*;
+import java.util.Arrays;
+import java.util.List;
 
 import opennlp.maxent.MaxentModel;
-import opennlp.tools.util.Cache;
 
 /** Performs k-best search over sequence.  This is besed on the description in
   * Ratnaparkhi (1998), PhD diss, Univ. of Pennsylvania. 
