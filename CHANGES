@@ -1,6 +1,10 @@
 0.6.7
 -----
 
+Changed the Unifiable interface so that the methods work on Unifiables
+rather than Objects.  Also, unifyCheck no longer returns a
+value. (Jason)
+
 Removed the discourse and structure packages and most of the classes
 inside them. Moved Category and CategoryFcn to the synsem package.
 Category now extends Mutable. (Jason)

@@ -22,7 +22,7 @@ package opennlp.common.unify;
  * A unifiable String value.
  *
  * @author      Jason Baldridge
- * @version     $Revision: 1.1 $, $Date: 2001/12/11 23:29:24 $
+ * @version     $Revision: 1.2 $, $Date: 2002/01/07 15:10:33 $
  **/
 public class StringValue implements Unifiable {
     private String _val;
@@ -71,8 +71,8 @@ public class StringValue implements Unifiable {
      * @return an object which represents the unification of 
      *         this Unifiable with the Object
      */
-    public Object unify (Object o, Substitution s) throws UnifyFailure {
-	if (equals(o)) {
+    public Unifiable unify (Unifiable u, Substitution s) throws UnifyFailure {
+	if (equals(u)) {
 	    return this;
 	} else {
 	    throw new UnifyFailure();
@@ -86,12 +86,9 @@ public class StringValue implements Unifiable {
      * @param o object to check for unifiability
      * @exception UnifyFailure if this Unifiable cannot be unified with 
      *            the Object
-     * @return the Object o, unmodified 
      **/
-    public Object unifyCheck (Object o) throws UnifyFailure {
-	if (o instanceof StringValue || o instanceof String) {
-	    return o;
-	} else {
+    public void unifyCheck (Unifiable u) throws UnifyFailure {
+	if (!(u instanceof StringValue)) {
 	    throw new UnifyFailure();
 	}
     }
@@ -104,7 +101,7 @@ public class StringValue implements Unifiable {
      * @return a copy of this Unifiable with all variables from the
      *         Substitution replaced by their values.  
      */
-    public Object fill (Substitution s) {
+    public Unifiable fill (Substitution s) {
 	return this;
     }
 

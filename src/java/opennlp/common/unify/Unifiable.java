@@ -15,16 +15,17 @@
 // License along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 //////////////////////////////////////////////////////////////////////////////
-
 package opennlp.common.unify;
+
 
 /**
  * An interface for classes that may be unified.
  *
  * @author      Gann Bierner
- * @version     $Revision: 1.6 $, $Date: 2001/12/11 23:29:24 $
+ * @version     $Revision: 1.7 $, $Date: 2002/01/07 15:10:33 $
  **/
 public interface Unifiable {
+
    
     /**
      * Determines if a Variable occurs within this Unifiable
@@ -44,6 +45,7 @@ public interface Unifiable {
      **/
     public boolean equals (Object o);
 
+
     /**
      * Unify this Unfiable with another Object.
      *
@@ -54,7 +56,8 @@ public interface Unifiable {
      * @return an object which represents the unification of 
      *         this Unifiable with the Object
      */
-    public Object unify (Object o, Substitution s) throws UnifyFailure;
+    public Unifiable unify (Unifiable u, Substitution s) throws UnifyFailure;
+
 
     /**
      * Check if this Unifiable can unify with another Object.  This
@@ -72,9 +75,9 @@ public interface Unifiable {
      * @param o object to check for unifiability
      * @exception UnifyFailure if this Unifiable cannot be unified with 
      *            the Object
-     * @return the Object o, unmodified 
      **/
-    public Object unifyCheck (Object o) throws UnifyFailure;
+    public void unifyCheck (Unifiable u) throws UnifyFailure;
+
 
     /**
      * Replaces any variables in this Unifiable with the values found
@@ -84,7 +87,7 @@ public interface Unifiable {
      * @return a copy of this Unifiable with all variables from the
      *         Substitution replaced by their values.  
      */
-    public Object fill (Substitution s);
+    public Unifiable fill (Substitution s);
     
 
 }

@@ -15,55 +15,65 @@
 // License along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 //////////////////////////////////////////////////////////////////////////////
-
 package opennlp.common.unify;
 
 /**
- * A utility for unifying two objects.  Takes care of ordering so that
- * Variables will be handled properly.
+ * A unification utility that abstracts a few basic issues such
+ * Variables and not needed to pass a substitution object explictly.
  *
  * @author      Jason Baldridge
- * @version     $Revision: 1.4 $, $Date: 2001/11/27 10:40:41 $
- *
-*/
+ * @version     $Revision: 1.5 $, $Date: 2002/01/07 15:10:33 $
+ **/
 public class Unifier {
+
    
-    public static final Object unify (Object o1, Object o2) 
+    /**
+     * Uses a <code>SelfCondensingSub</code> underlyingly so that it
+     * is not necessary to pass a substitution object explictly.
+     *
+     * @param u1 the first of two Unifiables to unify
+     * @param u2 the second of two Unifiables to unify
+     * @return the result of unifying u1 and u2
+     **/
+    public static final Unifiable unify (Unifiable u1, Unifiable u2) 
 	throws UnifyFailure {
+
 	Substitution sub = new SelfCondensingSub();
-	Object unified =  unify(o1, o2, sub);
-	if (unified instanceof Unifiable)
-	    ((Unifiable)unified).fill(sub);
-	return unified;
+	return unify(u1, u2, sub).fill(sub);
+
     }
 
 
-    public static final Object unify (Object o1, Object o2, Substitution sub) 
+    /**
+     * Method which handles ordering to make sure that the Unifiable
+     * unify() method is called on the Variable if either of the
+     * arguments is a Variable.  This way, under a unification scheme
+     * for a set of classes, you don't have to have each Unifiable
+     * check to see if the thing it is trying to be unified with is a
+     * Variable.
+     *
+     * @param u1 the first of two Unifiables to unify
+     * @param u2 the second of two Unifiables to unify
+     * @param sub the substitution object holding global unification
+     * information
+     * @return the result of unifying u1 and u2
+     **/
+    public static final Unifiable unify (Unifiable u1, 
+					 Unifiable u2, 
+					 Substitution sub) 
 	throws UnifyFailure {
 
 	// !!!!!!!!!!!!!!!!!!!!!!!! CAUTION !!!!!!!!!!!!!!!!!!!!!!!!
 	// the order of this if-else statement is important, so be
 	// careful before you change it!
 	// !!!!!!!!!!!!!!!!!!!!!!!! CAUTION !!!!!!!!!!!!!!!!!!!!!!!!
-	if (o2 instanceof Variable) {
-	    return ((Unifiable)o2).unify(o1, sub);
-	}
-	else if (o1 instanceof Unifiable) {
-	    return ((Unifiable)o1).unify(o2, sub);
-	}
-	else if (o2 instanceof Unifiable) {
-	    return ((Unifiable)o2).unify(o1, sub);
-	}
-	else if (o1 instanceof String 
-		 && o2 instanceof String 
-		 && o1.equals(o2)) {
-	    return o1;
+	if (u2 instanceof Variable) {
+	    return u2.unify(u1, sub);
 	}
 	else {
-	    throw new UnifyFailure();
+	    return u1.unify(u2, sub);
 	}
+
     }
-
-
 
 }

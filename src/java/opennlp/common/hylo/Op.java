@@ -107,15 +107,13 @@ public class Op extends HyloFormula {
 	}
     }
     
-    public Object unifyCheck (Object o) throws UnifyFailure {
-	if (o instanceof Op && _name.equals(((Op)o)._name)) {
-	    return this;
-	} else {
+    public void unifyCheck (Unifiable u) throws UnifyFailure {
+	if (!(u instanceof Op) || !(_name.equals(((Op)u)._name))) {
 	    throw new UnifyFailure();
 	}
     }
 
-    public Object fill (Substitution sub) {
+    public Unifiable fill (Substitution sub) {
 	List $args = new ArrayList();
 	for (Iterator argsIt = _args.iterator(); argsIt.hasNext();) {
 	    $args.add(((LF)argsIt.next()).fill(sub));

@@ -73,20 +73,19 @@ public class Modal extends HyloFormula {
 	}
     }
 
-    public Object unifyCheck (Object o) throws UnifyFailure {
-	if (o instanceof Modal
-	    && _isDiamond == ((Modal)o)._isDiamond
-	    && _relation.equals(((Modal)o)._relation)) {
+    public void unifyCheck (Unifiable u) throws UnifyFailure {
+	if (u instanceof Modal
+	    && _isDiamond == ((Modal)u)._isDiamond
+	    && _relation.equals(((Modal)u)._relation)) {
 
-	    _arg.unifyCheck(((Modal)o)._arg);
-	    return this;
+	    _arg.unifyCheck(((Modal)u)._arg);
 
 	} else {
 	    throw new UnifyFailure();
 	}
     }
 
-    public Object fill (Substitution sub) {
+    public Unifiable fill (Substitution sub) {
 	return new Modal(_isDiamond, _relation, (LF)_arg.fill(sub));
     }
     

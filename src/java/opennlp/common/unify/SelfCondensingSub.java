@@ -26,7 +26,7 @@ import java.util.*;
  * made.
  *
  * @author      Jason Baldridge
- * @version $Revision: 1.2 $, $Date: 2001/12/19 11:32:17 $ 
+ * @version $Revision: 1.3 $, $Date: 2002/01/07 15:10:33 $ 
 */
 public class SelfCondensingSub extends HashMap implements Substitution {
 
@@ -44,18 +44,19 @@ public class SelfCondensingSub extends HashMap implements Substitution {
      * @exception throws UnifyFailure if the Object cannot be unified
      * with a previous value substituted for the Variable.
      */
-    public Object makeSubstitution(Variable var, Object o) throws UnifyFailure {
+    public Unifiable makeSubstitution (Variable var, Unifiable u) 
+	throws UnifyFailure {
 
-	Object val1 = getValue(var);
+	Unifiable val1 = getValue(var);
 
-	if (o instanceof Variable) {
-	    Variable var2 = (Variable)o;
-	    Object val2 = getValue(var2);
+	if (u instanceof Variable) {
+	    Variable var2 = (Variable)u;
+	    Unifiable val2 = getValue(var2);
 	    if (val1 != null) {
 		if (val2 != null)
-		    o = Unifier.unify(var, val2, this);
+		    u = Unifier.unify(var, val2, this);
 		else
-		    o = makeSubstitution(var2, val1);
+		    u = makeSubstitution(var2, val1);
 	    }
 	    else {
 		if (val2 != null)
@@ -65,18 +66,15 @@ public class SelfCondensingSub extends HashMap implements Substitution {
 	    }
 	}
 	else if (val1 != null) {
-	    o = Unifier.unify(val1, o, this);
+	    u = Unifier.unify(val1, u, this);
 	}
-	put(var, o);
+	put(var, u);
 	for (Iterator i=keySet().iterator(); i.hasNext();) {
 	    Variable v = (Variable)i.next();
-	    Object val = getValue(v);
-	    if (val instanceof Unifiable)
-		put(v, ((Unifiable)val).fill(this));
+	    put(v, getValue(v).fill(this));
 	}
-	if (o instanceof Unifiable)
-	    o = ((Unifiable)o).fill(this);
-	return o;
+	u = u.fill(this);
+	return u;
     }
 
     /**
@@ -86,8 +84,8 @@ public class SelfCondensingSub extends HashMap implements Substitution {
      * @param var the variable whose value after unification is desired
      * @return the Object which this variable has been unified with 
      */
-    public Object getValue(Variable var) {
-	return get(var);
+    public Unifiable getValue (Variable var) {
+	return (Unifiable)get(var);
     }
 
     public Iterator varIterator () {

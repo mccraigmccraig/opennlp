@@ -26,7 +26,7 @@ import opennlp.common.unify.*;
  * representing data structures for hybrid logic.
  *
  * @author      Jason Baldridge
- * @version     $Revision: 1.4 $, $Date: 2002/01/05 17:14:41 $
+ * @version     $Revision: 1.5 $, $Date: 2002/01/07 15:10:33 $
  **/
 public abstract class HyloFormula implements LF {
 
@@ -37,6 +37,7 @@ public abstract class HyloFormula implements LF {
     public void deepMap (ModFcn mf) {
 	mf.modify(this);
     }
+
     
     /**
      * Unify this Unfiable with another Object.
@@ -48,7 +49,7 @@ public abstract class HyloFormula implements LF {
      * @return an object which represents the unification of 
      *         this Unifiable with the Object
      */
-    public Object unify (Object o, Substitution s) throws UnifyFailure {
+    public Unifiable unify (Unifiable u, Substitution s) throws UnifyFailure {
 	throw new UnifyFailure();
     }
 
@@ -71,9 +72,10 @@ public abstract class HyloFormula implements LF {
      *            the Object
      * @return the Object o, unmodified 
      **/
-    public Object unifyCheck (Object o) throws UnifyFailure {
+    public void unifyCheck (Unifiable u) throws UnifyFailure {
 	throw new UnifyFailure();
     }
+
 
     /**
      * Replaces any variables in this Unifiable with the values found
@@ -83,7 +85,7 @@ public abstract class HyloFormula implements LF {
      * @return a copy of this Unifiable with all variables from the
      *         Substitution replaced by their values.  
      */
-    public Object fill (Substitution s) {
+    public Unifiable fill (Substitution s) {
 	return this;
     }
        

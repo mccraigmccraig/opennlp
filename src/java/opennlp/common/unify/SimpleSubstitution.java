@@ -24,24 +24,23 @@ import java.util.*;
  * Simple implementation of Substitution interface.
  *
  * @author      Jason Baldridge
- * @version     $Revision: 1.5 $, $Date: 2002/01/05 17:13:21 $
+ * @version     $Revision: 1.6 $, $Date: 2002/01/07 15:10:33 $
  */
 public class SimpleSubstitution extends HashMap implements Substitution {
 
-    public Object makeSubstitution(Variable var, Object o) 
+    public Unifiable makeSubstitution (Variable var, Unifiable u) 
 	throws UnifyFailure{
 
-	if (o instanceof Unifiable)
-	    o = ((Unifiable)o).fill(this);
-	put(var, o);
-	return o;
+	u = u.fill(this);
+	put(var, u);
+	return u;
     }
 
-    public Object getValue(Variable var) {
-	return get(var);
+    public Unifiable getValue (Variable var) {
+	return (Unifiable)get(var);
     }
 
-    public Iterator varIterator() {
+    public Iterator varIterator () {
 	return keySet().iterator();
     }
     

@@ -74,21 +74,20 @@ public class HyloVar extends HyloFormula implements Variable {
 	}
     }
     
-    public Object unify (Object o, Substitution sub) throws UnifyFailure {
-	if (o instanceof LF) {
-	    if (((LF)o).occurs(this)) {
+    public Unifiable unify (Unifiable u, Substitution sub) throws UnifyFailure {
+	if (u instanceof LF) {
+	    if (u.occurs(this)) {
 		throw new UnifyFailure();
 	    }
-	    sub.makeSubstitution(this, o);
-	    return o;
+	    return sub.makeSubstitution(this, u);
 	}
 	else {
 	    throw new UnifyFailure();
 	}
     }
 
-    public Object fill (Substitution sub) {
-	Object val = sub.getValue(this);
+    public Unifiable fill (Substitution sub) {
+	Unifiable val = sub.getValue(this);
 	if (val != null) {
 	    return val;
 	} else {

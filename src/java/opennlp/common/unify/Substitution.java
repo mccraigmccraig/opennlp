@@ -23,7 +23,7 @@ import java.util.*;
  * Specifies how variable are to be replaced to make two objects unify.  
  *
  * @author      Gann Bierner & Jason Baldridge
- * @version     $Revision: 1.5 $, $Date: 2001/12/19 11:32:17 $
+ * @version     $Revision: 1.6 $, $Date: 2002/01/07 15:10:33 $
  */
 public interface Substitution {
 
@@ -38,7 +38,9 @@ public interface Substitution {
      * @exception throws UnifyFailure if the Object cannot be unified
      * with a previous value substituted for the Variable.  
      */
-    public Object makeSubstitution (Variable var, Object o) throws UnifyFailure;
+    public Unifiable makeSubstitution (Variable var, Unifiable u) 
+	throws UnifyFailure;
+
 
     /**
      * Try to get the value of a variable from this Substitution.
@@ -48,7 +50,8 @@ public interface Substitution {
      * @param var the variable whose value after unification is desired
      * @return the Object which this variable has been unified with 
      */
-    public Object getValue (Variable var);
+    public Unifiable getValue (Variable var);
+
 
     public Iterator varIterator();
     
