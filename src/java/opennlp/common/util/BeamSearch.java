@@ -60,9 +60,9 @@ public class BeamSearch {
     }
     for (int i = 0; i < n; i++) {
       int sz = Math.min(size, prev.size());
-      for (int j = 1; j <= sz; j++) {
-        Sequence top = (Sequence) prev.first();
-        prev.remove(top);
+      int sc =0;
+      for (Iterator si = prev.iterator();si.hasNext() && sc<sz;sc++) {
+        Sequence top = (Sequence) si.next();
         Object[] params = new Object[additionalContext.length + 3];
         params[0] = new Integer(i);
         params[1] = sequence;
@@ -80,11 +80,11 @@ public class BeamSearch {
           temp_scores[c] = scores[c];
         }
         Arrays.sort(temp_scores);
-        double min = temp_scores[temp_scores.length - size];
+        double min = temp_scores[Math.min(scores.length,size)];
 
         for (int p = 0; p < scores.length; p++) {
           if (scores[p] < min)
-            continue;
+            continue; //only advance first "size" outcomes
           Sequence newS = top.copy();
           newS.add(model.getOutcome(p), scores[p]);
           next.add(newS);
