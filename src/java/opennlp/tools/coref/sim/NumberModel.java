@@ -1,0 +1,183 @@
+///////////////////////////////////////////////////////////////////////////////
+//Copyright (C) 2003 Thomas Morton
+//
+//This library is free software; you can redistribute it and/or
+//modify it under the terms of the GNU Lesser General Public
+//License as published by the Free Software Foundation; either
+//version 2.1 of the License, or (at your option) any later version.
+//
+//This library is distributed in the hope that it will be useful,
+//but WITHOUT ANY WARRANTY; without even the implied warranty of
+//MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+//GNU Lesser General Public License for more details.
+//
+//You should have received a copy of the GNU Lesser General Public
+//License along with this program; if not, write to the Free Software
+//Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
+//////////////////////////////////////////////////////////////////////////////
+package opennlp.tools.coref.sim;
+
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
+
+import opennlp.tools.coref.*;
+import opennlp.tools.coref.resolver.MaxentResolver;
+
+import opennlp.tools.util.CollectionEventStream;
+import opennlp.tools.util.HashList;
+
+import opennlp.maxent.Event;
+import opennlp.maxent.GIS;
+import opennlp.maxent.MaxentModel;
+import opennlp.maxent.io.PlainTextGISModelReader;
+import opennlp.maxent.io.SuffixSensitiveGISModelReader;
+import opennlp.maxent.io.SuffixSensitiveGISModelWriter;
+
+public class NumberModel implements TestNumberModel, TrainSimilarityModel {
+
+  private String modelName;
+  private MaxentModel testModel;
+  private List events;
+
+  private int singularIndex;
+  private int pluralIndex;
+
+  public static TestNumberModel testModel(String name) throws IOException {
+    NumberModel nm = new NumberModel(name, false);
+    return nm;
+  }
+
+  public static TrainSimilarityModel trainModel(String modelName) throws IOException {
+    NumberModel gm = new NumberModel(modelName, true);
+    return gm;
+  }
+
+  private NumberModel(String modelName, boolean train) throws IOException {
+    this.modelName = modelName;
+    if (train) {
+      events = new ArrayList();
+    }
+    else {
+      if (MaxentResolver.loadAsResource()) {
+        testModel = (new PlainTextGISModelReader(new BufferedReader(new InputStreamReader(this.getClass().getResourceAsStream(modelName))))).getModel();
+      }
+      else {
+        testModel = (new SuffixSensitiveGISModelReader(new File(modelName))).getModel();
+      }
+      singularIndex = testModel.getIndex(NumberEnum.SINGULAR.toString());
+      pluralIndex = testModel.getIndex(NumberEnum.PLURAL.toString());
+    }
+  }
+
+  private List getFeatures(Context np1) {
+    List features = new ArrayList();
+    features.add("default");
+    Object[] npTokens = np1.getTokens();
+    for (int ti = 0, tl = npTokens.length - 1; ti < tl; ti++) {
+      features.add("mw=" + npTokens[ti].toString());
+    }
+    features.add("hw=" + np1.getHeadToken().toLowerCase());
+    features.add("ht=" + np1.getHeadTag());
+    return features;
+  }
+
+  private void addEvent(String outcome, Context np1) {
+    List feats = getFeatures(np1);
+    events.add(new Event(outcome, (String[]) feats.toArray(new String[feats.size()])));
+  }
+
+  public NumberEnum getNumber(MentionContext ec) {
+    if (Linker.singularPronounPattern.matcher(ec.getHeadTokenText()).matches()) {
+      return NumberEnum.SINGULAR;
+    }
+    else if (Linker.pluralPronounPattern.matcher(ec.getHeadTokenText()).matches()) {
+      return NumberEnum.PLURAL;
+    }
+    else {
+      return NumberEnum.UNKNOWN;
+    }
+  }
+
+  private NumberEnum getNumber(List entity) {
+    for (Iterator ci = entity.iterator(); ci.hasNext();) {
+      MentionContext ec = (MentionContext) ci.next();
+      NumberEnum ne = getNumber(ec);
+      if (ne != NumberEnum.UNKNOWN) {
+        return ne;
+      }
+    }
+    return NumberEnum.UNKNOWN;
+  }
+
+  public void setExtents(MentionContext[] extentContexts) {
+    HashList entities = new HashList();
+    List singletons = new ArrayList();
+    for (int ei = 0, el = extentContexts.length; ei < el; ei++) {
+      MentionContext ec = extentContexts[ei];
+      //System.err.println("NumberModel.setExtents: ec("+ec.getId()+") "+ec.toText());
+      if (ec.getId() != -1) {
+        entities.put(new Integer(ec.getId()), ec);
+      }
+      else {
+        singletons.add(ec);
+      }
+    }
+    List singles = new ArrayList();
+    List plurals = new ArrayList();
+    // coref entities
+    for (Iterator ei = entities.keySet().iterator(); ei.hasNext();) {
+      Integer key = (Integer) ei.next();
+      List entityContexts = (List) entities.get(key);
+      NumberEnum number = getNumber(entityContexts);
+      if (number == NumberEnum.SINGULAR) {
+        singles.addAll(entityContexts);
+      }
+      else if (number == NumberEnum.PLURAL) {
+        plurals.addAll(entityContexts);
+      }
+    }
+    // non-coref entities.
+    for (Iterator ei = singletons.iterator(); ei.hasNext();) {
+      MentionContext ec = (MentionContext) ei.next();
+      NumberEnum number = getNumber(ec);
+      if (number == NumberEnum.SINGULAR) {
+        singles.add(ec);
+      }
+      else if (number == NumberEnum.PLURAL) {
+        plurals.add(ec);
+      }
+    }
+
+    for (Iterator si = singles.iterator(); si.hasNext();) {
+      MentionContext ec = (MentionContext) si.next();
+      addEvent(NumberEnum.SINGULAR.toString(), Context.getContext(ec));
+    }
+    for (Iterator fi = plurals.iterator(); fi.hasNext();) {
+      MentionContext ec = (MentionContext) fi.next();
+      addEvent(NumberEnum.PLURAL.toString(), Context.getContext(ec));
+    }
+  }
+
+  public double[] numberDist(Context c) {
+    List feats = getFeatures(c);
+    return testModel.eval((String[]) feats.toArray(new String[feats.size()]));
+  }
+
+  public int getSingularIndex() {
+    return singularIndex;
+  }
+
+  public int getPluralIndex() {
+    return pluralIndex;
+  }
+
+  public void trainModel() throws IOException {
+    (new SuffixSensitiveGISModelWriter(GIS.trainModel(new CollectionEventStream(events),100,10),new File(modelName))).persist();    
+  }
+
+}
