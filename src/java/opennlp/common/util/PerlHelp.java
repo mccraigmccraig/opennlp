@@ -28,7 +28,7 @@ import java.util.*;
  * gnu.regexp.
  *
  * @author      Jason Baldridge
- * @version     $Revision: 1.3 $, $Date: 2001/11/27 16:58:57 $
+ * @version     $Revision: 1.4 $, $Date: 2001/11/27 17:00:30 $
  */
 public final class PerlHelp {
 
@@ -55,7 +55,7 @@ public final class PerlHelp {
 
 
     public static String[] getParagraphs (String text) {
-	String[] pars = new String { text };
+	String[] pars = { text };
 	return pars;
     }
 
