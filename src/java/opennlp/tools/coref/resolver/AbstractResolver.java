@@ -28,6 +28,7 @@ import opennlp.tools.util.CountedSet;
 
 public abstract class AbstractResolver implements Resolver {
 
+  /** The number of previous entities that resolver should consider. */ 
   protected int NUM_ENTITIES_BACK;
   protected boolean showExclusions;
   protected CountedSet distances;
