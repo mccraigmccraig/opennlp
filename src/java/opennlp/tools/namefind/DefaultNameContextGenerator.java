@@ -80,6 +80,12 @@ public class DefaultNameContextGenerator implements NameContextGenerator {
   public String[] getContext(int i, List toks, List preds, Map prevTags) {
     return (getContext(i, toks.toArray(), (String[]) preds.toArray(new String[preds.size()]),prevTags));
   }
+  
+  public String[] getContext(int index, Object[] sequence, String[] priorDecisions, Object[] additionalContext) {
+    return getContext(index,sequence,priorDecisions,(Map) additionalContext[0]);
+  }
+
+  
 
   /**
    * Return the context for finding names at the specified index.
@@ -255,7 +261,4 @@ public class DefaultNameContextGenerator implements NameContextGenerator {
     //System.err.println("Finder.wordFeature: word="+word+" feat="+feat);
     return (feat);
   }
-  public static void main(String[] args) {}
-
-
 }

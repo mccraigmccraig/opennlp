@@ -20,7 +20,6 @@ package opennlp.tools.namefind;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
@@ -87,7 +86,7 @@ public class NameFinderME implements NameFinder {
 
   /* inherieted javadoc */
   public String[] find(Object[] toks, Map prevTags) {
-    bestSequence = beam.bestSequence(Arrays.asList(toks), new Object[] { prevTags });
+    bestSequence = beam.bestSequence(toks, new Object[] { prevTags });
     List c = bestSequence.getOutcomes();
     return (String[]) c.toArray(new String[c.size()]);
   }

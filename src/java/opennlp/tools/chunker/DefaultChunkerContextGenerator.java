@@ -45,6 +45,10 @@ public class DefaultChunkerContextGenerator implements ChunkerContextGenerator {
     return (getContext(i, toks.toArray(), (String[]) tags.toArray(new String[tags.size()]), (String[]) preds.toArray(new String[preds.size()])));
   }
   
+  public String[] getContext(int index, Object[] sequence, String[] priorDecisions, Object[] additionalContext) {
+    return getContext(index,sequence,priorDecisions,(String[]) additionalContext[0]); 
+  }  
+  
   /**
    * Returns the contexts for chunking of the specified index.
    * @param i The index of the token in the specified toks array for which the context should be constructed. 
