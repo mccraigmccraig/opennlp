@@ -21,7 +21,6 @@ package opennlp.tools.postag;
 import opennlp.maxent.*;
 import opennlp.common.morph.MorphAnalyzer;
 import opennlp.common.util.Pair;
-import opennlp.common.util.PerlHelp;
 import opennlp.common.util.Sequence;
 
 import java.util.*;
@@ -30,12 +29,11 @@ import java.util.*;
  * A context generator for the POS Tagger.
  *
  * @author      Gann Bierner
- * @version     $Revision: 1.4 $, $Date: 2003/12/16 23:10:43 $
+ * @version     $Revision: 1.5 $, $Date: 2004/01/09 15:22:50 $
  */
 
 public class POSContextGenerator implements ContextGenerator {
   private MorphAnalyzer _manalyzer;
-
   private static final String SE = "*SE*";
   private static final String SB = "*SB*";
   private static final int PREFIX_LENGTH = 4;
@@ -44,10 +42,10 @@ public class POSContextGenerator implements ContextGenerator {
   public POSContextGenerator() {
     _manalyzer = null;
   }
-  
+
   public POSContextGenerator(MorphAnalyzer manalyser) {
-      _manalyzer = manalyser;
-    }
+    _manalyzer = manalyser;
+  }
 
   public String[] getContext(Object o) {
     Object[] data = (Object[]) o;
@@ -65,22 +63,22 @@ public class POSContextGenerator implements ContextGenerator {
   protected static String[] getSuffixes(String lex) {
     String[] suffs = new String[4];
     for (int li = 0, ll = PREFIX_LENGTH; li < ll; li++) {
-      suffs[li] = lex.substring(Math.max(lex.length()-li-1, 0));
+      suffs[li] = lex.substring(Math.max(lex.length() - li - 1, 0));
     }
     return suffs;
   }
 
-  public String[] getContext(int pos, List tokens, List tags) {
+  public String[] getContext(int index, List tokens, List tags) {
     String next, nextnext, lex, prev, prevprev;
     String tagprev, tagprevprev;
     tagprev = tagprevprev = null;
     next = nextnext = lex = prev = prevprev = null;
 
-    lex = (String) tokens.get(pos);
-    if (tokens.size() > pos + 1) {
-      next = (String) tokens.get(pos + 1);
-      if (tokens.size() > pos + 2)
-        nextnext = (String) tokens.get(pos + 2);
+    lex = (String) tokens.get(index);
+    if (tokens.size() > index + 1) {
+      next = (String) tokens.get(index + 1);
+      if (tokens.size() > index + 2)
+        nextnext = (String) tokens.get(index + 2);
       else
         nextnext = SE; // Sentence End
 
@@ -89,20 +87,22 @@ public class POSContextGenerator implements ContextGenerator {
       next = SE; // Sentence End
     }
 
-    if (pos - 1 >= 0) {
-      prev = (String) tokens.get(pos - 1);
-      tagprev = (String) tags.get(pos - 1);
+    if (index - 1 >= 0) {
+      prev = (String) tokens.get(index - 1);
+      tagprev = (String) tags.get(index - 1);
 
-      if (pos - 2 >= 0) {
-        prevprev = (String) tokens.get(pos - 2);
-        tagprevprev = (String) tags.get(pos - 2);
+      if (index - 2 >= 0) {
+        prevprev = (String) tokens.get(index - 2);
+        tagprevprev = (String) tags.get(index - 2);
       }
       else {
         prevprev = SB; // Sentence Beginning
+        tagprevprev = SB;
       }
     }
     else {
       prev = SB; // Sentence Beginning
+      tagprev = SB;
     }
 
     ArrayList e = new ArrayList();
@@ -129,38 +129,50 @@ public class POSContextGenerator implements ContextGenerator {
       }
     }
     // see if the word has any special characters
-    if (lex.indexOf('-') != -1) {
+    boolean hasHyphen = false;
+    boolean hasCapital = false;
+    boolean hasNumber = false;
+    boolean hasLetter = false;
+    char[] ca = lex.toCharArray();
+    for (int i = 0; i < ca.length; i++) {
+      if (Character.isUpperCase(ca[i])) {
+        hasCapital = true;
+      }
+      if (Character.isDigit(ca[i])) {
+        hasNumber = true;
+      }
+      if (ca[i] == '-') {
+        hasHyphen = true;
+      }
+      if (Character.isLetter(ca[i])) {
+        hasLetter = true;
+      }
+    }
+    if (hasHyphen) {
       e.add("h");
     }
 
-    if (PerlHelp.hasCap(lex)) {
+    if (hasCapital) {
       e.add("c");
     }
 
-    if (PerlHelp.hasNum(lex)) {
+    if (hasNumber) {
       e.add("d");
     }
 
-    // add the words and pos's of the surrounding context
-    if (prev != null) {
-      e.add("p=" + prev);
-      if (tagprev != null) {
-        e.add("t=" + tagprev);
-      }
-      if (prevprev != null) {
-        e.add("pp=" + prevprev);
-        if (tagprevprev != null) {
-          e.add("tt=" + tagprevprev);
-        }
-      }
+    if (hasLetter) {
+      e.add("l");
     }
 
-    if (next != null) {
-      e.add("n=" + next);
-      if (nextnext != null) {
-        e.add("nn=" + nextnext);
-      }
-    }
+    // add the words and pos's of the surrounding context
+    e.add("p=" + prev);
+    e.add("t=" + tagprev);
+    e.add("pp=" + prevprev);
+    e.add("tt=" + tagprevprev);
+    e.add("ttt="+tagprevprev+","+tagprev);
+    e.add("n=" + next);
+    e.add("nn=" + nextnext);
+    
     return (String[]) e.toArray(new String[e.size()]);
   }
 
