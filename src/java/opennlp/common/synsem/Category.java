@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////////
-// Copyright (C) 2002 Jason Baldridge and Gann Bierner
+// Copyright (C) 2002 Jason Baldridge, Gann Bierner and Michael White
 // 
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
@@ -28,10 +28,33 @@ import opennlp.common.util.*;
  * projects find the basic set-up useful for other representations (syntactic
  * trees or whatnot), they should not feel inhibited by the name category.
  *
+ * @author      Jason Baldridge
  * @author      Gann Bierner
- * @version     $Revision: 1.3 $, $Date: 2002/02/20 12:46:21 $
+ * @author      Michael White
+ * @version     $Revision: 1.4 $, $Date: 2002/11/05 17:38:54 $
  */
 public interface Category extends Unifiable, Mutable, java.io.Serializable {
+
+    /**
+     * Accessor function for the feature structure associated with this category.
+     *
+     * @return the feature structure for this cateogory
+     */    
+    public FeatureStructure getFeatureStructure();
+    
+    /**
+     * Gives this category a new feature structure.
+     *
+     * @param fs the new feature structure
+     */    
+    public void setFeatureStructure(FeatureStructure fs);
+
+    /** Gets the LF. */
+    public LF getLF();
+    
+    /** Sets the LF. */
+    public void setLF(LF lf);
+    
 
     /**
      * Determines if this category is  equal to another on the top level.
@@ -40,40 +63,24 @@ public interface Category extends Unifiable, Mutable, java.io.Serializable {
      * @param o object to check for equality
      * @return whether or not this is shallowly equal to object
      */
-    public boolean shallowEquals (Object o);
-
+    public boolean shallowEquals(Object o);
 
     /**
      * Deep copies this category.
      *
      * @return a deep copy of this category
      */
-    public Category copy ();
+    public Category copy();
 
 
-   
     /**
      * Iterates through this Category applying a function to this category
      * and every subcategory.
      *
      * @param f a function to be applied
      */    
-    public void forall (CategoryFcn f); //to ls
+    public void forall(CategoryFcn f); //to ls
 
-    /**
-     * Accessor function for the feature structure associated with this category
-     *
-     * @return the feature structure for this cateogory
-     */    
-    public FeatureStructure getFeatureStructure ();
-    
-    /**
-     * Gives this category a new feature structure
-     *
-     * @param fs the new feature structure
-     */    
-    public void setFeatureStructure (FeatureStructure fs);
-    
     /**
      * Creates a unique string that we can hash on.  It's good to do
      * things like normalize variables and to about the shortest
@@ -81,6 +88,5 @@ public interface Category extends Unifiable, Mutable, java.io.Serializable {
      *
      * @return a string representing this category that we can hash on
      */
-    public String hashString ();
-
+    public String hashString();
 }
