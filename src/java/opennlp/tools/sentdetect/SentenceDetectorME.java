@@ -39,7 +39,7 @@ import java.util.ArrayList;
  * string to determine if they signify the end of a sentence.
  *
  * @author      Jason Baldridge and Tom Morton
- * @version     $Revision: 1.9 $, $Date: 2004/09/08 15:38:17 $
+ * @version     $Revision: 1.10 $, $Date: 2004/11/03 19:00:26 $
  */
 
 public class SentenceDetectorME implements SentenceDetector {
@@ -160,9 +160,9 @@ public class SentenceDetectorME implements SentenceDetector {
     for (int i = 0, end = enders.size(), index = 0; i < end; i++) {
       Integer candidate = (Integer) enders.get(i);
       int cint = candidate.intValue();
-
-      // skip over the leading parts of contiguous delimiters
-      if (((i + 1) < end) && (((Integer) enders.get(i + 1)).intValue() == (cint + 1))) {
+      // skip over the leading parts of non-token final delimiters
+      int fws = getFirstWS(s,cint + 1);
+      if (((i + 1) < end) && (((Integer) enders.get(i + 1)).intValue() < fws)) {
         continue;
       }
 
