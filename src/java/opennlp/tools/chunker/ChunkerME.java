@@ -39,31 +39,31 @@ public class ChunkerME implements Chunker {
   private Sequence bestSequence;
 
   public ChunkerME(MaxentModel mod) {
-    this(mod, new DefaultChunkerContextGenerator(),10);
+    this(mod, new DefaultChunkerContextGenerator(), 10);
   }
 
   public ChunkerME(MaxentModel mod, ContextGenerator cg) {
-    this(mod,cg,10);
+    this(mod, cg, 10);
   }
-  
-  public ChunkerME(MaxentModel mod,ContextGenerator cg, int beamSize) {
+
+  public ChunkerME(MaxentModel mod, ContextGenerator cg, int beamSize) {
     _npModel = mod;
     _contextGen = cg;
-    this.beamSize=beamSize;
-    beam = new ChunkBeamSearch(beamSize,cg,mod);
-   }
+    this.beamSize = beamSize;
+    beam = new ChunkBeamSearch(beamSize, cg, mod);
+  }
 
   public List chunk(List toks, List tags) {
-    bestSequence = beam.bestSequence(toks, new Object[] {tags});
+    bestSequence = beam.bestSequence(toks, new Object[] { tags });
     return bestSequence.getOutcomes();
   }
 
   public String[] chunk(Object[] toks, String[] tags) {
-    bestSequence = beam.bestSequence(Arrays.asList(toks), new Object[] {Arrays.asList(tags)});
+    bestSequence = beam.bestSequence(Arrays.asList(toks), new Object[] { Arrays.asList(tags)});
     List c = bestSequence.getOutcomes();
     return (String[]) c.toArray(new String[c.size()]);
   }
-  
+
   /** 
    * This method determines wheter the outcome is valid for the preceeding sequence.  
    * This can be used to implement constraints on what sequences are valid.  
@@ -72,29 +72,27 @@ public class ChunkerME implements Chunker {
    * @return true is the outcome is valid for the sequence, false otherwise.
    */
   protected boolean validOutcome(String outcome, Sequence sequence) {
-    return(true);
+    return (true);
   }
-  
+
   class ChunkBeamSearch extends BeamSearch {
     public ChunkBeamSearch(int size, ContextGenerator cg, MaxentModel model) {
       super(size, cg, model);
     }
 
     protected boolean validSequence(int i, List sequence, Sequence s, String outcome) {
-      return validOutcome(outcome,s);
+      return validOutcome(outcome, s);
     }
   }
-  
-  public void probs(double[] probs) {
-      for (int pi = 0; pi < probs.length; pi++) {
-        probs[pi] = 0; //((Double) dlist.get(pi)).doubleValue();
-      }
-    }
 
-    public double[] probs() {
-      return bestSequence.getProbs();
-    }
-  
+  public void probs(double[] probs) {
+    bestSequence.getProbs(probs);
+  }
+
+  public double[] probs() {
+    return bestSequence.getProbs();
+  }
+
   public static GISModel train(opennlp.maxent.EventStream es, int iterations, int cut) throws java.io.IOException {
     return opennlp.maxent.GIS.trainModel(es, iterations, cut);
   }
@@ -132,4 +130,3 @@ public class ChunkerME implements Chunker {
     }
   }
 }
-
