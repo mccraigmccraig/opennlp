@@ -59,8 +59,8 @@ public class ParserME {
   private MaxentModel buildModel;
   private MaxentModel checkModel;
 
-  private ContextGenerator buildContextGenerator;
-  private ContextGenerator checkContextGenerator;
+  private BuildContextGenerator buildContextGenerator;
+  private CheckContextGenerator checkContextGenerator;
 
   private HeadRules headRules;
 
@@ -157,7 +157,7 @@ public class ParserME {
    * @return A full parse of the specified tokens or the flat chunks of the tokens if a fullparse could not be found.
    */
   public Parse parse(Parse p) {
-  	if (createDerivationString) p.derivation = new StringBuffer(100);
+  	if (createDerivationString) p.setDerivation(new StringBuffer(100));
     odh.clear();
     ndh.clear();
     parses.clear();
@@ -172,18 +172,33 @@ public class ParserME {
         int j = 0;
         for (Iterator pi = odh.iterator(); pi.hasNext() && j < K; j++) { // foearch derivation
           Parse tp = (Parse) pi.next();
-          if (tp.prob < bestComplete) { //this parse will never win, don't advance.
+          if (tp.getProb() < bestComplete) { //this parse and the ones which follow will never win, stop advancing.
             break;
           }
           if (guess == null && i == 2) {
             guess = tp;
           }
 
-          //System.out.print(i + " " + j + " " + tp.derivation + " " + tp.prob + " ");
+          //System.out.print(i + " " + j + " "+tp.getProb());
           //tp.show();
           //System.out.println();
-
-          Parse[] nd = advance(tp, Q, i);
+          Parse[] nd = null;
+          if (0 == i) {
+            nd = advanceTags(tp);
+          }
+          else if (1 == i) {
+            if (ndh.size() < K) {
+              //System.err.println("advancing ts "+j+" "+ndh.size()+" < "+K);
+              nd = advanceChunks(tp,bestComplete);
+            }
+            else {
+              //System.err.println("advancing ts "+j+" prob="+((Parse) ndh.last()).getProb());
+              nd = advanceChunks(tp,((Parse) ndh.last()).getProb());
+            }
+          }
+          else { // i > 1
+            nd = advanceParses(tp, Q);
+          }
           if (nd != null) {
             for (int k = 0, kl = nd.length; k < kl; k++) {
               //System.out.println("k="+k+" of "+nd.length);
@@ -200,7 +215,7 @@ public class ParserME {
             }
           }
           else {
-            System.err.println("Couldn't advance!\n");
+            System.err.println("Couldn't advance parse "+i+" stage "+j+"!\n");
           }
         }
         i++;
@@ -227,6 +242,7 @@ public class ParserME {
     Parse r;
     if (parses.size() == 0) {
       System.err.println("Couldn't find parse for: " + p);
+      //r = (Parse) odh.first(); 
       r = guess;
     }
     else {
@@ -236,204 +252,230 @@ public class ParserME {
   }
 
   private void advanceTop(Parse p) {
-    buildModel.eval(buildContextGenerator.getContext(new Object[] { p.getChildren(), ZERO }), bprobs);
-    p.prob += Math.log(bprobs[topStartIndex]);
-    checkModel.eval(checkContextGenerator.getContext(new Object[] { p.getChildren(), TOP_NODE, ZERO, ZERO }), cprobs);
-    p.prob += Math.log(cprobs[completeIndex]);
+    buildModel.eval(buildContextGenerator.getContext(p.getChildren(), 0), bprobs);
+    p.addProb(Math.log(bprobs[topStartIndex]));
+    checkModel.eval(checkContextGenerator.getContext(p.getChildren(), TOP_NODE, 0, 0), cprobs);
+    p.addProb(Math.log(cprobs[completeIndex]));
     p.setType(TOP_NODE);
   }
 
-  private Parse[] advance(Parse p, double Q, int dl) {
-    Parse[] newParses = null;
+  
+
+  /** Advances the specified parse and returns the an array advanced parses whose probability accounts for
+   * more than the speicficed amount of probability mass, Q.
+   * @param p The parse to advance.
+   * @param Q The amount of probability mass that should be accounted for by the advanced parses. 
+   */
+  private Parse[] advanceParses(Parse p, double Q) {
     double q = 1 - Q;
-    if (0 == dl) {
-      // tag
-      String[] words = new String[p.getChildren().size()];
-      double[] probs = new double[words.length];
-      for (int i = 0; i < p.getChildren().size(); i++) {
-        words[i] = ((Parse) p.getChildren().get(i)).toString();
+    Parse lastStartNode = null;
+    int lastStartIndex = -1;
+    String lastStartType = null;
+    int numNodes = p.getChildren().size();
+    int advanceNodeIndex;
+    Parse advanceNode=null;
+    for (advanceNodeIndex = 0; advanceNodeIndex < numNodes; advanceNodeIndex++) {
+      advanceNode = (Parse) p.getChildren().get(advanceNodeIndex);
+      if (advanceNode.getLabel() == null) {
+        break;
       }
-      Sequence[] ts = tagger.topKSequences(words);
-      newParses = new Parse[ts.length];
-      for (int i = 0; i < ts.length; i++) {
-        String[] tags = (String[]) ts[i].getOutcomes().toArray(new String[words.length]);
-        ts[i].getProbs(probs);
-        newParses[i] = (Parse) p.clone(); //copies top level
-        if (createDerivationString) newParses[i].derivation.append(i).append(".");
-        for (int j = 0; j < words.length; j++) {
-          Parse word = (Parse) p.getChildren().get(j);
-          //System.err.println("inserting tag "+tags[j]);
-          double prob = probs[j];
-          newParses[i].insert(new Parse(word.getText(), word.getSpan(), tags[j], prob));
-          newParses[i].prob += Math.log(prob);
-          //newParses[i].show();
+      else if (startTypeMap.containsKey(advanceNode.getLabel())) {
+        lastStartType = (String) startTypeMap.get(advanceNode.getLabel());
+        lastStartNode = advanceNode;
+        lastStartIndex = advanceNodeIndex;
+        //System.err.println("lastStart "+i+" "+lastStart.label+" "+lastStart.prob);
+      }
+    }
+    ArrayList newParsesList = new ArrayList(buildModel.getNumOutcomes());
+    //call build
+    buildModel.eval(buildContextGenerator.getContext(p.getChildren(), advanceNodeIndex), bprobs);
+    double bprobSum = 0;
+    while (bprobSum < Q) {
+      int max = 0;
+      for (int pi = 1; pi < bprobs.length; pi++) { //for each build outcome
+        if (bprobs[pi] > bprobs[max]) {
+          max = pi;
+        }
+      }
+      if (bprobs[max] == 0) {
+        break;
+      }
+      double bprob = bprobs[max];
+      bprobSum += bprobs[max];
+      bprobs[max] = 0; //zero out so new max can be found
+      String tag = buildModel.getOutcome(max);
+      //System.out.println("trying "+tag+" "+bprobSum+" lst="+lst);
+      if (max == topStartIndex) { // can't have top until complete
+        continue;
+      }
+      //System.err.println(i+" "+tag+" "+bprob);
+      if (startTypeMap.containsKey(tag)) { //update last start
+        lastStartIndex = advanceNodeIndex;
+        lastStartNode = advanceNode;
+        lastStartType = (String) startTypeMap.get(tag);
+      }
+      else if (contTypeMap.containsKey(tag)) {
+        if (lastStartNode == null || !lastStartType.equals(contTypeMap.get(tag))) {
+          continue; //Cont must match previous start or continue
+        }
+      }
+      Parse newParse1 = (Parse) p.clone(); //clone parse
+      if (createDerivationString) newParse1.getDerivation().append(max).append("-");
+      Parse pc = (Parse) advanceNode.clone(); //clone constituent being labeled
+      newParse1.getChildren().set(advanceNodeIndex, pc); //replace constituent labeled
+      pc.setLabel(tag);
+      newParse1.addProb(Math.log(bprob));
+      //check
+      checkModel.eval(checkContextGenerator.getContext(newParse1.getChildren(), lastStartType, lastStartIndex, advanceNodeIndex), cprobs);
+      //System.out.println("check "+cprobs[completeIndex]+"
+      // "+cprobs[incompleteIndex]);
+      Parse newParse2 = newParse1;
+      if (cprobs[completeIndex] > q) { //make sure a reduce is likely
+        newParse2 = (Parse) newParse1.clone();
+        if (createDerivationString) newParse2.getDerivation().append(1).append(".");
+        newParse2.addProb(Math.log(cprobs[1]));
+        Parse[] cons = new Parse[advanceNodeIndex - lastStartIndex + 1];
+        boolean flat = true;
+        //first
+        cons[0] = lastStartNode;
+        if (!cons[0].getType().equals(cons[0].getHead().getType())) {
+          flat = false;
+        }
+        //last
+        cons[advanceNodeIndex - lastStartIndex] = advanceNode;
+        if (flat && !cons[advanceNodeIndex - lastStartIndex].getType().equals(cons[advanceNodeIndex - lastStartIndex].getHead().getType())) {
+          flat = false;
+        }
+        //middle
+        for (int ci = 1; ci < advanceNodeIndex - lastStartIndex; ci++) {
+          cons[ci] = (Parse) p.getChildren().get(ci + lastStartIndex);
+          if (flat && !cons[ci].getType().equals(cons[ci].getHead().getType())) {
+            flat = false;
+          }
+        }
+        if (!flat) { //flat chunks are done by chunker
+          newParse2.insert(new Parse(p.getText(), new Span(lastStartNode.getSpan().getStart(), advanceNode.getSpan().getEnd()), lastStartType, cprobs[1], headRules.getHead(cons, lastStartType)));
+          newParsesList.add(newParse2);
+        }
+      }
+      if (cprobs[incompleteIndex] > q) { //make sure a shift is likly
+        if (createDerivationString) newParse1.getDerivation().append(0).append(".");
+        if (advanceNodeIndex != numNodes - 1) { //can't shift last element
+          newParse1.addProb(Math.log(cprobs[0]));
+          newParsesList.add(newParse1);
         }
       }
     }
-    else if (1 == dl) {
-      // chunk
-      String words[] = new String[p.getChildren().size()];
-      String ptags[] = new String[words.length];
-      double probs[] = new double[words.length];
-      Parse sp = null;
-      for (int i = 0, il = p.getChildren().size(); i < il; i++) {
-        sp = (Parse) p.getChildren().get(i);
-        words[i] = sp.getHead().toString();
-        ptags[i] = sp.getType();
-      }
-      Sequence[] cs = chunker.topKSequences(words, ptags);
-      newParses = new Parse[cs.length];
-      for (int si = 0, sl = cs.length; si < sl; si++) {
-        newParses[si] = (Parse) p.clone(); //copies top level
-        if (createDerivationString) newParses[si].derivation.append(si).append(".");
-        String[] tags = (String[]) cs[si].getOutcomes().toArray(new String[words.length]);
-        cs[si].getProbs(probs);
-        int start = -1;
-        int end = 0;
-        String type = null;
-        //System.err.print("sequence "+si+" ");
-        for (int j = 0; j <= tags.length; j++) {
-          //if (j != tags.length) {System.err.println(words[j]+" "+ptags[j]+" "+tags[j]+" "+probs.get(j));}
-          if (j != tags.length) {
-            newParses[si].prob += Math.log(probs[j]);
-          }
-          if (j != tags.length && tags[j].startsWith(CONT)) { // if continue just update end chunking tag don't use contTypeMap
-            end = j;
-          }
-          else { //make previous constituent if it exists
-            if (type != null) {
-              //System.err.println("inserting tag "+tags[j]);
-              Parse p1 = (Parse) p.getChildren().get(start);
-              Parse p2 = (Parse) p.getChildren().get(end);
-              //System.err.println("Putting "+type+" at "+start+","+end+" "+newParses[si].prob);
-              Parse[] cons = new Parse[end - start + 1];
-              cons[0] = p1;
-              //cons[0].label="Start-"+type;
-              if (end - start != 0) {
-                cons[end - start] = p2;
-                //cons[end-start].label="Cont-"+type;
-                for (int ci = 1; ci < end - start; ci++) {
-                  cons[ci] = (Parse) p.getChildren().get(ci + start);
-                  //cons[ci].label="Cont-"+type;
-                }
+    Parse[] newParses = new Parse[newParsesList.size()];
+    newParsesList.toArray(newParses);
+    return newParses;
+  }
+
+  /**
+   * Reutrns the top chunk sequences for the specified parse.
+   * 
+   * @param p
+   *          A pos-tag assigned parse.
+   * @return The top chunk assignments to the specified parse.
+   */
+  private Parse[] advanceChunks(Parse p, double minChunkScore) {
+    // chunk
+    String words[] = new String[p.getChildren().size()];
+    String ptags[] = new String[words.length];
+    double probs[] = new double[words.length];
+    Parse sp = null;
+    for (int i = 0, il = p.getChildren().size(); i < il; i++) {
+      sp = (Parse) p.getChildren().get(i);
+      words[i] = sp.getHead().toString();
+      ptags[i] = sp.getType();
+    }
+    //System.err.println("adjusted mcs = "+(minChunkScore-p.getProb()));
+    Sequence[] cs = chunker.topKSequences(words, ptags,minChunkScore-p.getProb());
+    Parse[] newParses = new Parse[cs.length];
+    for (int si = 0, sl = cs.length; si < sl; si++) {
+      newParses[si] = (Parse) p.clone(); //copies top level
+      if (createDerivationString) newParses[si].getDerivation().append(si).append(".");
+      String[] tags = (String[]) cs[si].getOutcomes().toArray(new String[words.length]);
+      cs[si].getProbs(probs);
+      int start = -1;
+      int end = 0;
+      String type = null;
+      //System.err.print("sequence "+si+" ");
+      for (int j = 0; j <= tags.length; j++) {
+        //if (j != tags.length) {System.err.println(words[j]+" "+ptags[j]+" "+tags[j]+" "+probs.get(j));}
+        if (j != tags.length) {
+          newParses[si].addProb(Math.log(probs[j]));
+        }
+        if (j != tags.length && tags[j].startsWith(CONT)) { // if continue just update end chunking tag don't use contTypeMap
+          end = j;
+        }
+        else { //make previous constituent if it exists
+          if (type != null) {
+            //System.err.println("inserting tag "+tags[j]);
+            Parse p1 = (Parse) p.getChildren().get(start);
+            Parse p2 = (Parse) p.getChildren().get(end);
+            //System.err.println("Putting "+type+" at "+start+","+end+" "+newParses[si].prob);
+            Parse[] cons = new Parse[end - start + 1];
+            cons[0] = p1;
+            //cons[0].label="Start-"+type;
+            if (end - start != 0) {
+              cons[end - start] = p2;
+              //cons[end-start].label="Cont-"+type;
+              for (int ci = 1; ci < end - start; ci++) {
+                cons[ci] = (Parse) p.getChildren().get(ci + start);
+                //cons[ci].label="Cont-"+type;
               }
-              newParses[si].insert(new Parse(p1.getText(), new Span(p1.getSpan().getStart(), p2.getSpan().getEnd()), type, 1, headRules.getHead(cons, type)));
             }
-            if (j != tags.length) { //update for new constituent
-              if (tags[j].startsWith(START)) { // don't use startTypeMap these are chunk tags
-                type = tags[j].substring(START.length());
-                start = j;
-                end = j;
-              }
-              else { // other 
-                type = null;
-              }
+            newParses[si].insert(new Parse(p1.getText(), new Span(p1.getSpan().getStart(), p2.getSpan().getEnd()), type, 1, headRules.getHead(cons, type)));
+          }
+          if (j != tags.length) { //update for new constituent
+            if (tags[j].startsWith(START)) { // don't use startTypeMap these are chunk tags
+              type = tags[j].substring(START.length());
+              start = j;
+              end = j;
+            }
+            else { // other 
+              type = null;
             }
           }
         }
-        //newParses[si].show();System.out.println();
+      }
+      //newParses[si].show();System.out.println();
+    }
+    return newParses;
+  }
+
+  /**
+   * Advances the parse by assigning it POS tags and returns multiple tag sequences.
+   * @param p The parse to be tagged.
+   * @return Parses with different POS-tag sequence assignments.
+   */
+  private Parse[] advanceTags(Parse p) {
+    String[] words = new String[p.getChildren().size()];
+    double[] probs = new double[words.length];
+    for (int i = 0; i < p.getChildren().size(); i++) {
+      words[i] = ((Parse) p.getChildren().get(i)).toString();
+    }
+    Sequence[] ts = tagger.topKSequences(words);
+    if (ts.length == 0) {
+      System.err.println("no tag sequence");
+    }
+    Parse[] newParses = new Parse[ts.length];
+    for (int i = 0; i < ts.length; i++) {
+      String[] tags = (String[]) ts[i].getOutcomes().toArray(new String[words.length]);
+      ts[i].getProbs(probs);
+      newParses[i] = (Parse) p.clone(); //copies top level
+      if (createDerivationString) newParses[i].getDerivation().append(i).append(".");
+      for (int j = 0; j < words.length; j++) {
+        Parse word = (Parse) p.getChildren().get(j);
+        //System.err.println("inserting tag "+tags[j]);
+        double prob = probs[j];
+        newParses[i].insert(new Parse(word.getText(), word.getSpan(), tags[j], prob));
+        newParses[i].addProb(Math.log(prob));
+        //newParses[i].show();
       }
     }
-    else { // dl > 1
-      Parse lastStart = null;
-      int lsi = -1; // last start index
-      String lst = null; // last start type
-      int psize = p.getChildren().size();
-      for (int i = 0; i < psize; i++) {
-        Parse part = (Parse) p.getChildren().get(i);
-        if (part.getLabel() == null) {
-          ArrayList newParsesList = new ArrayList(buildModel.getNumOutcomes());
-          //call build
-          buildModel.eval(buildContextGenerator.getContext(new Object[] { p.getChildren(), new Integer(i)}), bprobs);
-          double bprobSum = 0;
-          while (bprobSum < Q) {
-            int max = 0;
-            for (int pi = 1; pi < bprobs.length; pi++) { //for each build outcome
-              if (bprobs[pi] > bprobs[max]) {
-                max = pi;
-              }
-            }
-            if (bprobs[max] == 0) {
-              break;
-            }
-            double bprob = bprobs[max];
-            bprobSum += bprobs[max];
-            bprobs[max] = 0; //zero out so new max can be found
-            String tag = buildModel.getOutcome(max);
-            //System.out.println("trying "+tag+" "+bprobSum+" lst="+lst);
-            if (max == topStartIndex) { // can't have top until complete
-              continue;
-            }
-            //System.err.println(i+" "+tag+" "+bprob);
-            if (startTypeMap.containsKey(tag)) { //update last start
-              lsi = i;
-              lastStart = part;
-              lst = (String) startTypeMap.get(tag);
-            }
-            else if (contTypeMap.containsKey(tag)) {
-              if (lastStart == null || !lst.equals(contTypeMap.get(tag))) {
-                continue; //Cont must match previous start or continue
-              }
-            }
-            Parse newParse1 = (Parse) p.clone(); //clone parse
-            if (createDerivationString) newParse1.derivation.append(max).append("-");
-            Parse pc = (Parse) part.clone(); //clone constituent being labeled
-            newParse1.getChildren().set(i, pc); //replace constituent labeled
-            pc.setLabel(tag);
-            newParse1.prob += Math.log(bprob);
-            //check
-            checkModel.eval(checkContextGenerator.getContext(new Object[] { newParse1.getChildren(), lst, new Integer(lsi), new Integer(i)}), cprobs);
-            //System.out.println("check "+cprobs[completeIndex]+" "+cprobs[incompleteIndex]);
-            Parse newParse2 = newParse1;
-            if (cprobs[completeIndex] > q) { //make sure a reduce is likely
-              newParse2 = (Parse) newParse1.clone();
-              if (createDerivationString) newParse2.derivation.append(1).append(".");
-              newParse2.prob += Math.log(cprobs[1]);
-              Parse[] cons = new Parse[i - lsi + 1];
-              boolean flat = true;
-              //first
-              cons[0] = lastStart;
-              if (!cons[0].getType().equals(cons[0].getHead().getType())) {
-                flat = false;
-              }
-              //last
-              cons[i - lsi] = part;
-              if (flat && !cons[i - lsi].getType().equals(cons[i - lsi].getHead().getType())) {
-                flat = false;
-              }
-              //middle
-              for (int ci = 1; ci < i - lsi; ci++) {
-                cons[ci] = (Parse) p.getChildren().get(ci + lsi);
-                if (flat && !cons[ci].getType().equals(cons[ci].getHead().getType())) {
-                  flat = false;
-                }
-              }
-              if (!flat) { //flat chunks are done by chunker
-                newParse2.insert(new Parse(p.getText(), new Span(lastStart.getSpan().getStart(), part.getSpan().getEnd()), lst, cprobs[1], headRules.getHead(cons, lst)));
-                newParsesList.add(newParse2);
-              }
-            }
-            if (cprobs[incompleteIndex] > q) { //make sure a shift is likly
-              if (createDerivationString) newParse1.derivation.append(0).append(".");
-              if (i != psize - 1) { //can't shift last element
-                newParse1.prob += Math.log(cprobs[0]);
-                newParsesList.add(newParse1);
-              }
-            }
-          }
-          newParses = new Parse[newParsesList.size()];
-          newParsesList.toArray(newParses);
-          break;
-        }
-        else if (startTypeMap.containsKey(part.getLabel())) {
-          lst = (String) startTypeMap.get(part.getLabel());
-          lastStart = part;
-          lsi = i;
-          //System.err.println("lastStart "+i+" "+lastStart.label+" "+lastStart.prob);
-        }
-      }
-    }
-    return (newParses);
+    return newParses;
   }
 
   public static GISModel train(opennlp.maxent.EventStream es, int iterations, int cut) throws java.io.IOException {
