@@ -57,34 +57,55 @@ public class EnglishTreebankParser {
         new EnglishHeadRules(dataDir + "/head_rules"),beamSize,advancePercentage);
     }
   }
+  
+  public static ParserME getParser(String dataDir) throws IOException {
+    return getParser(dataDir,true,false,ParserME.defaultBeamSize,ParserME.defaultAdvancePercentage);
+  }
+  
 
   private static class EnglishTreebankPOSTagger extends POSTaggerME implements ParserTagger {
 
     private static final int K = 10;
-
+    int beamSize;
+    
     public EnglishTreebankPOSTagger(String modelFile) throws IOException {
-      super(10, new SuffixSensitiveGISModelReader(new File(modelFile)).getModel(), new DefaultPOSContextGenerator(), null);
+      this(modelFile,K,K);
+    }
+
+    public EnglishTreebankPOSTagger(String modelFile,int beamSize, int cacheSize) throws IOException {
+      super(beamSize, new SuffixSensitiveGISModelReader(new File(modelFile)).getModel(), new DefaultPOSContextGenerator(cacheSize), null);
+      this.beamSize = beamSize;
     }
 
     public EnglishTreebankPOSTagger(String modelFile, String tagDictionary, boolean useCase) throws IOException {
-      super(10, new SuffixSensitiveGISModelReader(new File(modelFile)).getModel(), new DefaultPOSContextGenerator(), new POSDictionary(tagDictionary, useCase));
+      this(modelFile,K,tagDictionary,useCase,K);
+    }
+    
+    public EnglishTreebankPOSTagger(String modelFile, int beamSize, String tagDictionary, boolean useCase, int cacheSize) throws IOException {
+      super(beamSize, new SuffixSensitiveGISModelReader(new File(modelFile)).getModel(), new DefaultPOSContextGenerator(cacheSize), new POSDictionary(tagDictionary, useCase));
+      this.beamSize = beamSize;
     }
 
     public Sequence[] topKSequences(List sentence) {
-      return beam.bestSequences(K, sentence, null);
+      return beam.bestSequences(beamSize, sentence.toArray(), null);
     }
 
     public Sequence[] topKSequences(String[] sentence) {
-      return beam.bestSequences(K, sentence, null);
+      return beam.bestSequences(beamSize, sentence, null);
     }
   }
 
   private static class EnglishTreebankChunker extends ChunkerME implements ParserChunker {
     private static final int K = 10;
+    private int beamSize;
     private Map continueStartMap;
     
     public EnglishTreebankChunker(String modelFile) throws IOException {
-      super(new SuffixSensitiveGISModelReader(new File(modelFile)).getModel(), new ChunkContextGenerator(), 10);
+      this(modelFile,K,K);
+    }
+    
+    public EnglishTreebankChunker(String modelFile, int beamSize, int cacheSize) throws IOException {
+      super(new SuffixSensitiveGISModelReader(new File(modelFile)).getModel(), new ChunkContextGenerator(cacheSize), beamSize);
       continueStartMap = new HashMap(model.getNumOutcomes());
       for (int oi=0,on=model.getNumOutcomes();oi<on;oi++) {
         String outcome = model.getOutcome(oi);
@@ -92,14 +113,15 @@ public class EnglishTreebankParser {
           continueStartMap.put(outcome,ParserME.START+outcome.substring(ParserME.CONT.length()));
         }
       }
+      this.beamSize = beamSize;
     }
 
     public Sequence[] topKSequences(List sentence, List tags) {
-      return beam.bestSequences(K, sentence, new Object[] { tags });
+      return beam.bestSequences(beamSize, sentence.toArray(), new Object[] { tags });
     }
 
-    public Sequence[] topKSequences(String[] sentence, String[] tags) {
-      return beam.bestSequences(K, sentence, new Object[] { tags });
+    public Sequence[] topKSequences(String[] sentence, String[] tags, double minSequenceScore) {
+      return beam.bestSequences(beamSize, sentence, new Object[] { tags },minSequenceScore);
     }
 
     protected boolean validOutcome(String outcome, String[] tagList) {
@@ -249,7 +271,6 @@ public class EnglishTreebankParser {
     try {
       while (null != (line = in.readLine())) {
         StringTokenizer str = new StringTokenizer(line);
-        int numToks = str.countTokens();
         StringBuffer sb = new StringBuffer();
         List tokens = new ArrayList();
         while (str.hasMoreTokens()) {
