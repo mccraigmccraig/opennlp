@@ -46,7 +46,7 @@ import java.util.regex.Pattern;
  * homepage: <http://www.cis.upenn.edu/~jcreynar>.
  *
  * @author      Tom Morton
- * @version $Revision: 1.6 $, $Date: 2004/07/06 02:54:05 $
+ * @version $Revision: 1.7 $, $Date: 2005/03/14 05:46:21 $
  */
 
 public class TokenizerME implements Tokenizer {
@@ -111,19 +111,10 @@ public class TokenizerME implements Tokenizer {
     List tokens = split(d);
     newTokens.clear();
     tokProbs.clear();
-    /*
-    if (1 == 1) {
-      Span[] spans = new Span[tokens.size()];
-      tokens.toArray(spans);
-      for (int ti=0,tl=tokens.size();ti<tl;ti++) {
-        tokProbs.add(ONE);
-      }
-      return spans;
-    }
-    */
     for (int i = 0, il = tokens.size(); i < il; i++) {
       Span s = (Span) tokens.get(i);
       String tok = d.substring(s.getStart(), s.getEnd());
+      // Can't tokenize single characters
       if (tok.length() < 2) {
         newTokens.add(s);
         tokProbs.add(ONE);
