@@ -33,10 +33,10 @@ public class Modal extends HyloFormula {
 
     public Modal (Element e) {
 	String type = e.getAttributeValue("type");
-	if (type.equals("d")) {
-	    _isDiamond = true;
-	} else {
+	if (type != null && type.equals("b")) {
 	    _isDiamond = false;
+	} else {
+	    _isDiamond = true;
 	}
 	
 	_relation = e.getAttributeValue("rel");
@@ -47,6 +47,10 @@ public class Modal extends HyloFormula {
 	_isDiamond = isDiamond;
 	_relation = rel;
 	_arg = arg;
+    }
+
+    public LF copy () {
+	return new Modal (_isDiamond, _relation, _arg.copy());
     }
     
     public boolean occurs (Variable var) {
@@ -78,13 +82,7 @@ public class Modal extends HyloFormula {
     }
 
     public Object fill (Substitution sub) {
-	if (_arg instanceof Variable) {
-	    LF $arg = (LF)sub.getValue((Variable)_arg);
-	    if ($arg != null) {
-		return new Modal(_isDiamond, _relation, $arg);
-	    }
-	}
-	return new Modal(_isDiamond, _relation, _arg);
+	return new Modal(_isDiamond, _relation, (LF)_arg.fill(sub));
     }
     
     public String toString () {

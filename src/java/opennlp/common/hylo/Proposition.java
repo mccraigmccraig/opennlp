@@ -18,21 +18,29 @@
 
 package opennlp.common.hylo;
 
-import opennlp.common.unify.*;
+import opennlp.common.synsem.*;
 import org.jdom.*;
 
 /**
  * A propositional value, such as the predict "sleep".
  *
  * @author      Jason Baldridge
- * @version     $Revision: 1.1 $, $Date: 2002/01/02 10:44:22 $
+ * @version     $Revision: 1.2 $, $Date: 2002/01/03 11:10:50 $
  **/
 public class Proposition extends HyloAtom {
 
+    public Proposition (String n) {
+	super(n);
+    }
+    
     public Proposition (Element e) {
 	super(e);
     }
 
+    public LF copy () {
+	return new Proposition(_name);
+    }
+    
     public boolean equals (Object o) {
 	if (o instanceof Proposition
 	    && _name == ((Proposition)o)._name) {

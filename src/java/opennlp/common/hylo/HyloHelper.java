@@ -23,24 +23,25 @@ import org.jdom.*;
 import java.util.*;
 
 public class HyloHelper {
+
     public static LF getLF (Element e) {
 	String type = e.getName();
 	if (type.equals("op")) {
 	    return new Op(e);
 	} else if (type.equals("modal")) {
 	    return new Modal(e);
-	} else if (type.equals("v")) {
+	} else if (type.equals("var")) {
 	    return new HyloVar(e.getAttributeValue("n"));
 	} else if (type.equals("nom")) {
 	    return new Nominal(e);
 	} else if (type.equals("prop")) {
 	    return new Proposition(e);
-	} else if (type.equals("sat-op")) {
+	} else if (type.equals("satop")) {
 	    return new SatOp(e);
 	} else if (type.equals("lf")) {
 	    return getLF((Element)e.getChildren().get(0));
 	}
-	System.out.println("Invalid WFF type: " + type);
+	System.out.println("Invalid hybrid logic LF type: " + type);
 	return null;
     }
 

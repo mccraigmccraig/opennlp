@@ -18,6 +18,7 @@
 
 package opennlp.common.hylo;
 
+import opennlp.common.synsem.*;
 import org.jdom.*;
 
 /**
@@ -25,12 +26,20 @@ import org.jdom.*;
  * point in a model.
  *
  * @author      Jason Baldridge
- * @version     $Revision: 1.3 $, $Date: 2002/01/02 10:44:22 $
+ * @version     $Revision: 1.4 $, $Date: 2002/01/03 11:10:50 $
  **/
 public class Nominal extends HyloAtom {
-    
+   
+    public Nominal (String n) {
+	super(n);
+    }
+
     public Nominal (Element e) {
 	super(e);
+    }
+
+    public LF copy () {
+	return new Nominal(_name);
     }
 
     public boolean equals (Object o) {

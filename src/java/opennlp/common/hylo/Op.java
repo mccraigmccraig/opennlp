@@ -46,6 +46,14 @@ public class Op extends HyloFormula {
 	_args.add(formula);
     }
 
+    public LF copy () {
+	List $args = new ArrayList();
+	for (Iterator argsIt = _args.iterator(); argsIt.hasNext();) {
+	    $args.add(((LF)argsIt.next()).copy());
+	}
+	return new Op(_name, $args);
+    }
+
     public boolean occurs (Variable var) {
 	for (Iterator argsIt = _args.iterator(); argsIt.hasNext(); ) {
 	    if (((LF)argsIt.next()).occurs(var)) {
@@ -92,17 +100,7 @@ public class Op extends HyloFormula {
     public Object fill (Substitution sub) {
 	List $args = new ArrayList();
 	for (Iterator argsIt = _args.iterator(); argsIt.hasNext();) {
-	    LF arg = (LF)argsIt.next();
-	    if (arg instanceof Variable) {
-		LF $arg = (LF)sub.getValue((Variable)arg);
-		if ($arg != null) {
-		    $args.add($arg);
-		} else {
-		    $args.add(arg);
-		}
-	    } else {
-		$args.add(arg);
-	    }
+	    $args.add(((LF)argsIt.next()).fill(sub));
 	}
 	return new Op(_name, $args);
     }

@@ -25,7 +25,14 @@ public class HyloVar extends HyloFormula implements Variable {
     
     private final String _name;
     private final int _index;
-
+    private final int _hashCode;
+    
+    private static int UNIQUE_STAMP = 0;
+    
+    public HyloVar () {
+	this("HLV"+UNIQUE_STAMP++);
+    }
+    
     public HyloVar (String name) {
 	this(name, 0);
     }
@@ -33,10 +40,15 @@ public class HyloVar extends HyloFormula implements Variable {
     protected HyloVar (String name, int index) {
 	_name = name;
 	_index = index;
+	_hashCode = _name.hashCode() + _index;
     }
     
     public String name () {
 	return _name;
+    }
+
+    public LF copy () {
+	return new HyloVar(_name, _index);
     }
     
     public Variable uniqueCopy (int index) {
@@ -47,10 +59,14 @@ public class HyloVar extends HyloFormula implements Variable {
 	return equals(var);
     }
 
+    public int hashCode () {
+	return _hashCode;
+    }
+    
     public boolean equals (Object o) {
 	if (o instanceof HyloVar
-	    && _name == ((HyloVar)o)._name
-	    && _index == ((HyloVar)o)._index) {
+	    && _index == ((HyloVar)o)._index
+	    && _name.equals(((HyloVar)o)._name)) {
 	    return true;
 	} else {
 	    return false;
@@ -70,6 +86,16 @@ public class HyloVar extends HyloFormula implements Variable {
 	}
     }
 
+    public Object fill (Substitution sub) {
+	Object val = sub.getValue(this);
+	if (val != null) {
+	    return val;
+	} else {
+	    return this;
+	}
+    }
+
+    
     public String toString () {	
 	return _name+_index;
     }
