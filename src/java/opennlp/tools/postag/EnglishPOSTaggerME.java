@@ -30,48 +30,55 @@ import opennlp.maxent.io.*;
  * achieved >96% accuracy on unseen data.
  *
  * @author      Gann Bierner
- * @version     $Revision: 1.1 $, $Date: 2003/11/05 03:31:04 $
+ * @version     $Revision: 1.2 $, $Date: 2003/11/22 19:45:14 $
  */
 
 public class EnglishPOSTaggerME extends POSTaggerME {
-    private static final String modelFile = "data/EnglishPOS.bin.gz";
 
-    /**
-     * No-arg constructor which loads the English POS tagging model
-     * transparently.
-     */
-    public EnglishPOSTaggerME() {
-	super(getModel(modelFile),
-	      new POSContextGenerator(new BasicEnglishAffixes()));
-	_useClosedClassTagsFilter = true;
-	_closedClassTagsFilter = new EnglishClosedClassTags();
+  public EnglishPOSTaggerME(String modelFile) {
+    super(getModel(modelFile), new POSContextGenerator(new BasicEnglishAffixes()));
+    _useClosedClassTagsFilter = true;
+    _closedClassTagsFilter = new EnglishClosedClassTags();
+  }
+
+  private static MaxentModel getModel(String name) {
+    try {
+      return new SuffixSensitiveGISModelReader(new File(name)).getModel();
     }
-
-    private static MaxentModel getModel(String name) {
-	try {
-	    return
-		new BinaryGISModelReader(
-	            new DataInputStream(new GZIPInputStream(new BufferedInputStream(
-	    EnglishPOSTaggerME.class.getResourceAsStream(name))))).getModel();
-
-	} catch (IOException E) { E.printStackTrace(); return null; }
+    catch (IOException e) {
+      e.printStackTrace();
+      return null;
     }
-    
-    /**
-     * <p>Part-of-speech tag a string passed in on the command line. For
-     * example: 
-     *
-     * <p>java opennlp.grok.preprocess.postag.EnglishPOSTaggerME -test "Mr. Smith gave a car to his son on Friday."
-     */
-    public static void main(String[] args) throws IOException {
-	System.out.println(new EnglishPOSTaggerME().tag(args[0]));
+  }
 
-	if (args[0].equals("-test")) {
-	    System.out.println(new EnglishPOSTaggerME().tag(args[0]));
-	}
-	else {
-	  //TrainEval.run(args, new EnglishPOSTaggerME());
-	}
+  /**
+   * <p>Part-of-speech tag a string passed in on the command line. For
+   * example: 
+   *
+   * <p>java opennlp.tools.postag.EnglishPOSTaggerME -test "Mr. Smith gave a car to his son on Friday."
+   */
+  public static void main(String[] args) throws IOException {
+    if (args.length == 0) {
+      System.err.println("Usage: EnglishPOSTTaggerME model < sentences");
+      System.err.println("       EnglishPOSTTaggerME -test model \"sentence\"");
+      System.exit(1);
     }
-
+    int ai=0;
+    boolean test = false;
+    if (args[ai].equals("-test")) {
+      ai++;
+      test=true;
+    }
+    POSTaggerME tagger = new EnglishPOSTaggerME(args[ai++]);
+    if (test) {
+      System.out.println(tagger.tag(args[ai]));
+    }
+    else {
+      BufferedReader in = new BufferedReader(new InputStreamReader(System.in));
+      
+      for (String line = in.readLine(); line != null; line = in.readLine()) {
+        System.out.println(tagger.tag(line));
+      }
+    }
+  }
 }
