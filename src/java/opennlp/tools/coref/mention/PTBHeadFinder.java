@@ -79,6 +79,7 @@ public final class PTBHeadFinder implements HeadFinder {
           }
         }
       }
+      //all other NPs
       for (int pi = 0; pi < parts.size(); pi++) {
         Parse child = (Parse) parts.get(pi);
         if (child.isNounPhrase()) {
@@ -92,17 +93,31 @@ public final class PTBHeadFinder implements HeadFinder {
     }
   }
 
-  public int getHeadIndex(List toks) {
+  public int getHeadIndex(Parse p) {
+    List sChildren = p.getSyntacticChildren();
+    boolean countTokens = false;
+    int tokenCount = 0;
+    //check for NP -> NN S type structures and return last token before S as head.
+    for (int sci=0,scn = sChildren.size();sci<scn;sci++) {
+      Parse sc = (Parse) sChildren.get(sci);
+      if (sc.getSyntacticType().startsWith("S")) {
+        countTokens = true;
+      }
+      if (countTokens) {
+        tokenCount+=sc.getTokens().size();
+      }
+    }
+    List toks = p.getTokens();
     if (toks.size() == 0) {
       System.err.println("PTBHeadFinder.getHeadIndex(): empty tok list");
     }
-    for (int ti = toks.size() - 1; ti >= 0; ti--) {
+    for (int ti = toks.size() - tokenCount -1; ti >= 0; ti--) {
       Parse tok = (Parse) toks.get(ti);
       if (!skipSet.contains(tok.getSyntacticType())) {
         return (ti);
       }
     }
-    return (toks.size() - 1);
+    return (toks.size() - tokenCount -1);
   }
 
   /** returns the bottom-most head of a <code>Parse</code>.  If no
@@ -123,7 +138,7 @@ public final class PTBHeadFinder implements HeadFinder {
 
   public Parse getHeadToken(Parse p) {
     List toks = p.getTokens();
-    return ((Parse) toks.get(getHeadIndex(toks)));
+    return ((Parse) toks.get(getHeadIndex(p)));
   }
 
 }
