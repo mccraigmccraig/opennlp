@@ -41,7 +41,6 @@ public class NameFinderME implements NameFinder {
   protected MaxentModel _npModel;
   protected NameContextGenerator _contextGen;
   private Sequence bestSequence;
-  private int beamSize;
   private BeamSearch beam;
 
   public static final String START = "start";
@@ -74,7 +73,6 @@ public class NameFinderME implements NameFinder {
   public NameFinderME(MaxentModel mod, NameContextGenerator cg, int beamSize) {
     _npModel = mod;
     _contextGen = cg;
-    this.beamSize = beamSize;
     beam = new NameBeamSearch(beamSize, cg, mod);
   }
   
