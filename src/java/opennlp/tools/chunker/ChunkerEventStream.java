@@ -80,9 +80,14 @@ public class ChunkerEventStream implements EventStream {
     List preds = new ArrayList();
     for (String line = (String) data.nextToken(); !line.equals(""); line = (String) data.nextToken()) {
       String[] parts = line.split(" ");
-      toks.add(parts[0]);
-      tags.add(parts[1]);
-      preds.add(parts[2]);
+      if (parts.length != 3) {
+        System.err.println("Skipping corrupt line: "+line);
+      }
+      else {
+        toks.add(parts[0]);
+        tags.add(parts[1]);
+        preds.add(parts[2]);
+      }
     }
     events = new Event[toks.size()];
     Object[] toksArray = toks.toArray();
