@@ -17,24 +17,26 @@
 //////////////////////////////////////////////////////////////////////////////   
 package opennlp.common.english;
 
+import opennlp.common.morph.*;
 import java.util.*;
 
 /**
  * A helper class for doing very *basic* English morphological analysis.
+ * This will be changed over to regular expressions when we move to Java 1.4.
  *
  * @author      Jason Baldridge
- * @version     $Revision: 1.4 $, $Date: 2002/04/08 14:46:59 $
+ * @version     $Revision: 1.5 $, $Date: 2002/04/25 14:59:09 $
  */
-public final class BasicEnglishAffixes {
+public final class BasicEnglishAffixes implements MorphAnalyzer {
 
-    private static byte MIN_WORD_LENGTH = 4;
+    private static final byte MIN_WORD_LENGTH = 4;
 
-    private static String[] twoCharSuffixes =
+    private static final String[] twoCharSuffixes =
         { "ad","al","an","ar","cy","ed","ee","en","er","es",
 	  "et","eth","ey","fy","ia","ic","ie","id","in","ly",
 	  "mo","ol","on","or","ry","st","th","ty","yl" };
 
-    private static String[] threeCharSuffixes =
+    private static final String[] threeCharSuffixes =
         { "ade","age","ana","and","ane","ant","ard","art","ary","ase","ate",
 	  "cal","cle","dom","ean","eer","eme","ene","ent","ery","ese","ess",
 	  "est","fer","fic","fid","ful","gen","gon","ial","ian","ide","ier",
@@ -43,7 +45,7 @@ public final class BasicEnglishAffixes {
 	  "ock","ode","oid","ole","oma","ome","one","ory","ose","our","ous",
 	  "ped","ple","pod","sis","ule","ure","ute","yne","zoa" };
 
-    private static String[] fourCharSuffixes =
+    private static final String[] fourCharSuffixes =
         { "able","acea","ales","ance","ancy","arch","asis","atic","ator",
 	  "cade","carp","cele","cene","cide","crat","cule","cyst","cyte",
 	  "derm","emia","ence","ency","eous","ette","fold","form","free",
@@ -55,7 +57,7 @@ public final class BasicEnglishAffixes {
 	  "tory","trix","tron","tude","type","uret","urgy","uria","ward",
 	  "ways","wise","zoon" };
 
-    private static String[] fiveCharSuffixes =
+    private static final String[] fiveCharSuffixes =
         { "andry","archy","arian","aster","ation","ative","atory","clase",
 	  "cline","cracy","diene","escent","esque","genic","graph","hemia",
 	  "iasis","ician","istic","latry","lepsy","logue","lysis","lytic",
@@ -66,8 +68,37 @@ public final class BasicEnglishAffixes {
 	  "scopy","sophy","stome","stomy","taxis","trope","ulent","ville",
 	  "wards" };
 
+    
+    /**
+     * Returns the morphological information for a word. NOT IMPLEMENTED.
+     *
+     * @param word  The string representation of the word to be analyzed.
+     * @return A String with the morph info, such as root, tense, person,
+     *         etc.  Eventually, this should be a class instead of a String.
+     */
+    public String analyze (String word) {
+	return word;
+    }
 
-    public static String[] getSuffixes(String word) {
+    
+    /**
+     * Returns the prefixes of a word. NOT IMPLEMENTED.
+     *
+     * @param word  The string representation of the word to be analyzed.
+     * @return A String[] containing all the suffixes of the word.
+     */
+    public String[] getPrefixes (String word) {
+	return new String[0];
+    }
+
+    
+    /**
+     * Returns the suffixes of a word.
+     *
+     * @param word  The string representation of the word to be analyzed.
+     * @return A String[] containing all the suffixes of the word.
+     */
+    public String[] getSuffixes (String word) {
 	ArrayList suffs = new ArrayList();
 
 	if (word.endsWith("ies")) {
@@ -96,7 +127,7 @@ public final class BasicEnglishAffixes {
     }
 
     
-    public static int nextSuffix(String word) {
+    public static final int nextSuffix (String word) {
 	int index = 0;
 	short wordLength = (short)word.length();
 	if (wordLength < MIN_WORD_LENGTH) {
@@ -130,7 +161,7 @@ public final class BasicEnglishAffixes {
     }
     
     public static void main(String[] args) {
-	String[] suffs = getSuffixes(args[0]);
+	String[] suffs = new BasicEnglishAffixes().getSuffixes(args[0]);
 	//System.out.println(nextSuffix(args[0]));
 	for (int i=0; i< suffs.length; i++)
 	    System.out.println(suffs[i]);
