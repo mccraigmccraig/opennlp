@@ -21,6 +21,7 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
+import opennlp.tools.coref.mention.MentionContext;
 import opennlp.tools.util.ReverseListIterator;
 
 /**

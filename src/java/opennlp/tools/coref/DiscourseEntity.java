@@ -19,6 +19,7 @@ package opennlp.tools.coref;
 
 import java.util.Set;
 
+import opennlp.tools.coref.mention.MentionContext;
 import opennlp.tools.coref.sim.GenderEnum;
 import opennlp.tools.coref.sim.NumberEnum;
 
