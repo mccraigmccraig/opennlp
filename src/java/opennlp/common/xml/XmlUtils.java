@@ -25,7 +25,7 @@ import java.util.*;
  * Utilities for manipulating XML based objects.
  *
  * @author      Jason Baldridge
- * @version     $Revision: 1.9 $, $Date: 2001/11/27 16:56:21 $
+ * @version     $Revision: 1.10 $, $Date: 2001/11/29 17:46:24 $
  */
 
 public class XmlUtils {
@@ -63,7 +63,7 @@ public class XmlUtils {
 	}
 	for (Iterator i=children.iterator(); i.hasNext(); )
 	    sb.append(getChildTextNested((Element)i.next(), name)).append(' ');
-	return sb.toString();
+	return sb.toString().trim();
     }
 
     
@@ -78,7 +78,7 @@ public class XmlUtils {
 	    sb.append(' ');
 	for (Iterator i=children.iterator(); i.hasNext(); )
 	    sb.append(getAllTextNested((Element)i.next())).append(' ');
-	return sb.toString();
+	return sb.toString().trim();
     }
 
     /**

@@ -31,7 +31,7 @@ import java.util.*;
  * specifications.
  *
  * @author      Jason Baldridge
- * @version     $Revision: 1.9 $, $Date: 2001/11/29 14:45:37 $
+ * @version     $Revision: 1.10 $, $Date: 2001/11/29 17:46:24 $
  **/
 public class NLPDocument extends Document {
     public static final String WORD_LABEL = "w";
@@ -146,10 +146,10 @@ public class NLPDocument extends Document {
 	String[] sents = new String[sentEls.size()];
 	int index = 0;
 	for (Iterator i=sentEls.iterator(); i.hasNext();) {
-	    List words = getWords((Element)i.next());
+	    String[] words = getWords((Element)i.next());
 	    StringBuffer sent = new StringBuffer();
-	    for (Iterator j=words.iterator(); j.hasNext();)
-		sent.append((String)j.next()).append(' ');
+	    for (int j=0; j<words.length; j++)
+		sent.append(words[j]);
 	    sents[index++] = sent.toString().trim();
 	}
 	return sents;
@@ -214,11 +214,16 @@ public class NLPDocument extends Document {
 	return getTokenElements(e).iterator();
     }
 
-    public List getWords (Element e) {
+    public String[] getWords () {
+	return getWords(_root);
+    }
+
+    public String[] getWords (Element e) {
 	List wordEls = getWordElements(e);
-	List words = new ArrayList(wordEls.size());
+	String[] words = new String[wordEls.size()];
+	int index = 0;
 	for (Iterator i=wordIterator(e); i.hasNext();) {
-	    words.add(((Element)i.next()).getText());
+	    words[index++] = ((Element)i.next()).getText();
 	}
 	return words;
     }
