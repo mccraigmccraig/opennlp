@@ -1,9 +1,10 @@
-0.6.8
------
-Summary: Major improvements to the hybrid logic package. A number of
-old interfaces were removed, most notably, those in the 'discourse'
-and 'structure' packages. Some minor enhancements to the 'xml' and
-'unify' packages.
+0.8.0 - "Stabilized"
+--------------------
+Summary: After a long journey, the API to a point where the design has
+restabilized, hence the jump to version 0.8.0.  Major improvements to
+the hybrid logic package. A number of old interfaces were removed,
+most notably, those in the 'discourse' and 'structure' packages. Some
+minor enhancements to the 'xml' and 'unify' packages.
 
 The output directory of the build process is now 'output' instead of
 'build'. (Jason)
