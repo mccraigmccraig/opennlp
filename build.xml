@@ -1,4 +1,4 @@
-<!-- $Id: build.xml,v 1.19 2002/01/07 16:30:40 jasonbaldridge Exp $ -->
+<!-- $Id: build.xml,v 1.20 2002/02/08 10:37:14 jasonbaldridge Exp $ -->
 <!-- This build file based on the JDOM build.xml file. -->
 
 <project default="package" basedir=".">
@@ -8,7 +8,7 @@
   <!-- =================================================================== -->
   <target name="init">
     <tstamp/>
-    <property name="Name" value="OpenNLP"/>
+    <property name="Name" value="Opennlp"/>
     <property name="name" value="opennlp"/>
     <property name="version" value="0.8.1"/>
     <property name="year" value="2001"/>
@@ -130,8 +130,10 @@
   <target name="release" depends="clean">
     <tar tarfile="${name}-${version}-src.tar"
          basedir="../"
-	 includes="${name}/**"
-	 excludes="**/CVS" />
+	 includes="${Name}/**" >
+      <exclude name="${Name}/docs/api/**"/>
+      <exclude name="**/CVS"/>
+    </tar>
     <gzip src="${name}-${version}-src.tar" 
           zipfile="../${name}-${version}-src.tgz" />
     <delete file="${name}-${version}-src.tar" />
