@@ -242,7 +242,7 @@ public class Parse implements Cloneable, Comparable {
         String token = getToken(rest);
         stack.push(new Object[] { type, new Integer(offset)});
         if (token != null && !type.equals("-NONE-")) {
-          cons.add(new Object[] { "TOK", new Span(offset, offset + token.length())});
+          cons.add(new Object[] { ParserME.TOK_NODE, new Span(offset, offset + token.length())});
           text.append(token).append(" ");
           offset += token.length() + 1;
         }

@@ -24,6 +24,8 @@ import opennlp.maxent.ContextGenerator;
 
 public class BuildContextGenerator implements ContextGenerator {
 
+  private static final String EOS = "eos";
+  
   public BuildContextGenerator() {
     super();
   }
@@ -35,7 +37,7 @@ public class BuildContextGenerator implements ContextGenerator {
 
   private String cons(Parse p, int i) {
     StringBuffer feat = new StringBuffer(20);
-    feat.append("cons(").append(i).append(")=");
+    feat.append(i).append("=");
     if (p != null) {
       if (p.getLabel() != null) {
         feat.append(p.getLabel()).append("|");
@@ -43,14 +45,14 @@ public class BuildContextGenerator implements ContextGenerator {
       feat.append(p.getType()).append("|").append(p.getHead().toString());
     }
     else {
-      feat.append("eos|eos|eos");
+      feat.append(EOS).append("|").append(EOS).append("|").append(EOS);
     }
     return (feat.toString());
   }
 
   private String consbo(Parse p, int i) { //cons back-off
     StringBuffer feat = new StringBuffer(20);
-    feat.append("cons(").append(i).append("*)=");
+    feat.append(i).append("*=");
     if (p != null) {
       if (p.getLabel() != null) {
         feat.append(p.getLabel()).append("|");
@@ -58,7 +60,7 @@ public class BuildContextGenerator implements ContextGenerator {
       feat.append(p.getType());
     }
     else {
-      feat.append("eos|eos");
+      feat.append(EOS).append("|").append(EOS);
     }
     return (feat.toString());
   }

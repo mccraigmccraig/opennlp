@@ -24,6 +24,8 @@ import opennlp.maxent.ContextGenerator;
 
 public class CheckContextGenerator implements ContextGenerator {
 
+  private static final String EOS = "eos";
+  
   public CheckContextGenerator() {
     super();
   }
@@ -35,46 +37,46 @@ public class CheckContextGenerator implements ContextGenerator {
 
   private void surround(Parse p, int i, String type, List features) {
     StringBuffer feat = new StringBuffer(20);
-    feat.append("surround(").append(i).append(")=");
+    feat.append("s").append(i).append("=");
     if (p != null) {
       feat.append(p.getHead().toString()).append("|").append(type).append("|").append(p.getHead().getType());
     }
     else {
-      feat.append("eos|").append(type).append("|eos");
+      feat.append(EOS).append("|").append(type).append("|").append(EOS);
     }
     features.add(feat.toString());
     feat.setLength(0);
-    feat.append("surround(").append(i).append("*)=");
+    feat.append("s").append(i).append("*=");
     if (p != null) {
       feat.append(type).append("|").append(p.getHead().getType());
     }
     else {
-      feat.append(type).append("|eos");
+      feat.append(type).append("|").append(EOS);
     }
     features.add(feat.toString());
   }
 
   private void checkcons(Parse p, String i, String type, List features) {
     StringBuffer feat = new StringBuffer(20);
-    feat.append("checkcons(").append(i).append(")=").append(p.getType()).append("|").append(p.getHead().toString()).append("|").append(type);
+    feat.append("c").append(i).append("=").append(p.getType()).append("|").append(p.getHead().toString()).append("|").append(type);
     features.add(feat.toString());
     feat.setLength(0);
-    feat.append("checkcons(").append(i).append("*)=").append(p.getType()).append("|").append(type);
+    feat.append("c").append(i).append("*=").append(p.getType()).append("|").append(type);
     features.add(feat.toString());
   }
 
   private void checkcons(Parse p1, Parse p2, String type, List features) {
     StringBuffer feat = new StringBuffer(20);
-    feat.append("checkcons(i,last)=").append(type).append(",").append(p1.getType()).append("|").append(p1.getHead().toString()).append(",").append(p2.getType()).append("|").append(p2.getHead().toString());
+    feat.append("cil=").append(type).append(",").append(p1.getType()).append("|").append(p1.getHead().toString()).append(",").append(p2.getType()).append("|").append(p2.getHead().toString());
     features.add(feat.toString());
     feat.setLength(0);
-    feat.append("checkcons(i*,last)=").append(type).append(",").append(p1.getType()).append(",").append(p2.getType()).append("|").append(p2.getHead().toString());
+    feat.append("ci*l=").append(type).append(",").append(p1.getType()).append(",").append(p2.getType()).append("|").append(p2.getHead().toString());
     features.add(feat.toString());
     feat.setLength(0);
-    feat.append("checkcons(i,last*)=").append(type).append(",").append(p1.getType()).append("|").append(p1.getHead().toString()).append(",").append(p2.getType());
+    feat.append("cil*=").append(type).append(",").append(p1.getType()).append("|").append(p1.getHead().toString()).append(",").append(p2.getType());
     features.add(feat.toString());
     feat.setLength(0);
-    feat.append("checkcons(i*,last*)=").append(type).append(",").append(p1.getType()).append(",").append(p2.getType());
+    feat.append("ci*l*=").append(type).append(",").append(p1.getType()).append(",").append(p2.getType());
     features.add(feat.toString());
   }
 
@@ -120,5 +122,4 @@ public class CheckContextGenerator implements ContextGenerator {
     surround(p2, 2, type, features);
     return ((String[]) features.toArray(new String[features.size()]));
   }
-
 }

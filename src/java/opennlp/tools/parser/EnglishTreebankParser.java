@@ -97,7 +97,7 @@ public class EnglishTreebankParser extends ParserME {
     }
 
     protected boolean validOutcome(String outcome, Sequence sequence) {
-      if (outcome.startsWith("I-")) {
+      if (outcome.startsWith(ParserME.CONT)) {
         List tagList = sequence.getOutcomes();
         int lti = tagList.size() - 1;
         if (lti == -1) {
@@ -105,10 +105,10 @@ public class EnglishTreebankParser extends ParserME {
         }
         else {
           String lastTag = (String) tagList.get(lti);
-          if (lastTag.equals("O")) {
+          if (lastTag.equals(ParserME.OTHER)) {
             return (false);
           }
-          if (!lastTag.substring(2).equals(outcome.substring(2))) {
+          if (!lastTag.substring(ParserME.START.length()).equals(outcome.substring(ParserME.CONT.length()))) {
             return (false);
           }
         }
@@ -132,7 +132,7 @@ public class EnglishTreebankParser extends ParserME {
         int start = 0;
         while (str.hasMoreTokens()) {
           String tok = str.nextToken();
-          p.insert(new Parse(line, new Span(start, start + tok.length()), "TOK", 0));
+          p.insert(new Parse(line, new Span(start, start + tok.length()), ParserME.TOK_NODE, 0));
           start += tok.length() + 1;
         }
         parser.parse(p).show();System.out.println();
