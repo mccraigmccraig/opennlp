@@ -35,7 +35,7 @@ import opennlp.maxent.io.*;
  * surrounding context.
  *
  * @author      Gann Bierner
- * @version $Revision: 1.3 $, $Date: 2003/12/06 16:54:55 $
+ * @version $Revision: 1.4 $, $Date: 2003/12/06 18:25:37 $
  */
 public class POSTaggerME implements Evalable, POSTagger {
 
@@ -59,22 +59,29 @@ public class POSTaggerME implements Evalable, POSTagger {
    * is to a word outside of a closed class.
    */
   protected boolean _useClosedClassTagsFilter = false;
+  
+  private static final int DEFAULT_BEAM_SIZE =3;
 
-  private static final int BEAM_SIZE = 3;
+  /** The size of the beam to be used in determining the best sequence of pos tags.*/
+  protected int size = 3;
 
   private Sequence bestSequence;
-  private BeamSearch beam;
-
-  protected POSTaggerME() {}
+  /** The search object used for search multiple sequences of tags. */
+  protected  BeamSearch beam;
 
   public POSTaggerME(MaxentModel mod) {
     this(mod, new POSContextGenerator());
   }
-
+  
   public POSTaggerME(MaxentModel mod, ContextGenerator cg) {
+    this(DEFAULT_BEAM_SIZE,mod,cg);
+  }
+
+  public POSTaggerME(int beamSize, MaxentModel mod, ContextGenerator cg) {
+    size = beamSize;
     _posModel = mod;
     _contextGen = cg;
-    beam = new PosBeamSearch(BEAM_SIZE, cg, mod);
+    beam = new PosBeamSearch(size, cg, mod);
   }
 
   public String getNegativeOutcome() {
@@ -160,15 +167,15 @@ public class POSTaggerME implements Evalable, POSTagger {
 
   }
 
-  class PosBeamSearch extends BeamSearch {
+  private class PosBeamSearch extends BeamSearch {
 
     public PosBeamSearch(int size, ContextGenerator cg, MaxentModel model) {
       super(size, cg, model);
     }
 
-    protected boolean validSequence(int i, List sequence, Sequence s, String outcome) {
+    protected boolean validSequence(int i, List inputSequence, Sequence outcomesSequence, String outcome) {
       if (_useClosedClassTagsFilter) {
-        return (_closedClassTagsFilter.filter((String) sequence.get(i), outcome));
+        return (_closedClassTagsFilter.filter((String) inputSequence.get(i), outcome));
       }
       return true;
     }

@@ -22,22 +22,32 @@ import java.util.*;
 import opennlp.maxent.ContextGenerator;
 import opennlp.maxent.MaxentModel;
 
+
+/** Performs k-best search over sequence.  This is besed on the description in
+  * Ratnaparkhi (1998), PhD diss, Univ. of Pennsylvania. 
+ */
 public class BeamSearch {
 
   protected MaxentModel model;
   protected ContextGenerator cg;
   protected int size;
 
-  ///////////////////////////////////////////////////////////////////
-  // Do a beam search to compute best sequence of results (as in pos)
-  // taken from Ratnaparkhi (1998), PhD diss, Univ. of Pennsylvania
-  ///////////////////////////////////////////////////////////////////
+  /** Creates new search object. 
+   * @param size The size of the beam (k).
+   * @param cg the context generator for the model. 
+   * @param model the model for assigning probabilities to the sequence outcomes.
+   */
   public BeamSearch(int size, ContextGenerator cg, MaxentModel model) {
     this.size = size;
     this.cg = cg;
     this.model = model;
   }
 
+  /** Returns the best sequence of outcomes based on model for this object.
+   * @param sequence The input sequence.
+   * @param context An Object[] of additional context.  This is passed to the context generator blindly with the assumption that the context are appropiate.
+   * @return The top ranked sequence of outcomes.
+   */
   public Sequence bestSequence(List sequence, Object context) {
     int n = sequence.size();
     SortedSet prev = new TreeSet();
@@ -53,12 +63,12 @@ public class BeamSearch {
       for (int j = 1; j <= sz; j++) {
         Sequence top = (Sequence) prev.first();
         prev.remove(top);
-        Object[] params = new Object[additionalContext.length+3];
+        Object[] params = new Object[additionalContext.length + 3];
         params[0] = new Integer(i);
         params[1] = sequence;
         params[2] = top;
-        for (int aci=0,acl=additionalContext.length;aci<acl;aci++) {
-          params[3+aci] = additionalContext[aci];          
+        for (int aci = 0, acl = additionalContext.length; aci < acl; aci++) {
+          params[3 + aci] = additionalContext[aci];
         }
         double[] scores = model.eval(cg.getContext(params));
         double[] temp_scores = new double[scores.length];
@@ -89,9 +99,17 @@ public class BeamSearch {
     return (Sequence) prev.first();
   }
 
-  protected boolean validSequence(int i, List sequence, Sequence s, String outcome) {
+  /** Determines wheter a particular continuation of a sequence is valid.  
+   * This is used to restrict invalid sequences such as thoses used in start/continure tag-based chunking 
+   * or could be used to implement tag dictionary restrictions.
+   * @param i The index in the input sequence for which the new outcome is being proposed.
+   * @param inputSequence The input sequnce.
+   * @param outcomesSequence The outcomes so far in this sequence.
+   * @param outcome The next proposed outcome for the outcomes sequence.
+   * @return true is the sequence would still be valid with the new outcome, false otherwise.
+   */
+  protected boolean validSequence(int i, List inputSequence, Sequence outcomesSequence, String outcome) {
     return true;
   }
 
-  
 }

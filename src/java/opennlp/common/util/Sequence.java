@@ -20,52 +20,65 @@ package opennlp.common.util;
 import java.util.ArrayList;
 import java.util.List;
 
+/** Represents a weighted sequence of outcomes. */
 public class Sequence implements Comparable {
-    double score = 1;
-    List outcomes;
-    List probs;
+  private double score = 0;
+  private List outcomes;
+  private List probs;
 
-    public Sequence() {
-      outcomes = new ArrayList();
-      probs = new ArrayList();
-    };
+  /** Creates a new sequence of outcomes. */
+  public Sequence() {
+    outcomes = new ArrayList();
+    probs = new ArrayList();
+  };
 
-    Sequence(double s) {
-      this();
-      score = s;
-    }
-    public int compareTo(Object o) {
-      Sequence s = (Sequence) o;
-      if (score < s.score)
-        return 1;
-      else if (score == s.score)
-        return 0;
-      else
-        return -1;
-    }
-
-    public Sequence copy() {
-      Sequence s = new Sequence(score);
-      s.outcomes.addAll(outcomes);
-      s.probs.addAll(probs);
-      return s;
-    }
-
-    public void add(String t, double d) {
-      outcomes.add(t);
-      probs.add(new Double(d));
-      score *= d;
-    }
-
-    public List getOutcomes() {
-      return (outcomes);
-    }
-
-    public List getProbs() {
-      return (probs);
-    }
-
-    public String toString() {
-      return super.toString() + " " + score;
-    }
+  public int compareTo(Object o) {
+    Sequence s = (Sequence) o;
+    if (score < s.score)
+      return 1;
+    else if (score == s.score)
+      return 0;
+    else
+      return -1;
   }
+
+
+  /** Returns a copy of the this sequence.
+   * @return a copy of this sequence.
+   */
+  public Sequence copy() {
+    Sequence s = new Sequence();
+    s.outcomes.addAll(outcomes);
+    s.probs.addAll(probs);
+    s.score = score;
+    return s;
+  }
+
+  /** Adds an outcome and probability to this sequence. 
+   * @param outcome the outcome to be added.
+   * @param p the probability associated with this outcome.
+   */
+  public void add(String outcome, double p) {
+    outcomes.add(outcome);
+    probs.add(new Double(p));
+    score += Math.log(p);
+  }
+
+  /** Returns a list of outcomes for this sequence.
+   * @return a list of outcomes.
+   */
+  public List getOutcomes() {
+    return (outcomes);
+  }
+
+  /** Returns a list of probabilities associated with the outcomes of this sequence.
+   * @return a list of probabilities.
+   */
+  public List getProbs() {
+    return (probs);
+  }
+
+  public String toString() {
+    return super.toString() + " " + score;
+  }
+}
