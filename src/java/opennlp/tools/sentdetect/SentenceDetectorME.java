@@ -39,7 +39,7 @@ import java.util.ArrayList;
  * string to determine if they signify the end of a sentence.
  *
  * @author      Jason Baldridge and Tom Morton
- * @version     $Revision: 1.8 $, $Date: 2004/06/11 21:31:47 $
+ * @version     $Revision: 1.9 $, $Date: 2004/09/08 15:38:17 $
  */
 
 public class SentenceDetectorME implements SentenceDetector {
@@ -115,13 +115,18 @@ public class SentenceDetectorME implements SentenceDetector {
     if (starts.length == 0) {
 	return new String[] {s};
     }
-    
-    String[] sents = new String[starts.length];
+
+    boolean leftover = starts[starts.length - 1] != s.length();
+    String[] sents = new String[leftover? starts.length + 1 : starts.length];
     sents[0] = s.substring(0,starts[0]);
     for (int si = 1; si < starts.length; si++) {
       sents[si] = s.substring(starts[si - 1], starts[si]);
     }
-    //sents[starts.length - 1] = s.substring(starts[starts.length - 1]);
+
+    if (leftover) {
+        sents[sents.length - 1] = s.substring(starts[starts.length - 1]);
+    }
+    
     return (sents);
   }
 
