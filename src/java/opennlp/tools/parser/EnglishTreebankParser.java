@@ -32,29 +32,28 @@ import opennlp.tools.util.Span;
 import opennlp.maxent.io.SuffixSensitiveGISModelReader;
 import opennlp.tools.chunker.ChunkerME;
 import opennlp.tools.postag.DefaultPOSContextGenerator;
+import opennlp.tools.postag.POSDictionary;
 import opennlp.tools.postag.POSTaggerME;
 
-public class EnglishTreebankParser extends ParserME {
+public class EnglishTreebankParser {
 
-  /** English parser which produces Penn treebank style parses.
-   * @param dataDir directory where the model files are located.
-   * @throws IOException when the models can't be loaded.
-   */
-  public EnglishTreebankParser(String dataDir) throws IOException {
-    super(
-          new SuffixSensitiveGISModelReader(new File(dataDir+"/build.bin.gz")).getModel(),
-          new SuffixSensitiveGISModelReader(new File(dataDir+"/check.bin.gz")).getModel(),
-          new EnglishTreebankPOSTagger(dataDir + "/tag.bin.gz"),
-          new EnglishTreebankChunker(dataDir + "/chunk.bin.gz"),
-          new HeadRules(dataDir + "/head_rules"));
-    /*
-    super(
-      new SuffixSensitiveGISModelReader(new File(dataDir + "/parser/EnglishParserBuild.bin.gz")).getModel(),
-      new SuffixSensitiveGISModelReader(new File(dataDir + "/parser/EnglishParserCheck.bin.gz")).getModel(),
-      new EnglishTreebankPOSTagger(dataDir + "/postag/EnglishPOS.bin.gz"),
-      new EnglishTreebankChunker(dataDir + "/parser/EnglishChunker.bin.gz"),
-      new HeadRules(dataDir + "/parser/head_rules"));
-      */
+  public static ParserME getParser(String dataDir, boolean useTagDictionary, boolean useCaseSensitiveTagDictionary) throws IOException {
+    if (useTagDictionary) {
+      return new ParserME(
+        new SuffixSensitiveGISModelReader(new File(dataDir + "/build.bin.gz")).getModel(),
+        new SuffixSensitiveGISModelReader(new File(dataDir + "/check.bin.gz")).getModel(),
+        new EnglishTreebankPOSTagger(dataDir + "/tag.bin.gz", dataDir + "/tagdict", useCaseSensitiveTagDictionary),
+        new EnglishTreebankChunker(dataDir + "/chunk.bin.gz"),
+        new HeadRules(dataDir + "/head_rules"));
+    }
+    else {
+      return new ParserME(
+        new SuffixSensitiveGISModelReader(new File(dataDir + "/build.bin.gz")).getModel(),
+        new SuffixSensitiveGISModelReader(new File(dataDir + "/check.bin.gz")).getModel(),
+        new EnglishTreebankPOSTagger(dataDir + "/tag.bin.gz"),
+        new EnglishTreebankChunker(dataDir + "/chunk.bin.gz"),
+        new HeadRules(dataDir + "/head_rules"));
+    }
   }
 
   private static class EnglishTreebankPOSTagger extends POSTaggerME implements ParserTagger {
@@ -62,8 +61,13 @@ public class EnglishTreebankParser extends ParserME {
     private static final int K = 10;
 
     public EnglishTreebankPOSTagger(String modelFile) throws IOException {
-      super(10, new SuffixSensitiveGISModelReader(new File(modelFile)).getModel(), new DefaultPOSContextGenerator());
+      super(10, new SuffixSensitiveGISModelReader(new File(modelFile)).getModel(), new DefaultPOSContextGenerator(), null);
     }
+
+    public EnglishTreebankPOSTagger(String modelFile, String tagDictionary, boolean useCase) throws IOException {
+      super(10, new SuffixSensitiveGISModelReader(new File(modelFile)).getModel(), new DefaultPOSContextGenerator(), new POSDictionary(tagDictionary, useCase));
+    }
+
     public Sequence[] topKSequences(List sentence) {
       return beam.bestSequences(K, sentence, null);
     }
@@ -108,7 +112,7 @@ public class EnglishTreebankParser extends ParserME {
           if (lastTag.equals(ParserME.OTHER)) {
             return (false);
           }
-          String pred =  outcome.substring(ParserME.CONT.length());
+          String pred = outcome.substring(ParserME.CONT.length());
           if (lastTag.startsWith(ParserME.START)) {
             return lastTag.substring(ParserME.START.length()).equals(pred);
           }
@@ -120,7 +124,7 @@ public class EnglishTreebankParser extends ParserME {
       return (true);
     }
   }
-  
+
   private static String convertToken(String token) {
     if (token.equals("(")) {
       return "-LRB-";
@@ -137,13 +141,45 @@ public class EnglishTreebankParser extends ParserME {
     return token;
   }
 
+  private static void usage() {
+    System.err.println("Usage: EnglishTreebankParser [-i] dataDirectory < sentences");
+    System.err.println("dataDirectory: Directory containing parser models.");
+    System.err.println("-d: Use tag dictionary.");
+    System.err.println("-i: Case insensitive tag dictionary.");
+    System.exit(1);
+  }
+
   public static void main(String[] args) throws IOException {
-    if (args.length != 1) {
-      System.err.println("Usage: EnglishTreebankParser dataDirectory < sentences");
-      System.exit(1);
+    if (args.length == 0) {
+      usage();
     }
+    boolean useTagDictionary=false;
+    boolean caseInsensitiveTagDictionary=false;
     int ai = 0;
-    ParserME parser = new EnglishTreebankParser(args[ai++]);
+    while (args[ai].startsWith("-")) {
+      if (args[ai].equals("-d")) {
+        useTagDictionary = true;
+        ai++;
+      }
+      if (args[ai].equals("-i")) {
+        caseInsensitiveTagDictionary = true;
+        ai++;
+      }
+      if (args[ai].equals("--")) {
+        ai++;
+        break;
+      }
+    }
+    ParserME parser;
+    if (caseInsensitiveTagDictionary) { 
+      parser = EnglishTreebankParser.getParser(args[ai++],true,false);
+    }
+    else if (useTagDictionary) {
+      parser = EnglishTreebankParser.getParser(args[ai++],true,true);
+    }
+    else {
+      parser = EnglishTreebankParser.getParser(args[ai++],false,false);
+    }
     BufferedReader in = new BufferedReader(new InputStreamReader(System.in));
     String line;
     try {
@@ -151,17 +187,17 @@ public class EnglishTreebankParser extends ParserME {
         StringTokenizer str = new StringTokenizer(line);
         int numToks = str.countTokens();
         StringBuffer sb = new StringBuffer();
-        List tokens = new ArrayList();        
+        List tokens = new ArrayList();
         while (str.hasMoreTokens()) {
           String tok = convertToken(str.nextToken());
           tokens.add(tok);
           sb.append(tok).append(" ");
         }
         if (sb.length() != 0) {
-          String text = sb.substring(0,sb.length()-1).toString();
-          Parse p = new Parse(text, new Span(0,text.length()), "INC", 1, null);
+          String text = sb.substring(0, sb.length() - 1).toString();
+          Parse p = new Parse(text, new Span(0, text.length()), "INC", 1, null);
           int start = 0;
-          for (Iterator ti=tokens.iterator();ti.hasNext();) {
+          for (Iterator ti = tokens.iterator(); ti.hasNext();) {
             String tok = (String) ti.next();
             p.insert(new Parse(text, new Span(start, start + tok.length()), ParserME.TOK_NODE, 0));
             start += tok.length() + 1;
