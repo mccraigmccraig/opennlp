@@ -17,12 +17,12 @@
 //////////////////////////////////////////////////////////////////////////////
 package opennlp.tools.chunker;
 
-import opennlp.maxent.ContextGenerator;
+import java.util.ArrayList;
+import java.util.List;
+
 import opennlp.maxent.DataStream;
 import opennlp.maxent.Event;
 import opennlp.maxent.EventStream;
-
-import java.util.*;
 
 /**
  * Class for creating an event stream out of data files for training a chunker. 
@@ -30,7 +30,7 @@ import java.util.*;
  */
 public class ChunkerEventStream implements EventStream {
 
-  private ContextGenerator cg;
+  private ChunkerContextGenerator cg;
   private DataStream data;
   private Event[] events;
   private int ei;
@@ -48,7 +48,7 @@ public class ChunkerEventStream implements EventStream {
    * @param d The data stream for this event stream.
    * @param cg The context generator which should be used in the creation of events for this event stream.
    */
-  public ChunkerEventStream(DataStream d, ContextGenerator cg) {
+  public ChunkerEventStream(DataStream d, ChunkerContextGenerator cg) {
     this.cg = cg;
     data = d;
     ei = 0;
@@ -85,9 +85,11 @@ public class ChunkerEventStream implements EventStream {
       preds.add(parts[2]);
     }
     events = new Event[toks.size()];
+    Object[] toksArray = toks.toArray();
+    String[] tagsArray = (String[]) tags.toArray(new String[tags.size()]);
+    String[] predsArray = (String[]) preds.toArray(new String[preds.size()]);
     for (int ei = 0, el = events.length; ei < el; ei++) {
-      Object[] params = { new Integer(ei), toks, tags, preds };
-      events[ei] = new Event((String) preds.get(ei), cg.getContext(params));
+      events[ei] = new Event((String) preds.get(ei), cg.getContext(ei,toksArray,tagsArray,predsArray));
     }
   }
 }
