@@ -44,7 +44,7 @@ public class ProperNounResolver extends MaxentResolver {
   public ProperNounResolver(String projectName, ResolverMode m) throws IOException {
     super(projectName,"pnmodel", m, 500);
     if (!acroMapLoaded) {
-      initAcronyms(projectName + "/acronyms.final");
+      initAcronyms(projectName + "/acronyms");
       acroMapLoaded = true;
     }
     showExclusions = false;
