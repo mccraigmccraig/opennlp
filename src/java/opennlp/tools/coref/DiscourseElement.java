@@ -27,7 +27,7 @@ import opennlp.tools.util.ReverseListIterator;
 /**
  * Represents an item in which can be put into the discourse model.  Object which are
  * to be placed in the discourse model should extend this class.
- * @see opennlp.coref.DiscourseModel    
+ * @see opennlp.tools.coref.DiscourseModel    
  */
 public abstract class DiscourseElement {
 
