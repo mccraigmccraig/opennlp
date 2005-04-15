@@ -27,6 +27,12 @@ import opennlp.tools.coref.sim.GenderModel;
 import opennlp.tools.coref.sim.NumberModel;
 import opennlp.tools.coref.sim.SimilarityModel;
 
+/**
+ * This class perform coreference for treebank style parses or for noun-phrase chunked data.    
+ * Non-constituent entites such as pre-nominal named-entities and sub entities in simple coordinated
+ * noun phases will be created.  This linker requires that named-entity information also be provided.   
+ * This information can be added to the parse using the -parse option with EnglishNameFinder. 
+ */
 public class DefaultLinker extends AbstractLinker {
   
   public DefaultLinker(String project, LinkerMode mode) throws IOException {
