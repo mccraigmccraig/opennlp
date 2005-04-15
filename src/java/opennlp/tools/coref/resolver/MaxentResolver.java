@@ -110,6 +110,8 @@ public abstract class MaxentResolver extends AbstractResolver {
   private static TestNumberModel numModel = null;
   /** The model for computing non-referential probabilities. */
   protected NonReferentialResolver nonReferentialResolver;
+  
+  private static final String modelExtension = ".bin.gz";
 
   /**
    * Creates a maximum-entropy-based resolver which will look the specified number of entities back for a referent.
@@ -144,10 +146,10 @@ public abstract class MaxentResolver extends AbstractResolver {
     this.modelName = project+"/"+name;
     if (ResolverMode.TEST == this.mode) {
       if (loadAsResource) {
-        model = (new PlainTextGISModelReader(new BufferedReader(new InputStreamReader(this.getClass().getResourceAsStream(modelName))))).getModel();
+        model = (new PlainTextGISModelReader(new BufferedReader(new InputStreamReader(this.getClass().getResourceAsStream(modelName+modelExtension))))).getModel();
       }
       else {
-        model = (new SuffixSensitiveGISModelReader(new File(modelName))).getModel();
+        model = (new SuffixSensitiveGISModelReader(new File(modelName+modelExtension))).getModel();
       }
       sameIndex = model.getIndex(SAME);
     }
@@ -396,7 +398,7 @@ public abstract class MaxentResolver extends AbstractResolver {
         }
         writer.close();
       }
-      (new SuffixSensitiveGISModelWriter(GIS.trainModel(new CollectionEventStream(events),100,10),new File(modelName))).persist();
+      (new SuffixSensitiveGISModelWriter(GIS.trainModel(new CollectionEventStream(events),100,10),new File(modelName+modelExtension))).persist();
       nonReferentialResolver.train();
     }
   }
