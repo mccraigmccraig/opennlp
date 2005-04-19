@@ -289,29 +289,38 @@ public class ParserEventStream implements EventStream {
 
   public static void main(String[] args) throws java.io.IOException {
     if (args.length == 0) {
-      System.err.println("Usage ParserEventStream -[tag|chunk|build|check] head_rules < parses");
+      System.err.println("Usage ParserEventStream -[tag|chunk|build|check|fun] head_rules < parses");
       System.exit(1);
     }
     EventTypeEnum etype = null;
+    boolean fun = false;
     int ai = 0;
-    if (args[ai].equals("-build")) {
-      etype = EventTypeEnum.BUILD;
+    while (ai < args.length && args[ai].startsWith("-")) {
+      if (args[ai].equals("-build")) {
+        etype = EventTypeEnum.BUILD;
+      }
+      else if (args[ai].equals("-check")) {
+        etype = EventTypeEnum.CHECK;
+      }
+      else if (args[ai].equals("-chunk")) {
+        etype = EventTypeEnum.CHUNK;
+      }
+      else if (args[ai].equals("-tag")) {
+        etype = EventTypeEnum.TAG;
+      }
+      else if (args[ai].equals("-fun")) {
+        fun = true;
+      }
+      else {
+        System.err.println("Invalid option " + args[ai]);
+        System.exit(1);
+      }
+      ai++;
     }
-    else if (args[ai].equals("-check")) {
-      etype = EventTypeEnum.CHECK;
-    }
-    else if (args[ai].equals("-chunk")) {
-      etype = EventTypeEnum.CHUNK;
-    }
-    else if (args[ai].equals("-tag")) {
-      etype = EventTypeEnum.TAG;
-    }
-    else {
-      System.err.println("Invalid option " + args[ai]);
-      System.exit(1);
-    }
-    ai++;
     EnglishHeadRules rules = new EnglishHeadRules(args[ai++]);
+    if (fun) {
+      Parse.useFunctionTags(true);
+    }
     opennlp.maxent.EventStream es = new ParserEventStream(new opennlp.maxent.PlainTextByLineDataStream(new java.io.InputStreamReader(System.in)), rules, etype);
     while (es.hasNext()) {
       System.out.println(es.nextEvent());
