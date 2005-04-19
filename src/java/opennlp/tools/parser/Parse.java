@@ -52,7 +52,7 @@ public class Parse implements Cloneable, Comparable {
   /** The pattern used to find the base constituent label of a Penn Treebank labeled constituent. */
   private static Pattern typePattern = Pattern.compile("^([^ =-]+)");
   /** The pattern used to find the function tags. */ 
-  private static Pattern funTypePattern = Pattern.compile("^[^-]+-([^ =-]+)");
+  private static Pattern funTypePattern = Pattern.compile("^[^ =-]+-([^ =-]+)");
   /** The patter used to identify tokens in Penn Treebank labeled constituents. */
   private static Pattern tokenPattern = Pattern.compile("^[^ ()]+ ([^ ()]+)\\s*\\)");
   
@@ -583,7 +583,12 @@ public class Parse implements Cloneable, Comparable {
       System.err.println("Reads training parses (one-sentence-per-line) and displays parse structure.");
       System.exit(1);
     }
-    EnglishHeadRules rules = new EnglishHeadRules(args[0]);
+    int ai=0;
+    if (args[0].equals("-fun")) {
+      Parse.useFunctionTags(true);
+      ai++;
+    }
+    EnglishHeadRules rules = new EnglishHeadRules(args[ai]);
     java.io.BufferedReader in = new java.io.BufferedReader(new java.io.InputStreamReader(System.in));
     for (String line = in.readLine(); line != null; line = in.readLine()) {
       Parse p = Parse.parseParse(line);
