@@ -67,8 +67,8 @@ public class BeamSearch {
    */
   public Sequence[] bestSequences(int numSequences, Object[] sequence, Object[] additionalContext, double minSequenceScore) {
     int n = sequence.length;
-    Heap prev = new TreeHeap(size);
-    Heap next = new  TreeHeap(size);
+    Heap prev = new ListHeap(size);
+    Heap next = new ListHeap(size);
     Heap tmp;
     prev.add(new Sequence());
     if (additionalContext == null) {
