@@ -29,6 +29,9 @@ import java.util.Set;
 import opennlp.tools.coref.Linker;
 import opennlp.tools.util.Span;
 
+/**
+ * Provides default implementation of many of the methods in the {@link MentionFinder} interface. 
+ */
 public abstract class AbstractMentionFinder implements MentionFinder {
 
   protected HeadFinder headFinder;
@@ -147,7 +150,7 @@ public abstract class AbstractMentionFinder implements MentionFinder {
         if (lastNpTokenIndex != ti) {
           if (ti - 1 >= 0 && ((Parse) npTokens.get(ti - 1)).getSyntacticType().startsWith("NN")) {
             Span npSpan = new Span(((Parse) npTokens.get(ti + 1)).getSpan().getStart(), ((Parse) npTokens.get(lastNpTokenIndex)).getSpan().getEnd());
-            Extent snpExtent = new Extent(npSpan, npSpan, tok.getEntityId(), null,"CNP");
+            Mention snpExtent = new Mention(npSpan, npSpan, tok.getEntityId(), null,"CNP");
             entities.add(snpExtent);
             //System.err.println("adding extent for conjunction in: "+np+" preeceeded by "+((Parse) npTokens.get(ti-1)).getSyntacticType());
             inCoordinatedNounPhrase = true;
@@ -161,7 +164,7 @@ public abstract class AbstractMentionFinder implements MentionFinder {
       else if (inCoordinatedNounPhrase && tokStr.equals(",")) {
         if (lastNpTokenIndex != ti) {
           Span npSpan = new Span(((Parse) npTokens.get(ti + 1)).getSpan().getStart(), ((Parse) npTokens.get(lastNpTokenIndex)).getSpan().getEnd());
-          Extent snpExtent = new Extent(npSpan, npSpan, tok.getEntityId(), null,"CNP");
+          Mention snpExtent = new Mention(npSpan, npSpan, tok.getEntityId(), null,"CNP");
           entities.add(snpExtent);
           //System.err.println("adding extent for comma in: "+np);
         }
@@ -169,7 +172,7 @@ public abstract class AbstractMentionFinder implements MentionFinder {
       }
       else if (inCoordinatedNounPhrase && ti == 0 && lastNpTokenIndex >= 0) {
         Span npSpan = new Span(((Parse) npTokens.get(ti)).getSpan().getStart(), ((Parse) npTokens.get(lastNpTokenIndex)).getSpan().getEnd());
-        Extent snpExtent = new Extent(npSpan, npSpan, tok.getEntityId(), null,"CNP");
+        Mention snpExtent = new Mention(npSpan, npSpan, tok.getEntityId(), null,"CNP");
         entities.add(snpExtent);
         //System.err.println("adding extent for start coord in: "+np);
       }
@@ -205,7 +208,7 @@ public abstract class AbstractMentionFinder implements MentionFinder {
           continue;
         }
         if (tok.getSyntacticType().startsWith("PRP") && handledPronoun(tok.toString())) {
-          Extent ppExtent = new Extent(tok.getSpan(), tok.getSpan(), tok.getEntityId(), null,Linker.PRONOUN_MODIFIER);
+          Mention ppExtent = new Mention(tok.getSpan(), tok.getSpan(), tok.getEntityId(), null,Linker.PRONOUN_MODIFIER);
           //System.err.println("AbstractEntityFinder.collectPossesivePronouns: adding possesive pronoun: "+tok+" "+tok.getEntityId());
           entities.add(ppExtent);
           //System.err.println("AbstractMentionFinder: adding pos-pro: "+ppExtent);
@@ -216,9 +219,9 @@ public abstract class AbstractMentionFinder implements MentionFinder {
   }
 
   private void removeDuplicates(List extents) {
-    Extent lastExtent = null;
+    Mention lastExtent = null;
     for (Iterator ei = extents.iterator(); ei.hasNext();) {
-      Extent e = (Extent) ei.next();
+      Mention e = (Mention) ei.next();
       if (lastExtent != null && e.getSpan().equals(lastExtent.getSpan())) {
         ei.remove();
       }
@@ -251,7 +254,7 @@ public abstract class AbstractMentionFinder implements MentionFinder {
     }
   }
 
-  private Extent[] collectMentions(List nps, Map headMap) {
+  private Mention[] collectMentions(List nps, Map headMap) {
     List mentions = new ArrayList(nps.size());
     Set recentMentions = new HashSet();
     //System.err.println("AbtractMentionFinder.collectMentions: "+headMap);
@@ -262,7 +265,7 @@ public abstract class AbstractMentionFinder implements MentionFinder {
         clearMentions(recentMentions, np);
         if (!isPartOfName(np)) {
           Parse head = headFinder.getLastHead(np);
-          Extent extent = new Extent(np.getSpan(), head.getSpan(), head.getEntityId(), np, null);
+          Mention extent = new Mention(np.getSpan(), head.getSpan(), head.getEntityId(), np, null);
           //System.err.println("adding "+np+" with head "+head);
           mentions.add(extent);
           recentMentions.add(np);
@@ -295,7 +298,7 @@ public abstract class AbstractMentionFinder implements MentionFinder {
     }
     Collections.sort(mentions);
     removeDuplicates(mentions);
-    return (Extent[]) mentions.toArray(new Extent[mentions.size()]);
+    return (Mention[]) mentions.toArray(new Mention[mentions.size()]);
   }
 
   /**
@@ -311,7 +314,7 @@ public abstract class AbstractMentionFinder implements MentionFinder {
         Parse lastToken = (Parse) kids.get(kids.size()-1);
         if (lastToken.isToken()) {
           Span extentSpan = new Span(firstToken.getSpan().getStart(),lastToken.getSpan().getEnd());
-          Extent extent = new Extent(extentSpan, extentSpan, -1, null, null);
+          Mention extent = new Mention(extentSpan, extentSpan, -1, null, null);
           mentions.add(extent);
         }
         else {
@@ -329,7 +332,7 @@ public abstract class AbstractMentionFinder implements MentionFinder {
       Parse ne = (Parse) nes.get(nei);
       if (!ne.getSpan().contains(headTokenSpan)) {
         //System.err.println("adding extent for prenominal ne: "+ne);
-        Extent extent = new Extent(ne.getSpan(), ne.getSpan(), ne.getEntityId(),null,"NAME");
+        Mention extent = new Mention(ne.getSpan(), ne.getSpan(), ne.getEntityId(),null,"NAME");
         extent.setNameType(ne.getEntityType());
         extents.add(extent);
       }
@@ -387,12 +390,12 @@ public abstract class AbstractMentionFinder implements MentionFinder {
     return p.getNamedEntities();
   }
 
-  public Extent[] getMentions(Parse p) {
+  public Mention[] getMentions(Parse p) {
     List nps = p.getNounPhrases();
     Collections.sort(nps);
     Map headMap = constructHeadMap(nps);
     //System.err.println("AbstractMentionFinder.getMentions: got " + nps.size()); // + " nps, and " + nes.size() + " named entities");
-    Extent[] mentions = collectMentions(nps, headMap);
+    Mention[] mentions = collectMentions(nps, headMap);
     return (mentions);
   }
 

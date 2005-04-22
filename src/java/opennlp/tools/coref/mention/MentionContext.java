@@ -26,8 +26,8 @@ import opennlp.tools.coref.sim.GenderEnum;
 import opennlp.tools.coref.sim.NumberEnum;
 import opennlp.tools.util.Span;
 
-/** Data strucure representation of a mention.  This includes numerous contextual
- * information used in performing coreference resolution.
+/** Data strucure representation of a mention with additional contextual information.  The contextual
+ * information is used in performing coreference resolution.
  */
 public class MentionContext {
   /** Parse elements for each token in the head basal noun phrase of this entity. */

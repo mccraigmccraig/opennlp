@@ -18,72 +18,94 @@
 package opennlp.tools.coref;
 
 import java.io.IOException;
-import java.util.List;
 import java.util.regex.Pattern;
 
+import opennlp.tools.coref.mention.Mention;
 import opennlp.tools.coref.mention.HeadFinder;
 import opennlp.tools.coref.mention.MentionContext;
 import opennlp.tools.coref.mention.Parse;
 
-import opennlp.tools.coref.mention.Extent;
-
-/** A linker provides an interface for finding mentions <code>getMentions</code>, 
- * and creating entities out of those mentions <code>getEntities</code>.  This interface also allows
- * for the training of a resolver with the method <code>setEntities</code> which is used to give the
+/** A linker provides an interface for finding mentions, {@link #getMentions getMentions}, 
+ * and creating entities out of those mentions, {@link #getEntities getEntities}.  This interface also allows
+ * for the training of a resolver with the method {@link #setEntities setEntitites} which is used to give the
  * resolver mentions whose entityId fields indicate which mentions refer to the same entity and the 
- * <code>train</code> method which compiles all the inormation provided via calls to 
- * <code>setEntities</code> into a model.
+ * {@link #train train} method which compiles all the inormation provided via calls to 
+ * {@link #setEntities setEntities} into a model.
  * @author Tom Morton
  *
  */
 public interface Linker {
   
 
+  /** String constant used to label a mention which is a description. */
   public static final String DESCRIPTOR = "desc";
+  /** String constation used to label an mention in an appositive relationship. */
   public static final String ISA = "isa";
-
+  /** String constatant used to label a mention which consists of two or more noun phrases. */
   public static final String COMBINED_NPS = "cmbnd";
+  /** String constatant used to label a mention which consists of a single noun phrase. */
   public static final String NP = "np";
+  /** String constatant used to label a mention which is a proper noun modifing another noun. */
   public static final String PROPER_NOUN_MODIFIER = "pnmod";
+  /** String constatant used to label a mention which is a pronoun. */
   public static final String PRONOUN_MODIFIER = "np";
   
+  /** Regular expression for English singular third person pronouns. */
   public static final Pattern singularThirdPersonPronounPattern = Pattern.compile("^(he|she|it|him|her|his|hers|its|himself|herself|itself)$",Pattern.CASE_INSENSITIVE);
+  /** Regular expression for English plural third person pronouns. */
   public static final Pattern pluralThirdPersonPronounPattern = Pattern.compile("^(they|their|theirs|them|themselves)$",Pattern.CASE_INSENSITIVE);
+  /** Regular expression for English speech pronouns. */
   public static final Pattern speechPronounPattern = Pattern.compile("^(I|me|my|you|your|you|we|us|our|ours)$",Pattern.CASE_INSENSITIVE);
+  /** Regular expression for English male pronouns. */
   public static final Pattern malePronounPattern = Pattern.compile("^(he|him|his|himself)$",Pattern.CASE_INSENSITIVE);
+  /** Regular expression for English female pronouns. */
   public static final Pattern femalePronounPattern = Pattern.compile("^(she|her|hers|herself)$",Pattern.CASE_INSENSITIVE);
+  /** Regular expression for English nueter pronouns. */
   public static final Pattern neuterPronounPattern = Pattern.compile("^(it|its|itself)$",Pattern.CASE_INSENSITIVE);
-  public static final Pattern firstPersonPronounPattern = Pattern.compile("^(I|me|my|we|our|us|ours)$",Pattern.CASE_INSENSITIVE);  
-  public static final Pattern secondPersonPronounPattern = Pattern.compile("^(you|your|yours)$",Pattern.CASE_INSENSITIVE);  
+  /** Regular expression for English first person pronouns. */
+  public static final Pattern firstPersonPronounPattern = Pattern.compile("^(I|me|my|we|our|us|ours)$",Pattern.CASE_INSENSITIVE);
+  /** Regular expression for English singular second person pronouns. */
+  public static final Pattern secondPersonPronounPattern = Pattern.compile("^(you|your|yours)$",Pattern.CASE_INSENSITIVE);
+  /** Regular expression for English third person pronouns. */
   public static final Pattern thirdPersonPronounPattern = Pattern.compile("^(he|she|it|him|her|his|hers|its|himself|herself|itself|they|their|theirs|them|themselves)$",Pattern.CASE_INSENSITIVE);
+  /** Regular expression for English singular pronouns. */
   public static final Pattern singularPronounPattern = Pattern.compile("^(I|me|my|he|she|it|him|her|his|hers|its|himself|herself|itself)$",Pattern.CASE_INSENSITIVE);
+  /** Regular expression for English plural pronouns. */
   public static final Pattern pluralPronounPattern = Pattern.compile("^(we|us|our|ours|they|their|theirs|them|themselves)$",Pattern.CASE_INSENSITIVE);
+  /** Regular expression for English honorifics. */
   public static final Pattern honorificsPattern = Pattern.compile("[A-Z][a-z]+\\.$|^[A-Z][b-df-hj-np-tv-xz]+$");
+  /** Regular expression for English corporate designators. */
   public static final Pattern designatorsPattern = Pattern.compile("[a-z]\\.$|^[A-Z][b-df-hj-np-tv-xz]+$|^Co(rp)?$");
   
-  public void setEntities(Extent[] mentions);
+  /**
+   * Indicated that the specified mentions can be used to train this linker.
+   * This requires that the coreference relationship between the mentions have been labeled
+   * in the mention's id field.
+   * @param mentions The mentions to be used to train the linker.
+   */
+  public void setEntities(Mention[] mentions);
   
   /** Returns a list of entities which group the mentions into entity classes. 
    * @param mentions A array of mentions. 
    * return An array of discourse entities.
    */
-  public DiscourseEntity[] getEntities(Extent[] mentions);
+  public DiscourseEntity[] getEntities(Mention[] mentions);
   
   /**
    * Creates mention contexts for the specified mention exents.  These are used to compute coreference features over.
    * @param mentions The mention of a document.
    * @return mention contexts for the specified mention exents.
    */
-  public MentionContext[] constructMentionContexts(Extent[] mentions);
+  public MentionContext[] constructMentionContexts(Mention[] mentions);
   
-  /** Trains the linker based on the data specified via calls to #setEntities */ 
+  /** Trains the linker based on the data specified via calls to {@link #setEntities setEntities}. */ 
   public void train() throws IOException;
     
   /** Returns a array of mentions contained in the specified parse for coreference resolution.
    * @param sentence The parse for a sentence. 
    * @return Array of mentions contained in the specified parse.
    */
-  public Extent[] getMentions(Parse sentence);
+  public Mention[] getMentions(Parse sentence);
  
   /** 
    * Returns the head finder associated with this linker.

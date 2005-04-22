@@ -29,7 +29,7 @@ import java.util.List;
 import java.util.Map;
 
 import opennlp.tools.coref.mention.DefaultParse;
-import opennlp.tools.coref.mention.Extent;
+import opennlp.tools.coref.mention.Mention;
 import opennlp.tools.coref.mention.MentionContext;
 import opennlp.tools.coref.mention.PTBMentionFinder;
 import opennlp.tools.parser.Parse;
@@ -39,7 +39,7 @@ import opennlp.tools.util.Span;
 /**
  * This class perform coreference for treebank style parses.  
  * It will only perform coreference over constituents defined in the trees and
- * will not generate new constituents for pre-nominal entities or sub entities in 
+ * will not generate new constituents for pre-nominal entities or sub-entities in 
  * simple coordinated noun phrases.  This linker requires that named-entity information also be provided.  
  * This information can be added to the parse using the -parse option with EnglishNameFinder.
  */
@@ -58,7 +58,7 @@ public class EnglishTreebankLinker extends DefaultLinker {
   }
   
   protected void initMentionFinder() {
-    mentionFinder = PTBMentionFinder.getInstance(headFinder);
+    mentionFinder = new PTBMentionFinder(headFinder);
   }
   
   private static void showEntities(DiscourseEntity[] entities) {
@@ -67,6 +67,11 @@ public class EnglishTreebankLinker extends DefaultLinker {
     }
   }
   
+  /**
+   * Identitifies corefernce relationships for parsed input passed via standard in.
+   * @param args The model directory.
+   * @throws IOException when the model directory can not be read.
+   */
   public static void main(String[] args) throws IOException {
     if (args.length == 0) {
       System.err.println("Usage: EnglishTreebankLinker model_directory < parses");
@@ -87,7 +92,7 @@ public class EnglishTreebankLinker extends DefaultLinker {
     List parses = new ArrayList();
     for (String line=in.readLine();null != line;line = in.readLine()) {
       if (line.equals("")) {
-        DiscourseEntity[] entities = treebankLinker.getEntities((Extent[]) document.toArray(new Extent[document.size()]));
+        DiscourseEntity[] entities = treebankLinker.getEntities((Mention[]) document.toArray(new Mention[document.size()]));
         //showEntities(entities);
         new CorefParse(parses,entities).show();
         sentenceNumber=0;
@@ -97,7 +102,7 @@ public class EnglishTreebankLinker extends DefaultLinker {
       else {
         Parse p = Parse.parseParse(line);
         parses.add(p);
-        Extent[] extents = treebankLinker.getMentions(new DefaultParse(p,sentenceNumber));
+        Mention[] extents = treebankLinker.getMentions(new DefaultParse(p,sentenceNumber));
         //construct new parses for mentions which don't have constituents.
         for (int ei=0,en=extents.length;ei<en;ei++) {
           //System.err.println("PennTreebankLiner.main: "+ei+" "+extents[ei]);
@@ -114,7 +119,7 @@ public class EnglishTreebankLinker extends DefaultLinker {
       }
     }
     if (document.size() > 0) {
-      DiscourseEntity[] entities = treebankLinker.getEntities((Extent[]) document.toArray(new Extent[document.size()]));
+      DiscourseEntity[] entities = treebankLinker.getEntities((Mention[]) document.toArray(new Mention[document.size()]));
       //showEntities(entities);
       (new CorefParse(parses,entities)).show();
     }
@@ -130,8 +135,8 @@ class CorefParse {
     this.parses = parses;
     parseMap = new HashMap();
     for (int ei=0,en=entities.length;ei<en;ei++) {
-      if (entities[ei].getNumExtents() > 1) {
-        for (Iterator mi=entities[ei].getExtents();mi.hasNext();) {
+      if (entities[ei].getNumMentions() > 1) {
+        for (Iterator mi=entities[ei].getMentions();mi.hasNext();) {
           MentionContext mc = (MentionContext) mi.next();
           Parse mentionParse = ((DefaultParse) mc.getParse()).getParse();
           parseMap.put(mentionParse,new Integer(ei+1));

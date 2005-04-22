@@ -17,6 +17,9 @@
 //////////////////////////////////////////////////////////////////////////////
 package opennlp.tools.coref.mention;
 
+/**
+ * Interface for finding head words in noun phrases and head noun-phrases in parses. 
+ */
 public interface HeadFinder {
 
   /** Returns the child parse which contains the lexical head of the specifie parse.

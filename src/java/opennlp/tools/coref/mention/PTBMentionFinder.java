@@ -17,24 +17,25 @@
 //////////////////////////////////////////////////////////////////////////////
 package opennlp.tools.coref.mention;
 
+/**
+ * Finds mentions from Penn Treebank style parses. 
+ */
 public class PTBMentionFinder extends AbstractMentionFinder {
 
   static MentionFinder ef = null;
 
-  private PTBMentionFinder(HeadFinder hf) { 
+  /**
+   * Creates a new mention finder with the specified head finder.
+   * @param hf The head finder.
+   */
+  public PTBMentionFinder(HeadFinder hf) { 
     collectPrenominalNamedEntities = false;
+    collectCoordinatedNounPhrases = true;
     headFinder = hf;
   }
-
-  public static MentionFinder getInstance(HeadFinder hf) {
-    if (ef == null) {
-      ef = new PTBMentionFinder(hf);
-    }
-    return (ef);
-  }
-
+  
+  
   /*
-
   private boolean isTraceNp(Parse np){
     List sc = np.getSyntacticChildren();
     return (sc.size() == 0);

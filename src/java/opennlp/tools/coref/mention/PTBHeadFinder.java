@@ -22,6 +22,9 @@ import java.util.List;
 import java.util.Set;
 
 
+/**
+ * Finds head information from Penn Treebank style parses. 
+ */
 public final class PTBHeadFinder implements HeadFinder {
 
   private static PTBHeadFinder instance;
@@ -38,6 +41,10 @@ public final class PTBHeadFinder implements HeadFinder {
 
   private PTBHeadFinder() {}
 
+  /**
+   * Returns an instance of this head finder.
+   * @return an instance of this head finder.
+   */
   public static HeadFinder getInstance() {
     if (instance == null) {
       instance = new PTBHeadFinder();
@@ -111,7 +118,7 @@ public final class PTBHeadFinder implements HeadFinder {
           countTokens = true;
         }
         else {
-          System.err.println("PTBHeadFinder.getHeadIndex(): NP -> S production assuming right-most head");
+          //System.err.println("PTBHeadFinder.getHeadIndex(): NP -> S production assuming right-most head");
         }
       }
       if (countTokens) {

@@ -35,39 +35,69 @@ public abstract class DiscourseElement {
   private int id=-1;
   private MentionContext lastExtent;
   
-  public DiscourseElement(MentionContext e) {
+  /**
+   * Creates a new discourse element which contains the specified mention.
+   * @param mention The mention which begins this discourse element.
+   */
+  public DiscourseElement(MentionContext mention) {
     extents=new ArrayList(1);
-    lastExtent = e;
-    extents.add(e);
+    lastExtent = mention;
+    extents.add(mention);
   }
 
-  public Iterator getReverseExtents() {
+  /**
+   * Returns an iterator over the mentions which iteratates through them based on which were most recently mentioned.  
+   * @return an iterator over the mentions which iteratates through them based on which were most recently mentioned.
+   */
+  public Iterator getRecentMentions() {
     return(new ReverseListIterator(extents));
   }
-
-  public Iterator getExtents() {
+  
+  /**
+   * Returns an iterator over the mentions which iteratates through them based on their occurance in the document.
+   * @return an iterator over the mentions which iteratates through them based on their occurance in the document.
+   */
+  public Iterator getMentions() {
     return(extents.listIterator());
   }
 
-  public int getNumExtents() {
+  /** Returns the number of mentions in this element. */
+  public int getNumMentions() {
     return(extents.size());
   }
 
-  public void addExtent(MentionContext e) {
-    extents.add(e);
-    if (e.getType() == null || !e.getType().equals("isa")) {
-      lastExtent=e;
+  /**
+   * Adds the specified mention to this discourse element.
+   * @param mention The mention to be added.
+   */
+  public void addMention(MentionContext mention) {
+    extents.add(mention);
+    if (mention.getType() == null || !mention.getType().equals(Linker.ISA)) {
+      lastExtent=mention;
     }
   }
 
+  /**
+   * Returns the last mention for this element.  For appositives this will be the
+   * first part of the appositive.
+   * @return the last mention for this element.
+   */
   public MentionContext getLastExtent() {
     return(lastExtent);
   }
 
-  public void setId(int i) {
-    id=i;
+  /**
+   * Associates an id with this element.
+   * @param id The id.
+   */
+  public void setId(int id) {
+    this.id=id;
   }
 
+  /**
+   * Returns the id associated with this element.
+   * @return the id associated with this element.
+   */
   public int getId() {
     return(id);
   }
@@ -84,7 +114,6 @@ public abstract class DiscourseElement {
     de.append(" ]");
     return(de.toString());
   }
-
 
 }
 

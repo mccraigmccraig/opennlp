@@ -35,16 +35,39 @@ import opennlp.tools.coref.sim.SimilarityModel;
  */
 public class DefaultLinker extends AbstractLinker {
   
-  public DefaultLinker(String project, LinkerMode mode) throws IOException {
-    this(project,mode,true,-1);
+  /**
+   * Creates a new linker with the specified model directory, running in the specified mode.
+   * @param modelDirectory The directory where the models for this linker are kept.
+   * @param mode The mode that this linker is running in.
+   * @throws IOException when the models can not be read or written to based on the mode.
+   */
+  public DefaultLinker(String modelDirectory, LinkerMode mode) throws IOException {
+    this(modelDirectory,mode,true,-1);
   }
   
-  public DefaultLinker(String project, LinkerMode mode, boolean useDiscourseModel) throws IOException {
-    this(project,mode,useDiscourseModel,-1);
+  /**
+   * Creates a new linker with the specified model directory, running in the specified mode which uses a discourse model
+   * based on the specified parameter.
+   * @param modelDirectory The directory where the models for this linker are kept.
+   * @param mode The mode that this linker is running in.
+   * @param useDiscourseModel Whether the model should use a discourse model or not.
+   * @throws IOException when the models can not be read or written to based on the mode.
+   */
+  public DefaultLinker(String modelDirectory, LinkerMode mode, boolean useDiscourseModel) throws IOException {
+    this(modelDirectory,mode,useDiscourseModel,-1);
   }
   
-  public DefaultLinker(String project, LinkerMode mode, boolean useDiscourseModel, double fixedNonReferentialProbability) throws IOException {
-    super(project, mode, useDiscourseModel);
+  /**
+   * Creates a new linker with the specified model directory, running in the specified mode which uses a discourse model
+   * based on the specified parameter and uses the specified fixed non-referential probability.
+   * @param modelDirectory The directory where the models for this linker are kept.
+   * @param mode The mode that this linker is running in.
+   * @param useDiscourseModel Whether the model should use a discourse model or not.
+   * @param fixedNonReferentialProbability The probability which resolvers are required to exceed to positi a coreference relationship.
+   * @throws IOException when the models can not be read or written to based on the mode.
+   */
+  public DefaultLinker(String modelDirectory, LinkerMode mode, boolean useDiscourseModel, double fixedNonReferentialProbability) throws IOException {
+    super(modelDirectory, mode, useDiscourseModel);
     initHeadFinder();
     initMentionFinder();
     initResolvers(mode, fixedNonReferentialProbability);
@@ -112,10 +135,16 @@ public class DefaultLinker extends AbstractLinker {
     }
   }
 
+  /**
+   * Initializes the head finder for this linker.
+   */
   protected void initHeadFinder() {
     headFinder = PTBHeadFinder.getInstance();
   }
-  
+  /**
+   * Initializes the mention finder for this linker.  
+   * This can be over-ridden to change the space of mentions used for coreference. 
+   */
   protected void initMentionFinder() {
     mentionFinder = ShallowParseMentionFinder.getInstance(headFinder);
   }

@@ -7,6 +7,9 @@ import com.sun.rsasign.c;
 
 import opennlp.tools.util.Span;
 
+/**
+ * Provides default implemenation of many of the methods in the {@link Parse} interface.  
+ */
 public abstract class AbstractParse implements Parse {
 
   public boolean isCoordinatedNounPhrase() {

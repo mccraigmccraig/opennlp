@@ -48,6 +48,6 @@ public interface MentionFinder {
    * @param parse A top level parse from which mentions are gathered.
    * @return an array of mentions which implement the <code>Extent</code> interface.
    */
-  public Extent[] getMentions(Parse parse);
+  public Mention[] getMentions(Parse parse);
 
 }

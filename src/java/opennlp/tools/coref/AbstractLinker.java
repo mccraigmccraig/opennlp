@@ -21,7 +21,7 @@ import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
 
-import opennlp.tools.coref.mention.Extent;
+import opennlp.tools.coref.mention.Mention;
 import opennlp.tools.coref.mention.HeadFinder;
 import opennlp.tools.coref.mention.MentionContext;
 import opennlp.tools.coref.mention.MentionFinder;
@@ -161,7 +161,7 @@ public abstract class AbstractLinker implements Linker {
           entity.setNumber(mention.getNumber());
           entity.setNumberProbability(mention.getNumberProb());
         }
-        entity.addExtent(mention);
+        entity.addMention(mention);
         dm.mentionEntity(entity);
       }
       else {
@@ -203,7 +203,7 @@ public abstract class AbstractLinker implements Linker {
     return (de1);
   }
 
-  public DiscourseEntity[] getEntities(Extent[] mentions) {
+  public DiscourseEntity[] getEntities(Mention[] mentions) {
     MentionContext[] extentContexts = this.constructMentionContexts(mentions);
     DiscourseModel dm = new DiscourseModel();
     for (int ei = 0; ei < extentContexts.length; ei++) {
@@ -213,7 +213,7 @@ public abstract class AbstractLinker implements Linker {
     return (dm.getEntities());
   }
 
-  public void setEntities(Extent[] mentions) {
+  public void setEntities(Mention[] mentions) {
     getEntities(mentions);
   }
 
@@ -223,11 +223,11 @@ public abstract class AbstractLinker implements Linker {
     }
   }
   
-  public Extent[] getMentions(Parse sentence) {
+  public Mention[] getMentions(Parse sentence) {
     return (mentionFinder.getMentions(sentence));
   }
   
-  public MentionContext[] constructMentionContexts(Extent[] mentions) {
+  public MentionContext[] constructMentionContexts(Mention[] mentions) {
     int mentionInSentenceIndex=-1;
     int numMentionsInSentence=-1;
     MentionContext[] contexts = new MentionContext[mentions.length];
