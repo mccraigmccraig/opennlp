@@ -20,10 +20,13 @@ package opennlp.tools.util;
 import java.util.Iterator;
 import java.util.List;
 
+/**
+ * An iterator for a list which returns values in the opposite order as the typical list iterator.
+ */
 public class ReverseListIterator implements Iterator {
   
-  int index;
-  List list;
+  private int index;
+  private List list;
 
   public ReverseListIterator(List list) {
     index = list.size()-1;

@@ -26,6 +26,9 @@ import java.io.FileOutputStream;
 import java.io.FileWriter;
 import java.io.IOException;
 
+/**
+ * Set which counts the number of times a values are added to it.  
+ */
 public class CountedSet extends HashMap {
 
   public CountedSet() {

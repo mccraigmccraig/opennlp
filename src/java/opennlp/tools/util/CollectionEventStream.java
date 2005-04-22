@@ -24,6 +24,9 @@ import java.util.Iterator;
 import opennlp.maxent.Event;
 import opennlp.maxent.EventStream;
 
+/**
+ * Creates an event stream out of a collection of events. 
+ */
 public class CollectionEventStream implements EventStream {
   
   Iterator ci;

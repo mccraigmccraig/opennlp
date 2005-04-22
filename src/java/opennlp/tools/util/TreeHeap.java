@@ -4,7 +4,9 @@ import java.util.SortedSet;
 import java.util.TreeSet;
 
 /** 
- * An implmention of the heap interface based on java.util.SortedSet.
+ * An implmention of the Heap interface based on {@link java.util.SortedSet}.
+ * This implementation will not allow multiple objects which are equal to be added to the heap.
+ * Only use this implementation when object in the heap can be totally ordered (no duplicates). 
  */
 public class TreeHeap implements Heap {
 
@@ -50,5 +52,20 @@ public class TreeHeap implements Heap {
   public void setSize() {}
 
   public void setSize(int size) {}
+  
+  public boolean isEmpty(){
+    return this.tree.isEmpty();
+  }
+  
+  public static void main(String[] args) {
+    Heap heap = new TreeHeap(5);
+    for (int ai=0;ai<args.length;ai++){
+      heap.add(new Integer(Integer.parseInt(args[ai])));
+    }
+    while (!heap.isEmpty()) {
+      System.out.print(heap.extract()+" ");
+    }
+    System.out.println();
+   }
 
 }

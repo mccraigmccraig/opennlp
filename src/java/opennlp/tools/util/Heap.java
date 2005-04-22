@@ -17,17 +17,22 @@
 //////////////////////////////////////////////////////////////////////////////
 package opennlp.tools.util;
 
-/** Inteface for interacting with a Heap data structure. */
+/** Inteface for interacting with a Heap data structure.  
+ * This implementation extract objects from smallest to largest based on either
+ * their natural ordering or the comparator provided to an implementation.
+ * While this is a typical of a heap it allows this objects natural ordering to
+ * match that of other sorted collections.
+ * */
 public interface Heap  {
 
   /** 
-   * Removes the top element from the heap and returns it.
-   * @return The top element from the heap.
+   * Removes the smallest element from the heap and returns it.
+   * @return The smallest element from the heap.
    */  
   public Object extract();
   
   /**
-   * Returns the top element of the heap.
+   * Returns the smallest element of the heap.
    * @return The top element of the heap.
    */
   public Object top();
@@ -43,6 +48,13 @@ public interface Heap  {
    * @return The size of the heap.
    */
   public int size();
+  
+ /**
+  * Returns whether the heap is empty.
+  * @return true if the heap is empty; false otherwise.
+  */
+  public boolean isEmpty();
+
   
   /**
    * Clears the contents of the heap.

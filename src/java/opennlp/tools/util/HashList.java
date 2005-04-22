@@ -23,6 +23,9 @@ import java.util.List;
 import java.util.ArrayList;
 import java.util.HashMap;
 
+/** 
+ * Class which creates mapping between keys and a list of values.  
+ */
 public class HashList extends HashMap {
 
   public HashList() {
