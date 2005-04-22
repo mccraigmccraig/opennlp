@@ -88,6 +88,7 @@ specific ones.  Models for the corresponding components can be found in
 the following directories:
 
 chunker		- English-Penn-Treebank-style phrase chunker models.
+coreference - MUC-style coreference.
 namefind	- MUC-style named entity finder models.
 parser		- English-Penn-Treebank-style parser models.
 postag		- English-Penn-Treebank-style part-of-speech tagger.
@@ -110,6 +111,7 @@ pos-tagger:         opennlp.tools.postag.EnglishPOSTaggerME
 chunker:            opennlp.tools.chunker.EnglishTreebankChunker
 name finder:        opennlp.tools.namefinder.EnglishNameFinder
 parser:             opennlp.tools.parser.EnglishTreebankParser
+coreference:        opennlp.tools.coref.EnglishTreebankLinker
 
 Examples: This is not a recomendation that you run the tools this way.  It's
 in fact very inefficient.  However, this should give you an idea of what the
@@ -118,28 +120,43 @@ look at the main's of these classes to see how to set up a particular
 component for use.
 
 Phrase Chunking:
-java opennlp.tools.sentdetect.EnglishSentenceDetectorME 
-  opennlp.models/sentdetect/EnglishSD.bin.gz < text | 
-java opennlp.tools.tokenize.EnglishTokenizerME 
-  opennlp.models/tokenize/EnglishTok.bin.gz | 
-java opennlp.tools.postag.EnglishPOSTaggerME 
-  opennlp.models/postag/EnglishPOS.bin.gz | 
-java opennlp.tools.chunker.EnglishTreebankChunker 
+java opennlp.tools.sentdetect.EnglishSentenceDetectorME \
+  opennlp.models/sentdetect/EnglishSD.bin.gz < text |
+java opennlp.tools.tokenize.EnglishTokenizerME \
+  opennlp.models/tokenize/EnglishTok.bin.gz |
+java opennlp.tools.postag.EnglishPOSTaggerME -td \
+  opennlp.models/parser/tagdict opennlp.models/postag/EnglishPOS.bin.gz |
+java opennlp.tools.chunker.EnglishTreebankChunker \
   opennlp.models/chunker/EnglishChunk.bin.gz
 
 Parsing:
-java opennlp.tools.sentdetect.EnglishSentenceDetectorME 
+java opennlp.tools.sentdetect.EnglishSentenceDetectorME \
   opennlp.models/sentdetect/EnglishSD.bin.gz < text | 
-java opennlp.tools.tokenize.EnglishTokenizerME 
+java opennlp.tools.tokenize.EnglishTokenizerME \
    opennlp.models/tokenize/EnglishTok.bin.gz | 
-java -Xmx450m opennlp.tools.parser.EnglishTreebankParser
+java -Xmx450m opennlp.tools.parser.EnglishTreebankParser -d \
   opennlp.models/parser
     
 Name Finding:
-java opennlp.tools.sentdetect.EnglishSentenceDetectorME 
+java opennlp.tools.sentdetect.EnglishSentenceDetectorME \
   opennlp.models/sentdetect/EnglishSD.bin.gz < text |
-java -Xmx600m opennlp.tools.namefind.EnglishNameFinder 
+java -Xmx600m opennlp.tools.namefind.EnglishNameFinder  \
   opennlp.models/namefind/*.bin.gz
+  
+Coreference:
+java opennlp.tools.sentdetect.EnglishSentenceDetectorME \
+  opennlp.models/sentdetect/EnglishSD.bin.gz < text | 
+java opennlp.tools.tokenize.EnglishTokenizerME \
+   opennlp.models/tokenize/EnglishTok.bin.gz | 
+java -Xmx450m opennlp.tools.parser.EnglishTreebankParser -d \
+  opennlp.models/parser |
+java -Xmx600m opennlp.tools.namefind.EnglishNameFinder -parse \
+  opennlp.models/namefind/*.bin.gz |
+java -Xmx200m -DWNSEARHCDIR=$WNSEARCHDIR \
+  opennlp.tools.coref.EnglishTreebankLinker opennlp.models/coref
+
+In the example above $WNSEARCHDIR is the location of the "dict" directory for 
+your WordNet 2.0 installation.  
 
 Training the Tools
 ==================
@@ -148,11 +165,16 @@ Look at the usage messages for these classes you are interested in
 training new models.
 
 sentence detector:  opennlp.tools.sentdetect.SentenceDetectorME
-tokenizer:          opennlp.tools.tokenize.TokenizerME
 pos-tagger:         opennlp.tools.postag.POSTaggerME
 chunker:            opennlp.tools.chunker.ChunkerME
 name finder:        opennlp.tools.namefind.NameFinderME
 parser:             opennlp.tools.parser.ParserME
+
+The following modules currently only support training via the WordFreak
+opennlp.plugin v1.2 (http://wordfreak.sourceforge.net/plugins.html).
+
+tokenizer:          org.annotation.opennlp.OpenNlpTokenAnnotator
+coreference:        org.annotation.opennlp.OpenNlpCoreferenceAnnotator
 
 Bug Reports
 ===========

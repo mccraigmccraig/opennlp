@@ -35,6 +35,9 @@ import java.util.regex.Pattern;
 import opennlp.tools.coref.DiscourseEntity;
 import opennlp.tools.coref.mention.MentionContext;
 
+/**
+ * Resolves coreference between proper nouns.
+ */
 public class ProperNounResolver extends MaxentResolver {
 
   private static final Pattern initialCaps = Pattern.compile("^[A-Z]");
@@ -99,7 +102,7 @@ public class ProperNounResolver extends MaxentResolver {
   }
 
   private MentionContext getProperNounExtent(DiscourseEntity de) {
-    for (Iterator ei = de.getExtents(); ei.hasNext();) { //use first extent which is propername
+    for (Iterator ei = de.getMentions(); ei.hasNext();) { //use first extent which is propername
       MentionContext xec = (MentionContext) ei.next();
       String xecHeadTag = xec.getHeadTokenTag();
       if (xecHeadTag.startsWith("NNP") || initialCaps.matcher(xec.getHeadTokenText()).find()) {
@@ -147,7 +150,7 @@ public class ProperNounResolver extends MaxentResolver {
     if (super.excluded(mention, entity)) {
       return (true);
     }
-    for (Iterator ei = entity.getExtents(); ei.hasNext();) {
+    for (Iterator ei = entity.getMentions(); ei.hasNext();) {
       MentionContext xec = (MentionContext) ei.next();
       if (xec.getHeadTokenTag().startsWith("NNP")) { // || initialCaps.matcher(xec.headToken.toString()).find()) {
         //System.err.println("MaxentProperNounResolver.exclude: kept "+xec.toText()+" with "+xec.headTag);

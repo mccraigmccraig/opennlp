@@ -25,6 +25,9 @@ import java.util.regex.Pattern;
 import opennlp.tools.coref.DiscourseEntity;
 import opennlp.tools.coref.mention.MentionContext;
 
+/**
+ *  Resolves coreference between appositives. 
+ */
 public class IsAResolver extends MaxentResolver {
 
   Pattern predicativePattern;

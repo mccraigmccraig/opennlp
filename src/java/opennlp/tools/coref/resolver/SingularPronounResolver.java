@@ -32,15 +32,13 @@ import opennlp.tools.coref.mention.MentionContext;
  */
 public class SingularPronounResolver extends MaxentResolver {
 
-  double[] candProbs;
-
-  int NUM_SENTS_BACK_PRONOUNS = 2;
   int mode;
 
   Pattern PronounPattern;
 
   public SingularPronounResolver(String projectName, ResolverMode m) throws IOException {
     super(projectName, "pmodel", m, 30);
+    this.numSentencesBack = 2;
   }
   
   public SingularPronounResolver(String projectName, ResolverMode m, NonReferentialResolver nonReferentialResolver) throws IOException {
@@ -51,10 +49,6 @@ public class SingularPronounResolver extends MaxentResolver {
     //System.err.println("MaxentSingularPronounResolver.canResolve: ec= ("+mention.id+") "+ mention.toText());
     String tag = mention.getHeadTokenTag();
     return (tag != null && tag.startsWith("PRP") && Linker.singularThirdPersonPronounPattern.matcher(mention.getHeadTokenText()).matches());
-  }
-
-  public void setNumberSentencesBack(int nsb) {
-    NUM_SENTS_BACK_PRONOUNS = nsb;
   }
 
   protected List getFeatures(MentionContext mention, DiscourseEntity entity) {
@@ -111,7 +105,7 @@ public class SingularPronounResolver extends MaxentResolver {
     }
     String mentionGender = null;
 
-    for (Iterator ei = entity.getExtents(); ei.hasNext();) {
+    for (Iterator ei = entity.getMentions(); ei.hasNext();) {
       MentionContext entityMention = (MentionContext) ei.next();
       String tag = entityMention.getHeadTokenTag();
       if (tag != null && tag.startsWith("PRP") && Linker.singularThirdPersonPronounPattern.matcher(mention.getHeadTokenText()).matches()) {
@@ -130,7 +124,7 @@ public class SingularPronounResolver extends MaxentResolver {
   protected boolean outOfRange(MentionContext mention, DiscourseEntity entity) {
     MentionContext cec = entity.getLastExtent();
     //System.err.println("MaxentSingularPronounresolve.outOfRange: ["+ec.toText()+" ("+ec.id+")] ["+cec.toText()+" ("+cec.id+")] ec.sentenceNumber=("+ec.sentenceNumber+")-cec.sentenceNumber=("+cec.sentenceNumber+") > "+NUM_SENTS_BACK_PRONOUNS);    
-    return (mention.getSentenceNumber() - cec.getSentenceNumber() > NUM_SENTS_BACK_PRONOUNS);
+    return (mention.getSentenceNumber() - cec.getSentenceNumber() > numSentencesBack);
   }
 
   /*

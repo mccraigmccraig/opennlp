@@ -21,6 +21,9 @@ import java.io.IOException;
 
 import opennlp.tools.coref.mention.MentionContext;
 
+/**
+ * Implementation of non-referential classifier which uses a fixed-value threshold. 
+ */
 public class FixedNonReferentialResolver implements NonReferentialResolver {
 
   private double nonReferentialProbability;

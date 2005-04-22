@@ -17,11 +17,10 @@
 //////////////////////////////////////////////////////////////////////////////
 package opennlp.tools.coref.resolver;
 
-import java.io.BufferedReader;
+import java.io.DataInputStream;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -34,7 +33,7 @@ import java.util.regex.Pattern;
 import opennlp.maxent.Event;
 import opennlp.maxent.GIS;
 import opennlp.maxent.MaxentModel;
-import opennlp.maxent.io.PlainTextGISModelReader;
+import opennlp.maxent.io.BinaryGISModelReader;
 import opennlp.maxent.io.SuffixSensitiveGISModelReader;
 import opennlp.maxent.io.SuffixSensitiveGISModelWriter;
 import opennlp.tools.coref.DiscourseEntity;
@@ -55,9 +54,11 @@ import opennlp.tools.util.CollectionEventStream;
  */
 public abstract class MaxentResolver extends AbstractResolver {
 
+  /** Outcomes when two mentions are coreferent. */
   public static final String SAME = "same";
+  /** Outcome when two mentions are not corefernt. */
   public static final String DIFF = "diff";
-
+  /** Default feature value. */
   public static final String DEFAULT = "default";
 
   private static final Pattern endsWithPeriod = Pattern.compile("\\.$");
@@ -129,7 +130,8 @@ public abstract class MaxentResolver extends AbstractResolver {
    * Creates a maximum-entropy-based resolver with the specified model name, using the 
    * specified mode, which will look the specified number of entities back for a referent and
    * prefer the first referent if specified.
-   * @param project The name of the file where this model will be read or written.
+   * @param modelDirectory The name of the directory where the resover models are stored.
+   * @param name The name of the file where this model will be read or written.
    * @param mode The mode this resolver is being using in (training, testing).
    * @param numberOfEntitiesBack The number of entities back in the text that this resolver will look
    * for a referent.
@@ -138,15 +140,15 @@ public abstract class MaxentResolver extends AbstractResolver {
    * @param nonReferentialResolver Determines how likly it is that this entity is non-referential.
    * @throws IOException If the model file is not found or can not be written to.
    */
-  public MaxentResolver(String project, String name, ResolverMode mode, int numberOfEntitiesBack, boolean preferFirstReferent, NonReferentialResolver nonReferentialResolver) throws IOException {
+  public MaxentResolver(String modelDirectory, String name, ResolverMode mode, int numberOfEntitiesBack, boolean preferFirstReferent, NonReferentialResolver nonReferentialResolver) throws IOException {
     super(numberOfEntitiesBack);
     this.preferFirstReferent = preferFirstReferent;
     this.nonReferentialResolver = nonReferentialResolver;
     this.mode = mode;
-    this.modelName = project+"/"+name;
+    this.modelName = modelDirectory+"/"+name;
     if (ResolverMode.TEST == this.mode) {
       if (loadAsResource) {
-        model = (new PlainTextGISModelReader(new BufferedReader(new InputStreamReader(this.getClass().getResourceAsStream(modelName+modelExtension))))).getModel();
+        model = (new BinaryGISModelReader(new DataInputStream(this.getClass().getResourceAsStream(modelName+modelExtension)))).getModel();
       }
       else {
         model = (new SuffixSensitiveGISModelReader(new File(modelName+modelExtension))).getModel();
@@ -166,34 +168,43 @@ public abstract class MaxentResolver extends AbstractResolver {
   /**
    * Creates a maximum-entropy-based resolver with the specified model name, using the 
    * specified mode, which will look the specified number of entities back for a referent.
+   * @param modelDirectory The name of the directory where the resover models are stored.
    * @param modelName The name of the file where this model will be read or written.
    * @param mode The mode this resolver is being using in (training, testing).
    * @param numberEntitiesBack The number of entities back in the text that this resolver will look
    * for a referent.
    * @throws IOException If the model file is not found or can not be written to.
    */
-  public MaxentResolver(String projectName, String modelName, ResolverMode mode, int numberEntitiesBack) throws IOException {
-    this(projectName, modelName, mode, numberEntitiesBack, false);
+  public MaxentResolver(String modelDirectory, String modelName, ResolverMode mode, int numberEntitiesBack) throws IOException {
+    this(modelDirectory, modelName, mode, numberEntitiesBack, false);
   }
   
-  public MaxentResolver(String projectName, String modelName, ResolverMode mode, int numberEntitiesBack, NonReferentialResolver nonReferentialResolver) throws IOException {
-    this(projectName, modelName, mode, numberEntitiesBack, false,nonReferentialResolver);
+  public MaxentResolver(String modelDirectory, String modelName, ResolverMode mode, int numberEntitiesBack, NonReferentialResolver nonReferentialResolver) throws IOException {
+    this(modelDirectory, modelName, mode, numberEntitiesBack, false,nonReferentialResolver);
   }
   
-  public MaxentResolver(String projectName, String modelName, ResolverMode mode, int numberEntitiesBack, boolean preferFirstReferent) throws IOException {
+  public MaxentResolver(String modelDirectory, String modelName, ResolverMode mode, int numberEntitiesBack, boolean preferFirstReferent) throws IOException {
     //this(projectName, modelName, mode, numberEntitiesBack, preferFirstReferent, SingletonNonReferentialResolver.getInstance(projectName,mode));
-    this(projectName, modelName, mode, numberEntitiesBack, preferFirstReferent, new DefaultNonReferentialResolver(projectName, modelName, mode));
+    this(modelDirectory, modelName, mode, numberEntitiesBack, preferFirstReferent, new DefaultNonReferentialResolver(modelDirectory, modelName, mode));
   }
   
-  public MaxentResolver(String projectName, String modelName, ResolverMode mode, int numberEntitiesBack, boolean preferFirstReferent, double nonReferentialProbability) throws IOException {
+  public MaxentResolver(String modelDirectory, String modelName, ResolverMode mode, int numberEntitiesBack, boolean preferFirstReferent, double nonReferentialProbability) throws IOException {
     //this(projectName, modelName, mode, numberEntitiesBack, preferFirstReferent, SingletonNonReferentialResolver.getInstance(projectName,mode));
-    this(projectName, modelName, mode, numberEntitiesBack, preferFirstReferent, new FixedNonReferentialResolver(nonReferentialProbability));
+    this(modelDirectory, modelName, mode, numberEntitiesBack, preferFirstReferent, new FixedNonReferentialResolver(nonReferentialProbability));
   }
   
-  public static void loadAsResource(boolean las) {
-    loadAsResource = las;
+  /**
+   * Specifies whether the models should be loaded from a resource.
+   * @param lar boolean which if true indicates that the model should be loaded as a resource. 
+   */
+  public static void loadAsResource(boolean lar) {
+    loadAsResource = lar;
   }
   
+  /**
+   * Returns whether the models should be loaded from a file or from a resource.
+   * @return  whether the models should be loaded from a file or from a resource.
+   */
   public static boolean loadAsResource() {
     return loadAsResource;
   }
@@ -364,11 +375,11 @@ public abstract class MaxentResolver extends AbstractResolver {
   }
 
   protected String getMentionCountFeature(DiscourseEntity de) {
-    if (de.getNumExtents() >= 5) {
+    if (de.getNumMentions() >= 5) {
       return ("mc=5+");
     }
     else {
-      return ("mc=" + de.getNumExtents());
+      return ("mc=" + de.getNumMentions());
     }
   }
 
@@ -434,7 +445,8 @@ public abstract class MaxentResolver extends AbstractResolver {
     return rv;
   }
 
-  public Object[] computeNumber(Context c) {
+  
+  private Object[] computeNumber(Context c) {
     double[] dist = numModel.numberDist(c);
     Object[] rv = new Object[2];
     //System.err.println("computeNumber: "+c+" sing="+dist[numModel.getSingularIndex()]+" plural="+dist[numModel.getPluralIndex()]);
@@ -453,10 +465,10 @@ public abstract class MaxentResolver extends AbstractResolver {
     return rv;
   }
 
-  protected String getSemanticCompatibilityFeature(MentionContext ec, DiscourseEntity de) {
+  private String getSemanticCompatibilityFeature(MentionContext ec, DiscourseEntity de) {
     if (simModel != null) {
       double best = 0;
-      for (Iterator xi = de.getExtents(); xi.hasNext();) {
+      for (Iterator xi = de.getMentions(); xi.hasNext();) {
         MentionContext ec2 = (MentionContext) xi.next();
         double sim = simModel.compatible(ec, ec2);
         if (debugOn) {
@@ -482,7 +494,7 @@ public abstract class MaxentResolver extends AbstractResolver {
     }
   }
 
-  protected String getGenderCompatibilityFeature(MentionContext ec, DiscourseEntity de) {
+  private String getGenderCompatibilityFeature(MentionContext ec, DiscourseEntity de) {
     GenderEnum eg = de.getGender();
     if (eg == GenderEnum.UNKNOWN || ec.getGender() == GenderEnum.UNKNOWN) {
       return GEN_UNKNOWN;
@@ -495,7 +507,7 @@ public abstract class MaxentResolver extends AbstractResolver {
     }
   }
 
-  protected String getNumberCompatibilityFeature(MentionContext ec, DiscourseEntity de) {
+  private String getNumberCompatibilityFeature(MentionContext ec, DiscourseEntity de) {
     NumberEnum en = de.getNumber();
     if (en == NumberEnum.UNKNOWN || ec.getNumber() == NumberEnum.UNKNOWN) {
       return NUM_UNKNOWN;
@@ -508,13 +520,19 @@ public abstract class MaxentResolver extends AbstractResolver {
     }
   }
 
-  protected List getCompatibilityFeatures(MentionContext ec, DiscourseEntity de) {
+  /**
+   * Returns features indicating whether the specified mention and the specified entity are compatible.
+   * @param mention The mention.
+   * @param entity The entity.
+   * @return list of features indicating whether the specified mention and the specified entity are compatible.
+   */
+  private List getCompatibilityFeatures(MentionContext mention, DiscourseEntity entity) {
     List compatFeatures = new ArrayList();
-    String semCompatible = getSemanticCompatibilityFeature(ec, de);
+    String semCompatible = getSemanticCompatibilityFeature(mention, entity);
     compatFeatures.add(semCompatible);
-    String genCompatible = getGenderCompatibilityFeature(ec, de);
+    String genCompatible = getGenderCompatibilityFeature(mention, entity);
     compatFeatures.add(genCompatible);
-    String numCompatible = getNumberCompatibilityFeature(ec, de);
+    String numCompatible = getNumberCompatibilityFeature(mention, entity);
     compatFeatures.add(numCompatible);
     if (semCompatible.equals(SIM_COMPATIBLE) && genCompatible.equals(GEN_COMPATIBLE) && numCompatible.equals(NUM_COMPATIBLE)) {
       compatFeatures.add("all.compatible");
@@ -524,6 +542,7 @@ public abstract class MaxentResolver extends AbstractResolver {
     }
     return compatFeatures;
   }
+  
   /**
    * Returns a list of features based on the surrounding context of the specified mention.
    * @param mention he mention whose surround context the features model. 
@@ -558,15 +577,7 @@ public abstract class MaxentResolver extends AbstractResolver {
     return (features);
   }
 
-  public static boolean isDebugOn() {
-    return debugOn;
-  }
-
-  public static void setDebug(boolean b) {
-    debugOn = b;
-  }
-
-  protected Set constructModifierSet(Parse[] tokens, int headIndex) {
+  private Set constructModifierSet(Parse[] tokens, int headIndex) {
     Set modSet = new HashSet();
     for (int ti = 0; ti < headIndex; ti++) {
       Parse tok = tokens[ti];
@@ -575,7 +586,13 @@ public abstract class MaxentResolver extends AbstractResolver {
     return (modSet);
   }
 
-  public boolean definiteArticle(String tok, String tag) {
+  /**
+   * Returns whether the specified token is a definite article.
+   * @param tok The token.
+   * @param tag The pos-tag for the specified token.
+   * @return whether the specified token is a definite article.
+   */
+  protected boolean definiteArticle(String tok, String tag) {
     tok = tok.toLowerCase();
     if (tok.equals("the") || tok.equals("these") || tok.equals("these") || tag.equals("PRP$")) {
       return (true);
@@ -621,6 +638,12 @@ public abstract class MaxentResolver extends AbstractResolver {
     */
   }
 
+  /**
+   * Returns distance features for the specified mention and entity.
+   * @param mention The mention.
+   * @param entity The entity.
+   * @return list of distance features for the specified mention and entity.
+   */
   protected List getDistanceFeatures(MentionContext mention, DiscourseEntity entity) {
     List features = new ArrayList();
     MentionContext cec = entity.getLastExtent();
@@ -674,13 +697,21 @@ public abstract class MaxentResolver extends AbstractResolver {
     return pronounMap;
   }
   
+  /**
+   * Returns features indicating whether the specified mention is compatible with the pronouns
+   * of the specified entity.
+   * @param mention The mention.
+   * @param entity The entity.
+   * @return list of features indicating whether the specified mention is compatible with the pronouns
+   * of the specified entity.
+   */
   protected List getPronounMatchFeatures(MentionContext mention, DiscourseEntity entity) {
     boolean foundCompatiblePronoun = false;
     boolean foundIncompatiblePronoun = false;
     if (mention.getHeadTokenTag().startsWith("PRP")) {
       Map pronounMap = getPronounFeatureMap(mention.getHeadTokenText());
       //System.err.println("getPronounMatchFeatures.pronounMap:"+pronounMap);
-      for (Iterator mi=entity.getExtents();mi.hasNext();) {
+      for (Iterator mi=entity.getMentions();mi.hasNext();) {
         MentionContext candidateMention = (MentionContext) mi.next();
         if (candidateMention.getHeadTokenTag().startsWith("PRP")) {
           if (mention.getHeadTokenText().equalsIgnoreCase(candidateMention.getHeadTokenText())) {
@@ -721,6 +752,12 @@ public abstract class MaxentResolver extends AbstractResolver {
     return pronounFeatures;
   }
 
+  /**
+   * Returns string-match features for the the specified mention and entity.
+   * @param mention The mention.
+   * @param entity The entity.
+   * @return list of string-match features for the the specified mention and entity.
+   */
   protected List getStringMatchFeatures(MentionContext mention, DiscourseEntity entity) {
     boolean sameHead = false;
     boolean modsMatch = false;
@@ -731,7 +768,7 @@ public abstract class MaxentResolver extends AbstractResolver {
     Set ecModSet = constructModifierSet(mtokens, mention.getHeadTokenIndex());
     String mentionHeadString = mention.getHeadTokenText().toLowerCase();
     Set featureSet = new HashSet();
-    for (Iterator ei = entity.getExtents(); ei.hasNext();) {
+    for (Iterator ei = entity.getMentions(); ei.hasNext();) {
       MentionContext entityMention = (MentionContext) ei.next();
       String exactMatchFeature = getExactMatchFeature(mention, entityMention);
       if (exactMatchFeature != null) {
@@ -802,7 +839,8 @@ public abstract class MaxentResolver extends AbstractResolver {
     return features;
   }
 
-  protected String extentString(MentionContext ec) {
+  
+  private String mentionString(MentionContext ec) {
     StringBuffer sb = new StringBuffer();
     Parse[] mtokens = ec.getTokens();
     sb.append(mtokens[0].toString());
@@ -813,7 +851,7 @@ public abstract class MaxentResolver extends AbstractResolver {
     return sb.toString();
   }
 
-  protected String excludeTheExtentString(MentionContext ec) {
+  private String excludedTheMentionString(MentionContext ec) {
     StringBuffer sb = new StringBuffer();
     boolean first = true;
     Parse[] mtokens = ec.getTokens();
@@ -830,7 +868,7 @@ public abstract class MaxentResolver extends AbstractResolver {
     return sb.toString();
   }
 
-  protected String excludeHonorificExtentString(MentionContext ec) {
+  private String excludedHonorificMentionString(MentionContext ec) {
     StringBuffer sb = new StringBuffer();
     boolean first = true;
     Parse[] mtokens = ec.getTokens();
@@ -847,7 +885,7 @@ public abstract class MaxentResolver extends AbstractResolver {
     return sb.toString();
   }
 
-  protected String excludeDeterminerExtentString(MentionContext ec) {
+  private String excludedDeterminerMentionString(MentionContext ec) {
     StringBuffer sb = new StringBuffer();
     boolean first = true;
     Parse[] mtokens = ec.getTokens();
@@ -865,30 +903,35 @@ public abstract class MaxentResolver extends AbstractResolver {
     return sb.toString();
   }
 
-  protected String getExactMatchFeature(MentionContext ec, MentionContext xec) {
-    if (extentString(ec).equals(extentString(xec))) {
+  private String getExactMatchFeature(MentionContext ec, MentionContext xec) {
+    if (mentionString(ec).equals(mentionString(xec))) {
       return "exactMatch";
     }
-    else if (excludeHonorificExtentString(ec).equals(excludeHonorificExtentString(xec))) {
+    else if (excludedHonorificMentionString(ec).equals(excludedHonorificMentionString(xec))) {
       return "exactMatchNoHonor";
     }
-    else if (excludeTheExtentString(ec).equals(excludeTheExtentString(xec))) {
+    else if (excludedTheMentionString(ec).equals(excludedTheMentionString(xec))) {
       return "exactMatchNoThe";
     }
-    else if (excludeDeterminerExtentString(ec).equals(excludeDeterminerExtentString(xec))) {
+    else if (excludedDeterminerMentionString(ec).equals(excludedDeterminerMentionString(xec))) {
       return "exactMatchNoDT";
     }
     return null;
   }
 
-  public static List getWordFeatures(Parse tok) {
+  /**
+   * Returns a list of word features for the specified tokens.
+   * @param token The token for which fetures are to be computed.
+   * @return a list of word features for the specified tokens.
+   */
+  public static List getWordFeatures(Parse token) {
     List wordFeatures = new ArrayList();
-    String word = tok.toString().toLowerCase();
+    String word = token.toString().toLowerCase();
     String wf = "";
     if (endsWithPeriod.matcher(word).find()) {
       wf = ",endWithPeriod";
     }
-    String tokTag = tok.getSyntacticType();
+    String tokTag = token.getSyntacticType();
     wordFeatures.add("w=" + word + ",t=" + tokTag + wf);
     wordFeatures.add("t=" + tokTag + wf);
     return (wordFeatures);

@@ -25,6 +25,9 @@ import opennlp.tools.coref.DiscourseEntity;
 import opennlp.tools.coref.mention.MentionContext;
 
 
+/**
+ * Resolves coreference between plural nouns. 
+ */
 public class PluralNounResolver extends MaxentResolver {
 
   public PluralNounResolver(String projectName, ResolverMode m) throws IOException {

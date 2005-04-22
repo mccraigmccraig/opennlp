@@ -26,32 +26,66 @@ import opennlp.tools.coref.mention.MentionContext;
 import opennlp.tools.coref.mention.Parse;
 import opennlp.tools.util.CountedSet;
 
+/**
+ * Default implementation of some methods in the {@link Resolver} interface. 
+ */
 public abstract class AbstractResolver implements Resolver {
 
   /** The number of previous entities that resolver should consider. */ 
-  protected int NUM_ENTITIES_BACK;
+  protected int numEntitiesBack;
+  /** Debugging variable which specifies whether error output is generated if a class excludes as possibly coreferent mentions which are in-fact coreferent.*/
   protected boolean showExclusions;
+  /** Debugging variable which holds statistics about mention distances durring training.*/
   protected CountedSet distances;
+  /** The number of senteces back this resolver should look for a referent. */
+  protected int numSentencesBack;
   
 
   public AbstractResolver(int neb) {
-    NUM_ENTITIES_BACK=neb;
+    numEntitiesBack=neb;
     showExclusions = true;
     distances = new CountedSet();
   }
 
+  /**
+   * Returns the number of previous entities that resolver should consider.
+   * @return the number of previous entities that resolver should consider.
+   */
   protected int getNumEntities() {
-    return(NUM_ENTITIES_BACK);
+    return(numEntitiesBack);
+  }
+  
+  /**
+   * Specifies the number of senteces back this resolver should look for a referent.
+   * @param nsb the number of senteces back this resolver should look for a referent.
+   */
+  public void setNumberSentencesBack(int nsb) {
+    numSentencesBack = nsb;
   }
 
+  /**
+   * The number of entites that should be considered for resolution with the specified discourse model.
+   * @param dm The discourse model.
+   * @return number of entites that should be considered for resolution.
+   */
   protected int getNumEntities(DiscourseModel dm) {
-    return(Math.min(dm.getNumEntities(),NUM_ENTITIES_BACK));
+    return(Math.min(dm.getNumEntities(),numEntitiesBack));
   }
 
+  /**
+   * Returns the head parse for the specified mention.
+   * @param mention The mention.
+   * @return the head parse for the specified mention.
+   */
   protected Parse getHead(MentionContext mention) {
     return mention.getHeadToken();
   }
 
+  /**
+   * Returns the index for the head word for the specified mention.
+   * @param mention The mention.
+   * @return the index for the head word for the specified mention.
+   */
   protected int getHeadIndex(MentionContext mention) {
     Parse[] mtokens = mention.getTokens();
     for (int ti=mtokens.length-1;ti>=0;ti--) {
@@ -64,6 +98,11 @@ public abstract class AbstractResolver implements Resolver {
     return(mtokens.length-1);
   }
 
+  /**
+   * Returns the text of the head word for the specified mention.
+   * @param mention The mention.
+   * @return The text of the head word for the specified mention.
+   */
   protected String getHeadString(MentionContext mention) {
     return(mention.getHeadTokenText().toLowerCase());
   }
@@ -113,6 +152,11 @@ public abstract class AbstractResolver implements Resolver {
     return(null);
   }
   
+  /**
+   * Returns the string of "_" delimited tokens for the specified mention.
+   * @param mention The mention.
+   * @return the string of "_" delimited tokens for the specified mention.
+   */
   protected String featureString(MentionContext mention){
     StringBuffer fs = new StringBuffer();
     Parse[] mtokens =mention.getTokens(); 
@@ -124,6 +168,11 @@ public abstract class AbstractResolver implements Resolver {
   }
 
 
+  /**
+   * Returns a string for the specified mention with punctuation, honorifics, designators, and determiners removed.
+   * @param mention The mention to be striped.
+   * @return a normalized string representation of the specified mention.
+   */
   protected String stripNp(MentionContext mention) {
     int start=mention.getNonDescriptorStart(); //start after descriptors
 
@@ -182,6 +231,11 @@ public abstract class AbstractResolver implements Resolver {
 
   public void train() throws IOException {}
   
+  /**
+   * Returns a string representing the gender of the specifed pronoun.
+   * @param pronoun An English pronoun. 
+   * @return the gender of the specifed pronoun.
+   */
   public static String getPronounGender(String pronoun) {
     if (Linker.malePronounPattern.matcher(pronoun).matches()) {
       return ("m");

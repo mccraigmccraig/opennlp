@@ -1,3 +1,28 @@
+1.2.0
+
+Summary
+=======
+This release adds a coreference resolution package. There are also some
+other minor fixes.
+
+General
+=======
+Updated some javadoc that was missing.
+Fixed bug in beam seach data structure.
+
+Sentence Detection
+==================
+Fixed bug involving the last sentence in a document.
+
+Tokenizer
+=========
+Re-trained model on move varied data set.
+
+Parser
+======
+Changed numerous List return types to Parse arrays.
+
+
 1.1.0
 
 Summary

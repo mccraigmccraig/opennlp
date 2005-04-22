@@ -1,4 +1,4 @@
-<!-- $Id: build.xml,v 1.34 2004/08/29 22:43:36 tsmorton Exp $ -->
+<!-- $Id: build.xml,v 1.35 2005/04/22 04:35:08 tsmorton Exp $ -->
 <!-- This build file based on the JDOM build.xml file. -->
 
 <project name="OpenNLP" default="package" basedir=".">
@@ -10,8 +10,8 @@
     <tstamp/>
     <property name="Name" value="OpenNLP Tools"/>
     <property name="name" value="opennlp-tools"/>
-    <property name="version" value="1.1.0"/>
-    <property name="year" value="2004"/>
+    <property name="version" value="1.2.0"/>
+    <property name="year" value="2005"/>
 
     <echo message="----------- ${Name} ${version} [${year}] ------------"/>
 
@@ -165,17 +165,20 @@
   <target name="javadoc" depends="prepare-src">
     <mkdir dir="${build.javadocs}"/>
     <javadoc packagenames="${packages}"
-             sourcepath="${src.dir}"
              destdir="${build.javadocs}"
              author="true"
              version="true"
              use="true"
              splitindex="true"
              noindex="false"
-             windowtitle="opennlp.common"
-             doctitle="The ${Name} Common API v${version}"
-             bottom="Copyright &#169; ${year} Jason Baldridge and Gann Bierner. All Rights Reserved."
-    />
+             windowtitle="opennlp.tools"
+             doctitle="The ${Name} API v${version}"
+             bottom="Copyright ${year} Jason Baldridge, Gann Bierner, and Thomas Morton. All Rights Reserved."
+    >
+    <sourcepath>
+	     <pathelement path="${src.dir}"/>
+    </sourcepath>
+    </javadoc>
   </target>
 
 

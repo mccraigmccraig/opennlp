@@ -25,6 +25,9 @@ import opennlp.tools.coref.DiscourseEntity;
 import opennlp.tools.coref.Linker;
 import opennlp.tools.coref.mention.MentionContext;
 
+/**
+ * Resolves coreference between plural pronouns and their referents.
+ */
 public class PluralPronounResolver extends MaxentResolver {
 
   int NUM_SENTS_BACK_PRONOUNS = 2;

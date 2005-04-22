@@ -21,6 +21,9 @@ import opennlp.tools.coref.DiscourseEntity;
 import opennlp.tools.coref.DiscourseModel;
 import opennlp.tools.coref.mention.MentionContext;
 
+/**
+ * Resolver used in training to update the discourse model based on the coreference annotation.  
+ */
 public class PerfectResolver extends  AbstractResolver {
 
   public PerfectResolver() {

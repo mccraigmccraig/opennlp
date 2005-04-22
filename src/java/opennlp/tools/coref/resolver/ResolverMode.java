@@ -17,6 +17,9 @@
 //////////////////////////////////////////////////////////////////////////////
 package opennlp.tools.coref.resolver;
 
+/**
+ * Enumerated type specifying the modes if a resolver. 
+ */
 public class ResolverMode { 
 
   private final String name;

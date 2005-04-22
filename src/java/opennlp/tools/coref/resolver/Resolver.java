@@ -23,9 +23,7 @@ import opennlp.tools.coref.DiscourseEntity;
 import opennlp.tools.coref.DiscourseModel;
 import opennlp.tools.coref.mention.MentionContext;
 
-/* Interface for reference resolvers. 
-   @author Tom Morton
-*/
+/** Interface for coreference resolvers. */
 public interface Resolver {
 
   /** Returns true if the resolver handles this type of refering expression.

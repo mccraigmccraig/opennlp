@@ -25,12 +25,14 @@ import opennlp.tools.coref.DiscourseEntity;
 import opennlp.tools.coref.Linker;
 import opennlp.tools.coref.mention.MentionContext;
 
+/**
+ * Resolves pronouns specific to quoted speech such as "you", "me", and "I".  
+ */
 public class SpeechPronounResolver extends MaxentResolver {
-
-  private static int NUM_SENTS_BACK = 0;
 
   public SpeechPronounResolver(String projectName, ResolverMode m) throws IOException {
     super(projectName,"fmodel", m, 30);
+    this.numSentencesBack = 0;
     showExclusions = false;
     preferFirstReferent = true;
   }
@@ -71,7 +73,7 @@ public class SpeechPronounResolver extends MaxentResolver {
 
   protected boolean outOfRange(MentionContext mention, DiscourseEntity entity) {
     MentionContext cec = entity.getLastExtent();
-    return (mention.getSentenceNumber() - cec.getSentenceNumber() > NUM_SENTS_BACK);
+    return (mention.getSentenceNumber() - cec.getSentenceNumber() > numSentencesBack);
   }
 
   public boolean canResolve(MentionContext mention) {
@@ -94,7 +96,7 @@ public class SpeechPronounResolver extends MaxentResolver {
         return true; // both NNP
       }
       else {
-        if (entity.getNumExtents() > 1) {
+        if (entity.getNumMentions() > 1) {
           return true;
         }
         return !canResolve(cec);

@@ -25,8 +25,7 @@ import opennlp.tools.coref.DiscourseEntity;
 import opennlp.tools.coref.mention.MentionContext;
 
 /**
- * @author Tom Morton
- *
+ * Resolves coreference between common nouns. 
  */
 public class CommonNounResolver extends MaxentResolver {
 

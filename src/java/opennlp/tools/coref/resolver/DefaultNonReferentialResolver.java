@@ -1,6 +1,7 @@
 package opennlp.tools.coref.resolver;
 
 import java.io.BufferedReader;
+import java.io.DataInputStream;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
@@ -12,6 +13,7 @@ import java.util.List;
 import opennlp.maxent.Event;
 import opennlp.maxent.GIS;
 import opennlp.maxent.MaxentModel;
+import opennlp.maxent.io.BinaryGISModelReader;
 import opennlp.maxent.io.PlainTextGISModelReader;
 import opennlp.maxent.io.SuffixSensitiveGISModelReader;
 import opennlp.maxent.io.SuffixSensitiveGISModelWriter;
@@ -20,7 +22,7 @@ import opennlp.tools.coref.mention.Parse;
 import opennlp.tools.util.CollectionEventStream;
 
 /**
- * Default implementation of the #NonReferentialResolver interface.
+ * Default implementation of the {@link NonReferentialResolver} interface.
  */
 public class DefaultNonReferentialResolver implements NonReferentialResolver {
 
@@ -30,6 +32,7 @@ public class DefaultNonReferentialResolver implements NonReferentialResolver {
   private boolean debugOn = false;
   private ResolverMode mode;
   private String modelName;
+  private String modelExtension = ".bin.gz";
   private int nonRefIndex;
   
   public DefaultNonReferentialResolver(String projectName, String name, ResolverMode mode) throws IOException {
@@ -40,10 +43,10 @@ public class DefaultNonReferentialResolver implements NonReferentialResolver {
     }
     else if (mode == ResolverMode.TEST) {
       if (loadAsResource) {
-        model = (new PlainTextGISModelReader(new BufferedReader(new InputStreamReader(this.getClass().getResourceAsStream(modelName))))).getModel();
+        model = (new BinaryGISModelReader(new DataInputStream(this.getClass().getResourceAsStream(modelName)))).getModel();
       }
       else {
-        model = (new SuffixSensitiveGISModelReader(new File(modelName))).getModel();
+        model = (new SuffixSensitiveGISModelReader(new File(modelName+modelExtension))).getModel();
       }
       nonRefIndex = model.getIndex(MaxentResolver.SAME);
     }
@@ -107,7 +110,7 @@ public class DefaultNonReferentialResolver implements NonReferentialResolver {
         }
         writer.close();
       }
-      (new SuffixSensitiveGISModelWriter(GIS.trainModel(new CollectionEventStream(events),100,10),new File(modelName))).persist();
+      (new SuffixSensitiveGISModelWriter(GIS.trainModel(new CollectionEventStream(events),100,10),new File(modelName+modelExtension))).persist();
     }
   }
 }
