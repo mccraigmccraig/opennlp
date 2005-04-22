@@ -28,6 +28,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.StringTokenizer;
+import java.util.regex.Pattern;
 
 import opennlp.tools.util.Sequence;
 import opennlp.tools.util.Span;
@@ -42,6 +43,8 @@ import opennlp.tools.postag.POSTaggerME;
  */
 public class EnglishTreebankParser {
 
+  private static Pattern untokenizedParenPattern1 = Pattern.compile("([^ ])([({)}])");
+  private static Pattern untokenizedParenPattern2 = Pattern.compile("([({)}])([^ ])");
   public static ParserME getParser(String dataDir, boolean useTagDictionary, boolean useCaseSensitiveTagDictionary, int beamSize, double advancePercentage) throws IOException {
     if (useTagDictionary) {
       return new ParserME(
@@ -292,6 +295,8 @@ public class EnglishTreebankParser {
     String line;
     try {
       while (null != (line = in.readLine())) {
+        line = untokenizedParenPattern1.matcher(line).replaceAll("$1 $2");
+        line = untokenizedParenPattern2.matcher(line).replaceAll("$1 $2");
         StringTokenizer str = new StringTokenizer(line);
         StringBuffer sb = new StringBuffer();
         List tokens = new ArrayList();
