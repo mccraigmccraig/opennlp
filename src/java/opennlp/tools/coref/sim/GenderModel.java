@@ -17,10 +17,9 @@
 //////////////////////////////////////////////////////////////////////////////
 package opennlp.tools.coref.sim;
 
-import java.io.BufferedReader;
+import java.io.DataInputStream;
 import java.io.File;
 import java.io.IOException;
-import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -28,14 +27,13 @@ import java.util.List;
 import opennlp.maxent.Event;
 import opennlp.maxent.GIS;
 import opennlp.maxent.MaxentModel;
-import opennlp.maxent.io.PlainTextGISModelReader;
+import opennlp.maxent.io.BinaryGISModelReader;
 import opennlp.maxent.io.SuffixSensitiveGISModelReader;
 import opennlp.maxent.io.SuffixSensitiveGISModelWriter;
 import opennlp.tools.coref.Linker;
 import opennlp.tools.coref.mention.MentionContext;
 import opennlp.tools.coref.mention.Parse;
 import opennlp.tools.coref.resolver.MaxentResolver;
-
 import opennlp.tools.util.CollectionEventStream;
 import opennlp.tools.util.HashList;
 
@@ -51,6 +49,7 @@ public class GenderModel implements TestGenderModel, TrainSimilarityModel {
   private int neuterIndex;
   
   private String modelName;
+  private String modelExtension = ".bin.gz";
   private MaxentModel testModel;
   private List events;
   private boolean debugOn = false;
@@ -72,10 +71,10 @@ public class GenderModel implements TestGenderModel, TrainSimilarityModel {
     }
     else {
       if (MaxentResolver.loadAsResource()) {
-        testModel = (new PlainTextGISModelReader(new BufferedReader(new InputStreamReader(this.getClass().getResourceAsStream(modelName))))).getModel();
+        testModel = (new BinaryGISModelReader(new DataInputStream(this.getClass().getResourceAsStream(modelName)))).getModel();
       }
       else {
-        testModel = (new SuffixSensitiveGISModelReader(new File(modelName))).getModel();
+        testModel = (new SuffixSensitiveGISModelReader(new File(modelName+modelExtension))).getModel();
       }
       maleIndex = testModel.getIndex(GenderEnum.MALE.toString());
       femaleIndex = testModel.getIndex(GenderEnum.FEMALE.toString());
@@ -213,7 +212,7 @@ public class GenderModel implements TestGenderModel, TrainSimilarityModel {
   }
 
   public void trainModel() throws IOException {
-    (new SuffixSensitiveGISModelWriter(GIS.trainModel(new CollectionEventStream(events),100,10),new File(modelName))).persist();
+    (new SuffixSensitiveGISModelWriter(GIS.trainModel(new CollectionEventStream(events),100,10),new File(modelName+modelExtension))).persist();
   }
 
   public int getFemaleIndex() {

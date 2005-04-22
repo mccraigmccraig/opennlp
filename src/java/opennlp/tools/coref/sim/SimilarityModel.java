@@ -30,20 +30,17 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import opennlp.tools.coref.*;
-import opennlp.tools.coref.mention.MentionContext;
-import opennlp.tools.coref.resolver.AbstractResolver;
-import opennlp.tools.coref.resolver.MaxentResolver;
-
-import opennlp.tools.util.CollectionEventStream;
-import opennlp.tools.util.HashList;
-
 import opennlp.maxent.Event;
 import opennlp.maxent.GIS;
 import opennlp.maxent.MaxentModel;
 import opennlp.maxent.io.PlainTextGISModelReader;
 import opennlp.maxent.io.SuffixSensitiveGISModelReader;
 import opennlp.maxent.io.SuffixSensitiveGISModelWriter;
+import opennlp.tools.coref.mention.MentionContext;
+import opennlp.tools.coref.resolver.AbstractResolver;
+import opennlp.tools.coref.resolver.MaxentResolver;
+import opennlp.tools.util.CollectionEventStream;
+import opennlp.tools.util.HashList;
 
 /**
  * Models semantic similarity between two mentions and returns a score based on 
@@ -52,6 +49,7 @@ import opennlp.maxent.io.SuffixSensitiveGISModelWriter;
 public class SimilarityModel implements TestSimilarityModel, TrainSimilarityModel {
 
   private String modelName;
+  private String modelExtension = ".bin.gz";
   private MaxentModel testModel;
   private List events;
   private int SAME_INDEX;
@@ -78,7 +76,7 @@ public class SimilarityModel implements TestSimilarityModel, TrainSimilarityMode
         testModel = (new PlainTextGISModelReader(new BufferedReader(new InputStreamReader(this.getClass().getResourceAsStream(modelName))))).getModel();
       }
       else {
-        testModel = (new SuffixSensitiveGISModelReader(new File(modelName))).getModel();
+        testModel = (new SuffixSensitiveGISModelReader(new File(modelName+modelExtension))).getModel();
       }
       SAME_INDEX = testModel.getIndex(SAME);
     }
@@ -272,11 +270,12 @@ public class SimilarityModel implements TestSimilarityModel, TrainSimilarityMode
       }
     }
   }
-  
+
+  /*
   private boolean isPronoun(MentionContext mention) {
     return mention.getHeadTokenTag().startsWith("PRP");
   }
-  
+  */
   
   
   public void setExtents(MentionContext[] extentContexts) {
@@ -310,7 +309,7 @@ public class SimilarityModel implements TestSimilarityModel, TrainSimilarityMode
       List entityContexts = (List) entities.get(key);      
       Set exclusionSet = constructExclusionSet(key, entities, headSets, nameSets, singletons);
       if (entityContexts.size() == 1) {
-        MentionContext sec = (MentionContext) entityContexts.get(0);
+        //MentionContext sec = (MentionContext) entityContexts.get(0);
         //System.err.println("singleton entity " + sec.getId() + " " + sec.toText());
       }
       for (int xi1 = 0, xl = entityContexts.size(); xi1 < xl; xi1++) {
@@ -370,7 +369,7 @@ public class SimilarityModel implements TestSimilarityModel, TrainSimilarityMode
       }
       writer.close();
     }
-    (new SuffixSensitiveGISModelWriter(GIS.trainModel(new CollectionEventStream(events),100,10),new File(modelName))).persist();
+    (new SuffixSensitiveGISModelWriter(GIS.trainModel(new CollectionEventStream(events),100,10),new File(modelName+modelExtension))).persist();
   }
 
   private boolean isName(Context np) {

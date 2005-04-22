@@ -18,7 +18,7 @@
 package opennlp.tools.coref.sim;
 
 /**
- * @author Tom Morton
+ * Interface for testing a number model.
  *
  */
 public interface TestNumberModel {

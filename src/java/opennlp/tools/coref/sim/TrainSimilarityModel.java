@@ -21,6 +21,9 @@ import java.io.IOException;
 
 import opennlp.tools.coref.mention.MentionContext;
 
+/**
+ * Interface for training a similarity, gender, or number model. 
+ */
 public interface TrainSimilarityModel {
   public void trainModel() throws IOException;
   /**

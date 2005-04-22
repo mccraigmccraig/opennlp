@@ -39,9 +39,13 @@ import opennlp.maxent.io.PlainTextGISModelReader;
 import opennlp.maxent.io.SuffixSensitiveGISModelReader;
 import opennlp.maxent.io.SuffixSensitiveGISModelWriter;
 
+/**
+ * Class which models the number of particular mentions and the entities made up of mentions. 
+ */
 public class NumberModel implements TestNumberModel, TrainSimilarityModel {
 
   private String modelName;
+  private String modelExtension = ".bin.gz";
   private MaxentModel testModel;
   private List events;
 
@@ -68,7 +72,7 @@ public class NumberModel implements TestNumberModel, TrainSimilarityModel {
         testModel = (new PlainTextGISModelReader(new BufferedReader(new InputStreamReader(this.getClass().getResourceAsStream(modelName))))).getModel();
       }
       else {
-        testModel = (new SuffixSensitiveGISModelReader(new File(modelName))).getModel();
+        testModel = (new SuffixSensitiveGISModelReader(new File(modelName+modelExtension))).getModel();
       }
       singularIndex = testModel.getIndex(NumberEnum.SINGULAR.toString());
       pluralIndex = testModel.getIndex(NumberEnum.PLURAL.toString());
@@ -178,7 +182,7 @@ public class NumberModel implements TestNumberModel, TrainSimilarityModel {
   }
 
   public void trainModel() throws IOException {
-    (new SuffixSensitiveGISModelWriter(GIS.trainModel(new CollectionEventStream(events),100,10),new File(modelName))).persist();    
+    (new SuffixSensitiveGISModelWriter(GIS.trainModel(new CollectionEventStream(events),100,10),new File(modelName+modelExtension))).persist();    
   }
 
 }
