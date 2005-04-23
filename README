@@ -152,7 +152,7 @@ java -Xmx450m opennlp.tools.parser.EnglishTreebankParser -d \
   opennlp.models/parser |
 java -Xmx600m opennlp.tools.namefind.EnglishNameFinder -parse \
   opennlp.models/namefind/*.bin.gz |
-java -Xmx200m -DWNSEARHCDIR=$WNSEARCHDIR \
+java -Xmx200m -DWNSEARCHDIR=$WNSEARCHDIR \
   opennlp.tools.coref.EnglishTreebankLinker opennlp.models/coref
 
 In the example above $WNSEARCHDIR is the location of the "dict" directory for 
