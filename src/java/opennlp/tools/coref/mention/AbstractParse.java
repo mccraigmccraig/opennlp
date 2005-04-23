@@ -3,10 +3,6 @@ package opennlp.tools.coref.mention;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.sun.rsasign.c;
-
-import opennlp.tools.util.Span;
-
 /**
  * Provides default implemenation of many of the methods in the {@link Parse} interface.  
  */
