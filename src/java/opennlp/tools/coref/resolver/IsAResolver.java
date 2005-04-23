@@ -72,7 +72,7 @@ public class IsAResolver extends MaxentResolver {
       return (false);
     }
     //full parse w/ trailing comma or period
-    if (cec.getSpan().getEnd() <= ec.getSpan().getEnd() + 2 && (ec.getNextToken().toString().equals(",") || ec.getNextToken().toString().equals("."))) {
+    if (cec.getSpan().getEnd() <= ec.getSpan().getEnd() + 2 && (ec.getNextToken() != null && (ec.getNextToken().toString().equals(",") || ec.getNextToken().toString().equals(".")))) {
       //System.err.println("IsAResolver.excluded: (false) spans end + punct");
       return (false);
     }
