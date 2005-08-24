@@ -68,25 +68,41 @@ public class EnglishTreebankChunker extends ChunkerME {
     super(mod, cg, beamSize);
   }
 
-  /* inherieted java doc */
-  protected boolean validOutcome(String outcome, Sequence sequence) {
+  private boolean validOutcome(String outcome, String prevOutcome) {
     if (outcome.startsWith("I-")) {
-      List tagList = sequence.getOutcomes();
-      int lti = tagList.size() - 1;
-      if (lti == -1) {
+      if (prevOutcome == null) {
         return (false);
       }
       else {
-        String lastTag = (String) tagList.get(lti);
-        if (lastTag.equals("O")) {
+        if (prevOutcome.equals("O")) {
           return (false);
         }
-        if (!lastTag.substring(2).equals(outcome.substring(2))) {
+        if (!prevOutcome.substring(2).equals(outcome.substring(2))) {
           return (false);
         }
       }
     }
     return (true);
+  }
+  
+  protected boolean validOutcome(String outcome, String[] sequence) {
+    String prevOutcome = null;
+    if (sequence.length > 0) {
+      prevOutcome = sequence[sequence.length-1];
+    }
+    return validOutcome(outcome,prevOutcome);
+  }
+
+
+  /* inherieted java doc */
+  protected boolean validOutcome(String outcome, Sequence sequence) {
+    String prevOutcome = null;
+    List tagList = sequence.getOutcomes();
+    int lti = tagList.size() - 1;
+    if (lti >= 0) {
+      prevOutcome = (String) tagList.get(lti);
+    }
+    return validOutcome(outcome,prevOutcome);
   }
 
   /**
