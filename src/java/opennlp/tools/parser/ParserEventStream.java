@@ -317,7 +317,7 @@ public class ParserEventStream implements EventStream {
       }
       ai++;
     }
-    EnglishHeadRules rules = new EnglishHeadRules(args[ai++]);
+    HeadRules rules = new opennlp.tools.lang.english.HeadRules(args[ai++]);
     if (fun) {
       Parse.useFunctionTags(true);
     }

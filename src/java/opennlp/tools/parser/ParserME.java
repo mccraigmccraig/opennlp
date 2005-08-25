@@ -598,7 +598,7 @@ public class ParserME {
     }
     java.io.File inFile = new java.io.File(args[argIndex++]);
     String headRulesFile = args[argIndex++];
-    EnglishHeadRules rules = new EnglishHeadRules(headRulesFile);
+    HeadRules rules = new opennlp.tools.lang.english.HeadRules(headRulesFile);
     java.io.File tagFile = new java.io.File(args[argIndex++]);
     java.io.File chunkFile = new java.io.File(args[argIndex++]);
     java.io.File buildFile = new java.io.File(args[argIndex++]);

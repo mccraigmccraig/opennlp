@@ -24,7 +24,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 
-import opennlp.tools.namefind.EnglishNameFinder;
+import opennlp.tools.lang.english.NameFinder;
 import opennlp.tools.parser.Parse;
 import opennlp.tools.parser.ParserME;
 import opennlp.tools.util.Span;
@@ -37,7 +37,7 @@ public class DefaultParse extends AbstractParse {
 
   private Parse parse;
   private int sentenceNumber;
-  private static Set entitySet = new HashSet(Arrays.asList(EnglishNameFinder.NAME_TYPES));
+  private static Set entitySet = new HashSet(Arrays.asList(NameFinder.NAME_TYPES));
   
   public DefaultParse(Parse parse, int sentenceNumber) {
     this.parse = parse;

@@ -125,7 +125,7 @@ public class Parse implements Cloneable, Comparable {
   
   /**
    * Designates that the specifed punctuation should is prior to this parse.
-   * @param The punctuation.
+   * @param punct The punctuation.
    */
   public void addPreviousPunctuation(Parse punct) {
     if (this.prevPunctSet == null) {
@@ -588,7 +588,7 @@ public class Parse implements Cloneable, Comparable {
       Parse.useFunctionTags(true);
       ai++;
     }
-    EnglishHeadRules rules = new EnglishHeadRules(args[ai]);
+    HeadRules rules = new opennlp.tools.lang.english.HeadRules(args[ai]);
     java.io.BufferedReader in = new java.io.BufferedReader(new java.io.InputStreamReader(System.in));
     for (String line = in.readLine(); line != null; line = in.readLine()) {
       Parse p = Parse.parseParse(line);
