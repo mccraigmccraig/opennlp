@@ -32,10 +32,13 @@ import java.io.StringReader;
 
 public class POSEventStream implements EventStream {
 
-  POSContextGenerator cg;
-  DataStream data;
-  Event[] events;
-  int ei;
+  private POSContextGenerator cg;
+  private DataStream data;
+  private Event[] events;
+  private int ei;
+  
+  /** The last line read in from the data file. */
+  private String line;
 
   public POSEventStream(DataStream d) {
     this(d, new DefaultPOSContextGenerator());
@@ -44,7 +47,7 @@ public class POSEventStream implements EventStream {
   public POSEventStream(DataStream d, POSContextGenerator cg) {
     this.cg = cg;
     data = d;
-    int ei = 0;
+    ei = 0;
     if (d.hasNext()) {
       addNewEvents((String) d.nextToken());
     }
@@ -54,21 +57,38 @@ public class POSEventStream implements EventStream {
   }
 
   public boolean hasNext() {
-    return (ei < events.length || data.hasNext());
+    if (ei < events.length) {
+      return true;
+    }
+    else if (line != null) { // previous result has not been consumed
+      return true;
+    }
+    //find next non-blank line
+    while (data.hasNext()) {
+      line = (String) data.nextToken();
+      if (line.equals("")) {
+      }
+      else {
+        return true;
+      }
+    }
+    return false;
   }
-
+  
   public Event nextEvent() {
     if (ei == events.length) {
-      addNewEvents((String) data.nextToken());
+      addNewEvents(line);
       ei = 0;
+      line = null;
     }
     return ((Event) events[ei++]);
-  }
+  }    
 
   private void addNewEvents(String sentence) {
     //String sentence = "the_DT stories_NNS about_IN well-heeled_JJ communities_NNS and_CC developers_NNS";
     EventCollector ec = new POSEventCollector(new StringReader(sentence), cg);
     events = ec.getEvents();
+    //System.err.println("POSEventStream.addNewEvents: got "+events.length+" events");
   }
 
   public static void main(String[] args) {
