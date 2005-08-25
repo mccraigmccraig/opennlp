@@ -18,20 +18,26 @@
 
 package opennlp.tools.sentdetect;
 
-import opennlp.maxent.*;
-import opennlp.maxent.io.*;
-
-import opennlp.maxent.IntegerPool;
-import opennlp.tools.util.Pair;
-
-import java.io.IOException;
-import java.io.File;
-import java.io.Reader;
 import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileReader;
-
-import java.util.List;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.Reader;
 import java.util.ArrayList;
+import java.util.List;
+
+import opennlp.maxent.ContextGenerator;
+import opennlp.maxent.DataStream;
+import opennlp.maxent.EventStream;
+import opennlp.maxent.GIS;
+import opennlp.maxent.GISModel;
+import opennlp.maxent.IntegerPool;
+import opennlp.maxent.MaxentModel;
+import opennlp.maxent.PlainTextByLineDataStream;
+import opennlp.maxent.io.SuffixSensitiveGISModelWriter;
+import opennlp.tools.util.Pair;
 
 /**
  * A sentence detector for splitting up raw text into sentences.  A maximum
@@ -39,7 +45,7 @@ import java.util.ArrayList;
  * string to determine if they signify the end of a sentence.
  *
  * @author      Jason Baldridge and Tom Morton
- * @version     $Revision: 1.11 $, $Date: 2005/04/04 04:17:37 $
+ * @version     $Revision: 1.12 $, $Date: 2005/08/25 03:18:18 $
  */
 
 public class SentenceDetectorME implements SentenceDetector {
@@ -238,6 +244,11 @@ public class SentenceDetectorME implements SentenceDetector {
     es = new SDEventStream(ds, scanner);
     return GIS.trainModel(es, iterations, cut);
   }
+  
+  private static void usage() {
+    System.err.println("Usage: SentenceDetectorME trainData modelName");
+    System.exit(1);    
+  }
 
   /**
    * <p>Trains a new sentence detection model.</p>
@@ -246,24 +257,33 @@ public class SentenceDetectorME implements SentenceDetector {
    *
    */
   public static void main(String[] args) throws IOException {
-    if (args.length == 0) {
-      System.err.println("Usage: SentenceDetectorME trainData modelName");
-      System.exit(1);
+    int ai=0;
+    String encoding = null;
+    while (args[ai].startsWith("-")) {
+      if (args[ai].equals("-encoding")) {
+        ai++;
+        if (ai < args.length) {
+          encoding = args[ai];
+          ai++;
+        }
+        else {
+          usage();
+        }
+      }
     }
+    File inFile = new File(args[ai++]);
+    File outFile = new File(args[ai++]);
+    GISModel mod;
+    
     try {
-      File inFile = new File(args[0]);
-      File outFile = new File(args[1]);
+      EventStream es = new SDEventStream(new PlainTextByLineDataStream(new InputStreamReader(new FileInputStream(inFile),encoding)));
 
-      GISModel mod;
-
-      EventStream es = new SDEventStream(new PlainTextByLineDataStream(new FileReader(inFile)));
-
-      if (args.length > 3)
-        mod = train(es, Integer.parseInt(args[2]), Integer.parseInt(args[3]));
+      if (args.length > ai)
+        mod = train(es, Integer.parseInt(args[ai++]), Integer.parseInt(args[ai++]));
       else
         mod = train(es, 100, 5);
 
-      System.out.println("Saving the model as: " + args[1]);
+      System.out.println("Saving the model as: " + outFile);
       new SuffixSensitiveGISModelWriter(mod, outFile).persist();
 
     }

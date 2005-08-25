@@ -18,8 +18,10 @@
 package opennlp.tools.namefind;
 
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileReader;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.util.List;
 import java.util.Map;
 
@@ -154,24 +156,42 @@ public class NameFinderME implements NameFinder {
   private static GISModel train(EventStream es, int iterations, int cut) throws IOException {
     return GIS.trainModel(iterations, new TwoPassDataIndexer(es, cut));
   }
+  
+  public static void usage(){
+    System.err.println("Usage: opennlp.tools.namefind.NameFinderME -encoding encoding training_file model");
+    System.exit(1);
+  }
 
   public static void main(String[] args) throws IOException {
     if (args.length == 0) {
-      System.err.println("Usage: NameFinderME training_file model");
-      System.exit(1);
+      usage();
     }
     try {
-      File inFile = new File(args[0]);
-      File outFile = new File(args[1]);
+      int ai=0;
+      String encoding = null;
+      while (args[ai].startsWith("-")) {
+        if (args[ai].equals("-encoding")) {
+          ai++;
+          if (ai < args.length) {
+            encoding = args[ai];
+            ai++;
+          }
+          else {
+            usage();
+          }
+        }
+      }
+      File inFile = new File(args[ai++]);
+      File outFile = new File(args[ai++]);
       GISModel mod;
 
-      EventStream es = new NameFinderEventStream(new PlainTextByLineDataStream(new FileReader(inFile)));
-      if (args.length > 3)
-        mod = train(es, Integer.parseInt(args[2]), Integer.parseInt(args[3]));
+      EventStream es = new NameFinderEventStream(new PlainTextByLineDataStream(new InputStreamReader(new FileInputStream(inFile),encoding)));
+      if (args.length > ai)
+        mod = train(es, Integer.parseInt(args[ai++]), Integer.parseInt(args[ai++]));
       else
         mod = train(es, 100, 5);
 
-      System.out.println("Saving the model as: " + args[1]);
+      System.out.println("Saving the model as: " + outFile);
       new SuffixSensitiveGISModelWriter(mod, outFile).persist();
 
     }

@@ -20,8 +20,9 @@ package opennlp.tools.postag;
 
 import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileReader;
+import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.io.Reader;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -47,7 +48,7 @@ import opennlp.tools.util.Sequence;
  * surrounding context.
  *
  * @author      Gann Bierner
- * @version $Revision: 1.9 $, $Date: 2004/08/13 16:59:43 $
+ * @version $Revision: 1.10 $, $Date: 2005/08/25 03:16:45 $
  */
 public class POSTaggerME implements Evalable, POSTagger {
 
@@ -257,6 +258,12 @@ public class POSTaggerME implements Evalable, POSTagger {
   public static GISModel train(EventStream es, int iterations, int cut) throws IOException {
     return opennlp.maxent.GIS.trainModel(iterations, new TwoPassDataIndexer(es, cut));
   }
+  
+  private static void usage() {
+    System.err.println("Usage: POSTaggerME -encoding encoding training model");
+    System.err.println("This trains a new model on the specified training file and writes the trained model to the model file.");
+    System.exit(1);
+  }
 
   /**
      * <p>Trains a new pos model.</p>
@@ -266,23 +273,34 @@ public class POSTaggerME implements Evalable, POSTagger {
      */
   public static void main(String[] args) throws IOException {
     if (args.length == 0){
-      System.err.println("Usage: POSTaggerME training model");
-      System.err.println("This trains a new model on the specified training file and writes the trained model to the model file.");
-      System.exit(1);
+      usage();
     }
     try {
-      File inFile = new File(args[0]);
-      File outFile = new File(args[1]);
+      int ai=0;
+      String encoding = null;
+      while (args[ai].startsWith("-")) {
+        if (args[ai].equals("-encoding")) {
+          ai++;
+          if (ai < args.length) {
+            encoding = args[ai];
+            ai++;
+          }
+          else {
+            usage();
+          }
+        }
+      }
+      File inFile = new File(args[ai++]);
+      File outFile = new File(args[ai++]);
       GISModel mod;
       
-      
-      EventStream es = new POSEventStream(new PlainTextByLineDataStream(new FileReader(inFile)));
-      if (args.length > 3)
-        mod = train(es, Integer.parseInt(args[2]), Integer.parseInt(args[3]));
+      EventStream es = new POSEventStream(new PlainTextByLineDataStream(new InputStreamReader(new FileInputStream(inFile),encoding)));
+      if (args.length > ai)
+        mod = train(es, Integer.parseInt(args[ai++]), Integer.parseInt(args[ai++]));
       else
         mod = train(es, 100, 5);
 
-      System.out.println("Saving the model as: " + args[1]);
+      System.out.println("Saving the model as: " + outFile);
       new SuffixSensitiveGISModelWriter(mod, outFile).persist();
 
     }
