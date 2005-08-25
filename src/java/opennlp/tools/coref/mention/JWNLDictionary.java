@@ -78,9 +78,25 @@ public class JWNLDictionary implements Dictionary {
     morphy = dict.getMorphologicalProcessor();
   }
 
-  public String[] getLemmas(String word, String pos) {
+  public String[] getLemmas(String word, String tag) {
     try {
-      List lemmas = morphy.lookupAllBaseForms(POS.NOUN,word);
+      POS pos;
+      if (tag.startsWith("N") || tag.startsWith("n")) {
+        pos = POS.NOUN;
+      }
+      else if (tag.startsWith("N") || tag.startsWith("v")) {
+        pos = POS.VERB;
+      }
+      else if (tag.startsWith("J") || tag.startsWith("a")) {
+        pos = POS.ADJECTIVE;
+      }
+      else if (tag.startsWith("R") || tag.startsWith("r")) {
+        pos = POS.ADVERB;
+      }
+      else {
+        pos = POS.NOUN;
+      }
+      List lemmas = morphy.lookupAllBaseForms(pos,word);
       return((String[]) lemmas.toArray(new String[lemmas.size()]));
     }
     catch (JWNLException e) {
