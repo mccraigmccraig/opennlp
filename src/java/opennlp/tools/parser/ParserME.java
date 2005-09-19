@@ -55,9 +55,11 @@ public class ParserME {
   private SortedSet odh;
   /** Incomplete parses which have been advanced. */
   private SortedSet ndh;
-  private ParserTagger tagger; //POS tagger
-  private ParserChunker chunker; //Basal Chunker
-
+  /** The pos-tagger that the parser uses. */
+  protected ParserTagger tagger; //POS tagger
+  /** The chunker that the parser uses to chunk non-recursive structures. */
+  protected ParserChunker chunker; //Basal Chunker
+  
   private MaxentModel buildModel;
   private MaxentModel checkModel;
 
@@ -261,7 +263,11 @@ public class ParserME {
     return parse(tokens,1)[0];
   }
 
-  private void advanceTop(Parse p) {
+  /**
+   * Adds the "TOP" node to the specified parse.
+   * @param p The complete parse.
+   */
+  protected void advanceTop(Parse p) {
     buildModel.eval(buildContextGenerator.getContext(p.getChildren(), 0), bprobs);
     p.addProb(Math.log(bprobs[topStartIndex]));
     checkModel.eval(checkContextGenerator.getContext(p.getChildren(), TOP_NODE, 0, 0), cprobs);
@@ -282,7 +288,7 @@ public class ParserME {
    * @param p The parse to advance.
    * @param Q The amount of probability mass that should be accounted for by the advanced parses. 
    */
-  private Parse[] advanceParses(final Parse p, double Q) {
+  protected Parse[] advanceParses(final Parse p, double Q) {
     double q = 1 - Q;
     /** The closest previous node which has been labeled as a start node. */
     Parse lastStartNode = null;
@@ -404,12 +410,10 @@ public class ParserME {
 
   /**
    * Reutrns the top chunk sequences for the specified parse.
-   * 
-   * @param p
-   *          A pos-tag assigned parse.
+   * @param p A pos-tag assigned parse.
    * @return The top chunk assignments to the specified parse.
    */
-  private Parse[] advanceChunks(final Parse p, double minChunkScore) {
+  protected Parse[] advanceChunks(final Parse p, double minChunkScore) {
     // chunk
     Parse[] children = p.getChildren();
     String words[] = new String[children.length];
@@ -482,7 +486,7 @@ public class ParserME {
    * @param p The parse to be tagged.
    * @return Parses with different POS-tag sequence assignments.
    */
-  private Parse[] advanceTags(final Parse p) {
+  protected Parse[] advanceTags(final Parse p) {
     Parse[] children = p.getChildren();
     String[] words = new String[children.length];
     double[] probs = new double[words.length];
