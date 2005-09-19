@@ -63,7 +63,7 @@ public class Parse implements Cloneable, Comparable {
   
   private static boolean useFunctionTags;
 
-  protected Object clone() {
+  public Object clone() {
     try {
       Parse p = (Parse) super.clone();
       p.parts = (List) ((LinkedList) this.parts).clone();
@@ -210,16 +210,17 @@ public class Parse implements Cloneable, Comparable {
       throw (new InternalError("Inserting constituent not contained in the sentence!"));
     }
   }
-
+  
   /**
-   * Displays this parse using Penn Treebank-style formatting. 
+   * Appends the specified string buffer with a string representation of this parse.
+   * @param sb A string buffer into which the parse string can be appended. 
    */
-  public void show() {
+  public void show(StringBuffer sb) {
     int start;
     start = span.getStart();
     if (!type.equals(ParserME.TOK_NODE)) {
-      System.out.print("(");
-      System.out.print(type +" ");
+      sb.append("(");
+      sb.append(type +" ");
       //System.out.print(label+" ");
       //System.out.print(head+" ");
       //System.out.print(df.format(prob)+" ");
@@ -229,16 +230,26 @@ public class Parse implements Cloneable, Comparable {
       Span s = c.span;
       if (start < s.getStart()) {
         //System.out.println("pre "+start+" "+s.getStart());
-        System.out.print(text.substring(start, s.getStart()));
+        sb.append(text.substring(start, s.getStart()));
       }
-      c.show();
+      c.show(sb);
       start = s.getEnd();
     }
-    System.out.print(text.substring(start, span.getEnd()));
+    sb.append(text.substring(start, span.getEnd()));
     if (!type.equals(ParserME.TOK_NODE)) {
-      System.out.print(")");
+      sb.append(")");
     }
   }
+
+  /**
+   * Displays this parse using Penn Treebank-style formatting. 
+   */
+  public void show() {
+    StringBuffer sb = new StringBuffer(text.length()*4);
+    show(sb);
+    System.out.println(sb);
+  }
+
 
   /**
    * Returns the probability associed with the pos-tag sequence assigned to this parse.
