@@ -26,9 +26,12 @@ import java.util.Set;
 import java.util.SortedSet;
 import java.util.TreeSet;
 
+import opennlp.maxent.DataStream;
 import opennlp.maxent.GISModel;
 import opennlp.maxent.MaxentModel;
 import opennlp.maxent.TwoPassDataIndexer;
+import opennlp.tools.ngram.Dictionary;
+import opennlp.tools.ngram.MutableDictionary;
 import opennlp.tools.util.Sequence;
 import opennlp.tools.util.Span;
 
@@ -550,9 +553,10 @@ public class ParserME {
   }
   
   private static void usage() {
-    System.err.println("Usage: ParserME -[tag|chunk|build|check|fun] trainingFile headRules tagModelFile chunkModelFile buildModelFile checkModelFile [iterations cutoff]");
+    System.err.println("Usage: ParserME -[dict|tag|chunk|build|check|fun] trainingFile headRules parserModelDirectory [iterations cutoff]");
     System.err.println();
     System.err.println("Training file should be one sentence per line where each line consists of a Penn Treebank Style parse");
+    System.err.println("-dict Just build the dictionaries.");
     System.err.println("-tag Just build the tagging model.");
     System.err.println("-chunk Just build the chunking model.");
     System.err.println("-build Just build the build model");
@@ -565,6 +569,7 @@ public class ParserME {
       usage();
       System.exit(1);
     }
+    boolean dict = false; 
     boolean tag = false;
     boolean chunk = false;
     boolean build = false;
@@ -574,7 +579,10 @@ public class ParserME {
     int argIndex = 0;
     while (args[argIndex].startsWith("-")) {
       all = false;
-      if (args[argIndex].equals("-tag")) {
+      if (args[argIndex].equals("-dict")) {
+        dict = true;
+      }
+      else if (args[argIndex].equals("-tag")) {
         tag = true;
       }
       else if (args[argIndex].equals("-chunk")) {
@@ -603,10 +611,12 @@ public class ParserME {
     java.io.File inFile = new java.io.File(args[argIndex++]);
     String headRulesFile = args[argIndex++];
     HeadRules rules = new opennlp.tools.lang.english.HeadRules(headRulesFile);
-    java.io.File tagFile = new java.io.File(args[argIndex++]);
-    java.io.File chunkFile = new java.io.File(args[argIndex++]);
-    java.io.File buildFile = new java.io.File(args[argIndex++]);
-    java.io.File checkFile = new java.io.File(args[argIndex++]);
+    String modelDirectory = args[argIndex++];
+    java.io.File dictFile = new java.io.File(modelDirectory+"/dict.bin.gz");
+    java.io.File tagFile = new java.io.File(modelDirectory+"/tag.bin.gz");
+    java.io.File chunkFile = new java.io.File(modelDirectory+"/chunk.bin.gz");
+    java.io.File buildFile = new java.io.File(modelDirectory+"/build.bin.gz");
+    java.io.File checkFile = new java.io.File(modelDirectory+"/check.bin.gz");
     int iterations = 100;
     int cutoff = 5;
     if (args.length > argIndex) {
@@ -616,7 +626,23 @@ public class ParserME {
     if (fun) {
       Parse.useFunctionTags(true);
     }
-
+    if (dict || all) {
+      System.err.println("Building dictionary");
+      MutableDictionary mdict = new MutableDictionary(cutoff);
+      DataStream data = new opennlp.maxent.PlainTextByLineDataStream(new java.io.FileReader(inFile));
+      while(data.hasNext()) {
+        String parseStr = (String) data.nextToken();
+        Parse p = Parse.parseParse(parseStr);
+        Parse[] pwords = p.getTagNodes();
+        String[] words = new String[pwords.length];
+        for (int wi=0;wi<words.length;wi++) {
+          words[wi] = pwords[wi].toString();
+        }
+        mdict.add(words,3);
+      }
+      System.out.println("Saving the dictionaries");
+      mdict.persist(dictFile);
+    }
     if (tag || all) {
       System.err.println("Training tagger");
       opennlp.maxent.EventStream tes = new ParserEventStream(new opennlp.maxent.PlainTextByLineDataStream(new java.io.FileReader(inFile)), rules, EventTypeEnum.TAG);
@@ -634,8 +660,10 @@ public class ParserME {
     }
 
     if (build || all) {
+      System.err.println("Loading Dictionary");
+      Dictionary tridict = new Dictionary(dictFile);
       System.err.println("Training builder");
-      opennlp.maxent.EventStream bes = new ParserEventStream(new opennlp.maxent.PlainTextByLineDataStream(new java.io.FileReader(inFile)), rules, EventTypeEnum.BUILD);
+      opennlp.maxent.EventStream bes = new ParserEventStream(new opennlp.maxent.PlainTextByLineDataStream(new java.io.FileReader(inFile)), rules, EventTypeEnum.BUILD,tridict);
       GISModel buildModel = train(bes, iterations, cutoff);
       System.out.println("Saving the build model as: " + buildFile);
       new opennlp.maxent.io.SuffixSensitiveGISModelWriter(buildModel, buildFile).persist();

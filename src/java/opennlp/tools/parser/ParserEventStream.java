@@ -25,6 +25,7 @@ import opennlp.maxent.DataStream;
 import opennlp.maxent.Event;
 import opennlp.maxent.EventStream;
 import opennlp.tools.chunker.ChunkerContextGenerator;
+import opennlp.tools.ngram.Dictionary;
 import opennlp.tools.postag.DefaultPOSContextGenerator;
 import opennlp.tools.postag.POSContextGenerator;
 
@@ -52,10 +53,11 @@ public class ParserEventStream implements EventStream {
    * @param d A 1-parse-per-line Penn Treebank Style parse. 
    * @param rules The head rules.
    * @param etype The type of events desired (tag, chunk, build, or check).
+   * @param dict A tri-gram dictionary to reduce feature generation.
    */
-  public ParserEventStream(DataStream d, HeadRules rules, EventTypeEnum etype) {
+  public ParserEventStream(DataStream d, HeadRules rules, EventTypeEnum etype, Dictionary dict) {
     if (etype == EventTypeEnum.BUILD) {
-      this.bcg = new BuildContextGenerator();
+      this.bcg = new BuildContextGenerator(dict);
     }
     else if (etype == EventTypeEnum.CHECK) {
       this.kcg = new CheckContextGenerator();
@@ -77,6 +79,10 @@ public class ParserEventStream implements EventStream {
     else {
       events = new Event[0];
     }
+  }
+  
+  public ParserEventStream(DataStream d, HeadRules rules, EventTypeEnum etype) {
+    this (d,rules,etype,null);
   }
 
   public boolean hasNext() {
@@ -321,7 +327,7 @@ public class ParserEventStream implements EventStream {
     if (fun) {
       Parse.useFunctionTags(true);
     }
-    opennlp.maxent.EventStream es = new ParserEventStream(new opennlp.maxent.PlainTextByLineDataStream(new java.io.InputStreamReader(System.in)), rules, etype);
+    opennlp.maxent.EventStream es = new ParserEventStream(new opennlp.maxent.PlainTextByLineDataStream(new java.io.InputStreamReader(System.in)), rules, etype, null);
     while (es.hasNext()) {
       System.out.println(es.nextEvent());
     }
