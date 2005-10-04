@@ -23,6 +23,7 @@ import java.util.List;
 import java.util.Set;
 
 import opennlp.maxent.ContextGenerator;
+import opennlp.tools.ngram.Dictionary;
 
 /**
  * Class to generator predictive contexts for deciding how constituents should be combined together.
@@ -32,6 +33,10 @@ public class BuildContextGenerator implements ContextGenerator {
 
   private static final String EOS = "eos";
   private boolean zeroBackOff;
+  private Dictionary dict;
+  private String[] unigram;
+  private String[] bigram;
+  private String[] trigram;
   
   /**
    * Creates a new context generator for making decisions about combining constitients togehter.
@@ -40,6 +45,14 @@ public class BuildContextGenerator implements ContextGenerator {
   public BuildContextGenerator() {
     super();
     zeroBackOff = false;
+  }
+  
+  public BuildContextGenerator(Dictionary dict) {
+    this();
+    this.dict = dict;
+    unigram = new String[1];
+    bigram = new String[2];
+    trigram = new String[3];
   }
 
   public String[] getContext(Object o) {
@@ -135,6 +148,78 @@ public class BuildContextGenerator implements ContextGenerator {
     if (index + 2 < ps) {
       p2 = constituents[index + 2];
     }
+    
+    boolean u_2 = true;
+    boolean u_1 = true;
+    boolean u0 = true;
+    boolean u1 = true;
+    boolean u2 = true;
+    boolean b_2_1 = true;
+    boolean b_10 = true;
+    boolean b01 = true;
+    boolean b12 = true;
+    boolean t_2_10 = true;
+    boolean t_101 = true;
+    boolean t012 = true;
+    
+    if (dict != null) {
+      
+      if (p_2 != null) {
+        unigram[0] = p_2.toString();
+        u_2 = dict.get(unigram);
+      }
+      
+      if (p2 != null) {
+        unigram[0] = p2.toString();
+        u2 = dict.get(unigram);
+      }
+
+      unigram[0] = p0.toString();
+      u0 = dict.get(unigram);
+      
+      if (p_2 != null && p_1 != null) {
+        bigram[0] = p_2.toString();
+        bigram[1] = p_1.toString();
+        b_2_1 = dict.get(bigram);
+        
+        trigram[0] = p_2.toString();
+        trigram[1] = p_1.toString();
+        trigram[2] = p_1.toString();
+        t_2_10 = dict.get(trigram);
+      }
+      if (p_1 != null) {
+        unigram[0] = p_1.toString();
+        u_1 = dict.get(unigram);
+        
+        bigram[0] = p_1.toString();
+        bigram[1] = p0.toString();
+        b_10 = dict.get(bigram);
+      }
+      if (p1 != null) {
+        unigram[0] = p1.toString();
+        u1 = dict.get(unigram);
+        
+        bigram[0] = p0.toString();
+        bigram[1] = p1.toString();
+        b01 = dict.get(bigram);
+      }
+      if (p1 != null && p2 != null) {
+        bigram[0] = p1.toString();
+        bigram[1] = p2.toString();
+        b12 = dict.get(bigram);
+        
+        trigram[0] = p0.toString();
+        trigram[1] = p1.toString();
+        trigram[2] = p2.toString();
+        t012 = dict.get(trigram);
+      }
+      if (p_1 != null && p1 != null) {
+        trigram[0] = p_1.toString();
+        trigram[1] = p0.toString();
+        trigram[2] = p1.toString();
+        t_101 = dict.get(trigram);
+      }
+    }
 
     String consp_2 = cons(p_2, -2);
     String consp_1 = cons(p_1, -1);
@@ -149,61 +234,63 @@ public class BuildContextGenerator implements ContextGenerator {
     String consbop2 = consbo(p2, 2);
 
     // cons(-2), cons(-1), cons(0), cons(1), cons(2)
-    features.add(consp0);
+    if (u0) features.add(consp0);
     features.add(consbop0);
 
-    features.add(consp_2);
+    if (u_2) features.add(consp_2);
     features.add(consbop_2);
-    features.add(consp_1);
+    if (u_1) features.add(consp_1);
     features.add(consbop_1);
-    features.add(consp1);
+    if (u1) features.add(consp1);
     features.add(consbop1);
-    features.add(consp2);
+    if (u2) features.add(consp2);
     features.add(consbop2);
 
+    //cons(0),cons(1)
     if (punct1s != null) {
       for (Iterator pi=punct1s.iterator();pi.hasNext();) {
         String punct = punct((Parse) pi.next(),1);
         //punct(1);
         features.add(punct);
         //cons(0)punct(1)
-        features.add(consp0+","+punct);
+        if (u0) features.add(consp0+","+punct);
         features.add(consbop0+","+punct);
         //cons(0)punct(1)cons(1)
-        features.add(consp0+","+punct+","+consp1);
-        features.add(consbop0+","+punct+","+consp1);
-        features.add(consp0+","+punct+","+consbop1);
+        if (b01) features.add(consp0+","+punct+","+consp1);
+        if (u1)  features.add(consbop0+","+punct+","+consp1);
+        if (u0)  features.add(consp0+","+punct+","+consbop1);
         features.add(consbop0+","+punct+","+consbop1);
       }
     }
     else {
       //cons(0),cons(1)
-      features.add(consp0 + "," + consp1);
-      features.add(consbop0 + "," + consp1);
-      features.add(consp0 + "," + consbop1);
+      if (b01) features.add(consp0 + "," + consp1);
+      if (u1)  features.add(consbop0 + "," + consp1);
+      if (u0)  features.add(consp0 + "," + consbop1);
       features.add(consbop0 + "," + consbop1);      
     }
     
+    //cons(-1,0)
     if (punct_1s != null) {
       for (Iterator pi=punct_1s.iterator();pi.hasNext();) {
         String punct = punct((Parse) pi.next(),-1);
         //punct(-1)
         features.add(punct);
         //punct(-1)cons(0)
-        features.add(punct+","+consp0);
+        if (u0) features.add(punct+","+consp0);
         features.add(punct+","+consbop0);
         //cons(-1)punct(-1)cons(0)
-        features.add(consp_1+","+punct+","+consp0);
-        features.add(consbop_1+","+punct+","+consp0);
-        features.add(consp_1+","+punct+","+consbop0);
+        if (b_10) features.add(consp_1+","+punct+","+consp0);
+        if (u0)   features.add(consbop_1+","+punct+","+consp0);
+        if (u_1)  features.add(consp_1+","+punct+","+consbop0);
         features.add(consbop_1+","+punct+","+consbop0);
       }
     }
     else {
       // cons(-1,0)
-      features.add(consp_1 + "," + consp0);
-      features.add(consbop_1 + "," + consp0);
-      features.add(consp_1 + "," + consbop0);
+      if (b_10) features.add(consp_1 + "," + consp0);
+      if (u0) features.add(consbop_1 + "," + consp0);
+      if (u_1) features.add(consp_1 + "," + consbop0);
       features.add(consbop_1 + "," + consbop0);      
     }
     
@@ -219,21 +306,21 @@ public class BuildContextGenerator implements ContextGenerator {
           String punct2 = punct((Parse) pi2.next(),2);
           for (Iterator pi1=punct1s.iterator();pi1.hasNext();) {
             String punct1 = punct((Parse) pi1.next(),1);
-            features.add(consp0   + "," + punct1+","+consp1   + "," + punct2+","+consp2);
+            if (t012) features.add(consp0   + "," + punct1+","+consp1   + "," + punct2+","+consp2);
             
-            features.add(consbop0 + "," + punct1+","+consp1   + "," + punct2+","+consp2);
-            features.add(consp0   + "," + punct1+","+consbop1 + "," + punct2+","+consp2);
-            features.add(consp0   + "," + punct1+","+consp1   + "," + punct2+","+consbop2);
+            if (b12) features.add(consbop0 + "," + punct1+","+consp1   + "," + punct2+","+consp2);
+            if (u0 && u2) features.add(consp0   + "," + punct1+","+consbop1 + "," + punct2+","+consp2);
+            if (b01) features.add(consp0   + "," + punct1+","+consp1   + "," + punct2+","+consbop2);
             
-            features.add(consbop0 + "," + punct1+","+consbop1 + "," + punct2+","+consp2);
-            features.add(consbop0 + "," + punct1+","+consp1   + "," + punct2+","+consbop2);
-            features.add(consp0   + "," + punct1+","+consbop1 + "," + punct2+","+consbop2);
+            if (u2) features.add(consbop0 + "," + punct1+","+consbop1 + "," + punct2+","+consp2);
+            if (u1) features.add(consbop0 + "," + punct1+","+consp1   + "," + punct2+","+consbop2);
+            if (u0) features.add(consp0   + "," + punct1+","+consbop1 + "," + punct2+","+consbop2);
             
             features.add(consbop0 + "," + punct1+","+consbop1 + "," + punct2+","+consbop2);
             if (zeroBackOff) {
-              features.add(consp0   + "," + punct1+","+consp1   + "," + punct2);
-              features.add(consbop0 + "," + punct1+","+consp1   + "," + punct2);
-              features.add(consp0   + "," + punct1+","+consbop1 + "," + punct2);
+              if (b01) features.add(consp0   + "," + punct1+","+consp1   + "," + punct2);
+              if (u1)  features.add(consbop0 + "," + punct1+","+consp1   + "," + punct2);
+              if (u0)  features.add(consp0   + "," + punct1+","+consbop1 + "," + punct2);
               features.add(consbop0 + "," + punct1+","+consbop1 + "," + punct2);
             }
           }
@@ -243,22 +330,22 @@ public class BuildContextGenerator implements ContextGenerator {
         //cons(0),cons(1),punct(2),cons(2)
         for (Iterator pi2=punct2s.iterator();pi2.hasNext();) {
           String punct2 = punct((Parse) pi2.next(),2);
-          features.add(consp0   + "," + consp1   + "," + punct2+","+consp2);
+          if (t012) features.add(consp0   + "," + consp1   + "," + punct2+","+consp2);
           
-          features.add(consbop0 + "," + consp1   +","  + punct2+ "," + consp2);
-          features.add(consp0   + "," + consbop1 + "," + punct2+","+consp2);
-          features.add(consp0   + "," + consp1   + "," + punct2+","+consbop2);
+          if (b12) features.add(consbop0 + "," + consp1   +","  + punct2+ "," + consp2);
+          if (u0 && u2) features.add(consp0   + "," + consbop1 + "," + punct2+","+consp2);
+          if (b01) features.add(consp0   + "," + consp1   + "," + punct2+","+consbop2);
           
-          features.add(consbop0 + "," + consbop1 + "," + punct2+","+consp2);
-          features.add(consbop0 + "," + consp1   + "," + punct2+","+consbop2);
-          features.add(consp0   + "," + consbop1 + "," + punct2+","+consbop2);
+          if (u2) features.add(consbop0 + "," + consbop1 + "," + punct2+","+consp2);
+          if (u1) features.add(consbop0 + "," + consp1   + "," + punct2+","+consbop2);
+          if (u0) features.add(consp0   + "," + consbop1 + "," + punct2+","+consbop2);
           
           features.add(consbop0 + "," + consbop1 + "," + punct2+","+consbop2);
           
           if (zeroBackOff) {
-            features.add(consp0   + "," + consp1   + "," + punct2);
-            features.add(consbop0 + "," + consp1   + "," + punct2);
-            features.add(consp0   + "," + consbop1 + "," + punct2);
+            if (b01) features.add(consp0   + "," + consp1   + "," + punct2);
+            if (u1)  features.add(consbop0 + "," + consp1   + "," + punct2);
+            if (u0)  features.add(consp0   + "," + consbop1 + "," + punct2);
             features.add(consbop0 + "," + consbop1 + "," + punct2);
           }
         }
@@ -269,15 +356,15 @@ public class BuildContextGenerator implements ContextGenerator {
         //cons(0),punct(1),cons(1),cons(2)
         for (Iterator pi1=punct1s.iterator();pi1.hasNext();) {
           String punct1 = punct((Parse) pi1.next(),1);
-          features.add(consp0   + "," + punct1   +","+ consp1   +","+consp2);
+          if (t012) features.add(consp0   + "," + punct1   +","+ consp1   +","+consp2);
           
-          features.add(consbop0 + "," + punct1   +","+ consp1   +","+consp2);
-          features.add(consp0   + "," + punct1   +","+ consbop1 +","+consp2);
-          features.add(consp0   + "," + punct1   +","+ consp1   +","+consbop2);
+          if (b12) features.add(consbop0 + "," + punct1   +","+ consp1   +","+consp2);
+          if (u0 && u2) features.add(consp0   + "," + punct1   +","+ consbop1 +","+consp2);
+          if (b01) features.add(consp0   + "," + punct1   +","+ consp1   +","+consbop2);
           
-          features.add(consbop0 + "," + punct1   +","+ consbop1 +","+consp2);
-          features.add(consbop0 + "," + punct1   +","+ consp1 +","+consbop2);
-          features.add(consp0   + "," + punct1   +","+ consbop1 +","+consbop2);   
+          if (u2) features.add(consbop0 + "," + punct1   +","+ consbop1 +","+consp2);
+          if (u1) features.add(consbop0 + "," + punct1   +","+ consp1 +","+consbop2);
+          if (u0) features.add(consp0   + "," + punct1   +","+ consbop1 +","+consbop2);   
           
           features.add(consbop0 + "," + punct1   +","+ consbop1 +","+consbop2);
           
@@ -286,15 +373,15 @@ public class BuildContextGenerator implements ContextGenerator {
       }
       else {
         //cons(0),cons(1),cons(2)
-        features.add(consp0   + "," + consp1   + "," + consp2);
+        if (t012) features.add(consp0   + "," + consp1   + "," + consp2);
         
-        features.add(consbop0 + "," + consp1   + "," + consp2);
-        features.add(consp0   + "," + consbop1 + "," + consp2);
-        features.add(consp0   + "," + consp1   + "," + consbop2);
+        if (b12) features.add(consbop0 + "," + consp1   + "," + consp2);
+        if (u0 && u2) features.add(consp0   + "," + consbop1 + "," + consp2);
+        if (b01) features.add(consp0   + "," + consp1   + "," + consbop2);
         
-        features.add(consbop0 + "," + consbop1 + "," + consp2);
-        features.add(consp0   + "," + consbop1 + "," + consbop2);
-        features.add(consbop0 + "," + consp1   + "," + consbop2);
+        if (u2) features.add(consbop0 + "," + consbop1 + "," + consp2);
+        if (u1) features.add(consbop0 + "," + consp1   + "," + consbop2);
+        if (u0) features.add(consp0   + "," + consbop1 + "," + consbop2);
         
         features.add(consbop0 + "," + consbop1 + "," + consbop2);
       }
@@ -312,21 +399,21 @@ public class BuildContextGenerator implements ContextGenerator {
           String punct_2 = punct((Parse) pi_2.next(),-2);
           for (Iterator pi_1=punct_1s.iterator();pi_1.hasNext();) {
             String punct_1 = punct((Parse) pi_1.next(),-1);
-            features.add(consp_2   + "," + punct_2+","+consp_1   + "," + punct_1+","+consp0);
+            if (t_2_10) features.add(consp_2   + "," + punct_2+","+consp_1   + "," + punct_1+","+consp0);
             
-            features.add(consbop_2 + "," + punct_2+","+consp_1   + "," + punct_1+","+consp0);
-            features.add(consp_2   + "," + punct_2+","+consbop_1 + "," + punct_1+","+consp0);
-            features.add(consp_2   + "," + punct_2+","+consp_1   + "," + punct_1+","+consbop0);
+            if (b_10) features.add(consbop_2 + "," + punct_2+","+consp_1   + "," + punct_1+","+consp0);
+            if (u_2 && u0) features.add(consp_2   + "," + punct_2+","+consbop_1 + "," + punct_1+","+consp0);
+            if (b_2_1) features.add(consp_2   + "," + punct_2+","+consp_1   + "," + punct_1+","+consbop0);
             
-            features.add(consbop_2 + "," + punct_2+","+consbop_1 + "," + punct_1+","+consp0);
-            features.add(consp_2   + "," + punct_2+","+consbop_1 + "," + punct_1+","+consbop0);
-            features.add(consbop_2 + "," + punct_2+","+consp_1   + "," + punct_1+","+consbop0);
-            
+            if (u0)  features.add(consbop_2 + "," + punct_2+","+consbop_1 + "," + punct_1+","+consp0);
+            if (u_1) features.add(consbop_2 + "," + punct_2+","+consp_1   + "," + punct_1+","+consbop0);
+            if (u_2) features.add(consp_2   + "," + punct_2+","+consbop_1 + "," + punct_1+","+consbop0);
+
             features.add(consbop_2 + "," + punct_2+","+consbop_1 + "," + punct_1+","+consbop0);
             if (zeroBackOff) {
-              features.add(punct_2+","+consp_1   + "," + punct_1+","+consp0);
-              features.add(punct_2+","+consbop_1 + "," + punct_1+","+consp0);
-              features.add(punct_2+","+consp_1   + "," + punct_1+","+consbop0);
+              if (b_10) features.add(punct_2+","+consp_1   + "," + punct_1+","+consp0);
+              if (u0)   features.add(punct_2+","+consbop_1 + "," + punct_1+","+consp0);
+              if (u_1)  features.add(punct_2+","+consp_1   + "," + punct_1+","+consbop0);
               features.add(punct_2+","+consbop_1 + "," + punct_1+","+consbop0);
             }
           }
@@ -336,22 +423,22 @@ public class BuildContextGenerator implements ContextGenerator {
         //cons(-2),punct(-2),cons(-1),cons(0)
         for (Iterator pi_2=punct_2s.iterator();pi_2.hasNext();) {
           String punct_2 = punct((Parse) pi_2.next(),-2);
-          features.add(consp_2   + "," + punct_2+","+consp_1   + ","+consp0);
+          if (t_2_10) features.add(consp_2   + "," + punct_2+","+consp_1   + ","+consp0);
           
-          features.add(consbop_2 + "," + punct_2+","+consp_1   + ","+consp0);
-          features.add(consp_2   + "," + punct_2+","+consbop_1 + ","+consp0);
-          features.add(consp_2   + "," + punct_2+","+consp_1   + ","+consbop0);
+          if (b_10) features.add(consbop_2 + "," + punct_2+","+consp_1   + ","+consp0);
+          if (u_2 && u0) features.add(consp_2   + "," + punct_2+","+consbop_1 + ","+consp0);
+          if (b_2_1) features.add(consp_2   + "," + punct_2+","+consp_1   + ","+consbop0);
           
-          features.add(consbop_2 + "," + punct_2+","+consbop_1 + ","+consp0);
-          features.add(consp_2   + "," + punct_2+","+consbop_1 + ","+consbop0);
-          features.add(consbop_2 + "," + punct_2+","+consp_1   + ","+consbop0);
+          if (u0)  features.add(consbop_2 + "," + punct_2+","+consbop_1 + ","+consp0);
+          if (u_1) features.add(consbop_2 + "," + punct_2+","+consp_1   + ","+consbop0);
+          if (u_2) features.add(consp_2   + "," + punct_2+","+consbop_1 + ","+consbop0);
           
           features.add(consbop_2 + "," + punct_2+","+consbop_1 + ","+consbop0);
           
           if (zeroBackOff) {
-            features.add(punct_2+","+consp_1   + ","+consp0);
-            features.add(punct_2+","+consbop_1 + ","+consp0);
-            features.add(punct_2+","+consp_1   + ","+consbop0);
+            if (b_10) features.add(punct_2+","+consp_1   + ","+consp0);
+            if (u0)   features.add(punct_2+","+consbop_1 + ","+consp0);
+            if (u_1)  features.add(punct_2+","+consp_1   + ","+consbop0);
             features.add(punct_2+","+consbop_1 + ","+consbop0);
           }
         }
@@ -362,15 +449,16 @@ public class BuildContextGenerator implements ContextGenerator {
         //cons(-2),cons(-1),punct(-1),cons(0)
         for (Iterator pi_1=punct_1s.iterator();pi_1.hasNext();) {
           String punct_1 = punct((Parse) pi_1.next(),-1);
-          features.add(consp_2   + "," + consp_1   + "," + punct_1+","+consp0);
+          if (t_2_10) features.add(consp_2   + "," + consp_1   + "," + punct_1+","+consp0);
           
-          features.add(consbop_2 + "," + consp_1   + "," + punct_1+","+consp0);
-          features.add(consp_2   + "," + consbop_1 + "," + punct_1+","+consp0);
-          features.add(consp_2   + "," + consp_1   + "," + punct_1+","+consbop0);
+          if (b_10) features.add(consbop_2 + "," + consp_1   + "," + punct_1+","+consp0);
+          if (u_2 && u0) features.add(consp_2   + "," + consbop_1 + "," + punct_1+","+consp0);
+          if (b_2_1) features.add(consp_2   + "," + consp_1   + "," + punct_1+","+consbop0);
           
-          features.add(consbop_2 + "," + consbop_1 + "," + punct_1+","+consp0);
-          features.add(consp_2   + "," + consbop_1 + "," + punct_1+","+consbop0);
-          features.add(consbop_2 + "," + consp_1 + "," + punct_1+","+consbop0);
+          if (u0)  features.add(consbop_2 + "," + consbop_1 + "," + punct_1+","+consp0);
+          if (u_1) features.add(consbop_2 + "," + consp_1 + "," + punct_1+","+consbop0);
+          if (u_2) features.add(consp_2   + "," + consbop_1 + "," + punct_1+","+consbop0);
+
           
           features.add(consbop_2 + "," + consbop_1 + "," + punct_1+","+consbop0);
           
@@ -379,15 +467,15 @@ public class BuildContextGenerator implements ContextGenerator {
       }
       else {
         //cons(-2),cons(-1),cons(0)
-        features.add(consp_2   + "," + consp_1   + "," +consp0);
+        if (t_2_10) features.add(consp_2   + "," + consp_1   + "," +consp0);
         
-        features.add(consbop_2 + "," + consp_1   + "," +consp0);
-        features.add(consp_2   + "," + consbop_1 + "," +consp0);
-        features.add(consp_2   + "," + consp_1   + "," +consbop0);
+        if (b_10) features.add(consbop_2 + "," + consp_1   + "," +consp0);
+        if (u_2 && u0) features.add(consp_2   + "," + consbop_1 + "," +consp0);
+        if (b_2_1)features.add(consp_2   + "," + consp_1   + "," +consbop0);
         
-        features.add(consbop_2 + "," + consbop_1 + "," +consp0);
-        features.add(consp_2   + "," + consbop_1 + "," +consbop0);
-        features.add(consbop_2 + "," + consp_1   + "," +consbop0);
+        if (u0)  features.add(consbop_2 + "," + consbop_1 + "," +consp0);
+        if (u_1) features.add(consbop_2 + "," + consp_1   + "," +consbop0);
+        if (u_2) features.add(consp_2   + "," + consbop_1 + "," +consbop0);
         
         features.add(consbop_2 + "," + consbop_1 + "," +consbop0);
       }
@@ -399,27 +487,27 @@ public class BuildContextGenerator implements ContextGenerator {
           String punct_1 = punct((Parse) pi_1.next(),-1);
           for (Iterator pi1=punct1s.iterator();pi1.hasNext();) {
             String punct1 = punct((Parse) pi1.next(),1);
-            features.add(consp_1   + "," + punct_1+","+consp0   + "," + punct1+","+consp1);
+            if (t_101) features.add(consp_1   + "," + punct_1+","+consp0   + "," + punct1+","+consp1);
             
-            features.add(consbop_1 + "," + punct_1+","+consp0   + "," + punct1+","+consp1);
-            features.add(consp_1   + "," + punct_1+","+consbop0 + "," + punct1+","+consp1);
-            features.add(consp_1   + "," + punct_1+","+consp0   + "," + punct1+","+consbop1);
+            if (b01) features.add(consbop_1 + "," + punct_1+","+consp0   + "," + punct1+","+consp1);
+            if (u_1 && u1) features.add(consp_1   + "," + punct_1+","+consbop0 + "," + punct1+","+consp1);
+            if (b_10) features.add(consp_1   + "," + punct_1+","+consp0   + "," + punct1+","+consbop1);
             
-            features.add(consbop_1 + "," + punct_1+","+consbop0 + "," + punct1+","+consp1);
-            features.add(consp_1   + "," + punct_1+","+consbop0 + "," + punct1+","+consbop1);
-            features.add(consbop_1 + "," + punct_1+","+consp0   + "," + punct1+","+consbop1);
+            if (u1)  features.add(consbop_1 + "," + punct_1+","+consbop0 + "," + punct1+","+consp1);
+            if (u0)  features.add(consbop_1 + "," + punct_1+","+consp0   + "," + punct1+","+consbop1);
+            if (u_1) features.add(consp_1   + "," + punct_1+","+consbop0 + "," + punct1+","+consbop1);
             
             features.add(consbop_1 + "," + punct_1+","+consbop0 + "," + punct1+","+consbop1);
             
             if (zeroBackOff) {
-              features.add(consp_1   + "," + punct_1+","+consp0   + "," + punct1);
-              features.add(consbop_1 + "," + punct_1+","+consp0   + "," + punct1);
-              features.add(consp_1   + "," + punct_1+","+consbop0 + "," + punct1);
+              if (b_10) features.add(consp_1   + "," + punct_1+","+consp0   + "," + punct1);
+              if (u0)   features.add(consbop_1 + "," + punct_1+","+consp0   + "," + punct1);
+              if (u_1)  features.add(consp_1   + "," + punct_1+","+consbop0 + "," + punct1);
               features.add(consbop_1 + "," + punct_1+","+consbop0 + "," + punct1);
             
-              features.add(punct_1+","+consp0   + "," + punct1+","+consp1);
-              features.add(punct_1+","+consbop0 + "," + punct1+","+consp1);
-              features.add(punct_1+","+consp0   + "," + punct1+","+consbop1);
+              if (b01) features.add(punct_1+","+consp0   + "," + punct1+","+consp1);
+              if (u1)  features.add(punct_1+","+consbop0 + "," + punct1+","+consp1);
+              if (u0)  features.add(punct_1+","+consp0   + "," + punct1+","+consbop1);
               features.add(punct_1+","+consbop0 + "," + punct1+","+consbop1);
             }
           }
@@ -429,22 +517,22 @@ public class BuildContextGenerator implements ContextGenerator {
         //cons(-1),punct(-1),cons(0),cons(1)
         for (Iterator pi_1=punct_1s.iterator();pi_1.hasNext();) {
           String punct_1 = punct((Parse) pi_1.next(),-1);
-          features.add(consp_1   + "," + punct_1+","+consp0   + "," + consp1);
+          if (t_101) features.add(consp_1   + "," + punct_1+","+consp0   + "," + consp1);
           
-          features.add(consbop_1 + "," + punct_1+","+consp0   + "," + consp1);
-          features.add(consp_1   + "," + punct_1+","+consbop0 + "," + consp1);
-          features.add(consp_1   + "," + punct_1+","+consp0   + "," + consbop1);
+          if (b01)features.add(consbop_1 + "," + punct_1+","+consp0   + "," + consp1);
+          if (u_1 && u1) features.add(consp_1   + "," + punct_1+","+consbop0 + "," + consp1);
+          if (u0) features.add(consp_1   + "," + punct_1+","+consp0   + "," + consbop1);
           
-          features.add(consbop_1 + "," + punct_1+","+consbop0 + "," + consp1);
-          features.add(consp_1   + "," + punct_1+","+consbop0 + "," + consbop1);
-          features.add(consbop_1 + "," + punct_1+","+consp0   + "," + consbop1);
+          if (u1)  features.add(consbop_1 + "," + punct_1+","+consbop0 + "," + consp1);
+          if (u0)  features.add(consbop_1 + "," + punct_1+","+consp0   + "," + consbop1);
+          if (u_1) features.add(consp_1   + "," + punct_1+","+consbop0 + "," + consbop1);
           
           features.add(consbop_1 + "," + punct_1+","+consbop0 + "," + consbop1);
           
           if(zeroBackOff) {
-            features.add(punct_1+","+consp0   + "," + consp1);
-            features.add(punct_1+","+consbop0   + "," + consp1);
-            features.add(punct_1+","+consp0   + "," + consbop1);
+            if (b01) features.add(punct_1+","+consp0   + "," + consp1);
+            if (u1)  features.add(punct_1+","+consbop0   + "," + consp1);
+            if (u0)  features.add(punct_1+","+consp0   + "," + consbop1);
             features.add(punct_1+","+consbop0   + "," + consbop1);
           }
         }
@@ -455,37 +543,37 @@ public class BuildContextGenerator implements ContextGenerator {
         //cons(-1),cons(0),punct(1),cons(1)
         for (Iterator pi1=punct1s.iterator();pi1.hasNext();) {
           String punct1 = punct((Parse) pi1.next(),1);
-          features.add(consp_1   + "," + consp0   + "," + punct1+","+consp1);
+          if (t_101) features.add(consp_1   + "," + consp0   + "," + punct1+","+consp1);
           
-          features.add(consbop_1 + "," + consp0   + "," + punct1+","+consp1);
-          features.add(consp_1   + "," + consbop0 + "," + punct1+","+consp1);
-          features.add(consp_1   + "," + consp0   + "," + punct1+","+consbop1);
+          if (b01) features.add(consbop_1 + "," + consp0   + "," + punct1+","+consp1);
+          if (u_1 && u1) features.add(consp_1   + "," + consbop0 + "," + punct1+","+consp1);
+          if (b_10) features.add(consp_1   + "," + consp0   + "," + punct1+","+consbop1);
           
-          features.add(consbop_1 + "," + consbop0 + "," + punct1+","+consp1);
-          features.add(consp_1   + "," + consbop0 + "," + punct1+","+consbop1);
-          features.add(consbop_1 + "," + consp0   + "," + punct1+","+consbop1);
+          if (u1)  features.add(consbop_1 + "," + consbop0 + "," + punct1+","+consp1);
+          if (u0)  features.add(consbop_1 + "," + consp0   + "," + punct1+","+consbop1);
+          if (u_1) features.add(consp_1   + "," + consbop0 + "," + punct1+","+consbop1);
           
           features.add(consbop_1 + "," + consbop0 + "," + punct1+","+consbop1);
           
           if (zeroBackOff) {
-            features.add(consp_1   + "," + consp0   + "," + punct1);
-            features.add(consbop_1 + "," + consp0   + "," + punct1);
-            features.add(consp_1   + "," + consbop0 + "," + punct1);
+            if (b_10) features.add(consp_1   + "," + consp0   + "," + punct1);
+            if (u0)   features.add(consbop_1 + "," + consp0   + "," + punct1);
+            if (u_1)  features.add(consp_1   + "," + consbop0 + "," + punct1);
             features.add(consbop_1 + "," + consbop0 + "," + punct1);
           }
         }
       }
       else {
         //cons(-1),cons(0),cons(1)
-        features.add(consp_1   + "," + consp0   + "," +consp1);
+        if (t_101) features.add(consp_1   + "," + consp0   + "," +consp1);
         
-        features.add(consbop_1 + "," + consp0   + "," +consp1);
-        features.add(consp_1   + "," + consbop0 + "," +consp1);
-        features.add(consp_1   + "," + consp0   + "," +consbop1);
+        if (b01)       features.add(consbop_1 + "," + consp0   + "," +consp1);
+        if (u_1 && u1) features.add(consp_1   + "," + consbop0 + "," +consp1);
+        if (b_10)      features.add(consp_1   + "," + consp0   + "," +consbop1);
         
-        features.add(consbop_1 + "," + consbop0 + "," +consp1);
-        features.add(consp_1   + "," + consbop0 + "," +consbop1);
-        features.add(consbop_1   + "," + consp0 + "," +consbop1);
+        if (u1)  features.add(consbop_1 + "," + consbop0 + "," +consp1);
+        if (u0)  features.add(consbop_1   + "," + consp0 + "," +consbop1);
+        if (u_1) features.add(consp_1   + "," + consbop0 + "," +consbop1);
         
         features.add(consbop_1 + "," + consbop0 + "," +consbop1);
       }
@@ -565,5 +653,4 @@ public class BuildContextGenerator implements ContextGenerator {
     }
     return ((String[]) features.toArray(new String[features.size()]));
   }
-
 }
