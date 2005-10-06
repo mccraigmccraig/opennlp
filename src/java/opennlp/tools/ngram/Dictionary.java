@@ -6,6 +6,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.Set;
 import java.util.zip.GZIPInputStream;
 
@@ -34,11 +35,11 @@ public class Dictionary {
   /** Constructor used to load a previously created dictionary for the specifed dictionary file.
    * @param dictionaryFile A file storing a dictionary.
    */
-  public Dictionary(File dictionaryFile) throws IOException {
-    DataInputStream input = new DataInputStream(new GZIPInputStream(new FileInputStream(dictionaryFile)));
-    //System.err.println("Reading: "+input.readUTF());
+  public Dictionary(String dictionaryFile) throws IOException {
+    DataInputStream input = new DataInputStream(new GZIPInputStream(new FileInputStream(new File(dictionaryFile))));
+    input.readUTF();
     int numWords = input.readInt();
-    //System.err.println("Reading: "+numWords+" words");
+    System.err.println("Reading: "+numWords+" words");
     wordMap = new NumberedSet(numWords);
     for (int wi=0;wi<numWords;wi++) {
       String word = input.readUTF();
@@ -67,7 +68,7 @@ public class Dictionary {
     }
   }
   
-  public boolean get(String[] words) {
+  public boolean contains(String[] words) {
     if (words.length == 1) {
       return wordMap.contains(words[0]);
     }
@@ -81,4 +82,74 @@ public class Dictionary {
       }
     }
   }
+  
+  public Iterator iterator() {
+    return new DictionaryIterator(this);
+  }
+  
+  
+  public static void main(String[] args) throws IOException {
+    if (args.length == 0) {
+      System.err.println("Usage: Dictionary dictionary_file");
+      System.exit(0);
+    }
+    Dictionary dict = new Dictionary(args[0]);
+    for (Iterator di = dict.iterator();di.hasNext();) {
+      System.out.println(di.next());
+    }
+  }
+}
+
+class DictionaryIterator implements Iterator {
+
+  Iterator wordIterator;
+  Iterator gramIterator;
+  boolean onWords;
+  String[] words;
+  
+  public DictionaryIterator(Dictionary dict) {
+    /*
+    words = new String[dict.wordMap.size()+1];
+    for (Iterator wi=dict.wordMap.iterator();wi.hasNext();) {
+      String word = (String) wi.next();
+      words[dict.wordMap.getIndex(word)]=word;
+    }
+    */
+    wordIterator = dict.wordMap.iterator();
+    gramIterator = dict.gramSet.iterator();
+    onWords = true;
+  }
+  public boolean hasNext() {
+    if (onWords) {
+      if (wordIterator.hasNext()) {
+        return true;
+      }
+      else {
+        onWords = false;
+      }
+    }
+    return gramIterator.hasNext();
+  }
+
+  public Object next() {
+    if (onWords) {
+      return wordIterator.next();
+    }
+    else {
+      int[] gramInts = ((NGram) gramIterator.next()).getWords();
+      StringBuffer sb = new StringBuffer();
+      for (int gi=0;gi<gramInts.length;gi++) {
+        //sb.append(words[gramInts[gi]]).append(",");
+        sb.append(gramInts[gi]).append(",");
+      }
+      sb.setLength(sb.length()-1);
+      return sb.toString();
+    }
+  }
+
+  public void remove() {
+    throw new UnsupportedOperationException("DictionaryIterator does not allow removal");
+  }
+  
+  
 }
