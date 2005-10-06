@@ -23,25 +23,18 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
 import java.util.StringTokenizer;
 import java.util.regex.Pattern;
 
-import opennlp.tools.util.Sequence;
-import opennlp.tools.util.Span;
 import opennlp.maxent.io.SuffixSensitiveGISModelReader;
-import opennlp.tools.chunker.ChunkerME;
-import opennlp.tools.parser.ChunkContextGenerator;
+import opennlp.tools.ngram.Dictionary;
 import opennlp.tools.parser.Parse;
-import opennlp.tools.parser.ParserChunker;
+import opennlp.tools.lang.english.ParserChunker;
 import opennlp.tools.parser.ParserME;
-import opennlp.tools.parser.ParserTagger;
-import opennlp.tools.postag.DefaultPOSContextGenerator;
-import opennlp.tools.postag.POSDictionary;
-import opennlp.tools.postag.POSTaggerME;
+import opennlp.tools.lang.english.ParserTagger;
+import opennlp.tools.util.Span;
 
 /**
  * Class for performing full parsing on English text. 
@@ -55,16 +48,16 @@ public class TreebankParser {
       return new ParserME(
         new SuffixSensitiveGISModelReader(new File(dataDir + "/build.bin.gz")).getModel(),
         new SuffixSensitiveGISModelReader(new File(dataDir + "/check.bin.gz")).getModel(),
-        new EnglishTreebankPOSTagger(dataDir + "/tag.bin.gz", dataDir + "/tagdict", useCaseSensitiveTagDictionary),
-        new EnglishTreebankChunker(dataDir + "/chunk.bin.gz"),
+        new ParserTagger(dataDir + "/tag.bin.gz", dataDir + "/tagdict", useCaseSensitiveTagDictionary ),//, new Dictionary(dataDir+"/dict.bin.gz")),
+        new ParserChunker(dataDir + "/chunk.bin.gz"),
         new HeadRules(dataDir + "/head_rules"),beamSize,advancePercentage);
     }
     else {
       return new ParserME(
         new SuffixSensitiveGISModelReader(new File(dataDir + "/build.bin.gz")).getModel(),
         new SuffixSensitiveGISModelReader(new File(dataDir + "/check.bin.gz")).getModel(),
-        new EnglishTreebankPOSTagger(dataDir + "/tag.bin.gz"),
-        new EnglishTreebankChunker(dataDir + "/chunk.bin.gz"),
+        new ParserTagger(dataDir + "/tag.bin.gz", dataDir + "/tagdict", useCaseSensitiveTagDictionary), //new Dictionary(dataDir+"/dict.bin.gz")),
+        new ParserChunker(dataDir + "/chunk.bin.gz"),
         new HeadRules(dataDir + "/head_rules"),beamSize,advancePercentage);
     }
   }
@@ -73,116 +66,6 @@ public class TreebankParser {
     return getParser(dataDir,true,false,ParserME.defaultBeamSize,ParserME.defaultAdvancePercentage);
   }
   
-
-  private static class EnglishTreebankPOSTagger extends POSTaggerME implements ParserTagger {
-
-    private static final int K = 10;
-    int beamSize;
-    
-    public EnglishTreebankPOSTagger(String modelFile) throws IOException {
-      this(modelFile,K,K);
-    }
-
-    public EnglishTreebankPOSTagger(String modelFile,int beamSize, int cacheSize) throws IOException {
-      super(beamSize, new SuffixSensitiveGISModelReader(new File(modelFile)).getModel(), new DefaultPOSContextGenerator(cacheSize), null);
-      this.beamSize = beamSize;
-    }
-
-    public EnglishTreebankPOSTagger(String modelFile, String tagDictionary, boolean useCase) throws IOException {
-      this(modelFile,K,tagDictionary,useCase,K);
-    }
-    
-    public EnglishTreebankPOSTagger(String modelFile, int beamSize, String tagDictionary, boolean useCase, int cacheSize) throws IOException {
-      super(beamSize, new SuffixSensitiveGISModelReader(new File(modelFile)).getModel(), new DefaultPOSContextGenerator(cacheSize), new POSDictionary(tagDictionary, useCase));
-      this.beamSize = beamSize;
-    }
-
-    public Sequence[] topKSequences(List sentence) {
-      return beam.bestSequences(beamSize, sentence.toArray(), null);
-    }
-
-    public Sequence[] topKSequences(String[] sentence) {
-      return beam.bestSequences(beamSize, sentence, null);
-    }
-  }
-
-  private static class EnglishTreebankChunker extends ChunkerME implements ParserChunker {
-    private static final int K = 10;
-    private int beamSize;
-    private Map continueStartMap;
-    
-    public EnglishTreebankChunker(String modelFile) throws IOException {
-      this(modelFile,K,K);
-    }
-    
-    public EnglishTreebankChunker(String modelFile, int beamSize, int cacheSize) throws IOException {
-      super(new SuffixSensitiveGISModelReader(new File(modelFile)).getModel(), new ChunkContextGenerator(cacheSize), beamSize);
-      continueStartMap = new HashMap(model.getNumOutcomes());
-      for (int oi=0,on=model.getNumOutcomes();oi<on;oi++) {
-        String outcome = model.getOutcome(oi);
-        if (outcome.startsWith(ParserME.CONT)){
-          continueStartMap.put(outcome,ParserME.START+outcome.substring(ParserME.CONT.length()));
-        }
-      }
-      this.beamSize = beamSize;
-    }
-
-    public Sequence[] topKSequences(List sentence, List tags) {
-      return beam.bestSequences(beamSize, sentence.toArray(), new Object[] { tags });
-    }
-
-    public Sequence[] topKSequences(String[] sentence, String[] tags, double minSequenceScore) {
-      return beam.bestSequences(beamSize, sentence, new Object[] { tags },minSequenceScore);
-    }
-
-    protected boolean validOutcome(String outcome, String[] tagList) {
-      if (continueStartMap.containsKey(outcome)) {
-        int lti = tagList.length - 1;
-        if (lti == -1) {
-          return (false);
-        }
-        else {
-          String lastTag = tagList[lti];
-          if (lastTag.equals(outcome)) {
-             return true;
-          }
-          if (lastTag.equals(continueStartMap.get(outcome))) {
-            return true;
-          }
-          if (lastTag.equals(ParserME.OTHER)) {
-            return (false);
-          }
-          return false;
-        }
-      }
-      return (true);
-    }
-    
-    protected boolean validOutcome(String outcome, Sequence sequence) {
-      if (continueStartMap.containsKey(outcome)) {
-        List tagList = sequence.getOutcomes();
-        int lti = tagList.size() - 1;
-        if (lti == -1) {
-          return (false);
-        }
-        else {
-          String lastTag = (String) tagList.get(lti);
-          if (lastTag.equals(outcome)) {
-             return true;
-          }
-          if (lastTag.equals(continueStartMap.get(outcome))) {
-            return true;
-          }
-          if (lastTag.equals(ParserME.OTHER)) {
-            return (false);
-          }
-          return false;
-        }
-      }
-      return (true);
-    }
-  }
-
   private static String convertToken(String token) {
     if (token.equals("(")) {
       return "-LRB-";
@@ -325,7 +208,6 @@ public class TreebankParser {
               System.out.print(pi+" "+parses[pi].getProb()+" ");
             }
             parses[pi].show();
-            System.out.println();
           }
         }
         else {
