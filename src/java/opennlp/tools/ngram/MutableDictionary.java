@@ -31,7 +31,7 @@ public class MutableDictionary extends Dictionary {
     wordCounts = new ArrayList();
   }
   
-  public MutableDictionary(File dictionaryFile, int cutoff) throws IOException {
+  public MutableDictionary(String dictionaryFile, int cutoff) throws IOException {
     super(dictionaryFile);
     this.cutoff = cutoff;
   }
@@ -50,6 +50,12 @@ public class MutableDictionary extends Dictionary {
     gramSet = cgramSet;
   }
   
+  /**
+   * Adds n-grams for consisting of the specified words of the specified size (and smaller) to this
+   * n-gram dictionary.
+   * @param words The words from which n-grams are derived.
+   * @param size The size of the n-grams to collect.
+   */
   public void add(String[] words,int size) {
     List gram = new ArrayList(size);
     //create uni-grams so n-grams can be created.
@@ -60,7 +66,7 @@ public class MutableDictionary extends Dictionary {
       //create all n-gram which start with wi
       gram.clear();
       gram.add(words[wi]);
-      for (int gi=2;gi<size;gi++) {
+      for (int gi=2;gi<=size;gi++) {
         if (wi+gi-1 < words.length) {
           gram.add(words[wi+gi-1]);
           gramSet.add(nGramFactory.createNGram(gram));
@@ -73,14 +79,14 @@ public class MutableDictionary extends Dictionary {
     //System.err.println("Writting "+wordMap.size()+" words and "+gramSet.size()+" n-grams");
     DataOutputStream output = new DataOutputStream(new GZIPOutputStream(new FileOutputStream(file)));
     output.writeUTF(FILE_TYPE);
-    //System.err.println("pruning from "+wordMap.size());
+    System.err.println("pruning from "+wordMap.size());
     for (Iterator ki=wordMap.iterator();ki.hasNext();) {
       String key = (String) ki.next();
       if (((CountedNumberedSet) wordMap).getCount(key) < cutoff) {
         ki.remove();
       }
     }
-    //System.err.println("pruning to "+wordMap.size());
+    System.err.println("pruning to "+wordMap.size());
     output.writeInt(wordMap.size());
     for (Iterator ki=wordMap.iterator();ki.hasNext();) {
       String key = (String) ki.next();
@@ -88,6 +94,7 @@ public class MutableDictionary extends Dictionary {
       output.writeInt(wordMap.getIndex(key));
     }
     CountedSet cset = (CountedSet) gramSet;
+    int gramCount = 0;
     for (Iterator gi = gramSet.iterator();gi.hasNext();) {
       NGram ngram = (NGram) gi.next();
       if (cset.getCount(ngram) >= cutoff) {
@@ -96,8 +103,13 @@ public class MutableDictionary extends Dictionary {
         for (int wi=0;wi<words.length;wi++) {
           output.writeInt(words[wi]);
         }
+        gramCount++;
+      }
+      else {
+        //System.err.println("ngram "+cset.getCount(ngram));
       }
     }
+    System.err.println("Wrote out "+gramCount+" n-grams");
     output.close();
   }
 
