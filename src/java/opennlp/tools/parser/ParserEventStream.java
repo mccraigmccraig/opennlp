@@ -66,7 +66,7 @@ public class ParserEventStream implements EventStream {
       this.ccg = new ChunkContextGenerator();
     }
     else if (etype == EventTypeEnum.TAG) {
-      this.tcg = new DefaultPOSContextGenerator();
+      this.tcg = new DefaultPOSContextGenerator(dict);
     }
     this.rules = rules;
     punctSet = rules.getPunctuationTags();

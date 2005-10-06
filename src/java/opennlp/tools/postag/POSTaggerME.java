@@ -30,6 +30,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.StringTokenizer;
 
+import opennlp.maxent.DataStream;
 import opennlp.maxent.Evalable;
 import opennlp.maxent.EventCollector;
 import opennlp.maxent.EventStream;
@@ -38,6 +39,9 @@ import opennlp.maxent.MaxentModel;
 import opennlp.maxent.PlainTextByLineDataStream;
 import opennlp.maxent.TwoPassDataIndexer;
 import opennlp.maxent.io.SuffixSensitiveGISModelWriter;
+import opennlp.tools.ngram.Dictionary;
+import opennlp.tools.ngram.MutableDictionary;
+import opennlp.tools.parser.Parse;
 import opennlp.tools.util.BeamSearch;
 import opennlp.tools.util.Pair;
 import opennlp.tools.util.Sequence;
@@ -48,7 +52,7 @@ import opennlp.tools.util.Sequence;
  * surrounding context.
  *
  * @author      Gann Bierner
- * @version $Revision: 1.10 $, $Date: 2005/08/25 03:16:45 $
+ * @version $Revision: 1.11 $, $Date: 2005/10/06 11:09:56 $
  */
 public class POSTaggerME implements Evalable, POSTagger {
 
@@ -65,7 +69,9 @@ public class POSTaggerME implements Evalable, POSTagger {
   /**
    * Tag dictionary used for restricting words to a fixed set of tags.
    */
-  protected POSDictionary dictionary;
+  protected POSDictionary tagDictionary;
+  
+  protected Dictionary ngramDictionary;
 
   /**
    * Says whether a filter should be used to check whether a tag assignment
@@ -83,12 +89,12 @@ public class POSTaggerME implements Evalable, POSTagger {
   /** The search object used for search multiple sequences of tags. */
   protected  BeamSearch beam;
 
-  public POSTaggerME(MaxentModel mod) {
-    this(mod, new DefaultPOSContextGenerator());
+  public POSTaggerME(MaxentModel mod, Dictionary dict) {
+    this(mod, new DefaultPOSContextGenerator(dict));
   }
   
-  public POSTaggerME(MaxentModel mod,POSDictionary dict) {
-      this(DEFAULT_BEAM_SIZE,mod, new DefaultPOSContextGenerator(),dict);
+  public POSTaggerME(MaxentModel mod,Dictionary dict,POSDictionary tagdict) {
+      this(DEFAULT_BEAM_SIZE,mod, new DefaultPOSContextGenerator(dict),tagdict);
     }
   
   public POSTaggerME(MaxentModel mod, POSContextGenerator cg) {
@@ -99,12 +105,12 @@ public class POSTaggerME implements Evalable, POSTagger {
       this(DEFAULT_BEAM_SIZE,mod,cg,dict);
     }
 
-  public POSTaggerME(int beamSize, MaxentModel mod, POSContextGenerator cg,POSDictionary dict) {
+  public POSTaggerME(int beamSize, MaxentModel mod, POSContextGenerator cg,POSDictionary tagdict) {
     size = beamSize;
     _posModel = mod;
     _contextGen = cg;
     beam = new PosBeamSearch(size, cg, mod);
-    dictionary = dict;
+    tagDictionary = tagdict;
   }
 
   public String getNegativeOutcome() {
@@ -202,11 +208,11 @@ public class POSTaggerME implements Evalable, POSTagger {
 
     
     protected boolean validSequence(int i, Object[] inputSequence, String[] outcomesSequence, String outcome) {
-      if (dictionary == null) {
+      if (tagDictionary == null) {
         return true;
       }
       else {
-        String[] tags = dictionary.getTags(inputSequence[i].toString());
+        String[] tags = tagDictionary.getTags(inputSequence[i].toString());
         if (tags == null) {
           return true;
         }
@@ -217,11 +223,11 @@ public class POSTaggerME implements Evalable, POSTagger {
     }
     
     protected boolean validSequence(int i, List inputSequence, Sequence outcomesSequence, String outcome) {
-      if (dictionary == null) {
+      if (tagDictionary == null) {
         return true;
       }
       else {
-        String[] tags = dictionary.getTags(inputSequence.get(i).toString());
+        String[] tags = tagDictionary.getTags(inputSequence.get(i).toString());
         if (tags == null) {
           return true;
         }
@@ -268,7 +274,7 @@ public class POSTaggerME implements Evalable, POSTagger {
   /**
      * <p>Trains a new pos model.</p>
      *
-     * <p>Usage: java opennlp.postag.POStaggerME data_file new_model_name (iterations cutoff)?</p>
+     * <p>Usage: java opennlp.postag.POStaggerME data_file dict_file new_model_name (iterations cutoff)?</p>
      *
      */
   public static void main(String[] args) throws IOException {
@@ -291,15 +297,34 @@ public class POSTaggerME implements Evalable, POSTagger {
         }
       }
       File inFile = new File(args[ai++]);
+      String dict = args[ai++];
       File outFile = new File(args[ai++]);
+      int cutoff = 5;
+      int iterations = 100;
+      if (args.length > ai) {
+        cutoff = Integer.parseInt(args[ai++]);
+        iterations = Integer.parseInt(args[ai++]);
+      }
       GISModel mod;
-      
-      EventStream es = new POSEventStream(new PlainTextByLineDataStream(new InputStreamReader(new FileInputStream(inFile),encoding)));
-      if (args.length > ai)
-        mod = train(es, Integer.parseInt(args[ai++]), Integer.parseInt(args[ai++]));
-      else
-        mod = train(es, 100, 5);
 
+      //TODO: Build dict
+      System.err.println("Building dictionary");
+      MutableDictionary mdict = new MutableDictionary(cutoff);
+      DataStream data = new opennlp.maxent.PlainTextByLineDataStream(new java.io.FileReader(inFile));
+      while(data.hasNext()) {
+        String tagStr = (String) data.nextToken();
+        String[] tt = tagStr.split(" ");
+        String[] words = new String[tt.length];
+        for (int wi=0;wi<words.length;wi++) {
+          words[wi] = tt[wi].substring(0,tt[wi].lastIndexOf('_'));
+        }
+        mdict.add(words,3);
+      }
+      System.out.println("Saving the dictionary");
+      mdict.persist(new File(dict));
+      
+      EventStream es = new POSEventStream(new PlainTextByLineDataStream(new InputStreamReader(new FileInputStream(inFile),encoding)), new Dictionary(dict));
+      mod = train(es, iterations, cutoff);
       System.out.println("Saving the model as: " + outFile);
       new SuffixSensitiveGISModelWriter(mod, outFile).persist();
 

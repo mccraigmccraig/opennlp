@@ -26,6 +26,7 @@ import java.io.PrintStream;
 
 import opennlp.maxent.MaxentModel;
 import opennlp.maxent.io.SuffixSensitiveGISModelReader;
+import opennlp.tools.ngram.Dictionary;
 import opennlp.tools.postag.DefaultPOSContextGenerator;
 import opennlp.tools.postag.POSDictionary;
 import opennlp.tools.postag.POSTaggerME;
@@ -36,12 +37,12 @@ import opennlp.tools.postag.POSTaggerME;
 
 public class PosTagger extends POSTaggerME {
 
-  public PosTagger(String modelFile, POSDictionary dict) {
-      super(getModel(modelFile), new DefaultPOSContextGenerator(),dict);
+  public PosTagger(String modelFile, Dictionary dict, POSDictionary tagdict) {
+      super(getModel(modelFile), new DefaultPOSContextGenerator(dict),tagdict);
   }
 
-  public PosTagger(String modelFile) {
-    super(getModel(modelFile), new DefaultPOSContextGenerator());
+  public PosTagger(String modelFile, Dictionary dict) {
+    super(getModel(modelFile), new DefaultPOSContextGenerator(dict));
   }
 
   private static MaxentModel getModel(String name) {
@@ -80,11 +81,13 @@ public class PosTagger extends POSTaggerME {
       }
     }
     POSTaggerME tagger;
+    String modelFile = args[ai++];
+    String dictFile = args[ai++];
     if (tagdict != null) {
-      tagger = new PosTagger(args[ai++],new POSDictionary(tagdict));
+      tagger = new PosTagger(modelFile,new Dictionary(dictFile),new POSDictionary(tagdict));
     }
     else {
-      tagger = new PosTagger(args[ai++]);
+      tagger = new PosTagger(modelFile,new Dictionary(dictFile));
     }
     if (test) {
       System.out.println(tagger.tag(args[ai]));

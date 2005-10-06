@@ -39,7 +39,7 @@ import opennlp.tools.util.Pair;
  * An event generator for the maxent POS Tagger.
  *
  * @author      Gann Bierner
- * @version     $Revision: 1.5 $, $Date: 2005/08/25 03:20:11 $
+ * @version     $Revision: 1.6 $, $Date: 2005/10/06 11:09:56 $
  */
 
 public class POSEventCollector implements EventCollector {
@@ -156,7 +156,8 @@ public class POSEventCollector implements EventCollector {
     
     return events;
   }
-  
+
+  /*
   public static void main(String[] args) {
     String data = "the_DT stories_NNS about_IN well-heeled_JJ communities_NNS and_CC developers_NNS";
     EventCollector ec = new POSEventCollector(new StringReader(data),
@@ -165,5 +166,6 @@ public class POSEventCollector implements EventCollector {
     for(int i=0; i<events.length; i++)
       System.out.println(events[i].getOutcome());
   }
+  */
   
 }

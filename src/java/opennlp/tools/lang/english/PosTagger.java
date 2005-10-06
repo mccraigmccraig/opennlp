@@ -25,6 +25,7 @@ import java.io.InputStreamReader;
 
 import opennlp.maxent.MaxentModel;
 import opennlp.maxent.io.SuffixSensitiveGISModelReader;
+import opennlp.tools.ngram.Dictionary;
 import opennlp.tools.postag.DefaultPOSContextGenerator;
 import opennlp.tools.postag.POSDictionary;
 import opennlp.tools.postag.POSTaggerME;
@@ -35,17 +36,17 @@ import opennlp.tools.postag.POSTaggerME;
  * achieved >96% accuracy on unseen data.
  *
  * @author      Gann Bierner
- * @version     $Revision: 1.1 $, $Date: 2005/08/25 03:22:28 $
+ * @version     $Revision: 1.2 $, $Date: 2005/10/06 11:07:42 $
  */
 
 public class PosTagger extends POSTaggerME {
 
-  public PosTagger(String modelFile, POSDictionary dict) {
-      super(getModel(modelFile), new DefaultPOSContextGenerator(),dict);
+  public PosTagger(String modelFile, Dictionary dict, POSDictionary tagdict) {
+      super(getModel(modelFile), new DefaultPOSContextGenerator(dict),tagdict);
   }
 
-  public PosTagger(String modelFile) {
-    super(getModel(modelFile), new DefaultPOSContextGenerator());
+  public PosTagger(String modelFile, Dictionary dict) {
+    super(getModel(modelFile), new DefaultPOSContextGenerator(dict));
   }
 
   private static MaxentModel getModel(String name) {
@@ -66,29 +67,26 @@ public class PosTagger extends POSTaggerME {
    */
   public static void main(String[] args) throws IOException {
     if (args.length == 0) {
-      System.err.println("Usage: PosTagger [-td tagdict] model < tokenized_sentences");
-      System.err.println("       PosTaggerME -test model \"sentence\"");
+      System.err.println("Usage: PosTagger [-td tagdict] model dict < tokenized_sentences");
       System.exit(1);
     }
     int ai=0;
     boolean test = false;
     String tagdict = null;
     while(ai < args.length && args[ai].startsWith("-")) {
-      if (args[ai].equals("-test")) {
-        ai++;
-        test=true;
-      }
-      else if (args[ai].equals("-td")) {
+      if (args[ai].equals("-td")) {
         tagdict = args[ai+1];
         ai+=2;
       }
     }
     POSTaggerME tagger;
+    String model = args[ai++];
+    String dictFile = args[ai++];
     if (tagdict != null) {
-      tagger = new PosTagger(args[ai++],new POSDictionary(tagdict));
+      tagger = new PosTagger(args[ai++],new Dictionary(dictFile),new POSDictionary(tagdict));
     }
     else {
-      tagger = new PosTagger(args[ai++]);
+      tagger = new PosTagger(model,new Dictionary(dictFile));
     }
     if (test) {
       System.out.println(tagger.tag(args[ai]));

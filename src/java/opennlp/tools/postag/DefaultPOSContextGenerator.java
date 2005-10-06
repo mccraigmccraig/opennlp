@@ -21,6 +21,7 @@ package opennlp.tools.postag;
 import java.util.ArrayList;
 import java.util.regex.Pattern;
 
+import opennlp.tools.ngram.Dictionary;
 import opennlp.tools.util.Cache;
 
 /**
@@ -28,7 +29,7 @@ import opennlp.tools.util.Cache;
  *
  * @author      Gann Bierner
  * @author      Tom Morton
- * @version     $Revision: 1.8 $, $Date: 2004/11/05 00:22:35 $
+ * @version     $Revision: 1.9 $, $Date: 2005/10/06 11:09:56 $
  */
 
 public class DefaultPOSContextGenerator implements POSContextGenerator {
@@ -43,12 +44,17 @@ public class DefaultPOSContextGenerator implements POSContextGenerator {
   
   private Cache contextsCache;
   private Object wordsKey;
+  
+  private Dictionary dict;
+  private String[] dictGram;
 
-  public DefaultPOSContextGenerator() {
-    this(0);
+  public DefaultPOSContextGenerator(Dictionary dict) {
+    this(0,dict);
   }
   
-  public DefaultPOSContextGenerator(int cacheSize) {
+  public DefaultPOSContextGenerator(int cacheSize,Dictionary dict) {
+    this.dict = dict;
+    dictGram = new String[1];
     if (cacheSize > 0) {
       contextsCache = new Cache(cacheSize);
     }
@@ -137,30 +143,31 @@ public class DefaultPOSContextGenerator implements POSContextGenerator {
 
     // add the word itself
     e.add("w=" + lex);
-
-    // do some basic suffix analysis
-    String[] suffs = getSuffixes(lex);
-    for (int i = 0; i < suffs.length; i++) {
-      e.add("suf=" + suffs[i]);
+    dictGram[0] = lex;
+    if (dict == null || !dict.contains(dictGram)) {
+      // do some basic suffix analysis
+      String[] suffs = getSuffixes(lex);
+      for (int i = 0; i < suffs.length; i++) {
+        e.add("suf=" + suffs[i]);
+      }
+      
+      String[] prefs = getPrefixes(lex);
+      for (int i = 0; i < prefs.length; i++) {
+        e.add("pre=" + prefs[i]);
+      }
+      // see if the word has any special characters
+      if (lex.indexOf('-') != -1) {
+        e.add("h");
+      }
+      
+      if (hasCap.matcher(lex).find()) {
+        e.add("c");
+      }
+      
+      if (hasNum.matcher(lex).find()) {
+        e.add("d");
+      }
     }
-
-    String[] prefs = getPrefixes(lex);
-    for (int i = 0; i < prefs.length; i++) {
-      e.add("pre=" + prefs[i]);
-    }
-    // see if the word has any special characters
-    if (lex.indexOf('-') != -1) {
-      e.add("h");
-    }
-
-    if (hasCap.matcher(lex).find()) {
-      e.add("c");
-    }
-
-    if (hasNum.matcher(lex).find()) {
-      e.add("d");
-    }
-
     // add the words and pos's of the surrounding context
     if (prev != null) {
       e.add("p=" + prev);

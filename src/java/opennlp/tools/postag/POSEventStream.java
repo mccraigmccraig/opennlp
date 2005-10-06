@@ -18,12 +18,13 @@
 
 package opennlp.tools.postag;
 
-import opennlp.maxent.EventStream;
+import java.io.StringReader;
+
 import opennlp.maxent.DataStream;
 import opennlp.maxent.Event;
 import opennlp.maxent.EventCollector;
-
-import java.io.StringReader;
+import opennlp.maxent.EventStream;
+import opennlp.tools.ngram.Dictionary;
 
 /**
  * An implementation of EventStream whcih assumes the data stream gives a
@@ -40,8 +41,8 @@ public class POSEventStream implements EventStream {
   /** The last line read in from the data file. */
   private String line;
 
-  public POSEventStream(DataStream d) {
-    this(d, new DefaultPOSContextGenerator());
+  public POSEventStream(DataStream d, Dictionary dict) {
+    this(d, new DefaultPOSContextGenerator(dict));
   }
 
   public POSEventStream(DataStream d, POSContextGenerator cg) {
@@ -91,8 +92,8 @@ public class POSEventStream implements EventStream {
     //System.err.println("POSEventStream.addNewEvents: got "+events.length+" events");
   }
 
-  public static void main(String[] args) {
-    EventStream es = new POSEventStream(new opennlp.maxent.PlainTextByLineDataStream(new java.io.InputStreamReader(System.in)));
+  public static void main(String[] args) throws java.io.IOException {
+    EventStream es = new POSEventStream(new opennlp.maxent.PlainTextByLineDataStream(new java.io.InputStreamReader(System.in)),new Dictionary(args[0]));
     while (es.hasNext()) {
       System.out.println(es.nextEvent());
     }
