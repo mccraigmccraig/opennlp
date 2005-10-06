@@ -29,7 +29,8 @@ public class NGram {
     return words;
   }
 
-  public boolean equals(NGram ngram) {
+  public boolean equals(Object o) {
+    NGram ngram = (NGram) o;
     int wn = this.words.length;
     if (wn == ngram.words.length) {
       for (int wi=0;wi<wn;wi++) {
@@ -72,6 +73,26 @@ public class NGram {
   }
   
   public static void main(String[] args) throws java.io.IOException {
+    /*
+    NGram g1 = new NGram(new int[]{1,2,3});
+    NGram g2 = new NGram(new int[]{2,3,4});
+    NGram g3 = new NGram(new int[]{1,2,3});
+    assert(g1.equals(g3));
+    assert(g3.equals(g1));
+    assert(!g1.equals(g2));
+    assert(!g2.equals(g1));
+    assert(g1.hashCode() == g3.hashCode());
+    System.err.println("g1 == g3 "+g1.equals(g3));
+    opennlp.tools.util.CountedSet cset = new opennlp.tools.util.CountedSet();
+    cset.add(g1);
+    cset.add(g2);
+    cset.add(g3);
+    
+    for (java.util.Iterator ci = cset.iterator();ci.hasNext();) {
+      Object ng = ci.next();
+      System.err.println(ng+" "+cset.getCount(ng));
+    }
+    */
     BufferedReader in = new BufferedReader(new InputStreamReader(System.in));
     for (String line=in.readLine(); null != line; line=in.readLine()) {
       String[] snums = line.split(" ");
