@@ -166,58 +166,58 @@ public class BuildContextGenerator implements ContextGenerator {
       
       if (p_2 != null) {
         unigram[0] = p_2.toString();
-        u_2 = dict.get(unigram);
+        u_2 = dict.contains(unigram);
       }
       
       if (p2 != null) {
         unigram[0] = p2.toString();
-        u2 = dict.get(unigram);
+        u2 = dict.contains(unigram);
       }
 
       unigram[0] = p0.toString();
-      u0 = dict.get(unigram);
+      u0 = dict.contains(unigram);
       
       if (p_2 != null && p_1 != null) {
         bigram[0] = p_2.toString();
         bigram[1] = p_1.toString();
-        b_2_1 = dict.get(bigram);
+        b_2_1 = dict.contains(bigram);
         
         trigram[0] = p_2.toString();
         trigram[1] = p_1.toString();
         trigram[2] = p_1.toString();
-        t_2_10 = dict.get(trigram);
+        t_2_10 = dict.contains(trigram);
       }
       if (p_1 != null) {
         unigram[0] = p_1.toString();
-        u_1 = dict.get(unigram);
+        u_1 = dict.contains(unigram);
         
         bigram[0] = p_1.toString();
         bigram[1] = p0.toString();
-        b_10 = dict.get(bigram);
+        b_10 = dict.contains(bigram);
       }
       if (p1 != null) {
         unigram[0] = p1.toString();
-        u1 = dict.get(unigram);
+        u1 = dict.contains(unigram);
         
         bigram[0] = p0.toString();
         bigram[1] = p1.toString();
-        b01 = dict.get(bigram);
+        b01 = dict.contains(bigram);
       }
       if (p1 != null && p2 != null) {
         bigram[0] = p1.toString();
         bigram[1] = p2.toString();
-        b12 = dict.get(bigram);
+        b12 = dict.contains(bigram);
         
         trigram[0] = p0.toString();
         trigram[1] = p1.toString();
         trigram[2] = p2.toString();
-        t012 = dict.get(trigram);
+        t012 = dict.contains(trigram);
       }
       if (p_1 != null && p1 != null) {
         trigram[0] = p_1.toString();
         trigram[1] = p0.toString();
         trigram[2] = p1.toString();
-        t_101 = dict.get(trigram);
+        t_101 = dict.contains(trigram);
       }
     }
 
