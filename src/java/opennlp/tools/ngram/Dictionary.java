@@ -106,6 +106,7 @@ class DictionaryIterator implements Iterator {
   Iterator gramIterator;
   boolean onWords;
   String[] words;
+  Dictionary dict;
   
   public DictionaryIterator(Dictionary dict) {
     /*
@@ -118,6 +119,7 @@ class DictionaryIterator implements Iterator {
     wordIterator = dict.wordMap.iterator();
     gramIterator = dict.gramSet.iterator();
     onWords = true;
+    this.dict = dict;
   }
   public boolean hasNext() {
     if (onWords) {
@@ -133,7 +135,8 @@ class DictionaryIterator implements Iterator {
 
   public Object next() {
     if (onWords) {
-      return wordIterator.next();
+      String word = (String) wordIterator.next(); 
+      return word+"="+dict.wordMap.getIndex(word);
     }
     else {
       int[] gramInts = ((NGram) gramIterator.next()).getWords();
