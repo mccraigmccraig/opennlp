@@ -184,7 +184,7 @@ public class BuildContextGenerator implements ContextGenerator {
         
         trigram[0] = p_2.toString();
         trigram[1] = p_1.toString();
-        trigram[2] = p_1.toString();
+        trigram[2] = p0.toString();
         t_2_10 = dict.contains(trigram);
       }
       if (p_1 != null) {
@@ -356,15 +356,15 @@ public class BuildContextGenerator implements ContextGenerator {
         //cons(0),punct(1),cons(1),cons(2)
         for (Iterator pi1=punct1s.iterator();pi1.hasNext();) {
           String punct1 = punct((Parse) pi1.next(),1);
-          if (t012) features.add(consp0   + "," + punct1   +","+ consp1   +","+consp2);
+          if (t012) features.add(consp0     + "," + punct1   +","+ consp1   +","+consp2);
           
-          if (b12) features.add(consbop0 + "," + punct1   +","+ consp1   +","+consp2);
-          if (u0 && u2) features.add(consp0   + "," + punct1   +","+ consbop1 +","+consp2);
-          if (b01) features.add(consp0   + "," + punct1   +","+ consp1   +","+consbop2);
+          if (b12) features.add(consbop0    + "," + punct1   +","+ consp1   +","+consp2);
+          if (u0 && u2) features.add(consp0 + "," + punct1   +","+ consbop1 +","+consp2);
+          if (b01) features.add(consp0      + "," + punct1   +","+ consp1   +","+consbop2);
           
-          if (u2) features.add(consbop0 + "," + punct1   +","+ consbop1 +","+consp2);
-          if (u1) features.add(consbop0 + "," + punct1   +","+ consp1 +","+consbop2);
-          if (u0) features.add(consp0   + "," + punct1   +","+ consbop1 +","+consbop2);   
+          if (u2) features.add(consbop0     + "," + punct1   +","+ consbop1 +","+consp2);
+          if (u1) features.add(consbop0     + "," + punct1   +","+ consp1 +","+consbop2);
+          if (u0) features.add(consp0       + "," + punct1   +","+ consbop1 +","+consbop2);   
           
           features.add(consbop0 + "," + punct1   +","+ consbop1 +","+consbop2);
           
