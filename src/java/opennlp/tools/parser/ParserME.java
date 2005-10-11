@@ -518,6 +518,15 @@ public class ParserME {
     return newParses;
   }
   
+  /**
+   * Removes the punctuation from the specified set of chunks, adds it to the parses
+   * adjacent to the punctuation is specified, and returns a new array of parses with the punctuation
+   * removed.
+   * @param chunks A set of parses.
+   * @param punctSet The set of punctuation which is to be removed.
+   * @param addPunctuation Specifies whether collapsed punctuation should be added to the adjacent tokens.
+   * @return An array of parses which is a subset of chunks with punctuation removed.
+   */
   public static Parse[] collapsePunctuation(Parse[] chunks, Set punctSet) {
     List collapsedParses = new ArrayList(chunks.length);
     int lastNonPunct = -1;
