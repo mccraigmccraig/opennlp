@@ -295,7 +295,7 @@ public class ParserEventStream implements EventStream {
 
   public static void main(String[] args) throws java.io.IOException {
     if (args.length == 0) {
-      System.err.println("Usage ParserEventStream -[tag|chunk|build|check|fun] head_rules < parses");
+      System.err.println("Usage ParserEventStream -[tag|chunk|build|check|fun] head_rules dictionary < parses");
       System.exit(1);
     }
     EventTypeEnum etype = null;
@@ -324,10 +324,14 @@ public class ParserEventStream implements EventStream {
       ai++;
     }
     HeadRules rules = new opennlp.tools.lang.english.HeadRules(args[ai++]);
+    Dictionary dict = null;
+    if (ai < args.length) {
+      dict = new Dictionary(args[ai++]);
+    }
     if (fun) {
       Parse.useFunctionTags(true);
     }
-    opennlp.maxent.EventStream es = new ParserEventStream(new opennlp.maxent.PlainTextByLineDataStream(new java.io.InputStreamReader(System.in)), rules, etype, null);
+    opennlp.maxent.EventStream es = new ParserEventStream(new opennlp.maxent.PlainTextByLineDataStream(new java.io.InputStreamReader(System.in)), rules, etype, dict);
     while (es.hasNext()) {
       System.out.println(es.nextEvent());
     }
