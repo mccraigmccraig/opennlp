@@ -1,10 +1,12 @@
 package opennlp.tools.ngram;
 
+import java.io.BufferedReader;
 import java.io.DataInputStream;
 import java.io.EOFException;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
@@ -94,9 +96,22 @@ public class Dictionary {
       System.exit(0);
     }
     Dictionary dict = new Dictionary(args[0]);
+    BufferedReader in = new BufferedReader(new InputStreamReader(System.in));
+    String line;
+    while (null != (line = in.readLine())) {
+      String[] words = line.split(" ");
+      if (dict.contains(words)) {
+        System.out.println("Dictionary contains: "+line);
+      }
+      else {
+        System.out.println("Dictionary does not contain: "+line);
+      }
+    }
+    /*
     for (Iterator di = dict.iterator();di.hasNext();) {
       System.out.println(di.next());
     }
+    */
   }
 }
 
