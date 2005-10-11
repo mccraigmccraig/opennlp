@@ -18,6 +18,7 @@
 package opennlp.tools.parser;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
@@ -125,10 +126,10 @@ public class BuildContextGenerator implements ContextGenerator {
     Parse p1 = null;
     Parse p2 = null;
     
-    Set punct1s = null;
-    Set punct2s = null;
-    Set punct_1s = null;
-    Set punct_2s = null;
+    Collection punct1s = null;
+    Collection punct2s = null;
+    Collection punct_1s = null;
+    Collection punct_2s = null;
 
     if (index - 2 >= 0) {
       p_2 = constituents[index - 2];
@@ -165,16 +166,16 @@ public class BuildContextGenerator implements ContextGenerator {
     if (dict != null) {
       
       if (p_2 != null) {
-        unigram[0] = p_2.toString();
+        unigram[0] = p_2.getHead().toString();
         u_2 = dict.contains(unigram);
       }
       
       if (p2 != null) {
-        unigram[0] = p2.toString();
+        unigram[0] = p2.getHead().toString();
         u2 = dict.contains(unigram);
       }
 
-      unigram[0] = p0.toString();
+      unigram[0] = p0.getHead().toString();
       u0 = dict.contains(unigram);
       
       if (p_2 != null && p_1 != null) {
@@ -182,41 +183,41 @@ public class BuildContextGenerator implements ContextGenerator {
         bigram[1] = p_1.toString();
         b_2_1 = dict.contains(bigram);
         
-        trigram[0] = p_2.toString();
-        trigram[1] = p_1.toString();
-        trigram[2] = p0.toString();
+        trigram[0] = p_2.getHead().toString();
+        trigram[1] = p_1.getHead().toString();
+        trigram[2] = p0.getHead().toString();
         t_2_10 = dict.contains(trigram);
       }
       if (p_1 != null) {
-        unigram[0] = p_1.toString();
+        unigram[0] = p_1.getHead().toString();
         u_1 = dict.contains(unigram);
         
-        bigram[0] = p_1.toString();
-        bigram[1] = p0.toString();
+        bigram[0] = p_1.getHead().toString();
+        bigram[1] = p0.getHead().toString();
         b_10 = dict.contains(bigram);
       }
       if (p1 != null) {
-        unigram[0] = p1.toString();
+        unigram[0] = p1.getHead().toString();
         u1 = dict.contains(unigram);
         
-        bigram[0] = p0.toString();
-        bigram[1] = p1.toString();
+        bigram[0] = p0.getHead().toString();
+        bigram[1] = p1.getHead().toString();
         b01 = dict.contains(bigram);
       }
       if (p1 != null && p2 != null) {
-        bigram[0] = p1.toString();
-        bigram[1] = p2.toString();
+        bigram[0] = p1.getHead().toString();
+        bigram[1] = p2.getHead().toString();
         b12 = dict.contains(bigram);
         
-        trigram[0] = p0.toString();
-        trigram[1] = p1.toString();
-        trigram[2] = p2.toString();
+        trigram[0] = p0.getHead().toString();
+        trigram[1] = p1.getHead().toString();
+        trigram[2] = p2.getHead().toString();
         t012 = dict.contains(trigram);
       }
       if (p_1 != null && p1 != null) {
-        trigram[0] = p_1.toString();
-        trigram[1] = p0.toString();
-        trigram[2] = p1.toString();
+        trigram[0] = p_1.getHead().toString();
+        trigram[1] = p0.getHead().toString();
+        trigram[2] = p1.getHead().toString();
         t_101 = dict.contains(trigram);
       }
     }
@@ -233,6 +234,11 @@ public class BuildContextGenerator implements ContextGenerator {
     String consbop1 = consbo(p1, 1);
     String consbop2 = consbo(p2, 2);
 
+    //features.add(p_1.getHead()+"=u_1="+u_1);
+    //features.add(p0.getHead()+"=u0="+u0);
+    //features.add(p1.getHead()+"=u1="+u1);
+    
+    // features.add("stage=cons(i)");
     // cons(-2), cons(-1), cons(0), cons(1), cons(2)
     if (u0) features.add(consp0);
     features.add(consbop0);
@@ -247,6 +253,7 @@ public class BuildContextGenerator implements ContextGenerator {
     features.add(consbop2);
 
     //cons(0),cons(1)
+    //features.add("stage=cons(0),cons(1)");
     if (punct1s != null) {
       for (Iterator pi=punct1s.iterator();pi.hasNext();) {
         String punct = punct((Parse) pi.next(),1);
@@ -270,6 +277,7 @@ public class BuildContextGenerator implements ContextGenerator {
       features.add(consbop0 + "," + consbop1);      
     }
     
+    //features.add("stage=cons(-1),cons(0)");
     //cons(-1,0)
     if (punct_1s != null) {
       for (Iterator pi=punct_1s.iterator();pi.hasNext();) {
@@ -293,7 +301,7 @@ public class BuildContextGenerator implements ContextGenerator {
       if (u_1) features.add(consp_1 + "," + consbop0);
       features.add(consbop_1 + "," + consbop0);      
     }
-    
+    //features.add("stage=cons(0),cons(1),cons(2)");
     if (punct2s != null) {
       for (Iterator pi=punct2s.iterator();pi.hasNext();) {
         String punct = punct((Parse) pi.next(),2);
@@ -386,7 +394,7 @@ public class BuildContextGenerator implements ContextGenerator {
         features.add(consbop0 + "," + consbop1 + "," + consbop2);
       }
     }
-    
+    //features.add("stage=cons(-2),cons(-1),cons(0)");
     if (punct_2s != null) {
       for (Iterator pi=punct_2s.iterator();pi.hasNext();) {
         String punct = punct((Parse) pi.next(),-2);
@@ -480,6 +488,7 @@ public class BuildContextGenerator implements ContextGenerator {
         features.add(consbop_2 + "," + consbop_1 + "," +consbop0);
       }
     }
+    //features.add("stage=cons(-1),cons(0),cons(1)");
     if (punct_1s !=null) {
       if (punct1s != null) {
         //cons(-1),punct(-1),cons(0),punct(1),cons(1)
@@ -578,7 +587,8 @@ public class BuildContextGenerator implements ContextGenerator {
         features.add(consbop_1 + "," + consbop0 + "," +consbop1);
       }
     }
-    
+
+    //features.add("stage=other");
     String p0Word = p0.toString();
     if (p0Word.equals("-RRB-")) {
       for (int pi = index - 1; pi >= 0; pi--) {

@@ -17,8 +17,10 @@
 //////////////////////////////////////////////////////////////////////////////   
 package opennlp.tools.parser;
 
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
@@ -57,9 +59,9 @@ public class Parse implements Cloneable, Comparable {
   private static Pattern tokenPattern = Pattern.compile("^[^ ()]+ ([^ ()]+)\\s*\\)");
   
   /** The set of punctuation parses which are between this parse and the previous parse. */
-  private Set prevPunctSet;
+  private Collection prevPunctSet;
   /** The set of punctuation parses which are between this parse and the subsequent parse. */
-  private Set nextPunctSet;
+  private Collection nextPunctSet;
   
   private static boolean useFunctionTags;
 
@@ -119,7 +121,7 @@ public class Parse implements Cloneable, Comparable {
    * Returns the set of punctuation parses that occur immediately before this parse.
    * @return the set of punctuation parses that occur immediately before this parse.
    */
-  public Set getPreviousPunctuationSet() {
+  public Collection getPreviousPunctuationSet() {
     return prevPunctSet;
   }
   
@@ -129,7 +131,7 @@ public class Parse implements Cloneable, Comparable {
    */
   public void addPreviousPunctuation(Parse punct) {
     if (this.prevPunctSet == null) {
-      this.prevPunctSet = new HashSet();
+      this.prevPunctSet = new LinkedHashSet();
     }
     prevPunctSet.add(punct);
   }
@@ -138,7 +140,7 @@ public class Parse implements Cloneable, Comparable {
    * Returns the set of punctuation parses that occur immediately after this parse.
    * @return the set of punctuation parses that occur immediately after this parse.
    */
-  public Set getNextPunctuationSet() {
+  public Collection getNextPunctuationSet() {
     return nextPunctSet;
   }
   
@@ -148,7 +150,7 @@ public class Parse implements Cloneable, Comparable {
    */
   public void addNextPunctuation(Parse punct) {
     if (this.nextPunctSet == null) {
-      this.nextPunctSet = new HashSet();
+      this.nextPunctSet = new LinkedHashSet();
     }
     nextPunctSet.add(punct);
   }
@@ -157,7 +159,7 @@ public class Parse implements Cloneable, Comparable {
    * Sets the set of punctuation tags which follow this parse.
    * @param punctSet The set of puncuation tags which follow this parse.
    */
-  public void setNextPunctuation(Set punctSet) {
+  public void setNextPunctuation(Collection punctSet) {
     this.nextPunctSet = punctSet;
   }
   
@@ -165,7 +167,7 @@ public class Parse implements Cloneable, Comparable {
    * Sets the set of punctuation tags which preceed this parse.
    * @param punctSet The set of puncuation tags which preceed this parse.
    */
-  public void setPrevPunctuation(Set punctSet) {
+  public void setPrevPunctuation(Collection punctSet) {
     this.prevPunctSet = punctSet;
   }
 

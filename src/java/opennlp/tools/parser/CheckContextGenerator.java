@@ -18,6 +18,7 @@
 package opennlp.tools.parser;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
@@ -45,7 +46,7 @@ public class CheckContextGenerator implements ContextGenerator {
     return getContext((Parse[]) params[0], (String) params[1], ((Integer) params[2]).intValue(), ((Integer) params[3]).intValue());
   }
 
-  private void surround(Parse p, int i, String type, Set punctSet, List features) {
+  private void surround(Parse p, int i, String type, Collection punctSet, List features) {
     StringBuffer feat = new StringBuffer(20);
     feat.append("s").append(i).append("=");
     if (punctSet !=null) {
@@ -148,7 +149,7 @@ public class CheckContextGenerator implements ContextGenerator {
       checkcons(p, pend, type, features);
       production.append(p.getType()).append(",");
       punctProduction.append(p.getType()).append(",");
-      Set nextPunct = p.getNextPunctuationSet();
+      Collection nextPunct = p.getNextPunctuationSet();
       if (nextPunct != null) {
         for (Iterator pit=nextPunct.iterator();pit.hasNext();) {
           Parse punct = (Parse) pit.next();
@@ -164,10 +165,10 @@ public class CheckContextGenerator implements ContextGenerator {
     Parse p_1 = null;
     Parse p1 = null;
     Parse p2 = null;
-    Set p1s = constituents[end].getNextPunctuationSet();
-    Set p2s = null;
-    Set p_1s = constituents[start].getPreviousPunctuationSet();
-    Set p_2s = null;
+    Collection p1s = constituents[end].getNextPunctuationSet();
+    Collection p2s = null;
+    Collection p_1s = constituents[start].getPreviousPunctuationSet();
+    Collection p_2s = null;
     if (start - 2 >= 0) {
       p_2 = constituents[start - 2];
     }
