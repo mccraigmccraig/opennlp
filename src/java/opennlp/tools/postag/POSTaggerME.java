@@ -52,7 +52,7 @@ import opennlp.tools.util.Sequence;
  * surrounding context.
  *
  * @author      Gann Bierner
- * @version $Revision: 1.11 $, $Date: 2005/10/06 11:09:56 $
+ * @version $Revision: 1.12 $, $Date: 2005/10/12 12:40:03 $
  */
 public class POSTaggerME implements Evalable, POSTagger {
 
@@ -318,7 +318,7 @@ public class POSTaggerME implements Evalable, POSTagger {
         for (int wi=0;wi<words.length;wi++) {
           words[wi] = tt[wi].substring(0,tt[wi].lastIndexOf('_'));
         }
-        mdict.add(words,3);
+        mdict.add(words,1,true);
       }
       System.out.println("Saving the dictionary");
       mdict.persist(new File(dict));

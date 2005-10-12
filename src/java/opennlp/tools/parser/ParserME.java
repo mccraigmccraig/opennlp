@@ -644,7 +644,7 @@ public class ParserME {
       for (Iterator pi=rules.getPunctuationTags().iterator();pi.hasNext();) {
         punctGram[0] = (String) pi.next();
         for (int ci=0;ci<cutoff;ci++) {
-          mdict.add(punctGram,1);
+          mdict.add(punctGram,1,true);
         }
       }
       while(data.hasNext()) {
@@ -656,7 +656,7 @@ public class ParserME {
         for (int wi=0;wi<words.length;wi++) {
           words[wi] = cwords[wi].toString();
         }
-        mdict.add(words,3);
+        mdict.add(words,3,true);
       }
       System.out.println("Saving the dictionary");
       mdict.persist(dictFile);

@@ -166,6 +166,41 @@ public class ParserEventStream implements EventStream {
     }
     this.events = (Event[]) events.toArray(new Event[events.size()]);
   }
+  
+  private static  Parse[] reduceChunks(Parse[] chunks, int ci, Parse parent) {
+    String type = parent.getType();
+    //  perform reduce
+    int reduceStart = ci;
+    int reduceEnd = ci;
+    while (reduceStart >=0 && chunks[reduceStart].getParent() == parent) {
+      reduceStart--;
+    }
+    reduceStart++;
+    Parse[] reducedChunks;
+    if (!type.equals(ParserME.TOP_NODE)) {
+      reducedChunks = new Parse[chunks.length-(reduceEnd-reduceStart+1)+1]; //total - num_removed + 1 (for new node)
+      //insert nodes before reduction
+      for (int ri=0,rn=reduceStart;ri<rn;ri++) {
+        reducedChunks[ri]=chunks[ri];
+      }
+      //insert reduced node
+      reducedChunks[reduceStart]=parent;
+      //propagate punctuation sets
+      parent.setPrevPunctuation(chunks[reduceStart].getPreviousPunctuationSet());
+      parent.setNextPunctuation(chunks[reduceEnd].getNextPunctuationSet());
+      //insert nodes after reduction
+      int ri=reduceStart+1;
+      for (int rci=reduceEnd+1;rci<chunks.length;rci++) {
+        reducedChunks[ri]=chunks[rci];
+        ri++;
+      }
+      ci=reduceStart-1; //ci will be incremented at end of loop
+    }
+    else {
+      reducedChunks = new Parse[0];
+    }
+    return reducedChunks;
+  }
 
   private void addParseEvents(List events, Parse[] chunks) {
     int ci = 0;
@@ -202,29 +237,8 @@ public class ParserEventStream implements EventStream {
             reduceStart--;
           }
           reduceStart++;
-          if (!type.equals(ParserME.TOP_NODE)) {
-            Parse[] reducedChunks = new Parse[chunks.length-(reduceEnd-reduceStart+1)+1]; //total - num_removed + 1 (for new node)
-            //insert nodes before reduction
-            for (int ri=0,rn=reduceStart;ri<rn;ri++) {
-              reducedChunks[ri]=chunks[ri];
-            }
-            //insert reduced node
-            reducedChunks[reduceStart]=parent;
-            //propagate punctuation sets
-            parent.setPrevPunctuation(chunks[reduceStart].getPreviousPunctuationSet());
-            parent.setNextPunctuation(chunks[reduceEnd].getNextPunctuationSet());
-            //insert nodes after reduction
-            int ri=reduceStart+1;
-            for (int rci=reduceEnd+1;rci<chunks.length;rci++) {
-              reducedChunks[ri]=chunks[rci];
-              ri++;
-            }
-            chunks = reducedChunks;
-            ci=reduceStart-1; //ci will be incremented at end of loop
-          }
-          else {
-            chunks = new Parse[0];
-          }
+          chunks = reduceChunks(chunks,ci,parent);
+          ci=reduceStart-1; //ci will be incremented at end of loop
         }
         else {
           if (etype == EventTypeEnum.CHECK) {
