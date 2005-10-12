@@ -56,11 +56,13 @@ public class MutableDictionary extends Dictionary {
    * @param words The words from which n-grams are derived.
    * @param size The size of the n-grams to collect.
    */
-  public void add(String[] words,int size) {
+  public void add(String[] words,int size, boolean unigrams) {
     List gram = new ArrayList(size);
     //create uni-grams so n-grams can be created.
-    for (int wi=0,wn=words.length;wi<wn;wi++) {
-      wordMap.add(words[wi]);
+    if (unigrams) {
+      for (int wi=0,wn=words.length;wi<wn;wi++) {
+        wordMap.add(words[wi]);
+      }
     }
     for (int wi=0,wn=words.length;wi<wn;wi++) {
       //create all n-gram which start with wi
