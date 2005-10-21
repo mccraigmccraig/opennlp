@@ -18,6 +18,7 @@
 package opennlp.tools.parser;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -561,6 +562,11 @@ public class ParserME {
     return opennlp.maxent.GIS.trainModel(iterations, new TwoPassDataIndexer(es, cut));
   }
   
+  private static boolean lastChild(Parse child, Parse parent, Set punctSet) {
+    Parse[] kids = collapsePunctuation(parent.getChildren(),punctSet);
+    return (kids[kids.length - 1] == child);
+  }
+  
   private static void usage() {
     System.err.println("Usage: ParserME -[dict|tag|chunk|build|check|fun] trainingFile headRules parserModelDirectory [iterations cutoff]");
     System.err.println();
@@ -638,25 +644,65 @@ public class ParserME {
     if (dict || all) {
       System.err.println("Building dictionary");
       MutableDictionary mdict = new MutableDictionary(cutoff);
+      String[] punct = new String[1];
       DataStream data = new opennlp.maxent.PlainTextByLineDataStream(new java.io.FileReader(inFile));
-      // add punctuation unigram so taggeer doesn't treat them as unknown words.
-      String[] punctGram = new String[1];
-      for (Iterator pi=rules.getPunctuationTags().iterator();pi.hasNext();) {
-        punctGram[0] = (String) pi.next();
-        for (int ci=0;ci<cutoff;ci++) {
-          mdict.add(punctGram,1,true);
-        }
-      }
       while(data.hasNext()) {
         String parseStr = (String) data.nextToken();
         Parse p = Parse.parseParse(parseStr);
+        p.updateHeads(rules);
         Parse[] pwords = p.getTagNodes();
-        Parse[] cwords = collapsePunctuation(pwords,rules.getPunctuationTags());
-        String[] words = new String[cwords.length];
+        String[] words = new String[pwords.length];
+        //add all uni-grams
         for (int wi=0;wi<words.length;wi++) {
-          words[wi] = cwords[wi].toString();
+          words[wi] = pwords[wi].toString();
         }
-        mdict.add(words,3,true);
+        mdict.add(words,1,true);
+        //add tri-grams and bi-grams for inital sequence
+        Parse[] chunks = collapsePunctuation(ParserEventStream.getInitialChunks(p),rules.getPunctuationTags());
+        String[] cwords = new String[chunks.length];
+        for (int wi=0;wi<cwords.length;wi++) {
+          cwords[wi] = chunks[wi].getHead().toString();
+        }
+        mdict.add(cwords,3,false);
+        //emulate reductions to produce additional n-grams 
+        int ci = 0;
+        while (ci < chunks.length) {
+          //System.err.println("chunks["+ci+"]="+chunks[ci].getHead().toString()+" chunks.length="+chunks.length);
+          if (lastChild(chunks[ci], chunks[ci].getParent(),rules.getPunctuationTags())) {
+            //perform reduce
+            int reduceStart = ci;
+            while (reduceStart >=0 && chunks[reduceStart].getParent() == chunks[ci].getParent()) {
+              reduceStart--;
+            }
+            reduceStart++;
+            chunks = ParserEventStream.reduceChunks(chunks,ci,chunks[ci].getParent());
+            ci = reduceStart;
+            if (chunks.length != 0) {
+              String[] window = new String[5];
+              int wi = 0;
+              if (ci-2 >= 0) window[wi++] = chunks[ci-2].getHead().toString();
+              if (ci-1 >= 0) window[wi++] = chunks[ci-1].getHead().toString();
+              window[wi++] = chunks[ci].getHead().toString();
+              if (ci+1 < chunks.length) window[wi++] = chunks[ci+1].getHead().toString();
+              if (ci+2 < chunks.length) window[wi++] = chunks[ci+2].getHead().toString();
+              if (wi < 5) {
+                String[] subWindow = new String[wi];
+                for (int swi=0;swi<wi;swi++) {
+                  subWindow[swi]=window[swi];
+                }
+                window = subWindow;
+              }
+              if (window.length >=3) {
+                mdict.add(window,3,false);
+              }
+              else if (window.length == 2) {
+                mdict.add(window,2,false);
+              }
+            }
+            ci=reduceStart-1; //ci will be incremented at end of loop
+          }
+          ci++;
+        }
       }
       System.out.println("Saving the dictionary");
       mdict.persist(dictFile);
