@@ -121,7 +121,7 @@ public class ParserEventStream implements EventStream {
     }
   }
 
-  private static Parse[] getInitialChunks(Parse p) {
+  public static Parse[] getInitialChunks(Parse p) {
     List chunks = new ArrayList();
     getInitialChunks(p, chunks);
     return (Parse[]) chunks.toArray(new Parse[chunks.size()]);
@@ -167,7 +167,7 @@ public class ParserEventStream implements EventStream {
     this.events = (Event[]) events.toArray(new Event[events.size()]);
   }
   
-  private static  Parse[] reduceChunks(Parse[] chunks, int ci, Parse parent) {
+  public static  Parse[] reduceChunks(Parse[] chunks, int ci, Parse parent) {
     String type = parent.getType();
     //  perform reduce
     int reduceStart = ci;
@@ -309,7 +309,7 @@ public class ParserEventStream implements EventStream {
 
   public static void main(String[] args) throws java.io.IOException {
     if (args.length == 0) {
-      System.err.println("Usage ParserEventStream -[tag|chunk|build|check|fun] head_rules dictionary < parses");
+      System.err.println("Usage ParserEventStream -[tag|chunk|build|check|fun] head_rules [dictionary] < parses");
       System.exit(1);
     }
     EventTypeEnum etype = null;
