@@ -71,7 +71,13 @@ public class MutableDictionary extends Dictionary {
       for (int gi=2;gi<=size;gi++) {
         if (wi+gi-1 < words.length) {
           gram.add(words[wi+gi-1]);
-          gramSet.add(nGramFactory.createNGram(gram));
+          NGram ngram = nGramFactory.createNGram(gram);
+          if (ngram != null) {
+            gramSet.add(ngram);
+          }
+          else {
+            throw new NullPointerException();
+          }
         }
       }
     }
