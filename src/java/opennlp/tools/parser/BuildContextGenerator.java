@@ -179,8 +179,8 @@ public class BuildContextGenerator implements ContextGenerator {
       u0 = dict.contains(unigram);
       
       if (p_2 != null && p_1 != null) {
-        bigram[0] = p_2.toString();
-        bigram[1] = p_1.toString();
+        bigram[0] = p_2.getHead().toString();
+        bigram[1] = p_1.getHead().toString();
         b_2_1 = dict.contains(bigram);
         
         trigram[0] = p_2.getHead().toString();
@@ -188,21 +188,24 @@ public class BuildContextGenerator implements ContextGenerator {
         trigram[2] = p0.getHead().toString();
         t_2_10 = dict.contains(trigram);
       }
+      if (p_1 != null && p1 != null) {
+        trigram[0] = p_1.getHead().toString();
+        trigram[1] = p0.getHead().toString();
+        trigram[2] = p1.getHead().toString();
+        t_101 = dict.contains(trigram);
+      }
       if (p_1 != null) {
         unigram[0] = p_1.getHead().toString();
         u_1 = dict.contains(unigram);
         
+        //extra check fpr 2==null case
+        b_2_1 = b_2_1 && u_1; 
+        t_2_10 = t_2_10 && u_1;
+        t_101 = t_101 && u_1;
+        
         bigram[0] = p_1.getHead().toString();
         bigram[1] = p0.getHead().toString();
         b_10 = dict.contains(bigram);
-      }
-      if (p1 != null) {
-        unigram[0] = p1.getHead().toString();
-        u1 = dict.contains(unigram);
-        
-        bigram[0] = p0.getHead().toString();
-        bigram[1] = p1.getHead().toString();
-        b01 = dict.contains(bigram);
       }
       if (p1 != null && p2 != null) {
         bigram[0] = p1.getHead().toString();
@@ -214,11 +217,18 @@ public class BuildContextGenerator implements ContextGenerator {
         trigram[2] = p2.getHead().toString();
         t012 = dict.contains(trigram);
       }
-      if (p_1 != null && p1 != null) {
-        trigram[0] = p_1.getHead().toString();
-        trigram[1] = p0.getHead().toString();
-        trigram[2] = p1.getHead().toString();
-        t_101 = dict.contains(trigram);
+      if (p1 != null) {
+        unigram[0] = p1.getHead().toString();
+        u1 = dict.contains(unigram);
+        
+        //extra check fpr 2==null case
+        b12 = b12 && u1;
+        t012 = t012 && u1;
+        t_101 = t_101 && u1;
+        
+        bigram[0] = p0.getHead().toString();
+        bigram[1] = p1.getHead().toString();
+        b01 = dict.contains(bigram);
       }
     }
 
