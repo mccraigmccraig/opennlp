@@ -104,6 +104,8 @@ public class ParserME {
   private boolean createDerivationString = false;
   private boolean debugOn = false;
   
+  protected boolean reportFailedParse;
+  
   /**
    * Creates a new parser using the specified models and head rules.
    * @param buildModel The model to assign constituent labels.
@@ -135,6 +137,7 @@ public class ParserME {
     this.M = beamSize;
     this.K = beamSize;
     this.Q = advancePercentage;
+    reportFailedParse = true;
     bprobs = new double[buildModel.getNumOutcomes()];
     cprobs = new double[checkModel.getNumOutcomes()];
     this.buildContextGenerator = new BuildContextGenerator();
@@ -238,7 +241,7 @@ public class ParserME {
       }
     }
     if (parses.size() == 0) {
-      System.err.println("Couldn't find parse for: " + tokens);
+      if (reportFailedParse) System.err.println("Couldn't find parse for: " + tokens);
       //Parse r = (Parse) odh.first();
       //r.show();
       //System.out.println();
@@ -630,7 +633,7 @@ public class ParserME {
     java.io.File dictFile = new java.io.File(modelDirectory+"/dict.bin.gz");
     java.io.File tagFile = new java.io.File(modelDirectory+"/tag.bin.gz");
     java.io.File chunkFile = new java.io.File(modelDirectory+"/chunk.bin.gz");
-    java.io.File buildFile = new java.io.File(modelDirectory+"/build.bin.gz");
+    java.io.File buildFile = new java.io.File(modelDirectory+"/build");
     java.io.File checkFile = new java.io.File(modelDirectory+"/check.bin.gz");
     int iterations = 100;
     int cutoff = 5;
