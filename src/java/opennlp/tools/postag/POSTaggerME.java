@@ -52,7 +52,7 @@ import opennlp.tools.util.Sequence;
  * surrounding context.
  *
  * @author      Gann Bierner
- * @version $Revision: 1.12 $, $Date: 2005/10/12 12:40:03 $
+ * @version $Revision: 1.13 $, $Date: 2005/11/01 23:04:37 $
  */
 public class POSTaggerME implements Evalable, POSTagger {
 
@@ -69,7 +69,7 @@ public class POSTaggerME implements Evalable, POSTagger {
   /**
    * Tag dictionary used for restricting words to a fixed set of tags.
    */
-  protected POSDictionary tagDictionary;
+  protected TagDictionary tagDictionary;
   
   protected Dictionary ngramDictionary;
 
@@ -93,7 +93,7 @@ public class POSTaggerME implements Evalable, POSTagger {
     this(mod, new DefaultPOSContextGenerator(dict));
   }
   
-  public POSTaggerME(MaxentModel mod,Dictionary dict,POSDictionary tagdict) {
+  public POSTaggerME(MaxentModel mod,Dictionary dict,TagDictionary tagdict) {
       this(DEFAULT_BEAM_SIZE,mod, new DefaultPOSContextGenerator(dict),tagdict);
     }
   
@@ -101,11 +101,11 @@ public class POSTaggerME implements Evalable, POSTagger {
     this(DEFAULT_BEAM_SIZE,mod,cg,null);
   }
   
-  public POSTaggerME(MaxentModel mod, POSContextGenerator cg, POSDictionary dict) {
+  public POSTaggerME(MaxentModel mod, POSContextGenerator cg, TagDictionary dict) {
       this(DEFAULT_BEAM_SIZE,mod,cg,dict);
     }
 
-  public POSTaggerME(int beamSize, MaxentModel mod, POSContextGenerator cg,POSDictionary tagdict) {
+  public POSTaggerME(int beamSize, MaxentModel mod, POSContextGenerator cg, TagDictionary tagdict) {
     size = beamSize;
     _posModel = mod;
     _contextGen = cg;

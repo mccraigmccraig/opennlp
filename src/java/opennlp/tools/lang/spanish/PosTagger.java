@@ -30,6 +30,7 @@ import opennlp.tools.ngram.Dictionary;
 import opennlp.tools.postag.DefaultPOSContextGenerator;
 import opennlp.tools.postag.POSDictionary;
 import opennlp.tools.postag.POSTaggerME;
+import opennlp.tools.postag.TagDictionary;
 
 /**
  * A part of speech tagger that uses a model trained on Spanish data.
@@ -37,7 +38,7 @@ import opennlp.tools.postag.POSTaggerME;
 
 public class PosTagger extends POSTaggerME {
 
-  public PosTagger(String modelFile, Dictionary dict, POSDictionary tagdict) {
+  public PosTagger(String modelFile, Dictionary dict, TagDictionary tagdict) {
       super(getModel(modelFile), new DefaultPOSContextGenerator(dict),tagdict);
   }
 

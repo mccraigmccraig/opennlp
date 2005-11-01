@@ -29,6 +29,7 @@ import opennlp.tools.ngram.Dictionary;
 import opennlp.tools.postag.DefaultPOSContextGenerator;
 import opennlp.tools.postag.POSDictionary;
 import opennlp.tools.postag.POSTaggerME;
+import opennlp.tools.postag.TagDictionary;
 
 /**
  * A part of speech tagger that uses a model trained on English data from the
@@ -36,12 +37,12 @@ import opennlp.tools.postag.POSTaggerME;
  * achieved >96% accuracy on unseen data.
  *
  * @author      Gann Bierner
- * @version     $Revision: 1.2 $, $Date: 2005/10/06 11:07:42 $
+ * @version     $Revision: 1.3 $, $Date: 2005/11/01 23:04:37 $
  */
 
 public class PosTagger extends POSTaggerME {
 
-  public PosTagger(String modelFile, Dictionary dict, POSDictionary tagdict) {
+  public PosTagger(String modelFile, Dictionary dict, TagDictionary tagdict) {
       super(getModel(modelFile), new DefaultPOSContextGenerator(dict),tagdict);
   }
 
