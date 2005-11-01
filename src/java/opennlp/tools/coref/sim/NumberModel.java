@@ -17,27 +17,20 @@
 //////////////////////////////////////////////////////////////////////////////
 package opennlp.tools.coref.sim;
 
-import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
-import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
-import opennlp.tools.coref.*;
-import opennlp.tools.coref.mention.MentionContext;
-import opennlp.tools.coref.resolver.MaxentResolver;
-
-import opennlp.tools.util.CollectionEventStream;
-import opennlp.tools.util.HashList;
-
 import opennlp.maxent.Event;
 import opennlp.maxent.GIS;
 import opennlp.maxent.MaxentModel;
-import opennlp.maxent.io.PlainTextGISModelReader;
 import opennlp.maxent.io.SuffixSensitiveGISModelReader;
 import opennlp.maxent.io.SuffixSensitiveGISModelWriter;
+import opennlp.tools.coref.Linker;
+import opennlp.tools.util.CollectionEventStream;
+import opennlp.tools.util.HashList;
 
 /**
  * Class which models the number of particular mentions and the entities made up of mentions. 
@@ -68,12 +61,10 @@ public class NumberModel implements TestNumberModel, TrainSimilarityModel {
       events = new ArrayList();
     }
     else {
-      if (MaxentResolver.loadAsResource()) {
-        testModel = (new PlainTextGISModelReader(new BufferedReader(new InputStreamReader(this.getClass().getResourceAsStream(modelName))))).getModel();
-      }
-      else {
-        testModel = (new SuffixSensitiveGISModelReader(new File(modelName+modelExtension))).getModel();
-      }
+      //if (MaxentResolver.loadAsResource()) {
+      //  testModel = (new PlainTextGISModelReader(new BufferedReader(new InputStreamReader(this.getClass().getResourceAsStream(modelName))))).getModel();
+      //}
+      testModel = (new SuffixSensitiveGISModelReader(new File(modelName+modelExtension))).getModel();
       singularIndex = testModel.getIndex(NumberEnum.SINGULAR.toString());
       pluralIndex = testModel.getIndex(NumberEnum.PLURAL.toString());
     }
@@ -86,8 +77,8 @@ public class NumberModel implements TestNumberModel, TrainSimilarityModel {
     for (int ti = 0, tl = npTokens.length - 1; ti < tl; ti++) {
       features.add("mw=" + npTokens[ti].toString());
     }
-    features.add("hw=" + np1.getHeadToken().toLowerCase());
-    features.add("ht=" + np1.getHeadTag());
+    features.add("hw=" + np1.getHeadTokenText().toLowerCase());
+    features.add("ht=" + np1.getHeadTokenTag());
     return features;
   }
 
@@ -96,7 +87,7 @@ public class NumberModel implements TestNumberModel, TrainSimilarityModel {
     events.add(new Event(outcome, (String[]) feats.toArray(new String[feats.size()])));
   }
 
-  public NumberEnum getNumber(MentionContext ec) {
+  public NumberEnum getNumber(Context ec) {
     if (Linker.singularPronounPattern.matcher(ec.getHeadTokenText()).matches()) {
       return NumberEnum.SINGULAR;
     }
@@ -110,7 +101,7 @@ public class NumberModel implements TestNumberModel, TrainSimilarityModel {
 
   private NumberEnum getNumber(List entity) {
     for (Iterator ci = entity.iterator(); ci.hasNext();) {
-      MentionContext ec = (MentionContext) ci.next();
+      Context ec = (Context) ci.next();
       NumberEnum ne = getNumber(ec);
       if (ne != NumberEnum.UNKNOWN) {
         return ne;
@@ -119,11 +110,11 @@ public class NumberModel implements TestNumberModel, TrainSimilarityModel {
     return NumberEnum.UNKNOWN;
   }
 
-  public void setExtents(MentionContext[] extentContexts) {
+  public void setExtents(Context[] extentContexts) {
     HashList entities = new HashList();
     List singletons = new ArrayList();
     for (int ei = 0, el = extentContexts.length; ei < el; ei++) {
-      MentionContext ec = extentContexts[ei];
+      Context ec = extentContexts[ei];
       //System.err.println("NumberModel.setExtents: ec("+ec.getId()+") "+ec.toText());
       if (ec.getId() != -1) {
         entities.put(new Integer(ec.getId()), ec);
@@ -148,7 +139,7 @@ public class NumberModel implements TestNumberModel, TrainSimilarityModel {
     }
     // non-coref entities.
     for (Iterator ei = singletons.iterator(); ei.hasNext();) {
-      MentionContext ec = (MentionContext) ei.next();
+      Context ec = (Context) ei.next();
       NumberEnum number = getNumber(ec);
       if (number == NumberEnum.SINGULAR) {
         singles.add(ec);
@@ -159,12 +150,12 @@ public class NumberModel implements TestNumberModel, TrainSimilarityModel {
     }
 
     for (Iterator si = singles.iterator(); si.hasNext();) {
-      MentionContext ec = (MentionContext) si.next();
-      addEvent(NumberEnum.SINGULAR.toString(), Context.getContext(ec));
+      Context ec = (Context) si.next();
+      addEvent(NumberEnum.SINGULAR.toString(), ec);
     }
     for (Iterator fi = plurals.iterator(); fi.hasNext();) {
-      MentionContext ec = (MentionContext) fi.next();
-      addEvent(NumberEnum.PLURAL.toString(), Context.getContext(ec));
+      Context ec = (Context) fi.next();
+      addEvent(NumberEnum.PLURAL.toString(),ec);
     }
   }
 

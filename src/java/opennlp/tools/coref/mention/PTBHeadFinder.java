@@ -139,7 +139,7 @@ public final class PTBHeadFinder implements HeadFinder {
     return (toks.size() - tokenCount -1);
   }
 
-  /** returns the bottom-most head of a <code>Parse</code>.  If no
+  /** Returns the bottom-most head of a <code>Parse</code>.  If no
       head is available which is a child of <code>p</code> then
       <code>p</code> is returned. */
   public Parse getLastHead(Parse p) {

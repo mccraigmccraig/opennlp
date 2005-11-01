@@ -42,7 +42,7 @@ public class DefiniteNounResolver extends MaxentResolver {
 
 
   public boolean canResolve(MentionContext mention) {
-    Parse[] mtokens = mention.getTokens();
+    Object[] mtokens = mention.getTokens();
 
     String firstTok = mention.getFirstTokenText().toLowerCase();
     boolean rv = mtokens.length > 1 && !mention.getHeadTokenTag().startsWith("NNP") && definiteArticle(firstTok, mention.getFirstTokenTag());

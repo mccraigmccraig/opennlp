@@ -26,28 +26,45 @@ public class Mention implements Comparable {
 
   /** Represents the character offset for this extent. */
   private Span span;
+  
   /** A string representing the type of this extent.  This is helpfull for determining
    * which piece of code created a particular extent.
    */
-  private String type;
+  protected String type;
   /** The entity id indicating which entity this extent belongs to.  This is only
    * used when training a coreference classifier.
    */
   private int id;
+  
   /** Represents the character offsets of the the head of this extent. */
   private Span headSpan;
+  
   /** The parse node that this extent is based on. */
-  private Parse parse;
+  protected Parse parse;
   
   /** A string representing the name type for this extent. */
-  private String nameType;
+  protected String nameType;
     
+  
   public Mention(Span span, Span headSpan, int entityId, Parse parse, String extentType) {
     this.span=span;
     this.headSpan=headSpan;
     this.id=entityId;
     this.type=extentType;
     this.parse = parse;
+  }
+  
+  public Mention(Span span, Span headSpan, int entityId, Parse parse, String extentType, String nameType) {
+    this.span=span;
+    this.headSpan=headSpan;
+    this.id=entityId;
+    this.type=extentType;
+    this.parse = parse;
+    this.nameType = nameType;
+  }
+  
+  public Mention(Mention mention) {
+    this(mention.span,mention.headSpan,mention.id,mention.parse,mention.type,mention.nameType);
   }
 
   /**
@@ -99,7 +116,7 @@ public class Mention implements Comparable {
    * Specifies the named-entity category associated with this mention.
    * @param nameType the named-entity category associated with this mention.
    */
-  void setNameType(String nameType) {
+  protected void setNameType(String nameType) {
     this.nameType = nameType;
   }
 

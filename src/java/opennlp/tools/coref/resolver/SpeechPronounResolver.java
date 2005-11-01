@@ -58,14 +58,14 @@ public class SpeechPronounResolver extends MaxentResolver {
         for (int ci = 0, cl = contexts.size(); ci < cl; ci++) {
           features.add(contexts.get(ci));
         }
-        features.add(mention.getNeType() + "," + cec.getHeadTokenText());
+        features.add(mention.getNameType() + "," + cec.getHeadTokenText());
       }
       else {
         List ccontexts = getContextFeatures(cec);
         for (int ci = 0, cl = ccontexts.size(); ci < cl; ci++) {
           features.add(ccontexts.get(ci));
         }
-        features.add(cec.getNeType() + "," + mention.getHeadTokenText());
+        features.add(cec.getNameType() + "," + mention.getHeadTokenText());
       }
     }
     return (features);

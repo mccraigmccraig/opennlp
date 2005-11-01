@@ -44,6 +44,7 @@ import opennlp.tools.coref.mention.Parse;
 import opennlp.tools.coref.sim.Context;
 import opennlp.tools.coref.sim.GenderEnum;
 import opennlp.tools.coref.sim.NumberEnum;
+import opennlp.tools.coref.sim.SemanticEnum;
 import opennlp.tools.coref.sim.TestGenderModel;
 import opennlp.tools.coref.sim.TestNumberModel;
 import opennlp.tools.coref.sim.TestSimilarityModel;
@@ -98,8 +99,8 @@ public abstract class MaxentResolver extends AbstractResolver {
    */
   protected boolean preferFirstReferent;
   /** When true, this designates that training should consist of a single positive and a single negitive example
-   * (when possible) for each mention.  When false all possible pairs are used for training. */
-  protected boolean sampleSelection;
+   * (when possible) for each mention. */
+  protected boolean pairedSampleSelection;
   /** When true, this designates that the same maximum entropy model should be used non-reference
    * events (the pairing of a mention and the "null" reference) as is used for potentially 
    * referential pairs.  When false a seperate model is created for these events.  
@@ -212,11 +213,6 @@ public abstract class MaxentResolver extends AbstractResolver {
   public DiscourseEntity resolve(MentionContext ec, DiscourseModel dm) {
     DiscourseEntity de;
     int ei = 0;
-    Context c = Context.getContext(ec);
-    Object[] pair = computeGender(c);
-    ec.setGender((GenderEnum) pair[0],((Double) pair[1]).doubleValue());
-    pair = computeNumber(c);
-    ec.setNumber((NumberEnum) pair[0],((Double) pair[1]).doubleValue());
     double nonReferentialProbability = nonReferentialResolver.getNonReferentialProbability(ec);
     for (; ei < getNumEntities(dm); ei++) {
       de = (DiscourseEntity) dm.getEntity(ei);
@@ -240,7 +236,7 @@ public abstract class MaxentResolver extends AbstractResolver {
           candProbs[ei] = 0;
         }
         if (debugOn) {
-          System.err.println(this +".resolve: " + ec.toText() + " -> " + de + " " + candProbs[ei] + " " + lfeatures);
+          System.err.println(this +".resolve: " + ec.toText() + " -> " + de + " ("+ec.getGender()+","+de.getGender()+") " + candProbs[ei] + " " + lfeatures);
         }
       }
       if (preferFirstReferent && candProbs[ei] > nonReferentialProbability) {
@@ -297,7 +293,14 @@ public abstract class MaxentResolver extends AbstractResolver {
   }
   */
 
-  protected boolean diffCriteria(DiscourseEntity de) {
+  /**
+   * Returns whether the specified entity satisfies the criteria for being a default referent.
+   * This criteria is used to perform sample selection on the training data and to select a single
+   * non-referent entity. Typcically the criteria is a hueristic for a likly referent.
+   * @param de The discourse entity being considered for non-reference.
+   * @return True if the entity should be used as a default referent, false otherwise. 
+   */
+  protected boolean defaultReferent(DiscourseEntity de) {
     MentionContext ec = de.getLastExtent();
     if (ec.getNounPhraseSentenceIndex() == 0) {
       return (true);
@@ -308,11 +311,6 @@ public abstract class MaxentResolver extends AbstractResolver {
   public DiscourseEntity retain(MentionContext mention, DiscourseModel dm) {
     //System.err.println(this+".retain("+ec+") "+mode);
     if (ResolverMode.TRAIN == mode) {
-      Context c = Context.getContext(mention);
-      Object[] pair = computeGender(c);
-      mention.setGender((GenderEnum) pair[0],((Double) pair[1]).doubleValue());
-      pair = computeNumber(c);
-      mention.setNumber((NumberEnum) pair[0],((Double) pair[1]).doubleValue());
       DiscourseEntity de = null;
       boolean referentFound = false;
       boolean hasReferentialCandidate = false;
@@ -329,14 +327,14 @@ public abstract class MaxentResolver extends AbstractResolver {
         if (excluded(mention, cde)) {
           if (showExclusions) {
             if (mention.getId() != -1 && entityMention.getId() == mention.getId()) {
-              System.err.println(this +".retain: Referent excluded: (" + mention.getId() + ") " + mention.toText() + " " + mention.getSpan() + " -> (" + entityMention.getId() + ") " + entityMention.toText() + " " + entityMention.getSpan() + " " + this);
+              System.err.println(this +".retain: Referent excluded: (" + mention.getId() + ") " + mention.toText() + " " + mention.getIndexSpan() + " -> (" + entityMention.getId() + ") " + entityMention.toText() + " " + entityMention.getSpan() + " " + this);
             }
           }
         }
         else {
           hasReferentialCandidate = true;
-          boolean useAsDifferentExample = diffCriteria(cde);
-          if (!sampleSelection || (mention.getId() != -1 && entityMention.getId() == mention.getId()) || (!nonReferentFound && useAsDifferentExample)) {
+          boolean useAsDifferentExample = defaultReferent(cde);
+          //if (!sampleSelection || (mention.getId() != -1 && entityMention.getId() == mention.getId()) || (!nonReferentFound && useAsDifferentExample)) {
             List features = getFeatures(mention, cde);
 
             //add Event to Model
@@ -350,13 +348,13 @@ public abstract class MaxentResolver extends AbstractResolver {
               //System.err.println("MaxentResolver.retain: resolved at "+ei);
               distances.add(new Integer(ei));
             }
-            else if (!sampleSelection || (!nonReferentFound && useAsDifferentExample)) {
+            else if (!pairedSampleSelection || (!nonReferentFound && useAsDifferentExample)) {
               nonReferentFound = true;
               events.add(new Event(DIFF, (String[]) features.toArray(new String[features.size()])));
             }
-          }
+          //}
         }
-        if (sampleSelection && referentFound && nonReferentFound) {
+        if (pairedSampleSelection && referentFound && nonReferentFound) {
           break;
         }
         if (preferFirstReferent && referentFound) {
@@ -414,57 +412,10 @@ public abstract class MaxentResolver extends AbstractResolver {
     }
   }
 
-  public static void setSimilarityModel(TestSimilarityModel sm, TestGenderModel gm, TestNumberModel nm) {
+  public static void setSimilarityModel(TestSimilarityModel sm) {
     simModel = sm;
-    genModel = gm;
-    numModel = nm;
   }
-
-  private Object[] computeGender(Context c) {
-    Object[] rv = new Object[2];
-    double[] gdist = genModel.genderDistribution(c);
-    if (debugOn) {
-      System.err.println("MaxentResolver.computeGender: "+c.toString()+" m="+gdist[genModel.getMaleIndex()]+" f="+gdist[genModel.getFemaleIndex()]+" n="+gdist[genModel.getNeuterIndex()]);
-    }
-    if (genModel.getMaleIndex() >= 0 && gdist[genModel.getMaleIndex()] > minGenderProb) {
-      rv[0] = GenderEnum.MALE;
-      rv[1] = new Double(gdist[genModel.getMaleIndex()]);
-    }
-    else if (genModel.getFemaleIndex() >= 0 && gdist[genModel.getFemaleIndex()] > minGenderProb) {
-      rv[0] = GenderEnum.FEMALE;
-      rv[1] = new Double(gdist[genModel.getFemaleIndex()]);
-    }
-    else if (genModel.getNeuterIndex() >= 0 && gdist[genModel.getNeuterIndex()] > minGenderProb) {
-      rv[0] = GenderEnum.NEUTER;
-      rv[1] = new Double(gdist[genModel.getNeuterIndex()]);
-    }
-    else {
-      rv[0] = GenderEnum.UNKNOWN;
-      rv[1] = minGenderProbObject;
-    }
-    return rv;
-  }
-
   
-  private Object[] computeNumber(Context c) {
-    double[] dist = numModel.numberDist(c);
-    Object[] rv = new Object[2];
-    //System.err.println("computeNumber: "+c+" sing="+dist[numModel.getSingularIndex()]+" plural="+dist[numModel.getPluralIndex()]);
-    if (dist[numModel.getSingularIndex()] > minNumberProb) {
-      rv[0] = NumberEnum.SINGULAR;
-      rv[1] = new Double(dist[numModel.getSingularIndex()]);
-    }
-    else if (dist[numModel.getPluralIndex()] > minNumberProb) {
-      rv[0] = NumberEnum.PLURAL;
-      rv[1] = new Double(dist[numModel.getPluralIndex()]);
-    }
-    else {
-      rv[0] = NumberEnum.UNKNOWN;
-      rv[1] = minNumberProbObject;
-    }
-    return rv;
-  }
-
   private String getSemanticCompatibilityFeature(MentionContext ec, DiscourseEntity de) {
     if (simModel != null) {
       double best = 0;
@@ -472,7 +423,7 @@ public abstract class MaxentResolver extends AbstractResolver {
         MentionContext ec2 = (MentionContext) xi.next();
         double sim = simModel.compatible(ec, ec2);
         if (debugOn) {
-          System.err.println("MaxentResolver,getSemanticCompatibilityFeature: sem-compat " + sim + " " + ec.toText() + " " + ec2.toText());
+          System.err.println("MaxentResolver.getSemanticCompatibilityFeature: sem-compat " + sim + " " + ec.toText() + " " + ec2.toText());
         }
         if (sim > best) {
           best = sim;
@@ -496,6 +447,7 @@ public abstract class MaxentResolver extends AbstractResolver {
 
   private String getGenderCompatibilityFeature(MentionContext ec, DiscourseEntity de) {
     GenderEnum eg = de.getGender();
+    //System.err.println("getGenderCompatibility: mention="+ec.getGender()+" entity="+eg);
     if (eg == GenderEnum.UNKNOWN || ec.getGender() == GenderEnum.UNKNOWN) {
       return GEN_UNKNOWN;
     }
@@ -647,19 +599,20 @@ public abstract class MaxentResolver extends AbstractResolver {
   protected List getDistanceFeatures(MentionContext mention, DiscourseEntity entity) {
     List features = new ArrayList();
     MentionContext cec = entity.getLastExtent();
-    int edist = mention.getNounPhraseDocumentIndex()- cec.getNounPhraseDocumentIndex();
-    int sdist = mention.getSentenceNumber() - cec.getSentenceNumber();
-    int hdist;
-    if (sdist == 0) {
-      hdist = cec.getNounPhraseSentenceIndex();
+    int entityDistance = mention.getNounPhraseDocumentIndex()- cec.getNounPhraseDocumentIndex();
+    int sentenceDistance = mention.getSentenceNumber() - cec.getSentenceNumber();
+    int hobbsEntityDistance;
+    if (sentenceDistance == 0) {
+      hobbsEntityDistance = cec.getNounPhraseSentenceIndex();
     }
     else {
-      //hdist = edist + (2 * cec.nounLocation) - cec.maxNounLocation;
-      hdist = edist + cec.getNounPhraseSentenceIndex() - cec.getMaxNounPhraseSentenceIndex();
+      //hobbsEntityDistance = entityDistance - (entities within sentence from mention to end) + (entities within sentence form start to mention) 
+      //hobbsEntityDistance = entityDistance - (cec.maxNounLocation - cec.getNounPhraseSentenceIndex) + cec.getNounPhraseSentenceIndex; 
+      hobbsEntityDistance = entityDistance + (2 * cec.getNounPhraseSentenceIndex()) - cec.getMaxNounPhraseSentenceIndex();
     }
-    features.add("hd=" + hdist);
-    features.add("de=" + edist);
-    features.add("ds=" + sdist);
+    features.add("hd=" + hobbsEntityDistance);
+    features.add("de=" + entityDistance);
+    features.add("ds=" + sentenceDistance);
     //features.add("ds=" + sdist + pronoun);
     //features.add("dn=" + cec.sentenceNumber);
     //features.add("ep=" + cec.nounLocation);
@@ -764,13 +717,13 @@ public abstract class MaxentResolver extends AbstractResolver {
     boolean titleMatch = false;
     boolean nonTheModsMatch = false;
     List features = new ArrayList();
-    Parse[] mtokens = mention.getTokens();
+    Parse[] mtokens = mention.getTokenParses();
     Set ecModSet = constructModifierSet(mtokens, mention.getHeadTokenIndex());
     String mentionHeadString = mention.getHeadTokenText().toLowerCase();
     Set featureSet = new HashSet();
     for (Iterator ei = entity.getMentions(); ei.hasNext();) {
       MentionContext entityMention = (MentionContext) ei.next();
-      String exactMatchFeature = getExactMatchFeature(mention, entityMention);
+      String exactMatchFeature = getExactMatchFeature(entityMention, mention);
       if (exactMatchFeature != null) {
         featureSet.add(exactMatchFeature);
       }
@@ -786,7 +739,7 @@ public abstract class MaxentResolver extends AbstractResolver {
           }
         }
       }
-      Parse[] xtoks = entityMention.getTokens();
+      Parse[] xtoks = entityMention.getTokenParses();
       int headIndex = entityMention.getHeadTokenIndex();
       //if (!mention.getHeadTokenTag().equals(entityMention.getHeadTokenTag())) {
       //  //System.err.println("skipping "+mention.headTokenText+" with "+xec.headTokenText+" because "+mention.headTokenTag+" != "+xec.headTokenTag);
@@ -842,19 +795,20 @@ public abstract class MaxentResolver extends AbstractResolver {
   
   private String mentionString(MentionContext ec) {
     StringBuffer sb = new StringBuffer();
-    Parse[] mtokens = ec.getTokens();
+    Object[] mtokens = ec.getTokens();
     sb.append(mtokens[0].toString());
     for (int ti = 1, tl = mtokens.length; ti < tl; ti++) {
       String token = mtokens[ti].toString();
       sb.append(" ").append(token);
     }
+    //System.err.println("mentionString "+ec+" == "+sb.toString()+" mtokens.length="+mtokens.length);
     return sb.toString();
   }
 
   private String excludedTheMentionString(MentionContext ec) {
     StringBuffer sb = new StringBuffer();
     boolean first = true;
-    Parse[] mtokens = ec.getTokens();
+    Object[] mtokens = ec.getTokens();
     for (int ti = 0, tl = mtokens.length; ti < tl; ti++) {
       String token = mtokens[ti].toString();
       if (!token.equals("the") && !token.equals("The") && !token.equals("THE")) {
@@ -871,7 +825,7 @@ public abstract class MaxentResolver extends AbstractResolver {
   private String excludedHonorificMentionString(MentionContext ec) {
     StringBuffer sb = new StringBuffer();
     boolean first = true;
-    Parse[] mtokens = ec.getTokens();
+    Object[] mtokens = ec.getTokens();
     for (int ti = 0, tl = mtokens.length; ti < tl; ti++) {
       String token = mtokens[ti].toString();
       if (!Linker.honorificsPattern.matcher(token).matches()) {
@@ -888,7 +842,7 @@ public abstract class MaxentResolver extends AbstractResolver {
   private String excludedDeterminerMentionString(MentionContext ec) {
     StringBuffer sb = new StringBuffer();
     boolean first = true;
-    Parse[] mtokens = ec.getTokens();
+    Parse[] mtokens = ec.getTokenParses();
     for (int ti = 0, tl = mtokens.length; ti < tl; ti++) {
       Parse token = mtokens[ti];
       String tag = token.getSyntacticType();
@@ -904,6 +858,7 @@ public abstract class MaxentResolver extends AbstractResolver {
   }
 
   private String getExactMatchFeature(MentionContext ec, MentionContext xec) {
+    //System.err.println("getExactMatchFeature: ec="+mentionString(ec)+" mc="+mentionString(xec));
     if (mentionString(ec).equals(mentionString(xec))) {
       return "exactMatch";
     }

@@ -43,6 +43,7 @@ public class SingularPronounResolver extends MaxentResolver {
   
   public SingularPronounResolver(String projectName, ResolverMode m, NonReferentialResolver nonReferentialResolver) throws IOException {
     super(projectName, "pmodel", m, 30,nonReferentialResolver);
+    this.numSentencesBack = 2;
   }
 
   public boolean canResolve(MentionContext mention) {
@@ -55,7 +56,6 @@ public class SingularPronounResolver extends MaxentResolver {
     List features = new ArrayList();
     features.addAll(super.getFeatures(mention, entity));
     if (entity != null) { //generate pronoun w/ referent features
-      //String pronoun = getHeadString(mention);
       MentionContext cec = entity.getLastExtent();
       //String gen = getPronounGender(pronoun);
       features.addAll(getPronounMatchFeatures(mention,entity));
@@ -123,7 +123,7 @@ public class SingularPronounResolver extends MaxentResolver {
 
   protected boolean outOfRange(MentionContext mention, DiscourseEntity entity) {
     MentionContext cec = entity.getLastExtent();
-    //System.err.println("MaxentSingularPronounresolve.outOfRange: ["+ec.toText()+" ("+ec.id+")] ["+cec.toText()+" ("+cec.id+")] ec.sentenceNumber=("+ec.sentenceNumber+")-cec.sentenceNumber=("+cec.sentenceNumber+") > "+NUM_SENTS_BACK_PRONOUNS);    
+    //System.err.println("MaxentSingularPronounresolve.outOfRange: ["+entity.getLastExtent().toText()+" ("+entity.getId()+")] ["+mention.toText()+" ("+mention.getId()+")] entity.sentenceNumber=("+entity.getLastExtent().getSentenceNumber()+")-mention.sentenceNumber=("+mention.getSentenceNumber()+") > "+numSentencesBack);    
     return (mention.getSentenceNumber() - cec.getSentenceNumber() > numSentencesBack);
   }
 

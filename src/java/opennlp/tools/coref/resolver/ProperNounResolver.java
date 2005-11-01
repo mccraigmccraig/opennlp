@@ -56,7 +56,7 @@ public class ProperNounResolver extends MaxentResolver {
   public ProperNounResolver(String projectName, ResolverMode m,NonReferentialResolver nonRefResolver) throws IOException {
     super(projectName,"pnmodel", m, 500,nonRefResolver);
     if (!acroMapLoaded) {
-      initAcronyms(projectName + "/acronyms.final");
+      initAcronyms(projectName + "/acronyms");
       acroMapLoaded = true;
     }
     showExclusions = false;
@@ -97,7 +97,7 @@ public class ProperNounResolver extends MaxentResolver {
       }
     }
     catch (IOException e) {
-      System.err.println("MaxentProperNounResolver.initAcronyms: Acronym Database not found: " + e);
+      System.err.println("ProperNounResolver.initAcronyms: Acronym Database not found: " + e);
     }
   }
 
@@ -136,7 +136,7 @@ public class ProperNounResolver extends MaxentResolver {
   }
 
   protected List getFeatures(MentionContext mention, DiscourseEntity entity) {
-    //System.err.println("MaxentProperNounResolver.getFeatures: "+mention.toText()+" -> "+entity);
+    //System.err.println("ProperNounResolver.getFeatures: "+mention.toText()+" -> "+entity);
     List features = new ArrayList();
     features.addAll(super.getFeatures(mention, entity));
     if (entity != null) {

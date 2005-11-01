@@ -19,12 +19,27 @@ package opennlp.tools.coref;
 
 import java.io.IOException;
 
-import opennlp.tools.coref.LinkerMode;
+import opennlp.tools.coref.mention.MentionContext;
 import opennlp.tools.coref.mention.PTBHeadFinder;
 import opennlp.tools.coref.mention.ShallowParseMentionFinder;
-import opennlp.tools.coref.resolver.*;
-import opennlp.tools.coref.sim.GenderModel;
-import opennlp.tools.coref.sim.NumberModel;
+import opennlp.tools.coref.resolver.AbstractResolver;
+import opennlp.tools.coref.resolver.CommonNounResolver;
+import opennlp.tools.coref.resolver.DefiniteNounResolver;
+import opennlp.tools.coref.resolver.FixedNonReferentialResolver;
+import opennlp.tools.coref.resolver.IsAResolver;
+import opennlp.tools.coref.resolver.MaxentResolver;
+import opennlp.tools.coref.resolver.NonReferentialResolver;
+import opennlp.tools.coref.resolver.PerfectResolver;
+import opennlp.tools.coref.resolver.PluralNounResolver;
+import opennlp.tools.coref.resolver.PluralPronounResolver;
+import opennlp.tools.coref.resolver.ProperNounResolver;
+import opennlp.tools.coref.resolver.ResolverMode;
+import opennlp.tools.coref.resolver.SingularPronounResolver;
+import opennlp.tools.coref.resolver.SpeechPronounResolver;
+import opennlp.tools.coref.sim.Context;
+import opennlp.tools.coref.sim.Gender;
+import opennlp.tools.coref.sim.MaxentCompatibilityModel;
+import opennlp.tools.coref.sim.Number;
 import opennlp.tools.coref.sim.SimilarityModel;
 
 /**
@@ -34,6 +49,8 @@ import opennlp.tools.coref.sim.SimilarityModel;
  * This information can be added to the parse using the -parse option with EnglishNameFinder. 
  */
 public class DefaultLinker extends AbstractLinker {
+  
+  protected MaxentCompatibilityModel mcm;
   
   /**
    * Creates a new linker with the specified model directory, running in the specified mode.
@@ -68,6 +85,7 @@ public class DefaultLinker extends AbstractLinker {
    */
   public DefaultLinker(String modelDirectory, LinkerMode mode, boolean useDiscourseModel, double fixedNonReferentialProbability) throws IOException {
     super(modelDirectory, mode, useDiscourseModel);
+    mcm = new MaxentCompatibilityModel(corefProject);
     initHeadFinder();
     initMentionFinder();
     initResolvers(mode, fixedNonReferentialProbability);
@@ -116,7 +134,7 @@ public class DefaultLinker extends AbstractLinker {
         //String[] names = {"Pronoun", "Proper", "Def-NP", "Is-a", "Plural Pronoun"};
         //eval = new Evaluation(names);
       }
-      MaxentResolver.setSimilarityModel(SimilarityModel.testModel(corefProject + "/sim"), GenderModel.testModel(corefProject + "/gen"), NumberModel.testModel(corefProject + "/num"));
+      MaxentResolver.setSimilarityModel(SimilarityModel.testModel(corefProject + "/sim"));
     }
     else if (LinkerMode.TRAIN == mode) {
       resolvers = new AbstractResolver[9];
@@ -148,4 +166,16 @@ public class DefaultLinker extends AbstractLinker {
   protected void initMentionFinder() {
     mentionFinder = ShallowParseMentionFinder.getInstance(headFinder);
   }
+
+  @Override
+  protected Gender computeGender(MentionContext mention) {
+    return mcm.computeGender(mention);
+  }
+
+  @Override
+  protected Number computeNumber(MentionContext mention) {
+    return mcm.computeNumber(mention);
+  }
+  
+  
 }

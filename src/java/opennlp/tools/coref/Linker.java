@@ -20,10 +20,10 @@ package opennlp.tools.coref;
 import java.io.IOException;
 import java.util.regex.Pattern;
 
-import opennlp.tools.coref.mention.Mention;
 import opennlp.tools.coref.mention.HeadFinder;
+import opennlp.tools.coref.mention.Mention;
 import opennlp.tools.coref.mention.MentionContext;
-import opennlp.tools.coref.mention.Parse;
+import opennlp.tools.coref.mention.MentionFinder;
 
 /** A linker provides an interface for finding mentions, {@link #getMentions getMentions}, 
  * and creating entities out of those mentions, {@link #getEntities getEntities}.  This interface also allows
@@ -101,11 +101,11 @@ public interface Linker {
   /** Trains the linker based on the data specified via calls to {@link #setEntities setEntities}. */ 
   public void train() throws IOException;
     
-  /** Returns a array of mentions contained in the specified parse for coreference resolution.
-   * @param sentence The parse for a sentence. 
-   * @return Array of mentions contained in the specified parse.
+  /**
+   * Returns the mention finder for this linker.  This can be used to get the mentions of a Parse.
+   * @return The object which finds mentions for this linker.
    */
-  public Mention[] getMentions(Parse sentence);
+  public MentionFinder getMentionFinder();
  
   /** 
    * Returns the head finder associated with this linker.

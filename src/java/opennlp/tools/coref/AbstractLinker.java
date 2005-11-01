@@ -18,15 +18,15 @@
 package opennlp.tools.coref;
 
 import java.io.IOException;
-import java.util.Arrays;
-import java.util.List;
 
-import opennlp.tools.coref.mention.Mention;
 import opennlp.tools.coref.mention.HeadFinder;
+import opennlp.tools.coref.mention.Mention;
 import opennlp.tools.coref.mention.MentionContext;
 import opennlp.tools.coref.mention.MentionFinder;
 import opennlp.tools.coref.mention.Parse;
 import opennlp.tools.coref.resolver.AbstractResolver;
+import opennlp.tools.coref.sim.Gender;
+import opennlp.tools.coref.sim.Number;
 
 /** 
  * Provides a default implementation of many of the methods in <code>Linker</code> that
@@ -66,6 +66,11 @@ public abstract class AbstractLinker implements Linker {
   /** Specifies whether coreferent mentions should be combined into a single entity. 
    * Set this to true to combine them, false otherwise.  */
   protected boolean useDiscourseModel;
+  
+  /** Specifies whether mentions for which no resolver can be used should be added to the
+   * discourse model.
+   */ 
+  protected boolean removeUnresolvedMentions;
 
   /** 
    * Creates a new linker using the models in the specified project directory and using the specified mode.
@@ -88,6 +93,7 @@ public abstract class AbstractLinker implements Linker {
     this.mode = mode;
     SINGULAR_PRONOUN = -1;
     this.useDiscourseModel = useDiscourseModel;
+    removeUnresolvedMentions = true;
   }
 
   /**
@@ -99,6 +105,7 @@ public abstract class AbstractLinker implements Linker {
     //System.err.println("AbstractLinker.resolve: "+mode+"("+econtext.id+") "+econtext.toText());
     boolean validEntity = true; // true if we should add this entity to the dm
     boolean canResolve = false;
+    
     for (int ri = 0; ri < resolvers.length; ri++) {
       if (resolvers[ri].canResolve(mention)) {
         if (mode == LinkerMode.TEST) {
@@ -127,7 +134,7 @@ public abstract class AbstractLinker implements Linker {
         entities[ri] = null;
       }
     }
-    if (!canResolve) {
+    if (!canResolve && removeUnresolvedMentions) {
       //System.err.println("No resolver for: "+econtext.toText()+ " head="+econtext.headTokenText+" "+econtext.headTokenTag);
       validEntity = false;
     }
@@ -222,14 +229,15 @@ public abstract class AbstractLinker implements Linker {
       resolvers[ri].train();
     }
   }
-  
-  public Mention[] getMentions(Parse sentence) {
-    return (mentionFinder.getMentions(sentence));
+    
+  public MentionFinder getMentionFinder() {
+    return mentionFinder;
   }
   
   public MentionContext[] constructMentionContexts(Mention[] mentions) {
     int mentionInSentenceIndex=-1;
     int numMentionsInSentence=-1;
+    int prevSentenceIndex = -1;
     MentionContext[] contexts = new MentionContext[mentions.length];
     for (int mi=0,mn=mentions.length;mi<mn;mi++) {
       Parse mentionParse = mentions[mi].getParse();
@@ -238,13 +246,29 @@ public abstract class AbstractLinker implements Linker {
         System.err.println("no parse for "+mentions[mi]);
       }
       int sentenceIndex = mentionParse.getSentenceNumber();
-      
-      contexts[mi]=new MentionContext(mentionParse, mentionInSentenceIndex, numMentionsInSentence, mi, sentenceIndex, mentions[mi].getNameType(),getHeadFinder());
+      if (sentenceIndex != prevSentenceIndex) {
+        mentionInSentenceIndex=0;
+        prevSentenceIndex = sentenceIndex;
+        numMentionsInSentence = 0;
+        for (int msi=mi;msi<mentions.length;msi++) {
+          if (sentenceIndex != mentions[msi].getParse().getSentenceNumber()) {
+            break;
+          }
+          numMentionsInSentence++;
+        }
+      }
+      contexts[mi]=new MentionContext(mentions[mi], mentionInSentenceIndex, numMentionsInSentence, mi, sentenceIndex, getHeadFinder());
       //System.err.println("AbstractLinker.constructMentionContexts: mi="+mi+" sn="+mentionParse.getSentenceNumber()+" extent="+mentions[mi]+" parse="+mentionParse.getSpan()+" mc="+contexts[mi].toText());
       contexts[mi].setId(mentions[mi].getId());
       mentionInSentenceIndex++;
+      Gender g  = computeGender(contexts[mi]);
+      contexts[mi].setGender(g.getType(),g.getConfidence());
+      Number n = computeNumber(contexts[mi]);
+      contexts[mi].setNumber(n.getType(),n.getConfidence());
     }
     return (contexts);
   }
-
+  
+  protected abstract Gender computeGender(MentionContext mention);
+  protected abstract Number computeNumber(MentionContext mention);
 }

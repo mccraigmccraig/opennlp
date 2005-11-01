@@ -72,9 +72,7 @@ public abstract class DiscourseElement {
    */
   public void addMention(MentionContext mention) {
     extents.add(mention);
-    if (mention.getType() == null || !mention.getType().equals(Linker.ISA)) {
-      lastExtent=mention;
-    }
+    lastExtent=mention;
   }
 
   /**

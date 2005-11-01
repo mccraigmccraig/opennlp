@@ -63,16 +63,16 @@ public class IsAResolver extends MaxentResolver {
     }
     //shallow parse appositives
     //System.err.println("IsAResolver.excluded: ec="+ec.toText()+" "+ec.span+" cec="+cec.toText()+" "+cec.span);
-    if (cec.getSpan().getEnd() == ec.getSpan().getStart() - 2) {
+    if (cec.getIndexSpan().getEnd() == ec.getIndexSpan().getStart() - 2) {
       return (false);
     }
     //full parse w/o trailing comma
-    if (cec.getSpan().getEnd() == ec.getSpan().getEnd()) {
+    if (cec.getIndexSpan().getEnd() == ec.getIndexSpan().getEnd()) {
       //System.err.println("IsAResolver.excluded: (false) spans share end");
       return (false);
     }
     //full parse w/ trailing comma or period
-    if (cec.getSpan().getEnd() <= ec.getSpan().getEnd() + 2 && (ec.getNextToken() != null && (ec.getNextToken().toString().equals(",") || ec.getNextToken().toString().equals(".")))) {
+    if (cec.getIndexSpan().getEnd() <= ec.getIndexSpan().getEnd() + 2 && (ec.getNextToken() != null && (ec.getNextToken().toString().equals(",") || ec.getNextToken().toString().equals(".")))) {
       //System.err.println("IsAResolver.excluded: (false) spans end + punct");
       return (false);
     }
@@ -85,7 +85,7 @@ public class IsAResolver extends MaxentResolver {
     return (cec.getSentenceNumber() != ec.getSentenceNumber());
   }
 
-  protected boolean diffCriteria(DiscourseEntity de) {
+  protected boolean defaultReferent(DiscourseEntity de) {
     return (true);
   }
 

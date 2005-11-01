@@ -33,5 +33,5 @@ public interface TrainSimilarityModel {
    * from the set of extents which don't meet this criteria.
    * @param extents
    */
-  public void setExtents(MentionContext[] extents);
+  public void setExtents(Context[] extents);
 }

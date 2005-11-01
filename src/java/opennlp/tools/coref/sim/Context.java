@@ -19,45 +19,73 @@ package opennlp.tools.coref.sim;
 
 import java.util.Collections;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 import opennlp.tools.coref.mention.Dictionary;
-import opennlp.tools.coref.mention.MentionContext;
+import opennlp.tools.coref.mention.DictionaryFactory;
+import opennlp.tools.coref.mention.HeadFinder;
+import opennlp.tools.coref.mention.Mention;
+import opennlp.tools.coref.mention.Parse;
+import opennlp.tools.util.Span;
 
 /**
  * Specifies the context of a mention for computing gender, number, and semantic compatibility.
  */
-public class Context {
+public class Context extends Mention {
 
-  private String headToken;
-  private String headTag;
-  private Set synsets;
-  private String neType;
-  private Object[] tokens;
+  protected String headTokenText;
+  protected String headTokenTag;
+  protected Set synsets;
+  protected Object[] tokens;
   
-  private static Dictionary dictionary;
-
-  public Context(Object[] tokens, String headToken, String headTag, String neType, Set synsets) {
-    this.tokens = tokens;
-    this.headToken = headToken;
-    this.headTag = headTag;
-    this.synsets = synsets;
-    this.neType = neType;  
+  /** The token index in of the head word of this mention. */ 
+  protected int headTokenIndex;
+  
+  public Context(Span span, Span headSpan, int entityId, Parse parse, String extentType, String nameType, HeadFinder headFinder) {
+    super(span,headSpan,entityId,parse,extentType,nameType);
+    init(headFinder);
   }
 
   public Context(Object[] tokens, String headToken, String headTag, String neType) {
-    this(tokens, headToken, headTag, neType, null);
+    super(null,null,1,null,null,neType);
+    this.tokens =tokens;
+    this.headTokenIndex = tokens.length-1;
+    this.headTokenText = headToken;
+    this.headTokenTag = headTag;
     this.synsets = getSynsetSet(this);
   }
-    
-  public static void setDictionary(Dictionary dict) {
-    Context.dictionary = dict;
+      
+  public Context(Mention mention, HeadFinder headFinder) {
+    super(mention);
+    init(headFinder);
   }
   
-
-  public static Context getContext(MentionContext ec) {
-    return new Context(ec.getTokens(),ec.getHeadTokenText(), ec.getHeadTokenTag(), ec.getNeType(), ec.getSynsets());
+  private void init(HeadFinder headFinder) {
+    Parse head = headFinder.getLastHead(parse);
+    List tokenList = head.getTokens();
+    headTokenIndex = headFinder.getHeadIndex(head);
+    Parse headToken = headFinder.getHeadToken(head);
+    tokens = (Parse[]) tokenList.toArray(new Parse[tokenList.size()]);
+    this.headTokenTag = headToken.getSyntacticType();
+    this.headTokenText = headToken.toString();
+    if (headTokenTag.startsWith("NN") && !headTokenTag.startsWith("NNP")) {
+      this.synsets = getSynsetSet(this);
+    }
+    else {
+      this.synsets=Collections.EMPTY_SET;
+    }
   }
+  
+  
+  public static Context[] constructContexts(Mention[] mentions,HeadFinder headFinder) {
+    Context[] contexts = new Context[mentions.length];
+    for (int mi=0;mi<mentions.length;mi++) {
+      contexts[mi] = new Context(mentions[mi],headFinder);
+    }
+    return contexts;
+  }
+  
   
   public String toString() {
     StringBuffer sb = new StringBuffer();
@@ -71,22 +99,18 @@ public class Context {
     return tokens;
   }
   
-  public String getHeadToken() {
-    return headToken;
+  public String getHeadTokenText() {
+    return headTokenText;
   }
   
-  public String getHeadTag() {
-    return headTag;
+  public String getHeadTokenTag() {
+    return headTokenTag;
   }
   
   public Set getSynsets() {
     return synsets;
   }
-  
-  public String getNameType() {
-    return neType;
-  }
-  
+    
   public static Context parseContext(String word) {
       String[] parts = word.split("/");
       if (parts.length == 2) {
@@ -95,7 +119,7 @@ public class Context {
       }
       else if (parts.length == 3) {
         String[] tokens = parts[0].split(" ");
-        return new Context(tokens,tokens[tokens.length-1], parts[1], parts[2], Collections.EMPTY_SET);
+        return new Context(tokens,tokens[tokens.length-1], parts[1], parts[2]);
       }
       return null;
     }
@@ -103,9 +127,11 @@ public class Context {
   private static Set getSynsetSet(Context c) {
     Set synsetSet = new HashSet();
     String[] lemmas = getLemmas(c);
+    Dictionary dict = DictionaryFactory.getDictionary();
     //System.err.println(lemmas.length+" lemmas for "+c.headToken);
     for (int li = 0; li < lemmas.length; li++) {
-      String[] synsets = dictionary.getParentSenseKeys(lemmas[li],"NN",0);
+      synsetSet.add(dict.getSenseKey(lemmas[li],"NN",0));
+      String[] synsets = dict.getParentSenseKeys(lemmas[li],"NN",0);
       for (int si=0,sn=synsets.length;si<sn;si++) {
         synsetSet.add(synsets[si]);
       }
@@ -114,7 +140,14 @@ public class Context {
   }
 
   private static String[] getLemmas(Context c) {
-    String word = c.headToken.toLowerCase();
-    return dictionary.getLemmas(word,"NN");
+    String word = c.headTokenText.toLowerCase();
+    return DictionaryFactory.getDictionary().getLemmas(word,"NN");
+  }
+
+  /** Returns the token index into the mention for the head word. 
+   * @return the token index into the mention for the head word. 
+   */
+  public int getHeadTokenIndex() {
+    return headTokenIndex;
   }
 }

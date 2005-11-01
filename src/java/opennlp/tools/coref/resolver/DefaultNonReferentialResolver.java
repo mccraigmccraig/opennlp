@@ -86,7 +86,7 @@ public class DefaultNonReferentialResolver implements NonReferentialResolver {
    */
   protected List getNonReferentialFeatures(MentionContext mention) {
     List features = new ArrayList();
-    Parse[] mtokens = mention.getTokens();
+    Parse[] mtokens = mention.getTokenParses();
     //System.err.println("getNonReferentialFeatures: mention has "+mtokens.length+" tokens");
     for (int ti = 0; ti <= mention.getHeadTokenIndex(); ti++) {
       Parse tok = mtokens[ti];

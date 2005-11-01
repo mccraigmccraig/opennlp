@@ -26,12 +26,13 @@ import opennlp.tools.coref.mention.MentionContext;
 /** Interface for coreference resolvers. */
 public interface Resolver {
 
-  /** Returns true if the resolver handles this type of refering expression.
-   * @param ec the refering expression. 
+  /** Returns true if this resolver is able to resolve the referening experession of the same type
+   * as the specified mention.
+   * @param mention The mention being considered for resolution. 
    * @return true if the resolver handles this type of refering
    * expression, false otherwise.
    */
-  public boolean canResolve(MentionContext ec);
+  public boolean canResolve(MentionContext mention);
 
   /** Resolve this refering extression to a discourse entity in the discourse model.
    * @param ec the refering expression. 
@@ -41,13 +42,15 @@ public interface Resolver {
    * coreferent with the refering expression. */
   public DiscourseEntity resolve(MentionContext ec, DiscourseModel dm);
 
-  /** Incorporates this refering expression into the model for resolution. 
-   * @param ec the refering expression.
-   * @param dm the discourse model.
+  /** Uses the specified mention and discourse model to train this resolver.
+   * All mentions sent to this method need to have their id fields set to indicate coreference
+   * relationships.    
+   * @param mention The mention which is being used for training.
+   * @param model the discourse model.
    * @return the discourse entity which is refered to by the refering
-   * expression or null if no discourse entity is appropiate.
+   * expression or null if no discourse entity is referenced.
    */ 
-  public DiscourseEntity retain(MentionContext ec, DiscourseModel dm);
+  public DiscourseEntity retain(MentionContext mention, DiscourseModel model);
 
   /** Retrains model on examples for which retain was called.  */
   public void train() throws IOException;

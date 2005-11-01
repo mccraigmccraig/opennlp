@@ -28,7 +28,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
-import opennlp.tools.coref.DefaultLinker;
+import opennlp.tools.coref.*;
 import opennlp.tools.coref.DiscourseEntity;
 import opennlp.tools.coref.Linker;
 import opennlp.tools.coref.LinkerMode;
@@ -62,7 +62,7 @@ public class TreebankLinker extends DefaultLinker {
   }
   
   protected void initMentionFinder() {
-    mentionFinder = new PTBMentionFinder(headFinder);
+    mentionFinder = PTBMentionFinder.getInstance(headFinder);
   }
   
   private static void showEntities(DiscourseEntity[] entities) {
@@ -78,7 +78,7 @@ public class TreebankLinker extends DefaultLinker {
    */
   public static void main(String[] args) throws IOException {
     if (args.length == 0) {
-      System.err.println("Usage: TreebankLinker model_directory < parses");
+      System.err.println("Usage: EnglishTreebankLinker model_directory < parses");
       System.exit(1);
     }
     BufferedReader in;
@@ -106,7 +106,7 @@ public class TreebankLinker extends DefaultLinker {
       else {
         Parse p = Parse.parseParse(line);
         parses.add(p);
-        Mention[] extents = treebankLinker.getMentions(new DefaultParse(p,sentenceNumber));
+        Mention[] extents = treebankLinker.getMentionFinder().getMentions(new DefaultParse(p,sentenceNumber));
         //construct new parses for mentions which don't have constituents.
         for (int ei=0,en=extents.length;ei<en;ei++) {
           //System.err.println("PennTreebankLiner.main: "+ei+" "+extents[ei]);

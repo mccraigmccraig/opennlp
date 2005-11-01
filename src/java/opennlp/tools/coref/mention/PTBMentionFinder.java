@@ -22,17 +22,29 @@ package opennlp.tools.coref.mention;
  */
 public class PTBMentionFinder extends AbstractMentionFinder {
 
-  static MentionFinder ef = null;
+  private static PTBMentionFinder instance = null;
 
   /**
    * Creates a new mention finder with the specified head finder.
    * @param hf The head finder.
    */
-  public PTBMentionFinder(HeadFinder hf) { 
+  private PTBMentionFinder(HeadFinder hf) { 
     collectPrenominalNamedEntities = false;
     collectCoordinatedNounPhrases = true;
     headFinder = hf;
   }
+  
+  public static PTBMentionFinder getInstance(HeadFinder hf) {
+    if (instance == null) {
+      instance = new PTBMentionFinder(hf);
+    }
+    else if (instance.headFinder != hf) {
+      instance = new PTBMentionFinder(hf);
+    }
+    return(instance);
+  }
+  
+  
   
   
   /*

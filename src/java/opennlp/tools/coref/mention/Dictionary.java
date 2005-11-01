@@ -26,7 +26,7 @@ public interface Dictionary {
    * Returns the lemmas of the specified word with the specified part-of-speech.  
    * @param word The word whose lemmas are desired.
    * @param pos The part-of-speech of the specified word.
-   * @return The lemmas of the pecified word given the specified part-of-speech.
+   * @return The lemmas of the specified word given the specified part-of-speech.
    */
   public String[] getLemmas(String word, String pos);
   

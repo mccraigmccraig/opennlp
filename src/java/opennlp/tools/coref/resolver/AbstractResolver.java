@@ -78,7 +78,7 @@ public abstract class AbstractResolver implements Resolver {
    * @return the head parse for the specified mention.
    */
   protected Parse getHead(MentionContext mention) {
-    return mention.getHeadToken();
+    return mention.getHeadTokenParse();
   }
 
   /**
@@ -87,7 +87,7 @@ public abstract class AbstractResolver implements Resolver {
    * @return the index for the head word for the specified mention.
    */
   protected int getHeadIndex(MentionContext mention) {
-    Parse[] mtokens = mention.getTokens();
+    Parse[] mtokens = (Parse[]) mention.getTokenParses();
     for (int ti=mtokens.length-1;ti>=0;ti--) {
       Parse tok = mtokens[ti];
       if (!tok.getSyntacticType().equals("POS") && !tok.getSyntacticType().equals(",") &&
@@ -132,7 +132,7 @@ public abstract class AbstractResolver implements Resolver {
   protected boolean excluded(MentionContext mention, DiscourseEntity entity) {
     MentionContext cec = entity.getLastExtent();
     return(mention.getSentenceNumber() == cec.getSentenceNumber() && 
-	   mention.getSpan().getEnd() <= cec.getSpan().getEnd());
+	   mention.getIndexSpan().getEnd() <= cec.getIndexSpan().getEnd());
   }
 
   public DiscourseEntity retain(MentionContext mention, DiscourseModel dm) {
@@ -159,7 +159,7 @@ public abstract class AbstractResolver implements Resolver {
    */
   protected String featureString(MentionContext mention){
     StringBuffer fs = new StringBuffer();
-    Parse[] mtokens =mention.getTokens(); 
+    Object[] mtokens =mention.getTokens(); 
     fs.append(mtokens[0].toString());
     for (int ti=1,tl=mtokens.length;ti<tl;ti++) {
       fs.append("_").append(mtokens[ti].toString());
@@ -176,7 +176,7 @@ public abstract class AbstractResolver implements Resolver {
   protected String stripNp(MentionContext mention) {
     int start=mention.getNonDescriptorStart(); //start after descriptors
 
-    Parse[] mtokens = mention.getTokens();
+    Parse[] mtokens = mention.getTokenParses();
     int end=mention.getHeadTokenIndex()+1;
     if (start == end) {
       //System.err.println("stripNp: return null 1");

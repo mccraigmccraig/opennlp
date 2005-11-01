@@ -17,11 +17,9 @@
 //////////////////////////////////////////////////////////////////////////////
 package opennlp.tools.coref.mention;
 
-import java.util.Collections;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
+import opennlp.tools.coref.sim.Context;
 import opennlp.tools.coref.sim.GenderEnum;
 import opennlp.tools.coref.sim.NumberEnum;
 import opennlp.tools.util.Span;
@@ -29,24 +27,18 @@ import opennlp.tools.util.Span;
 /** Data strucure representation of a mention with additional contextual information.  The contextual
  * information is used in performing coreference resolution.
  */
-public class MentionContext {
-  /** Parse elements for each token in the head basal noun phrase of this entity. */
-  private Parse[] tokens;
+public class MentionContext extends Context {
   /** The index of first token which is not part of a descriptor.  This is 0 if no descriptor is present. */
   private int nonDescriptorStart;
-  /** The Parse for this mention. */
-  private Parse parse;
   /** The Parse of the head constituent of this mention. */
   private Parse head;
   /** Sentence-token-based span whose end is the last token of the mention. */
-  private Span span;
-  /** Sentence-token-based span whose end is the last token of the menion head. */
-  private Span headSpan;
+  private Span indexSpan;
   /** Position of the NP in the sentence. */
   private int nounLocation;
   /** Position of the NP in the document. */
   private  int nounNumber; 
-  /** Number of Noun Phrase in the sentence containing this mention. */
+  /** Number of noun phrases in the sentence which contains this mention. */
   private int maxNounLocation;
   /** Index of the sentece in the document which contains this mention. */
   private int sentenceNumber;
@@ -56,29 +48,16 @@ public class MentionContext {
   private Parse nextToken;
   /** The token following this mention's basal noun phrase.*/
   private Parse basalNextToken;
-  /** The type of coreference performed on this mention. */
-  private String type = null;
-  /** Specifies the entity id number.  This is used to indicate coreference relationships during training. */
-  private int id = -1;
-  /** The named-entity type associated with this mention. */
-  private String neType;
-  /** The token index in of the head word of this mention. */ 
-  private int headTokenIndex;
-  /** The pos-tag of the mention's head word. */
-  private String headTokenTag;
+  
+  
   /** The parse of the mention's head word. */
   private Parse headToken;
-  /** The text of the mention's head word. */
-  private String headTokenText;
   /** The parse of the first word in the mention. */
   private Parse firstToken;
   /** The text of the first word in the mention. */
   private String firstTokenText;
   /** The pos-tag of the first word in the mention. */
   private String firstTokenTag;
-  /** The categorical keys associated with this mention. 
-   * In the current implementation WordNet provides the source of these keys. */
-  private Set synsets;
   /** The gender assigned to this mention. */
   private GenderEnum gender;
   /** The probability associated with the gender assignment. */
@@ -87,6 +66,42 @@ public class MentionContext {
   private NumberEnum number;
   /** The robability associated with the number assignment. */
   private double numberProb;
+  
+
+  public MentionContext(Span span, Span headSpan, int entityId, Parse parse, String extentType, String nameType, int mentionIndex, int mentionsInSentence, int mentionIndexInDocument, int sentenceIndex, HeadFinder headFinder) {
+    super(span,headSpan,entityId,parse,extentType,nameType,headFinder);
+    nounLocation = mentionIndex;
+    maxNounLocation = mentionsInSentence;
+    nounNumber = mentionIndexInDocument;
+    sentenceNumber = sentenceIndex;
+    indexSpan = parse.getSpan();
+    prevToken = parse.getPreviousToken();
+    nextToken = parse.getNextToken();
+    head = headFinder.getLastHead(parse);
+    List headTokens = head.getTokens();
+    tokens = (Parse[]) headTokens.toArray(new Parse[headTokens.size()]);
+    basalNextToken = head.getNextToken();
+    //System.err.println("MentionContext.init: "+ent+" "+ent.getEntityId()+" head="+head);
+    nonDescriptorStart = 0;
+    initHeads(headFinder.getHeadIndex(head));
+    gender = GenderEnum.UNKNOWN;
+    this.genderProb = 0d;
+    number = NumberEnum.UNKNOWN;
+    this.numberProb = 0d;
+  }
+  /**
+   * Constructs context information for the specified mention.
+   * @param mention The mention object on which this object is based.
+   * @param mentionIndexInSentence The mention's position in the sentence.
+   * @param mentionsInSentence The number of mentions in the sentence.
+   * @param mentionIndexInDocument The index of this mention with respect to the document.
+   * @param sentenceIndex The index of the sentence which contains this mention.
+   * @param headFinder An object which provides head information.
+   */
+  public MentionContext(Mention mention, int mentionIndexInSentence, int mentionsInSentence, int mentionIndexInDocument, int sentenceIndex, HeadFinder headFinder) {
+    this(mention.getSpan(),mention.getHeadSpan(),mention.getId(),mention.getParse(),mention.type,mention.nameType, mentionIndexInSentence,mentionsInSentence,mentionIndexInDocument,sentenceIndex,headFinder);
+  }
+      
 
   /** 
    * Constructs context information for the specified mention.
@@ -98,12 +113,13 @@ public class MentionContext {
    *  @param nameType The named-entity type for this mention.
    *  @param headFinder Object which provides head information.
    **/
+  /*
   public MentionContext(Parse mentionParse, int mentionIndex, int mentionsInSentence, int mentionsInDocument, int sentenceIndex, String nameType, HeadFinder headFinder) {
     nounLocation = mentionIndex;
     maxNounLocation = mentionsInDocument;
     sentenceNumber = sentenceIndex;
     parse = mentionParse;
-    span = mentionParse.getSpan();
+    indexSpan = mentionParse.getSpan();
     prevToken = mentionParse.getPreviousToken();
     nextToken = mentionParse.getNextToken();
     head = headFinder.getLastHead(mentionParse);
@@ -111,7 +127,7 @@ public class MentionContext {
     tokens = (Parse[]) headTokens.toArray(new Parse[headTokens.size()]);
     basalNextToken = head.getNextToken();
     //System.err.println("MentionContext.init: "+ent+" "+ent.getEntityId()+" head="+head);
-    headSpan = head.getSpan();
+    indexHeadSpan = head.getSpan();
     nonDescriptorStart = 0;
     initHeads(headFinder.getHeadIndex(head));
     this.neType= nameType;
@@ -127,25 +143,26 @@ public class MentionContext {
     number = NumberEnum.UNKNOWN;
     this.numberProb = 0d;
   }
+  */
 
   private void initHeads(int headIndex) {
     this.headTokenIndex=headIndex;
-    this.headToken = tokens[getHeadTokenIndex()];
+    this.headToken = (Parse) tokens[getHeadTokenIndex()];
     this.headTokenText = headToken.toString();
     this.headTokenTag=headToken.getSyntacticType();
-    this.firstToken = tokens[0];
+    this.firstToken = (Parse) tokens[0];
     this.firstTokenTag = firstToken.getSyntacticType();
     this.firstTokenText=firstToken.toString();
   }
 
-  public Parse getHeadToken() {
+  /**
+   * Returns the parse of the head token for this mention.
+   * @return the parse of the head token for this mention.
+   */
+  public Parse getHeadTokenParse() {
     return headToken;
   }
   
-  public Parse[] getTokens() {
-    return tokens;
-  }
-
   public String getHeadText() {
     StringBuffer headText = new StringBuffer();
     for (int hsi = 0; hsi < tokens.length; hsi++) {
@@ -157,31 +174,41 @@ public class MentionContext {
   public Parse getHead() {
     return head;
   }
-  
-  public Parse getParse() {
-    return parse;
-  }
-  
+    
   public int getNonDescriptorStart() {
     return this.nonDescriptorStart;
   }
   
-  public Span getSpan() {
-    return span;
+  /** 
+   * Returns a sentence-based token span for this mention.  If this mention consist
+   * of the third, fourth, and fifth token, then this span will be 2..4.   
+   * @return a sentence-based token span for this mention.
+   */
+  public Span getIndexSpan() {
+    return indexSpan;
   }
-  
-  public Span getHeadSpan() {
-    return headSpan;
-  }
-  
+    
+  /**
+   * Returns the index of the noun phrase for this mention in a sentence.
+   * @return the index of the noun phrase for this mention in a sentence.
+   */
   public int getNounPhraseSentenceIndex() {
     return nounLocation;
   }
   
+  /**
+   * Returns the index of the noun phrase for this mention in a document.
+   * @return the index of the noun phrase for this mention in a document.
+   */
   public int getNounPhraseDocumentIndex() {
     return nounNumber;
   }
   
+  /**
+   * Returns the index of the last noun phrase in the sentence containing this mention.
+   * This is one less than the number of noun phrases in the sentence which contains this mention. 
+   * @return the index of the last noun phrase in the sentence containing this mention.
+   */
   public int getMaxNounPhraseSentenceIndex() {
     return maxNounLocation;
   }
@@ -198,61 +225,14 @@ public class MentionContext {
     return nextToken;
   }
   
+  /**
+   * Returns the index of the sentence which contains this mention.
+   * @return the index of the sentence which contains this mention.
+   */ 
   public int getSentenceNumber() {
     return sentenceNumber;
   }
 
-  public String getType() {
-    return type;
-  }
-
-
-  /**
-   * Returns the entity id number.  This value is only used during training.
-   * @return the entity id number.
-   */
-  public int getId() {
-    return id;
-  }
-  
-  /**
-   * Assigns this mention the specified entity id.
-   * @param id An index representing which entity group this mention belongs to.
-   * This is used when training models.
-   */
-  public void setId(int id) {
-    this.id = id;
-  }
-  
-  /**
-   * Returns the named-entity type of this annotation.
-   * @return the named-entity type of this annotation.
-   */
-  public String getNeType() {
-    return neType;
-  }
-
-  /** Returns the token index into the mention for the head word. 
-   * @return the token index into the mention for the head word. 
-   */
-  public int getHeadTokenIndex() {
-    return headTokenIndex;
-  }
-  
-  /** Returns the pos-tag of this mention's head token.
-   * @return the pos-tag of this mention's head token.
-   */
-  public String getHeadTokenTag() {
-    return headTokenTag;
-  }
-
-  /** Returns the text of this mention's head token.
-   * @return the text of this mention's head token.
-   */
-  public String getHeadTokenText() {
-    return headTokenText;
-  }
-  
   /** Returns the parse for the first token in this mention.
    * @return The parse for the first token in this mention.
    */
@@ -268,17 +248,19 @@ public class MentionContext {
   }
   
   /**
-   * @return Returns the firstTokenTag.
+   * Returns the pos-tag of the first token of this mention. 
+   * @return the pos-tag of the first token of this mention.
    */
   public String getFirstTokenTag() {
     return firstTokenTag;
   }
-
-  /** Returns the set of categorical keys associated with this mention.
-   * @return The set of categorical keys assocoated with this mention.
+  
+  /**
+   * Returns the parses for the tokens which are contained in this mention.
+   * @return An array of parses, in order, for each token contained in this mention.
    */
-  public Set getSynsets() {
-    return synsets;
+  public Parse[] getTokenParses() {
+    return (Parse[]) tokens;
   }
 
   /**
@@ -289,6 +271,7 @@ public class MentionContext {
     return (parse.toString());
   }
   
+  /*
   private static String[] getLemmas(MentionContext xec) {
     //TODO: Try multi-word lemmas first.
     String word = xec.getHeadTokenText();
@@ -307,6 +290,7 @@ public class MentionContext {
     }
     return (synsetSet);
   }
+  */
 
   /**
    * Assigns the specified gender with the specified probability to this mention.

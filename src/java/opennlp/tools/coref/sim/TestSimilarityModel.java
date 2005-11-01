@@ -23,5 +23,5 @@ import opennlp.tools.coref.mention.MentionContext;
  * Interface for testing a similarity model. 
  */
 public interface TestSimilarityModel {
-  public double compatible(MentionContext np1, MentionContext np2);
+  public double compatible(Context np1, Context np2);
 }
