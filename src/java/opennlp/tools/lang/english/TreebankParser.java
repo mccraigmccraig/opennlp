@@ -81,9 +81,32 @@ public class TreebankParser {
     }
     return token;
   }
+  
+  public static Parse[] parseLine(String line, ParserME parser, int numParses) {
+    line = untokenizedParenPattern1.matcher(line).replaceAll("$1 $2");
+    line = untokenizedParenPattern2.matcher(line).replaceAll("$1 $2");
+    StringTokenizer str = new StringTokenizer(line);
+    StringBuffer sb = new StringBuffer();
+    List tokens = new ArrayList();
+    while (str.hasMoreTokens()) {
+      String tok = convertToken(str.nextToken());
+      tokens.add(tok);
+      sb.append(tok).append(" ");
+    }
+    String text = sb.substring(0, sb.length() - 1).toString();
+    Parse p = new Parse(text, new Span(0, text.length()), "INC", 1, null);
+    int start = 0;
+    for (Iterator ti = tokens.iterator(); ti.hasNext();) {
+      String tok = (String) ti.next();
+      p.insert(new Parse(text, new Span(start, start + tok.length()), ParserME.TOK_NODE, 0));
+      start += tok.length() + 1;
+    }
+    Parse[] parses = parser.parse(p,numParses);
+    return parses;
+  }
 
   private static void usage() {
-    System.err.println("Usage: EnglishTreebankParser -[id] -bs -ap dataDirectory < tokenized_sentences");
+    System.err.println("Usage: TreebankParser -[id] -bs -ap dataDirectory < tokenized_sentences");
     System.err.println("dataDirectory: Directory containing parser models.");
     System.err.println("-d: Use tag dictionary.");
     System.err.println("-i: Case insensitive tag dictionary.");
@@ -92,6 +115,7 @@ public class TreebankParser {
     System.err.println("-k 5: Show the top 5 parses.  This will also display their log-probablities.");
     System.exit(1);
   }
+  
 
   public static void main(String[] args) throws IOException {
     if (args.length == 0) {
@@ -183,35 +207,17 @@ public class TreebankParser {
     String line;
     try {
       while (null != (line = in.readLine())) {
-        line = untokenizedParenPattern1.matcher(line).replaceAll("$1 $2");
-        line = untokenizedParenPattern2.matcher(line).replaceAll("$1 $2");
-        StringTokenizer str = new StringTokenizer(line);
-        StringBuffer sb = new StringBuffer();
-        List tokens = new ArrayList();
-        while (str.hasMoreTokens()) {
-          String tok = convertToken(str.nextToken());
-          tokens.add(tok);
-          sb.append(tok).append(" ");
+        if (line.length() == 0) {
+          System.out.println();          
         }
-        if (sb.length() != 0) {
-          String text = sb.substring(0, sb.length() - 1).toString();
-          Parse p = new Parse(text, new Span(0, text.length()), "INC", 1, null);
-          int start = 0;
-          for (Iterator ti = tokens.iterator(); ti.hasNext();) {
-            String tok = (String) ti.next();
-            p.insert(new Parse(text, new Span(start, start + tok.length()), ParserME.TOK_NODE, 0));
-            start += tok.length() + 1;
-          }
-          Parse[] parses = parser.parse(p,numParses);
+        else {
+          Parse[] parses = parseLine(line, parser, numParses);
           for (int pi=0,pn=parses.length;pi<pn;pi++) {
             if (showTopK) {
               System.out.print(pi+" "+parses[pi].getProb()+" ");
             }
             parses[pi].show();
           }
-        }
-        else {
-          System.out.println();
         }
       }
     }
