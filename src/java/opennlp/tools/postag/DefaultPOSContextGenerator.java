@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////////
-// Copyright (C) 2002 Jason Baldridge and Gann Bierner
+// Copyright (C) 2002 Jason Baldridge, Gann Bierner and Tom Morton
 // 
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
@@ -19,6 +19,7 @@
 package opennlp.tools.postag;
 
 import java.util.ArrayList;
+import java.util.List;
 import java.util.regex.Pattern;
 
 import opennlp.tools.ngram.Dictionary;
@@ -29,7 +30,7 @@ import opennlp.tools.util.Cache;
  *
  * @author      Gann Bierner
  * @author      Tom Morton
- * @version     $Revision: 1.9 $, $Date: 2005/10/06 11:09:56 $
+ * @version     $Revision: 1.10 $, $Date: 2005/11/06 23:14:58 $
  */
 
 public class DefaultPOSContextGenerator implements POSContextGenerator {
@@ -139,8 +140,8 @@ public class DefaultPOSContextGenerator implements POSContextGenerator {
         wordsKey = tokens;
       }
     }
-    ArrayList e = new ArrayList();
-
+    List e = new ArrayList();
+    e.add("def");
     // add the word itself
     e.add("w=" + lex);
     dictGram[0] = lex;
@@ -177,7 +178,7 @@ public class DefaultPOSContextGenerator implements POSContextGenerator {
       if (prevprev != null) {
         e.add("pp=" + prevprev);
         if (tagprevprev != null) {
-          e.add("tt=" + tagprevprev);
+          e.add("t2=" + tagprevprev+","+tagprev);
         }
       }
     }
