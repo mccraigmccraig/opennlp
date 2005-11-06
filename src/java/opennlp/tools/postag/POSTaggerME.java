@@ -41,7 +41,6 @@ import opennlp.maxent.TwoPassDataIndexer;
 import opennlp.maxent.io.SuffixSensitiveGISModelWriter;
 import opennlp.tools.ngram.Dictionary;
 import opennlp.tools.ngram.MutableDictionary;
-import opennlp.tools.parser.Parse;
 import opennlp.tools.util.BeamSearch;
 import opennlp.tools.util.Pair;
 import opennlp.tools.util.Sequence;
@@ -52,7 +51,7 @@ import opennlp.tools.util.Sequence;
  * surrounding context.
  *
  * @author      Gann Bierner
- * @version $Revision: 1.13 $, $Date: 2005/11/01 23:04:37 $
+ * @version $Revision: 1.14 $, $Date: 2005/11/06 23:25:18 $
  */
 public class POSTaggerME implements Evalable, POSTagger {
 
@@ -266,15 +265,17 @@ public class POSTaggerME implements Evalable, POSTagger {
   }
   
   private static void usage() {
-    System.err.println("Usage: POSTaggerME -encoding encoding training model");
+    System.err.println("Usage: POSTaggerME [-encoding encoding] [-dict dict_file] training model [cutoff] [iterations]");
     System.err.println("This trains a new model on the specified training file and writes the trained model to the model file.");
+    System.err.println("-encoding Specifies the encoding of the training file");
+    System.err.println("-dict Specifies that a dictionary file should be created for use in distinguising between rare and non-rare words");
     System.exit(1);
   }
 
   /**
      * <p>Trains a new pos model.</p>
      *
-     * <p>Usage: java opennlp.postag.POStaggerME data_file dict_file new_model_name (iterations cutoff)?</p>
+     * <p>Usage: java opennlp.postag.POStaggerME [-encoding charset] [-d dict_file] data_file  new_model_name (iterations cutoff)?</p>
      *
      */
   public static void main(String[] args) throws IOException {
@@ -284,12 +285,21 @@ public class POSTaggerME implements Evalable, POSTagger {
     try {
       int ai=0;
       String encoding = null;
+      String dict = null;
       while (args[ai].startsWith("-")) {
         if (args[ai].equals("-encoding")) {
           ai++;
           if (ai < args.length) {
-            encoding = args[ai];
-            ai++;
+            encoding = args[ai++];
+          }
+          else {
+            usage();
+          }
+        }
+        else if (args[ai].equals("-dict")) {
+          ai++;
+          if (ai < args.length) {
+            dict = args[ai++];
           }
           else {
             usage();
@@ -297,7 +307,6 @@ public class POSTaggerME implements Evalable, POSTagger {
         }
       }
       File inFile = new File(args[ai++]);
-      String dict = args[ai++];
       File outFile = new File(args[ai++]);
       int cutoff = 5;
       int iterations = 100;
@@ -306,24 +315,39 @@ public class POSTaggerME implements Evalable, POSTagger {
         iterations = Integer.parseInt(args[ai++]);
       }
       GISModel mod;
-
-      //TODO: Build dict
-      System.err.println("Building dictionary");
-      MutableDictionary mdict = new MutableDictionary(cutoff);
-      DataStream data = new opennlp.maxent.PlainTextByLineDataStream(new java.io.FileReader(inFile));
-      while(data.hasNext()) {
-        String tagStr = (String) data.nextToken();
-        String[] tt = tagStr.split(" ");
-        String[] words = new String[tt.length];
-        for (int wi=0;wi<words.length;wi++) {
-          words[wi] = tt[wi].substring(0,tt[wi].lastIndexOf('_'));
+      if (dict != null) {
+        System.err.println("Building dictionary");
+        MutableDictionary mdict = new MutableDictionary(cutoff);
+        DataStream data = new opennlp.maxent.PlainTextByLineDataStream(new java.io.FileReader(inFile));
+        while(data.hasNext()) {
+          String tagStr = (String) data.nextToken();
+          String[] tt = tagStr.split(" ");
+          String[] words = new String[tt.length];
+          for (int wi=0;wi<words.length;wi++) {
+            words[wi] = tt[wi].substring(0,tt[wi].lastIndexOf('_'));
+          }
+          mdict.add(words,1,true);
         }
-        mdict.add(words,1,true);
+        System.out.println("Saving the dictionary");
+        mdict.persist(new File(dict));
       }
-      System.out.println("Saving the dictionary");
-      mdict.persist(new File(dict));
-      
-      EventStream es = new POSEventStream(new PlainTextByLineDataStream(new InputStreamReader(new FileInputStream(inFile),encoding)), new Dictionary(dict));
+      EventStream es;
+      if (encoding == null) {
+        if (dict == null) {
+          es = new POSEventStream(new PlainTextByLineDataStream(new InputStreamReader(new FileInputStream(inFile))));
+        }
+        else {
+          es = new POSEventStream(new PlainTextByLineDataStream(new InputStreamReader(new FileInputStream(inFile))), new Dictionary(dict));
+        }
+      }
+      else {
+        if (dict == null) {
+          es = new POSEventStream(new PlainTextByLineDataStream(new InputStreamReader(new FileInputStream(inFile),encoding)));
+        }
+        else {
+          es = new POSEventStream(new PlainTextByLineDataStream(new InputStreamReader(new FileInputStream(inFile),encoding)), new Dictionary(dict));
+        }
+      }
       mod = train(es, iterations, cutoff);
       System.out.println("Saving the model as: " + outFile);
       new SuffixSensitiveGISModelWriter(mod, outFile).persist();
