@@ -703,7 +703,7 @@ public class ParserME {
     java.io.File dictFile = new java.io.File(modelDirectory+"/dict.bin.gz");
     java.io.File tagFile = new java.io.File(modelDirectory+"/tag.bin.gz");
     java.io.File chunkFile = new java.io.File(modelDirectory+"/chunk.bin.gz");
-    java.io.File buildFile = new java.io.File(modelDirectory+"/build");
+    java.io.File buildFile = new java.io.File(modelDirectory+"/build.bin.gz");
     java.io.File checkFile = new java.io.File(modelDirectory+"/check.bin.gz");
     int iterations = 100;
     int cutoff = 5;
