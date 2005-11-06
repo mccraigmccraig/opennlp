@@ -41,6 +41,10 @@ public class POSEventStream implements EventStream {
   /** The last line read in from the data file. */
   private String line;
 
+  public POSEventStream(DataStream d) {
+    this(d, new DefaultPOSContextGenerator(null));
+  }
+  
   public POSEventStream(DataStream d, Dictionary dict) {
     this(d, new DefaultPOSContextGenerator(dict));
   }
