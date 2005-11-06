@@ -37,7 +37,7 @@ import opennlp.tools.postag.TagDictionary;
  * achieved >96% accuracy on unseen data.
  *
  * @author      Gann Bierner
- * @version     $Revision: 1.3 $, $Date: 2005/11/01 23:04:37 $
+ * @version     $Revision: 1.4 $, $Date: 2005/11/06 23:13:13 $
  */
 
 public class PosTagger extends POSTaggerME {
@@ -45,6 +45,10 @@ public class PosTagger extends POSTaggerME {
   public PosTagger(String modelFile, Dictionary dict, TagDictionary tagdict) {
       super(getModel(modelFile), new DefaultPOSContextGenerator(dict),tagdict);
   }
+  
+  public PosTagger(String modelFile, TagDictionary tagdict) {
+    super(getModel(modelFile), new DefaultPOSContextGenerator(null),tagdict);
+}
 
   public PosTagger(String modelFile, Dictionary dict) {
     super(getModel(modelFile), new DefaultPOSContextGenerator(dict));
@@ -68,23 +72,38 @@ public class PosTagger extends POSTaggerME {
    */
   public static void main(String[] args) throws IOException {
     if (args.length == 0) {
-      System.err.println("Usage: PosTagger [-td tagdict] model dict < tokenized_sentences");
+      System.err.println("Usage: PosTagger [-d tagdict] [-di case_insensiteve_tagdict] model dict < tokenized_sentences");
       System.exit(1);
     }
     int ai=0;
     boolean test = false;
     String tagdict = null;
+    boolean caseSensitive = true;
     while(ai < args.length && args[ai].startsWith("-")) {
-      if (args[ai].equals("-td")) {
+      if (args[ai].equals("-d")) {
         tagdict = args[ai+1];
         ai+=2;
+      }
+      else if (args[ai].equals("-di")) {
+        tagdict = args[ai+1];
+        ai+=2;
+        caseSensitive = false;
       }
     }
     POSTaggerME tagger;
     String model = args[ai++];
-    String dictFile = args[ai++];
+    String dictFile = null;
+    if (ai < args.length) {
+      dictFile = args[ai++];
+    }
+    
     if (tagdict != null) {
-      tagger = new PosTagger(args[ai++],new Dictionary(dictFile),new POSDictionary(tagdict));
+      if (dictFile != null) {
+        tagger = new PosTagger(model,new Dictionary(dictFile),new POSDictionary(tagdict,caseSensitive));
+      }
+      else {
+        tagger = new PosTagger(model,new POSDictionary(tagdict,caseSensitive));
+      }
     }
     else {
       tagger = new PosTagger(model,new Dictionary(dictFile));
