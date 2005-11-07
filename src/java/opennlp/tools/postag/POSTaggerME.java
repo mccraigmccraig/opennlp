@@ -51,7 +51,7 @@ import opennlp.tools.util.Sequence;
  * surrounding context.
  *
  * @author      Gann Bierner
- * @version $Revision: 1.14 $, $Date: 2005/11/06 23:25:18 $
+ * @version $Revision: 1.15 $, $Date: 2005/11/07 02:54:32 $
  */
 public class POSTaggerME implements Evalable, POSTagger {
 
@@ -304,6 +304,10 @@ public class POSTaggerME implements Evalable, POSTagger {
           else {
             usage();
           }
+        }
+        else {
+          System.err.println("Unknown option "+args[ai]);
+          usage();
         }
       }
       File inFile = new File(args[ai++]);
