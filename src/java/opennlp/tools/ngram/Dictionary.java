@@ -41,7 +41,7 @@ public class Dictionary {
     DataInputStream input = new DataInputStream(new GZIPInputStream(new FileInputStream(new File(dictionaryFile))));
     input.readUTF();
     int numWords = input.readInt();
-    System.err.println("Reading: "+numWords+" words");
+    //System.err.println("Reading: "+numWords+" words");
     wordMap = new NumberedSet(numWords);
     for (int wi=0;wi<numWords;wi++) {
       String word = input.readUTF();
