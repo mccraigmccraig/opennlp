@@ -198,7 +198,7 @@ public class BuildContextGenerator implements ContextGenerator {
         unigram[0] = p_1.getHead().toString();
         u_1 = dict.contains(unigram);
         
-        //extra check fpr 2==null case
+        //extra check for 2==null case
         b_2_1 = b_2_1 && u_1; 
         t_2_10 = t_2_10 && u_1;
         t_101 = t_101 && u_1;
