@@ -571,7 +571,7 @@ public class ParserME {
   }
   
   private static void usage() {
-    System.err.println("Usage: ParserME -[dict|tag|chunk|build|check|fun] trainingFile headRules parserModelDirectory [iterations cutoff]");
+    System.err.println("Usage: ParserME -[dict|tag|chunk|build|check|fun] trainingFile parserModelDirectory [iterations cutoff]");
     System.err.println();
     System.err.println("Training file should be one sentence per line where each line consists of a Penn Treebank Style parse");
     System.err.println("-dict Just build the dictionaries.");
@@ -653,7 +653,7 @@ public class ParserME {
   }
 
   public static void main(String[] args) throws java.io.IOException {
-    if (args.length < 4) {
+    if (args.length < 3) {
       usage();
       System.exit(1);
     }
@@ -697,9 +697,8 @@ public class ParserME {
       argIndex++;
     }
     java.io.File inFile = new java.io.File(args[argIndex++]);
-    String headRulesFile = args[argIndex++];
-    HeadRules rules = new opennlp.tools.lang.english.HeadRules(headRulesFile);
     String modelDirectory = args[argIndex++];
+    HeadRules rules = new opennlp.tools.lang.english.HeadRules(modelDirectory+"/head_rules");
     java.io.File dictFile = new java.io.File(modelDirectory+"/dict.bin.gz");
     java.io.File tagFile = new java.io.File(modelDirectory+"/tag.bin.gz");
     java.io.File chunkFile = new java.io.File(modelDirectory+"/chunk.bin.gz");
