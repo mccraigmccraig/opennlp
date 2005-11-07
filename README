@@ -2,7 +2,7 @@ Introduction
 ============
 The opennlp project is now the home of a set of java-based NLP tools 
 which perform sentence detection, tokenization, pos-tagging, chunking and
-parsing, and named-entity detection.  
+parsing, named-entity detection, and coreference.  
 
 In its previous life it was used to hold a common infrastructure code
 for the opennlp.grok project.  The work previously done can be found in
@@ -58,7 +58,7 @@ tools (i.e. make or shell scripts) where a new JVM is started for each task.
 Build targets
 =============
 
-The build system is not only responsible for compiling Opennlp into a jar
+The build system is not only responsible for compiling OpenNlp into a jar
 file, but is also responsible for creating the HTML documentation in
 the form of javadocs.
 
@@ -88,7 +88,7 @@ specific ones.  Models for the corresponding components can be found in
 the following directories:
 
 chunker		- English-Penn-Treebank-style phrase chunker models.
-coreference - MUC-style coreference.
+coreference     - MUC-style coreference.
 namefind	- MUC-style named entity finder models.
 parser		- English-Penn-Treebank-style parser models.
 postag		- English-Penn-Treebank-style part-of-speech tagger.
@@ -103,55 +103,64 @@ contains a main which will annotate text from standard in.  Some of
 them require processing by the previous component.  Most of these take a
 single argument which is the location of the model for this component.
 The exceptions are the parser which requires a  model directory, and
-the namefinder which takes a list of models.
+the namefinder which takes a list of models.  Tools are separated into
+packages by language.  Currently only two languages are supported (English
+and Spanish), but we plan to support others in the future.  Here we will 
+just discuss the English tools. 
 
-sentence detector:  opennlp.tools.sentdetect.EnglishSentenceDetectorME
-tokenizer:          opennlp.tools.tokenize.EnglishTokenizerME
-pos-tagger:         opennlp.tools.postag.EnglishPOSTaggerME
-chunker:            opennlp.tools.chunker.EnglishTreebankChunker
-name finder:        opennlp.tools.namefinder.EnglishNameFinder
-parser:             opennlp.tools.parser.EnglishTreebankParser
-coreference:        opennlp.tools.coref.EnglishTreebankLinker
+sentence detector:  opennlp.tools.lang.english.SentenceDetector
+tokenizer:          opennlp.tools.lang.english.Tokenizer
+pos-tagger:         opennlp.tools.lang.english.PosTagger
+chunker:            opennlp.tools.lang.english.TreebankChunker
+name finder:        opennlp.tools.lang.english.NameFinder
+parser:             opennlp.tools.lang.english.TreebankParser
+coreference:        opennlp.tools.lang.english.TreebankLinker
 
-Examples: This is not a recomendation that you run the tools this way.  It's
-in fact very inefficient.  However, this should give you an idea of what the
-tools can do and the kind of input they assume.  Developers should know to 
-look at the main's of these classes to see how to set up a particular 
-component for use.
+Examples: These example are simply that, example and are not a recommendation that 
+you run the tools this way.  It's in fact very inefficient.  However, this should 
+give you an idea of what the tools can do and the kind of input they assume.  Developers should know to look at the main's of these classes to see how to set 
+up a particular component for use.  
+
+Note: All these example assume that your CLASSPATH has been set to include: 
+opennlp-tools-1.3.0.jar, trove.jar, maxent-2.4.0.jar, and for coreference: jwnl-1.3.3.jar.  The opennlp jar is located in the output directory (once you've 
+built it) and the others are located in the lib directory.  Information about the
+jars in the lib directory can be found in the lib/LIBNOTES file.  If you are 
+un-certain about how to set your classpath please google: java classpath 
+where you will find many pages on the subject.
 
 Phrase Chunking:
-java opennlp.tools.sentdetect.EnglishSentenceDetectorME \
+java opennlp.tools.lang.english.SentenceDetector \
   opennlp.models/sentdetect/EnglishSD.bin.gz < text |
-java opennlp.tools.tokenize.EnglishTokenizerME \
+java opennlp.tools.lang.english.Tokenizer \
   opennlp.models/tokenize/EnglishTok.bin.gz |
-java opennlp.tools.postag.EnglishPOSTaggerME -td \
-  opennlp.models/parser/tagdict opennlp.models/postag/EnglishPOS.bin.gz |
-java opennlp.tools.chunker.EnglishTreebankChunker \
+java opennlp.tools.lang.english.PosTagger -d \
+  opennlp.models/parser/tagdict opennlp.models/parser/tag.bin.gz |
+java opennlp.tools.lang.english.TreebankChunker \
   opennlp.models/chunker/EnglishChunk.bin.gz
 
 Parsing:
-java opennlp.tools.sentdetect.EnglishSentenceDetectorME \
-  opennlp.models/sentdetect/EnglishSD.bin.gz < text | 
-java opennlp.tools.tokenize.EnglishTokenizerME \
-   opennlp.models/tokenize/EnglishTok.bin.gz | 
-java -Xmx450m opennlp.tools.parser.EnglishTreebankParser -d \
+java opennlp.tools.lang.english.SentenceDetector \
+  opennlp.models/sentdetect/EnglishSD.bin.gz < text |
+java opennlp.tools.lang.english.Tokenizer \
+  opennlp.models/tokenize/EnglishTok.bin.gz |
+java -Xmx350m opennlp.tools.lang.english.TreebankParser -d \
   opennlp.models/parser
     
 Name Finding:
-java opennlp.tools.sentdetect.EnglishSentenceDetectorME \
+java opennlp.tools.lang.english.SentenceDetector \
   opennlp.models/sentdetect/EnglishSD.bin.gz < text |
-java -Xmx600m opennlp.tools.namefind.EnglishNameFinder  \
+java -Xmx350m opennlp.tools.lang.english.NameFinder  \
   opennlp.models/namefind/*.bin.gz
   
 Coreference:
-java opennlp.tools.sentdetect.EnglishSentenceDetectorME \
-  opennlp.models/sentdetect/EnglishSD.bin.gz < text | 
-java opennlp.tools.tokenize.EnglishTokenizerME \
-   opennlp.models/tokenize/EnglishTok.bin.gz | 
-java -Xmx450m opennlp.tools.parser.EnglishTreebankParser -d \
+java opennlp.tools.lang.english.SentenceDetector \
+  opennlp.models/sentdetect/EnglishSD.bin.gz < text |
+java opennlp.tools.lang.english.Tokenizer \
+  opennlp.models/tokenize/EnglishTok.bin.gz |
+java -Xmx350m opennlp.tools.lang.english.TreebankParser -d \
   opennlp.models/parser |
-java -Xmx600m opennlp.tools.namefind.EnglishNameFinder -parse \
-  opennlp.models/namefind/*.bin.gz |
+java -Xmx350m opennlp.tools.lang.english.NameFinder -parse \
+  opennlp.models/namefind/*.bin.gz
 java -Xmx200m -DWNSEARCHDIR=$WNSEARCHDIR \
   opennlp.tools.coref.EnglishTreebankLinker opennlp.models/coref
 
@@ -176,12 +185,16 @@ opennlp.plugin v1.2 (http://wordfreak.sourceforge.net/plugins.html).
 tokenizer:          org.annotation.opennlp.OpenNlpTokenAnnotator
 coreference:        org.annotation.opennlp.OpenNlpCoreferenceAnnotator
 
+Note: In order to train a model you need all the training data.  There is
+not currently a mechanism to update the models distributed with the project
+with additional data.
+
 Bug Reports
 ===========
 
-Please report bugs at the bug section of the OpenNLP sourceforge site:
+Please report bugs at the bug section of the OpenNlp sourceforge site:
 
-http://sourceforge.net/tracker/?atid=103368&group_id=3368&func=browse
+https://sourceforge.net/tracker/?group_id=3368&atid=103368
 
 Note: Incorrect automatic-annotation on a specific piece of text does
 not constitute a bug.  The best way to address such errors is to provide
