@@ -166,6 +166,15 @@ public class ParserME {
   }
   
   /**
+   * Specifies whether the parser should report when it was unable to find a parse for
+   * a particular sentence.
+   * @param errorReporting If true then un-parsed sentences are reported, false otherwise.
+   */
+  public void setErrorReporting(boolean errorReporting) {
+    this.reportFailedParse = errorReporting;
+  }
+  
+  /**
    * Returns the specified number of parses for the specified tokens. 
    * @param tokens A parse containing the tokens with a single parent node.
    * @param numParses The number of parses desired.
