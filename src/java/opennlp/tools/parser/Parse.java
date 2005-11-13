@@ -64,21 +64,18 @@ public class Parse implements Cloneable, Comparable {
   private Collection nextPunctSet;
   
   private static boolean useFunctionTags;
-
-  public Object clone() {
-    try {
-      Parse p = (Parse) super.clone();
-      p.parts = (List) ((LinkedList) this.parts).clone();
-      if (derivation != null) {
-        p.derivation = new StringBuffer(100);
-        p.derivation.append(derivation.toString());
-      }
-      return (p);
+  
+  public Parse clone() {
+    Parse p = new Parse(this.text, this.span, this.type, this.prob, this.head);
+    p.parts = (List) ((LinkedList) this.parts).clone();
+    if (derivation != null) {
+      p.derivation = new StringBuffer(100);
+      p.derivation.append(this.derivation.toString());
     }
-    catch (CloneNotSupportedException e) {
-      throw new InternalError();
-    }
+    p.label = this.label;
+    return (p);
   }
+  
   
   public static void useFunctionTags(boolean uft) {
     useFunctionTags = uft;
@@ -176,7 +173,7 @@ public class Parse implements Cloneable, Comparable {
    * method assumes that the specified constituent can be inserted into this parse.
    * @param constituent The constituent to be inserted.
    */
-  public void insert(Parse constituent) {
+  public void insert(final Parse constituent) {
     Span ic = constituent.span;
     if (span.contains(ic)) {
       //double oprob=c.prob;
@@ -184,7 +181,7 @@ public class Parse implements Cloneable, Comparable {
       int pn = parts.size();
       for (; pi < pn; pi++) {
         Parse subPart = (Parse) parts.get(pi);
-        //System.err.println("Parse.insert:con="+constituent+" sp["+pi+"]"+subPart);
+        //System.err.println("Parse.insert:con="+constituent+" sp["+pi+"] "+subPart+" "+subPart.getType());
         Span sp = subPart.span;
         if (sp.getStart() >= ic.getEnd()) {
           break;
@@ -196,6 +193,7 @@ public class Parse implements Cloneable, Comparable {
           pi--;
           constituent.parts.add(subPart);
           subPart.setParent(constituent);
+          //System.err.println("Parse.insert: "+subPart.hashCode()+" -> "+subPart.getParent().hashCode());
           pn = parts.size();
         }
         else if (sp.contains(ic)) {
@@ -207,6 +205,7 @@ public class Parse implements Cloneable, Comparable {
       //System.err.println("Parse.insert:adding con="+constituent+" to "+this);
       parts.add(pi, constituent);
       constituent.setParent(this);
+      //System.err.println("Parse.insert: "+constituent.hashCode()+" -> "+constituent.getParent().hashCode());
     }
     else {
       throw (new InternalError("Inserting constituent not contained in the sentence!"));
@@ -449,6 +448,8 @@ public class Parse implements Cloneable, Comparable {
     StringBuffer text = new StringBuffer();
     int offset = 0;
     Stack stack = new Stack();
+    List tokens = new LinkedList();
+    List tags = new LinkedList();
     List cons = new LinkedList();
     for (int ci = 0, cl = parse.length(); ci < cl; ci++) {
       char c = parse.charAt(ci);
@@ -477,12 +478,25 @@ public class Parse implements Cloneable, Comparable {
     }
     String txt = text.toString();
     Parse p = new Parse(txt, new Span(0, txt.length()), ParserME.TOP_NODE, 1);
-    for (Iterator ci=cons.iterator();ci.hasNext();) {
-      Object[] parts = (Object[]) ci.next();
+    /*
+    for (int ti=0;ti < tokens.size();ti++) {
+      Object[] parts = (Object[]) cons.get(ti);
       String type = (String) parts[0];
       if (!type.equals(ParserME.TOP_NODE)) {
         Parse con = new Parse(txt, (Span) parts[1], type, 1);
+        System.err.println("insert "+type+" "+con.toString());
         p.insert(con);
+      }
+    }
+    */
+    for (int ci=0;ci < cons.size();ci++) {
+      Object[] parts = (Object[]) cons.get(ci);
+      String type = (String) parts[0];
+      if (!type.equals(ParserME.TOP_NODE)) {
+        Parse con = new Parse(txt, (Span) parts[1], type, 1);
+        System.err.println("insert["+ci+"] "+type+" "+con.toString()+" "+con.hashCode());
+        p.insert(con);
+        //codeTree(p);
       }
     }
     return p;
@@ -584,6 +598,31 @@ public class Parse implements Cloneable, Comparable {
   public void setDerivation(StringBuffer derivation) {
     this.derivation = derivation;
   }
+  
+  private void codeTree(Parse p,int[] levels) {
+    Parse[] kids = p.getChildren();
+    StringBuffer levelsBuff = new StringBuffer();
+    levelsBuff.append("[");
+    int[] nlevels = new int[levels.length+1];
+    for (int li=0;li<levels.length;li++) {
+      nlevels[li] = levels[li];
+      levelsBuff.append(levels[li]).append(".");
+    }
+    for (int ki=0;ki<kids.length;ki++) {
+      nlevels[levels.length] = ki;
+      System.out.println(levelsBuff.toString()+ki+"] "+kids[ki].getType()+" "+kids[ki].hashCode()+" -> "+kids[ki].getParent().hashCode()+" "+kids[ki].getParent().getType()+" "+kids[ki].toString());
+      codeTree(kids[ki],nlevels);
+    }
+  }
+  
+  /**
+   * Prints to standard out a representation of the specified parse which contains hash codes so that 
+   * parent/child relationships can be explicitly seen.
+   * @param p The parse to display.
+   */
+  public void showCodeTree() {
+    codeTree(this,new int[0]);
+  }
 
   /**
    * Reads training parses (one-sentence-per-line) and displays parse structure.
@@ -592,7 +631,7 @@ public class Parse implements Cloneable, Comparable {
    */
   public static void main(String[] args) throws java.io.IOException {
     if (args.length == 0) {
-      System.err.println("Usage: Parse head_rules < train_parses");
+      System.err.println("Usage: Parse -fun head_rules < train_parses");
       System.err.println("Reads training parses (one-sentence-per-line) and displays parse structure.");
       System.exit(1);
     }
@@ -605,8 +644,9 @@ public class Parse implements Cloneable, Comparable {
     java.io.BufferedReader in = new java.io.BufferedReader(new java.io.InputStreamReader(System.in));
     for (String line = in.readLine(); line != null; line = in.readLine()) {
       Parse p = Parse.parseParse(line);
-      p.updateHeads(rules);
-      p.show();
+      //p.updateHeads(rules);
+      //p.show();
+      p.showCodeTree();
       System.out.println();
     }
   }
