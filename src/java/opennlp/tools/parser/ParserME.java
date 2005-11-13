@@ -175,7 +175,12 @@ public class ParserME {
   }
   
   /**
-   * Returns the specified number of parses for the specified tokens. 
+   * Returns the specified number of parses or fewer for the specified tokens. <br>
+   * <b>Note:</b> The nodes within
+   * the returned parses are shared with other parses and therefore their parent node references will not be consistent
+   * with their child node reference.  {@link #setParents setParents} can be used to make the parents consistent
+   * with a partuicular parse, but subsequent calls to <code>setParents</code> can invalidate the results of earlier
+   * calls.<br>  
    * @param tokens A parse containing the tokens with a single parent node.
    * @param numParses The number of parses desired.
    * @return the specified number of parses for the specified tokens.
@@ -269,6 +274,19 @@ public class ParserME {
       return (Parse[]) topParses.toArray(new Parse[topParses.size()]);
     }
   }
+  
+  /**
+   * Assigns parent references for the specified parse so that they
+   * are consistent with the children references.
+   * @param p The parse whose parent references need to be assigned.  
+   */
+  public static void setParents(Parse p) {
+    Parse[] children = p.getChildren();
+    for (int ci = 0; ci < children.length; ci++) {
+      children[ci].setParent(p);
+      setParents(children[ci]);
+    }
+  }
 
   /**
    * Returns a parse for the specified parse of tokens.
@@ -276,7 +294,9 @@ public class ParserME {
    * @return A full parse of the specified tokens or the flat chunks of the tokens if a fullparse could not be found.
    */
   public Parse parse(Parse tokens) {
-    return parse(tokens,1)[0];
+    Parse p = parse(tokens,1)[0];
+    setParents(p);
+    return p;
   }
 
   /**
@@ -537,7 +557,6 @@ public class ParserME {
    * removed.
    * @param chunks A set of parses.
    * @param punctSet The set of punctuation which is to be removed.
-   * @param addPunctuation Specifies whether collapsed punctuation should be added to the adjacent tokens.
    * @return An array of parses which is a subset of chunks with punctuation removed.
    */
   public static Parse[] collapsePunctuation(Parse[] chunks, Set punctSet) {
