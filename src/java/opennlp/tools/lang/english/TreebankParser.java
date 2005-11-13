@@ -101,7 +101,13 @@ public class TreebankParser {
       p.insert(new Parse(text, new Span(start, start + tok.length()), ParserME.TOK_NODE, 0));
       start += tok.length() + 1;
     }
-    Parse[] parses = parser.parse(p,numParses);
+    Parse[] parses;
+    if (numParses == 1) {
+      parses = new Parse[] { parser.parse(p)};
+    }
+    else {
+      parses = parser.parse(p,numParses);
+    }
     return parses;
   }
 
