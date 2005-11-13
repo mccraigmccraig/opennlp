@@ -25,7 +25,7 @@ import opennlp.tools.coref.mention.Mention;
 import opennlp.tools.coref.mention.MentionContext;
 import opennlp.tools.coref.mention.MentionFinder;
 
-/** A linker provides an interface for finding mentions, {@link #getMentions getMentions}, 
+/** A linker provides an interface for finding mentions, {@link #getMentionFinder getMentionFinder}, 
  * and creating entities out of those mentions, {@link #getEntities getEntities}.  This interface also allows
  * for the training of a resolver with the method {@link #setEntities setEntitites} which is used to give the
  * resolver mentions whose entityId fields indicate which mentions refer to the same entity and the 
