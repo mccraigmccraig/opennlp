@@ -65,7 +65,7 @@ public class Parse implements Cloneable, Comparable {
   
   private static boolean useFunctionTags;
   
-  public Parse clone() {
+  public Object clone() {
     Parse p = new Parse(this.text, this.span, this.type, this.prob, this.head);
     p.parts = (List) ((LinkedList) this.parts).clone();
     if (derivation != null) {
