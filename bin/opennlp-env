@@ -1,0 +1,7 @@
+#!/bin/sh
+# sets OPENNLP environment variables
+JARS=`echo $OPENNLP_DIR/lib/*.jar | tr ' ' ':'`
+echo $JARS
+CP=${JARS}
+JAVA=$JAVA_HOME/bin/java
+JAVA_CMD="$JAVA -Xmx1000m -classpath $CP -Dopennlp.dir=$OPENNLP_DIR"

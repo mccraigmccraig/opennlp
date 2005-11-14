@@ -51,7 +51,7 @@ import opennlp.tools.util.Sequence;
  * surrounding context.
  *
  * @author      Gann Bierner
- * @version $Revision: 1.15 $, $Date: 2005/11/07 02:54:32 $
+ * @version $Revision: 1.16 $, $Date: 2005/11/14 19:50:43 $
  */
 public class POSTaggerME implements Evalable, POSTagger {
 
@@ -282,8 +282,8 @@ public class POSTaggerME implements Evalable, POSTagger {
     if (args.length == 0){
       usage();
     }
+    int ai=0;
     try {
-      int ai=0;
       String encoding = null;
       String dict = null;
       while (args[ai].startsWith("-")) {
