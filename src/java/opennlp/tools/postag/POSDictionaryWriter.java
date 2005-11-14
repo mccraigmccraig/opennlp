@@ -17,6 +17,8 @@
 //////////////////////////////////////////////////////////////////////////////
 package opennlp.tools.postag;
 
+import java.io.BufferedReader;
+import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.Writer;
@@ -26,6 +28,8 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
 
+import opennlp.tools.util.CountedSet;
+
 /** 
  * Class for writting a pos-tag-dictionary to a file.
  */
@@ -33,14 +37,13 @@ public class POSDictionaryWriter {
 
   private Writer dictFile;
   private Map dictionary;
-  private Map wordCounts;
-  private Integer ONE = new Integer(1);
-  private String newline = System.getProperty("line.seperator");
+  private CountedSet wordCounts;
+  private String newline = System.getProperty("line.separator");
   
   public POSDictionaryWriter(String file) throws IOException {
     dictFile = new FileWriter(file);
     dictionary = new HashMap();
-    wordCounts = new HashMap();
+    wordCounts = new CountedSet();
   }
   
   public void addEntry(String word, String tag) {
@@ -50,13 +53,7 @@ public class POSDictionaryWriter {
       dictionary.put(word,tags);
     }
     tags.add(tag);
-    Integer c = (Integer) wordCounts.get(word);
-    if (c == null) {
-      wordCounts.put(word,ONE);
-    }
-    else {
-      wordCounts.put(word,new Integer(c.intValue()+1));
-    }
+    wordCounts.add(word);
   }
   
   public void write() throws IOException {
@@ -64,9 +61,9 @@ public class POSDictionaryWriter {
   }
   
   public void write(int cutoff) throws IOException {
-    for (Iterator wi=wordCounts.keySet().iterator();wi.hasNext();) {
+    for (Iterator wi=wordCounts.iterator();wi.hasNext();) {
       String word = (String) wi.next();
-      if (((Integer) wordCounts.get(word)).intValue() > cutoff) {
+      if (wordCounts.getCount(word) >= cutoff) {
         dictFile.write(word);
         Set tags = (Set) dictionary.get(word);
         for (Iterator ti=tags.iterator();ti.hasNext();) {
@@ -76,6 +73,29 @@ public class POSDictionaryWriter {
         dictFile.write(newline);
       }
     }
+    dictFile.close();
   }
 
+  public static void main(String[] args) throws IOException {
+    if (args.length == 0) {
+      System.err.println("Usage: POSDictionaryWriter dictionary tag_files");
+      System.exit(1);
+    }
+    int ai=0;
+    String dictionaryFile = args[ai++];
+    POSDictionaryWriter dict = new POSDictionaryWriter(dictionaryFile);
+    for (int fi=ai;fi<args.length;fi++) {
+      BufferedReader in = new BufferedReader(new FileReader(args[fi]));
+      for (String line=in.readLine();line != null; line = in.readLine()) {
+        String[] parts = line.split("\\s+");
+        for (int pi=0;pi<parts.length;pi++) {
+          int index = parts[pi].lastIndexOf('_');
+          String word = parts[pi].substring(0,index);
+          String tag = parts[pi].substring(index+1);
+          dict.addEntry(word,tag);
+        }
+      }
+    }
+    dict.write();
+  }
 }
