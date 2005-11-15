@@ -49,7 +49,7 @@ import opennlp.tools.util.Sequence;
  * Invoke a part-of-speech tagging model from the command line.
  *
  * @author   Jason Baldridge
- * @version $Revision: 1.1 $, $Date: 2005/11/15 00:15:29 $
+ * @version $Revision: 1.2 $, $Date: 2005/11/15 16:25:16 $
  */
 public class BatchTagger {
 
@@ -71,12 +71,22 @@ public class BatchTagger {
     try {
       String encoding = null;
 
-      Dictionary dict = null;
+      String dictFile = "";
+      int cutoff = 0;
       while (args[ai].startsWith("-")) {
 	if (args[ai].equals("-dict")) {
           ai++;
           if (ai < args.length) {
-            dict = new Dictionary(args[ai++]);
+            dictFile = args[ai++];
+          }
+          else {
+            usage();
+          }
+        }
+	else if (args[ai].equals("-cutoff")) {
+          ai++;
+          if (ai < args.length) {
+            cutoff = Integer.parseInt(args[ai++]);
           }
           else {
             usage();
@@ -87,6 +97,8 @@ public class BatchTagger {
           usage();
         }
       }
+
+      Dictionary dict = new MutableDictionary(dictFile, cutoff);
 
       File textFile = new File(args[ai++]);
       File modelFile = new File(args[ai++]);
