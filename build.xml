@@ -1,4 +1,4 @@
-<!-- $Id: build.xml,v 1.39 2005/11/14 20:21:40 tsmorton Exp $ -->
+<!-- $Id: build.xml,v 1.40 2005/11/15 00:15:27 jasonbaldridge Exp $ -->
 <!-- This build file based on the JDOM build.xml file. -->
 
 <project name="OpenNLP" default="package" basedir=".">
@@ -102,7 +102,7 @@
   <!-- Creates the class package                                           -->
   <!-- =================================================================== -->
   <target name="package" depends="compile">
-    <jar jarfile="${lib.dir}/${name}.jar"
+    <jar jarfile="${build.dir}/${name}-${version}.jar"
          basedir="${build.dest}" />
   </target>
 
