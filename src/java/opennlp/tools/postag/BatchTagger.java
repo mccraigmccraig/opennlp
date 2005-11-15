@@ -49,7 +49,7 @@ import opennlp.tools.util.Sequence;
  * Invoke a part-of-speech tagging model from the command line.
  *
  * @author   Jason Baldridge
- * @version $Revision: 1.2 $, $Date: 2005/11/15 16:25:16 $
+ * @version $Revision: 1.3 $, $Date: 2005/11/15 18:08:52 $
  */
 public class BatchTagger {
 
@@ -72,6 +72,7 @@ public class BatchTagger {
       String encoding = null;
 
       String dictFile = "";
+      String tagDictFile = "";
       int cutoff = 0;
       while (args[ai].startsWith("-")) {
 	if (args[ai].equals("-dict")) {
@@ -83,10 +84,10 @@ public class BatchTagger {
             usage();
           }
         }
-	else if (args[ai].equals("-cutoff")) {
+	else if (args[ai].equals("-tag_dict")) {
           ai++;
           if (ai < args.length) {
-            cutoff = Integer.parseInt(args[ai++]);
+            tagDictFile = args[ai++];
           }
           else {
             usage();
@@ -98,14 +99,22 @@ public class BatchTagger {
         }
       }
 
-      Dictionary dict = new MutableDictionary(dictFile, cutoff);
+      Dictionary dict = new Dictionary(dictFile);
 
       File textFile = new File(args[ai++]);
       File modelFile = new File(args[ai++]);
 
       GISModel mod = new SuffixSensitiveGISModelReader(modelFile).getModel();
 
-      POSTagger tagger = new POSTaggerME(mod, dict);
+      POSTagger tagger;
+      if (tagDictFile.equals("")) {
+	  tagger = new POSTaggerME(mod, dict);
+      }
+      else {
+	  tagger = 
+	      new POSTaggerME(mod, dict, new POSDictionary(tagDictFile)); 
+      }
+
       DataStream text = 
 	  new opennlp.maxent.PlainTextByLineDataStream(
 	       new java.io.FileReader(textFile));
