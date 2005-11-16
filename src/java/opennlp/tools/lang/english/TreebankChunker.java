@@ -132,7 +132,7 @@ public class TreebankChunker extends ChunkerME {
           tags[ti]=tt[1]; 
         }
         String[] chunks = chunker.chunk(tokens,tags);
-        System.err.println(java.util.Arrays.asList(chunks));
+        //System.err.println(java.util.Arrays.asList(chunks));
         for (int ci=0,cn=chunks.length;ci<cn;ci++) {
           if (ci > 0 && !chunks[ci].startsWith("I-") && !chunks[ci-1].equals("O")) {
             System.out.print(" ]");
