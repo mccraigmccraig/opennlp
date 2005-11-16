@@ -145,39 +145,39 @@ on the subject.
 
 English Phrase Chunking:
 java opennlp.tools.lang.english.SentenceDetector \
-  opennlp.models/sentdetect/EnglishSD.bin.gz < text |
+  opennlp.models/english/sentdetect/EnglishSD.bin.gz < text |
 java opennlp.tools.lang.english.Tokenizer \
-  opennlp.models/tokenize/EnglishTok.bin.gz |
+  opennlp.models/english/tokenize/EnglishTok.bin.gz |
 java opennlp.tools.lang.english.PosTagger -d \
-  opennlp.models/parser/tagdict opennlp.models/parser/tag.bin.gz |
+  opennlp.models/english/parser/tagdict opennlp.models/english/parser/tag.bin.gz |
 java opennlp.tools.lang.english.TreebankChunker \
-  opennlp.models/chunker/EnglishChunk.bin.gz
+  opennlp.models/english/chunker/EnglishChunk.bin.gz
 
 English Parsing:
 java opennlp.tools.lang.english.SentenceDetector \
-  opennlp.models/sentdetect/EnglishSD.bin.gz < text |
+  opennlp.models/english/sentdetect/EnglishSD.bin.gz < text |
 java opennlp.tools.lang.english.Tokenizer \
-  opennlp.models/tokenize/EnglishTok.bin.gz |
+  opennlp.models/english/tokenize/EnglishTok.bin.gz |
 java -Xmx350m opennlp.tools.lang.english.TreebankParser -d \
-  opennlp.models/parser
+  opennlp.models/english/parser
     
 English Name Finding:
 java opennlp.tools.lang.english.SentenceDetector \
-  opennlp.models/sentdetect/EnglishSD.bin.gz < text |
+  opennlp.models/english/sentdetect/EnglishSD.bin.gz < text |
 java -Xmx350m opennlp.tools.lang.english.NameFinder  \
-  opennlp.models/namefind/*.bin.gz
+  opennlp.models/english/namefind/*.bin.gz
   
 English Coreference:
 java opennlp.tools.lang.english.SentenceDetector \
-  opennlp.models/sentdetect/EnglishSD.bin.gz < text |
+  opennlp.models/english/sentdetect/EnglishSD.bin.gz < text |
 java opennlp.tools.lang.english.Tokenizer \
-  opennlp.models/tokenize/EnglishTok.bin.gz |
+  opennlp.models/english/tokenize/EnglishTok.bin.gz |
 java -Xmx350m opennlp.tools.lang.english.TreebankParser -d \
-  opennlp.models/parser |
+  opennlp.models/english/parser |
 java -Xmx350m opennlp.tools.lang.english.NameFinder -parse \
-  opennlp.models/namefind/*.bin.gz
+  opennlp.models/english/namefind/*.bin.gz |
 java -Xmx200m -DWNSEARCHDIR=$WNSEARCHDIR \
-  opennlp.tools.coref.EnglishTreebankLinker opennlp.models/coref
+  opennlp.tools.lang.english.TreebankLinker opennlp.models/english/coref
 
 In the example above $WNSEARCHDIR is the location of the "dict" directory for 
 your WordNet 2.0 installation.  
@@ -185,7 +185,7 @@ your WordNet 2.0 installation.
 Spanish Part-Of-Speech Tagging:
 
 java opennlp.tools.lang.spanish.SentenceDetector \
-  opennlp.models/spanish/sentdetect/SpanishSent.bin.gz < test.txt | 
+  opennlp.models/spanish/sentdetect/SpanishSent.bin.gz < texto | 
 java opennlp.tools.lang.spanish.Tokenizer \
   opennlp.models/spanish/tokenize/SpanishTok.bin.gz | 
 java opennlp.tools.lang.spanish.TokenChunker \
