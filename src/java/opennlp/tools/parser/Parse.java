@@ -494,7 +494,7 @@ public class Parse implements Cloneable, Comparable {
       String type = (String) parts[0];
       if (!type.equals(ParserME.TOP_NODE)) {
         Parse con = new Parse(txt, (Span) parts[1], type, 1);
-        System.err.println("insert["+ci+"] "+type+" "+con.toString()+" "+con.hashCode());
+        //System.err.println("insert["+ci+"] "+type+" "+con.toString()+" "+con.hashCode());
         p.insert(con);
         //codeTree(p);
       }
