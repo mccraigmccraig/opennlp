@@ -1,3 +1,21 @@
+///////////////////////////////////////////////////////////////////////////////
+//Copyright (C) 2005 Thomas Morton
+// 
+//This library is free software; you can redistribute it and/or
+//modify it under the terms of the GNU Lesser General Public
+//License as published by the Free Software Foundation; either
+//version 2.1 of the License, or (at your option) any later version.
+// 
+//This library is distributed in the hope that it will be useful,
+//but WITHOUT ANY WARRANTY; without even the implied warranty of
+//MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+//GNU Lesser General Public License for more details.
+// 
+//You should have received a copy of the GNU Lesser General Public
+//License along with this program; if not, write to the Free Software
+//Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
+//////////////////////////////////////////////////////////////////////////////
+
 package opennlp.tools.ngram;
 
 import java.io.BufferedReader;
@@ -23,15 +41,22 @@ import opennlp.tools.util.NumberedSet;
  */
 public class Dictionary {
 
+  /** The name of the file format used for storing a dictionary. */
   public static String FILE_TYPE = "dict";
-  /** Mapping between words and a unique integer assigned to each words. **/
+  /** Mapping between words and a unique integer assigned to each words. 
+   * This structure also stores unigrams. **/
   protected NumberedSet wordMap;
-  /** Set which stores all n-grams. */
+  /** Set which contains all n-grams of size two or more. */
   protected Set gramSet;
-  //protected int size;
+  /** Specifies the number of time an n-gram needs to occur to be included when all n-grams are saved to a file. */ 
   protected int cutoff;
+  /** Factory for creating n-grams. */
   protected NGramFactory nGramFactory;
   
+  /**
+   * Creates a new empty dictionary of n-grams.
+   *
+   */
   protected Dictionary() {}
 
   /** Constructor used to load a previously created dictionary for the specifed dictionary file.
@@ -52,6 +77,11 @@ public class Dictionary {
     nGramFactory = new NGramFactory(wordMap);
   }
   
+  /**
+   * Loads the contents of the specified input stream into this dictionary. 
+   * @param input A dictionary file.
+   * @throws IOException If the specified input stream can not be read. 
+   */
   protected void loadGrams(DataInputStream input) throws IOException {
     gramSet = new HashSet();
     try {
@@ -70,6 +100,11 @@ public class Dictionary {
     }
   }
   
+  /**
+   * Returns true if this dictionary contains the n-gram consisting of the specified words.
+   * @param words The words which make up the n-gram to look up in the dictionary.
+   * @return true if this dictionary contains the specified n-gram; false otherwise.
+   */
   public boolean contains(String[] words) {
     if (words.length == 1) {
       return wordMap.contains(words[0]);
@@ -85,11 +120,19 @@ public class Dictionary {
     }
   }
   
+  /**
+   * Returns an iterator over all n-grams in this dictionary.
+   * @return an iterator over all n-grams in this dictionary.
+   */
   public Iterator iterator() {
     return new DictionaryIterator(this);
   }
   
-  
+  /**
+   * Allows a dictionery to be queried for specific n-grams from the command-line from statndard in using space delimited n-grams on a single line.
+   * @param args The dictionary file. 
+   * @throws IOException The dictionary file can not be read.
+   */
   public static void main(String[] args) throws IOException {
     if (args.length == 0) {
       System.err.println("Usage: Dictionary dictionary_file");

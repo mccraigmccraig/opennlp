@@ -1,3 +1,20 @@
+///////////////////////////////////////////////////////////////////////////////
+//Copyright (C) 2005 Thomas Morton
+// 
+//This library is free software; you can redistribute it and/or
+//modify it under the terms of the GNU Lesser General Public
+//License as published by the Free Software Foundation; either
+//version 2.1 of the License, or (at your option) any later version.
+// 
+//This library is distributed in the hope that it will be useful,
+//but WITHOUT ANY WARRANTY; without even the implied warranty of
+//MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+//GNU Lesser General Public License for more details.
+// 
+//You should have received a copy of the GNU Lesser General Public
+//License along with this program; if not, write to the Free Software
+//Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
+//////////////////////////////////////////////////////////////////////////////
 package opennlp.tools.ngram;
 
 import java.io.DataInputStream;
@@ -22,6 +39,11 @@ public class MutableDictionary extends Dictionary {
 
   List wordCounts;
   
+  /**
+   * Creates a new empty dictionary with the specified cut-off.  
+   * Only n-grams which occur at least cut-off number of times will be saved.
+   * @param cutoff The number of times an n-gram needs to occur to be saved.
+   */
   public MutableDictionary(int cutoff) {
     super();
     this.cutoff = cutoff;
@@ -31,11 +53,18 @@ public class MutableDictionary extends Dictionary {
     wordCounts = new ArrayList();
   }
   
+  /**
+   * Creates a new dictionary initalized with the contents of the specified dictionary file and with the specified cut-off.  
+   * Only n-grams which occur at least cut-off number of times will be saved.
+   * @param dictionaryFile
+   * @param cutoff The number of times an n-gram needs to occur to be saved.
+   * @throws IOException If the specified dictionary file can not be read.
+   */
   public MutableDictionary(String dictionaryFile, int cutoff) throws IOException {
     super(dictionaryFile);
     this.cutoff = cutoff;
   }
-  
+
   protected void loadGrams(DataInputStream input) throws IOException {
     int numGrams = input.readInt();
     CountedSet cgramSet = new CountedSet(numGrams);
@@ -83,6 +112,11 @@ public class MutableDictionary extends Dictionary {
     }
   }
 
+  /**
+   * Save this n-gram dictionary to the specified file.
+   * @param file The file to store the n-gram dictionary.
+   * @throws IOException If the file can not be written.
+   */
   public void persist(File file) throws IOException {
     //System.err.println("Writting "+wordMap.size()+" words and "+gramSet.size()+" n-grams");
     DataOutputStream output = new DataOutputStream(new GZIPOutputStream(new FileOutputStream(file)));
