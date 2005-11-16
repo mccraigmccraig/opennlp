@@ -42,8 +42,12 @@ public class PosTagger extends POSTaggerME {
       super(getModel(modelFile), new DefaultPOSContextGenerator(dict),tagdict);
   }
 
-  public PosTagger(String modelFile, Dictionary dict) {
-    super(getModel(modelFile), new DefaultPOSContextGenerator(dict));
+  public PosTagger(String modelFile, TagDictionary tagdict) {
+    super(getModel(modelFile), new DefaultPOSContextGenerator(null),tagdict);
+  }
+  
+  public PosTagger(String modelFile) {
+    super(getModel(modelFile), new DefaultPOSContextGenerator(null));
   }
 
   private static MaxentModel getModel(String name) {
@@ -83,12 +87,11 @@ public class PosTagger extends POSTaggerME {
     }
     POSTaggerME tagger;
     String modelFile = args[ai++];
-    String dictFile = args[ai++];
     if (tagdict != null) {
-      tagger = new PosTagger(modelFile,new Dictionary(dictFile),new POSDictionary(tagdict));
+      tagger = new PosTagger(modelFile, new POSDictionary(tagdict));
     }
     else {
-      tagger = new PosTagger(modelFile,new Dictionary(dictFile));
+      tagger = new PosTagger(modelFile);
     }
     if (test) {
       System.out.println(tagger.tag(args[ai]));
