@@ -79,21 +79,24 @@ It is quite understandable.
 
 Downloading Models
 ==================
-English models have been trained for each of the tools and are required
-unless one wishes to create their own models from their own annotated
-data.  These models can be downloaded by check out the "models" module
-from the "/cvsroot/opennlp" repository on sourceforge.  The models are
-large (especially the ones for the parser).  You may want to just fetch
-specific ones.  Models for the corresponding components can be found in
-the following directories:
+Models have been trained for various of the component and are required
+unless one wishes to create their own models exclusivly from their own
+annotated data.  These models can be downloaded clicking on the "Models"
+link at opennlp.sourceforge.net.  The models are large (especially
+the ones for the parser).  You may want to just fetch specific ones.
+Models for the corresponding components can be found in the following
+directories:
 
-chunker		- English-Penn-Treebank-style phrase chunker models.
-coreference     - MUC-style coreference.
-namefind	- MUC-style named entity finder models.
-parser		- English-Penn-Treebank-style parser models.
-postag		- English-Penn-Treebank-style part-of-speech tagger.
-sentdetect	- English sentence detector.
-tokenize	- English-Penn-Treebank-style tokenizer.
+english/chunker	   - English-Penn-Treebank-style phrase chunker models.
+english/coref      - MUC-style coreference.
+english/namefind   - MUC-style named entity finder models.
+english/parser	   - English-Penn-Treebank-style parser and pos-tag models.
+english/sentdetect - English sentence detector.
+english/tokenize   - English-Penn-Treebank-style tokenizer.
+
+spanish/postag     - Spanish part-of-speech tagger.
+spanish/sentdetect - Spanish sentence detector.
+spanish/tokenize   - Spanish tokenizer.
 
 Running the Tools
 =================
@@ -105,8 +108,9 @@ single argument which is the location of the model for this component.
 The exceptions are the parser which requires a  model directory, and
 the namefinder which takes a list of models.  Tools are separated into
 packages by language.  Currently only two languages are supported (English
-and Spanish), but we plan to support others in the future.  Here we will 
-just discuss the English tools. 
+and Spanish), but we plan to support others in the future. 
+
+English:
 
 sentence detector:  opennlp.tools.lang.english.SentenceDetector
 tokenizer:          opennlp.tools.lang.english.Tokenizer
@@ -116,19 +120,30 @@ name finder:        opennlp.tools.lang.english.NameFinder
 parser:             opennlp.tools.lang.english.TreebankParser
 coreference:        opennlp.tools.lang.english.TreebankLinker
 
-Examples: These example are simply that, example and are not a recommendation that 
-you run the tools this way.  It's in fact very inefficient.  However, this should 
-give you an idea of what the tools can do and the kind of input they assume.  Developers should know to look at the main's of these classes to see how to set 
-up a particular component for use.  
+Spanish:
 
-Note: All these example assume that your CLASSPATH has been set to include: 
-opennlp-tools-1.3.0.jar, trove.jar, maxent-2.4.0.jar, and for coreference: jwnl-1.3.3.jar.  The opennlp jar is located in the output directory (once you've 
-built it) and the others are located in the lib directory.  Information about the
-jars in the lib directory can be found in the lib/LIBNOTES file.  If you are 
-un-certain about how to set your classpath please google: java classpath 
-where you will find many pages on the subject.
+sentence detector:  opennlp.tools.lang.spanish.SentenceDetector
+tokenizer:          opennlp.tools.lang.spanish.Tokenizer
+token chunker:      opennlp.tools.lang.spanish.TokenChunker
+pos-tagger:         opennlp.tools.lang.spanish.PosTagger
 
-Phrase Chunking:
+Examples: These example are simply that, example and are not a
+recommendation that you run the tools this way.  It's in fact very
+inefficient.  However, this should give you an idea of what the tools
+can do and the kind of input they assume.  Developers should know to
+look at the main's of these classes to see how to set up a particular
+component for use.
+
+Note: All these example assume that your CLASSPATH has been set to
+include: opennlp-tools-1.3.0.jar, trove.jar, maxent-2.4.0.jar, and for
+coreference: jwnl-1.3.3.jar.  The opennlp jar is located in the output
+directory (once you've built it) and the others are located in the lib
+directory.  Information about the jars in the lib directory can be found
+in the lib/LIBNOTES file.  If you are un-certain about how to set your
+classpath please google: java classpath where you will find many pages
+on the subject.
+
+English Phrase Chunking:
 java opennlp.tools.lang.english.SentenceDetector \
   opennlp.models/sentdetect/EnglishSD.bin.gz < text |
 java opennlp.tools.lang.english.Tokenizer \
@@ -138,7 +153,7 @@ java opennlp.tools.lang.english.PosTagger -d \
 java opennlp.tools.lang.english.TreebankChunker \
   opennlp.models/chunker/EnglishChunk.bin.gz
 
-Parsing:
+English Parsing:
 java opennlp.tools.lang.english.SentenceDetector \
   opennlp.models/sentdetect/EnglishSD.bin.gz < text |
 java opennlp.tools.lang.english.Tokenizer \
@@ -146,13 +161,13 @@ java opennlp.tools.lang.english.Tokenizer \
 java -Xmx350m opennlp.tools.lang.english.TreebankParser -d \
   opennlp.models/parser
     
-Name Finding:
+English Name Finding:
 java opennlp.tools.lang.english.SentenceDetector \
   opennlp.models/sentdetect/EnglishSD.bin.gz < text |
 java -Xmx350m opennlp.tools.lang.english.NameFinder  \
   opennlp.models/namefind/*.bin.gz
   
-Coreference:
+English Coreference:
 java opennlp.tools.lang.english.SentenceDetector \
   opennlp.models/sentdetect/EnglishSD.bin.gz < text |
 java opennlp.tools.lang.english.Tokenizer \
@@ -167,6 +182,17 @@ java -Xmx200m -DWNSEARCHDIR=$WNSEARCHDIR \
 In the example above $WNSEARCHDIR is the location of the "dict" directory for 
 your WordNet 2.0 installation.  
 
+Spanish Part-Of-Speech Tagging:
+
+java opennlp.tools.lang.spanish.SentenceDetector \
+  opennlp.models/spanish/sentdetect/SpanishSent.bin.gz < test.txt | 
+java opennlp.tools.lang.spanish.Tokenizer \
+  opennlp.models/spanish/tokenize/SpanishTok.bin.gz | 
+java opennlp.tools.lang.spanish.TokenChunker \
+  opennlp.models/spanish/tokenize/SpanishTokChunk.bin.gz | 
+java opennlp.tools.lang.spanish.PosTagger \
+  opennlp.models/spanish/postag/SpanishPOS.bin.gz
+
 Training the Tools
 ==================
 The main of the following classes can be used to train new models.
@@ -180,7 +206,7 @@ name finder:        opennlp.tools.namefind.NameFinderME
 parser:             opennlp.tools.parser.ParserME
 
 The following modules currently only support training via the WordFreak
-opennlp.plugin v1.2 (http://wordfreak.sourceforge.net/plugins.html).
+opennlp.plugin v1.3 (http://wordfreak.sourceforge.net/plugins.html).
 
 tokenizer:          org.annotation.opennlp.OpenNlpTokenAnnotator
 coreference:        org.annotation.opennlp.OpenNlpCoreferenceAnnotator
