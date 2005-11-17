@@ -261,10 +261,12 @@ public abstract class AbstractLinker implements Linker {
       //System.err.println("AbstractLinker.constructMentionContexts: mi="+mi+" sn="+mentionParse.getSentenceNumber()+" extent="+mentions[mi]+" parse="+mentionParse.getSpan()+" mc="+contexts[mi].toText());
       contexts[mi].setId(mentions[mi].getId());
       mentionInSentenceIndex++;
-      Gender g  = computeGender(contexts[mi]);
-      contexts[mi].setGender(g.getType(),g.getConfidence());
-      Number n = computeNumber(contexts[mi]);
-      contexts[mi].setNumber(n.getType(),n.getConfidence());
+      if (mode != LinkerMode.SIM) {
+        Gender g  = computeGender(contexts[mi]);
+        contexts[mi].setGender(g.getType(),g.getConfidence());
+        Number n = computeNumber(contexts[mi]);
+        contexts[mi].setNumber(n.getType(),n.getConfidence());
+      }
     }
     return (contexts);
   }

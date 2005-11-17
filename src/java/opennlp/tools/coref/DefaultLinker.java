@@ -85,11 +85,15 @@ public class DefaultLinker extends AbstractLinker {
    */
   public DefaultLinker(String modelDirectory, LinkerMode mode, boolean useDiscourseModel, double fixedNonReferentialProbability) throws IOException {
     super(modelDirectory, mode, useDiscourseModel);
-    mcm = new MaxentCompatibilityModel(corefProject);
+    if (mode != LinkerMode.SIM) {
+      mcm = new MaxentCompatibilityModel(corefProject);
+    }
     initHeadFinder();
     initMentionFinder();
-    initResolvers(mode, fixedNonReferentialProbability);
-    entities = new DiscourseEntity[resolvers.length];
+    if (mode != LinkerMode.SIM) {
+      initResolvers(mode, fixedNonReferentialProbability);
+      entities = new DiscourseEntity[resolvers.length];
+    }
   }
   
   /**
