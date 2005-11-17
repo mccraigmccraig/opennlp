@@ -32,6 +32,9 @@ public class LinkerMode {
   public static final LinkerMode TRAIN = new LinkerMode("train");
   /** Evaluation mode, used to evaluate identifed coreference relationships based on annotatoed text. */
   public static final LinkerMode EVAL = new LinkerMode("eval");
+  /** Trianing mode, used to learn coreference relationships in annotatoed text. */
+  public static final LinkerMode SIM = new LinkerMode("sim");
+
 
   public String toString() {
     return(name);
