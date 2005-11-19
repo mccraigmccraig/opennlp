@@ -31,16 +31,17 @@ import opennlp.tools.sentdetect.SentenceDetectorME;
  * Journal text).
  *
  * @author      Jason Baldridge and Tom Morton
- * @version     $Revision: 1.1 $, $Date: 2005/08/25 03:22:28 $
+ * @version     $Revision: 1.2 $, $Date: 2005/11/19 17:05:38 $
  */
 
 public class SentenceDetector extends SentenceDetectorME {
   /**
-   * No-arg constructor which loads the English sentence detection model
-   * transparently.
+   * Loads a new sentence detector using the model specified by the model name.
+   * @param modelName The name of the maxent model trained for sentence detection. 
+   * @throws IOException If the model specified can not be read.
    */
-  public SentenceDetector(String name) throws IOException {
-    super((new SuffixSensitiveGISModelReader(new File(name))).getModel());
+  public SentenceDetector(String modelName) throws IOException {
+    super((new SuffixSensitiveGISModelReader(new File(modelName))).getModel());
   }
 
   /**
