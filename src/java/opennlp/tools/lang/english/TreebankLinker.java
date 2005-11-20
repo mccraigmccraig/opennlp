@@ -78,7 +78,7 @@ public class TreebankLinker extends DefaultLinker {
    */
   public static void main(String[] args) throws IOException {
     if (args.length == 0) {
-      System.err.println("Usage: EnglishTreebankLinker model_directory < parses");
+      System.err.println("Usage: TreebankLinker model_directory < parses");
       System.exit(1);
     }
     BufferedReader in;
