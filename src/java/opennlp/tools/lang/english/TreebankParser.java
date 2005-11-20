@@ -29,11 +29,8 @@ import java.util.StringTokenizer;
 import java.util.regex.Pattern;
 
 import opennlp.maxent.io.SuffixSensitiveGISModelReader;
-import opennlp.tools.ngram.Dictionary;
 import opennlp.tools.parser.Parse;
-import opennlp.tools.lang.english.ParserChunker;
 import opennlp.tools.parser.ParserME;
-import opennlp.tools.lang.english.ParserTagger;
 import opennlp.tools.util.Span;
 
 /**
@@ -56,14 +53,14 @@ public class TreebankParser {
       return new ParserME(
         new SuffixSensitiveGISModelReader(new File(dataDir + "/build.bin.gz")).getModel(),
         new SuffixSensitiveGISModelReader(new File(dataDir + "/check.bin.gz")).getModel(),
-        new ParserTagger(dataDir + "/tag.bin.gz", dataDir + "/tagdict", useCaseSensitiveTagDictionary), //new Dictionary(dataDir+"/dict.bin.gz")),
+        new ParserTagger(dataDir + "/tag.bin.gz",null), //new Dictionary(dataDir+"/dict.bin.gz")),
         new ParserChunker(dataDir + "/chunk.bin.gz"),
         new HeadRules(dataDir + "/head_rules"),beamSize,advancePercentage);
     }
   }
   
   public static ParserME getParser(String dataDir) throws IOException {
-    return getParser(dataDir,true,false,ParserME.defaultBeamSize,ParserME.defaultAdvancePercentage);
+    return getParser(dataDir,true,true,ParserME.defaultBeamSize,ParserME.defaultAdvancePercentage);
   }
   
   private static String convertToken(String token) {
@@ -128,7 +125,7 @@ public class TreebankParser {
       usage();
     }
     boolean useTagDictionary = false;
-    boolean caseInsensitiveTagDictionary = false;
+    boolean caseSensitiveTagDictionary = true;
     boolean showTopK = false;
     int numParses = 1;
     int ai = 0;
@@ -139,7 +136,7 @@ public class TreebankParser {
         useTagDictionary = true;
       }
       else if (args[ai].equals("-i")) {
-        caseInsensitiveTagDictionary = true;
+        caseSensitiveTagDictionary = false;
       }
       else if (args[ai].equals("-bs")) {
       	if (args.length > ai+1) {
@@ -194,7 +191,7 @@ public class TreebankParser {
       ai++;
     }
     ParserME parser;
-    if (caseInsensitiveTagDictionary) {
+    if (!caseSensitiveTagDictionary) {
       parser = TreebankParser.getParser(args[ai++], true, false,beamSize,advancePercentage);
     }
     else if (useTagDictionary) {
