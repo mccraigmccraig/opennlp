@@ -41,12 +41,8 @@ import opennlp.tools.coref.DiscourseModel;
 import opennlp.tools.coref.Linker;
 import opennlp.tools.coref.mention.MentionContext;
 import opennlp.tools.coref.mention.Parse;
-import opennlp.tools.coref.sim.Context;
 import opennlp.tools.coref.sim.GenderEnum;
 import opennlp.tools.coref.sim.NumberEnum;
-import opennlp.tools.coref.sim.SemanticEnum;
-import opennlp.tools.coref.sim.TestGenderModel;
-import opennlp.tools.coref.sim.TestNumberModel;
 import opennlp.tools.coref.sim.TestSimilarityModel;
 import opennlp.tools.util.CollectionEventStream;
 
@@ -63,12 +59,7 @@ public abstract class MaxentResolver extends AbstractResolver {
   public static final String DEFAULT = "default";
 
   private static final Pattern endsWithPeriod = Pattern.compile("\\.$");
-
-  private final double minGenderProb = 0.66;
-  private final Double minGenderProbObject = new Double(minGenderProb);
-  private final double minNumberProb = 0.66;
-  private final Double minNumberProbObject = new Double(minNumberProb);
-  private final double minSimProb = 0.60;
+  private final double minSimProb = 0.66;
 
   private final String SIM_COMPATIBLE = "sim.compatible";
   private final String SIM_INCOMPATIBLE = "sim.incompatible";
@@ -108,8 +99,6 @@ public abstract class MaxentResolver extends AbstractResolver {
   protected boolean useSameModelForNonRef;
   
   private static TestSimilarityModel simModel = null;
-  private static TestGenderModel genModel = null;
-  private static TestNumberModel numModel = null;
   /** The model for computing non-referential probabilities. */
   protected NonReferentialResolver nonReferentialResolver;
   
@@ -214,6 +203,9 @@ public abstract class MaxentResolver extends AbstractResolver {
     DiscourseEntity de;
     int ei = 0;
     double nonReferentialProbability = nonReferentialResolver.getNonReferentialProbability(ec);
+    if (debugOn) {
+      System.err.println(this +".resolve: " + ec.toText() + " -> " +  "null "+nonReferentialProbability);
+    }
     for (; ei < getNumEntities(dm); ei++) {
       de = (DiscourseEntity) dm.getEntity(ei);
       if (outOfRange(ec, de)) {
@@ -432,7 +424,7 @@ public abstract class MaxentResolver extends AbstractResolver {
       if (best > minSimProb) {
         return SIM_COMPATIBLE;
       }
-      else if (best > 1 - minSimProb) {
+      else if (best > (1 - minSimProb)) {
         return SIM_UNKNOWN;
       }
       else {
