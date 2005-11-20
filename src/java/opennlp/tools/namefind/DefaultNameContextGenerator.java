@@ -163,9 +163,8 @@ public class DefaultNameContextGenerator implements NameContextGenerator {
     * features that do not depend on previous outcome or decision
     * features.  This method is called by <code>search</code>.
     *
-    * @param toks: The list of tokens being processed.
-    * @param i: The index of the token whose features should be
-    * returned.
+    * @param toks The list of tokens being processed.
+    * @param i The index of the token whose features should be returned.
     * @return a list of the features for <code>toks[i]</code> that can
     * be safely cached.
     */
@@ -242,14 +241,14 @@ public class DefaultNameContextGenerator implements NameContextGenerator {
   
 
   /**
-    * Return the most relevant feature for a given word.  This method
+    * Returns the most relevant feature for a given word.  This method
     * is called by getCachedFeatures to get the features for words
     * within a window of the word being analyzed.  Typical features
     * are "2d" (2 digits); "4d" (4 digits); and "ac" (all caps).
     * Note that only a single feature is returned.  The default
     * feature is "other".
     *
-    * @param word: The word whose features should be returned.
+    * @param word The word whose features should be returned.
     */
   private String wordFeature(String word) {
     //String feat = (String) wordFeatureCache.get(word);
