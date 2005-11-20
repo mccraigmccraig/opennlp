@@ -37,7 +37,7 @@ import opennlp.tools.postag.TagDictionary;
  * achieved >96% accuracy on unseen data.
  *
  * @author      Gann Bierner
- * @version     $Revision: 1.4 $, $Date: 2005/11/06 23:13:13 $
+ * @version     $Revision: 1.5 $, $Date: 2005/11/20 04:47:57 $
  */
 
 public class PosTagger extends POSTaggerME {
@@ -72,7 +72,7 @@ public class PosTagger extends POSTaggerME {
    */
   public static void main(String[] args) throws IOException {
     if (args.length == 0) {
-      System.err.println("Usage: PosTagger [-d tagdict] [-di case_insensiteve_tagdict] model dict < tokenized_sentences");
+      System.err.println("Usage: PosTagger [-d tagdict] [-di case_insensiteve_tagdict] model < tokenized_sentences");
       System.exit(1);
     }
     int ai=0;
@@ -106,7 +106,12 @@ public class PosTagger extends POSTaggerME {
       }
     }
     else {
-      tagger = new PosTagger(model,new Dictionary(dictFile));
+      if (dictFile != null) {
+        tagger = new PosTagger(model,new Dictionary(dictFile));
+      }
+      else {
+        tagger = new PosTagger(model,(Dictionary)null);
+      }
     }
     if (test) {
       System.out.println(tagger.tag(args[ai]));
