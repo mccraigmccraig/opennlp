@@ -151,20 +151,20 @@ public class ParserEventStream implements EventStream {
   private void addNewEvents() {
     String parseStr = (String) data.nextToken();
     //System.err.println("ParserEventStream.addNewEvents: "+parseStr);
-    List events = new ArrayList();
+    List newEvents = new ArrayList();
     Parse p = Parse.parseParse(parseStr);
     p.updateHeads(rules);
     Parse[] chunks = getInitialChunks(p);
     if (etype == EventTypeEnum.TAG) {
-      addTagEvents(events, chunks);
+      addTagEvents(newEvents, chunks);
     }
     else if (etype == EventTypeEnum.CHUNK) {
-      addChunkEvents(events, chunks);
+      addChunkEvents(newEvents, chunks);
     }
     else {
-      addParseEvents(events, ParserME.collapsePunctuation(chunks,punctSet));
+      addParseEvents(newEvents, ParserME.collapsePunctuation(chunks,punctSet));
     }
-    this.events = (Event[]) events.toArray(new Event[events.size()]);
+    this.events = (Event[]) newEvents.toArray(new Event[newEvents.size()]);
   }
   
   public static  Parse[] reduceChunks(Parse[] chunks, int ci, Parse parent) {
@@ -202,7 +202,7 @@ public class ParserEventStream implements EventStream {
     return reducedChunks;
   }
 
-  private void addParseEvents(List events, Parse[] chunks) {
+  private void addParseEvents(List parseEvents, Parse[] chunks) {
     int ci = 0;
     while (ci < chunks.length) {
       //System.err.println("parserEventStream.addParseEvents: chunks="+Arrays.asList(chunks));
@@ -220,7 +220,7 @@ public class ParserEventStream implements EventStream {
         //System.err.println("parserEventStream.addParseEvents: chunks["+ci+"]="+c+" label="+outcome);
         c.setLabel(outcome);
         if (etype == EventTypeEnum.BUILD) {
-          events.add(new Event(outcome, bcg.getContext(chunks, ci)));
+          parseEvents.add(new Event(outcome, bcg.getContext(chunks, ci)));
         }
         int start = ci - 1;
         while (start >= 0 && chunks[start].getParent() == parent) {
@@ -228,11 +228,10 @@ public class ParserEventStream implements EventStream {
         }
         if (lastChild(c, parent)) {
           if (etype == EventTypeEnum.CHECK) {
-            events.add(new Event(ParserME.COMPLETE, kcg.getContext( chunks, type, start + 1, ci)));
+            parseEvents.add(new Event(ParserME.COMPLETE, kcg.getContext( chunks, type, start + 1, ci)));
           }
           //perform reduce
           int reduceStart = ci;
-          int reduceEnd = ci;
           while (reduceStart >=0 && chunks[reduceStart].getParent() == parent) {
             reduceStart--;
           }
@@ -242,7 +241,7 @@ public class ParserEventStream implements EventStream {
         }
         else {
           if (etype == EventTypeEnum.CHECK) {
-            events.add(new Event(ParserME.INCOMPLETE, kcg.getContext(chunks, type, start + 1, ci)));
+            parseEvents.add(new Event(ParserME.INCOMPLETE, kcg.getContext(chunks, type, start + 1, ci)));
           }
         }
       }
@@ -250,7 +249,7 @@ public class ParserEventStream implements EventStream {
     }
   }
 
-  private void addChunkEvents(List events, Parse[] chunks) {
+  private void addChunkEvents(List chunkEvents, Parse[] chunks) {
     List toks = new ArrayList();
     List tags = new ArrayList();
     List preds = new ArrayList();
@@ -280,11 +279,11 @@ public class ParserEventStream implements EventStream {
       }
     }
     for (int ti = 0, tl = toks.size(); ti < tl; ti++) {
-      events.add(new Event((String) preds.get(ti), ccg.getContext(ti, toks.toArray(), (String[]) tags.toArray(new String[tags.size()]), (String[]) preds.toArray(new String[preds.size()]))));
+      chunkEvents.add(new Event((String) preds.get(ti), ccg.getContext(ti, toks.toArray(), (String[]) tags.toArray(new String[tags.size()]), (String[]) preds.toArray(new String[preds.size()]))));
     }
   }
 
-  private void addTagEvents(List events, Parse[] chunks) {
+  private void addTagEvents(List tagEvents, Parse[] chunks) {
     List toks = new ArrayList();
     List preds = new ArrayList();
     for (int ci = 0, cl = chunks.length; ci < cl; ci++) {
@@ -303,7 +302,7 @@ public class ParserEventStream implements EventStream {
       }
     }
     for (int ti = 0, tl = toks.size(); ti < tl; ti++) {
-      events.add(new Event((String) preds.get(ti), tcg.getContext(ti, toks.toArray(), (String[]) preds.toArray(new String[preds.size()]), null)));
+      tagEvents.add(new Event((String) preds.get(ti), tcg.getContext(ti, toks.toArray(), (String[]) preds.toArray(new String[preds.size()]), null)));
     }
   }
 

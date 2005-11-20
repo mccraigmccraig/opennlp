@@ -125,7 +125,7 @@ public class ListHeap implements Heap {
     if (list.size() == 0) {
       throw new RuntimeException("Heap Underflow");
     }
-    Object max = list.get(0);
+    Object top = list.get(0);
     int last = list.size() - 1;
     if (last != 0) {
       list.set(0, list.remove(last));
@@ -135,7 +135,7 @@ public class ListHeap implements Heap {
       list.remove(last);
     }
 
-    return max;
+    return top;
   }
 
   public void setSize() {

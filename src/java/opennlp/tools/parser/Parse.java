@@ -448,8 +448,6 @@ public class Parse implements Cloneable, Comparable {
     StringBuffer text = new StringBuffer();
     int offset = 0;
     Stack stack = new Stack();
-    List tokens = new LinkedList();
-    List tags = new LinkedList();
     List cons = new LinkedList();
     for (int ci = 0, cl = parse.length(); ci < cl; ci++) {
       char c = parse.charAt(ci);
@@ -558,10 +556,10 @@ public class Parse implements Cloneable, Comparable {
       return parent;
     }
     Set parents = new HashSet();
-    Parse parent = this;
-    while(parent != null) {
-      parents.add(parent);
-      parent = parent.getParent();
+    Parse cparent = this;
+    while(cparent != null) {
+      parents.add(cparent);
+      cparent = cparent.getParent();
     }
     while (node != null) {
       if (parents.contains(node)) {
@@ -643,10 +641,9 @@ public class Parse implements Cloneable, Comparable {
     java.io.BufferedReader in = new java.io.BufferedReader(new java.io.InputStreamReader(System.in));
     for (String line = in.readLine(); line != null; line = in.readLine()) {
       Parse p = Parse.parseParse(line);
-      //p.updateHeads(rules);
-      //p.show();
-      p.showCodeTree();
-      System.out.println();
+      p.updateHeads(rules);
+      p.show();
+      //p.showCodeTree();
     }
   }
 }
