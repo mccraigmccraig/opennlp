@@ -21,22 +21,19 @@ package opennlp.tools.tokenize;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.regex.Pattern;
 
-
-import opennlp.maxent.MaxentModel;
-import opennlp.maxent.EventStream;
-import opennlp.maxent.EventCollectorAsStream;
 import opennlp.maxent.ContextGenerator;
-import opennlp.maxent.GIS;
+import opennlp.maxent.EventCollectorAsStream;
+import opennlp.maxent.EventStream;
 import opennlp.maxent.GISModel;
+import opennlp.maxent.MaxentModel;
 import opennlp.maxent.TwoPassDataIndexer;
 import opennlp.maxent.io.SuffixSensitiveGISModelWriter;
 import opennlp.tools.util.ObjectIntPair;
 import opennlp.tools.util.Span;
-
-import java.util.List;
-import java.util.ArrayList;
-import java.util.regex.Pattern;
 
 /**
  * A Tokenizer for converting raw text into separated tokens.  It uses
@@ -46,7 +43,7 @@ import java.util.regex.Pattern;
  * homepage: <http://www.cis.upenn.edu/~jcreynar>.
  *
  * @author      Tom Morton
- * @version $Revision: 1.10 $, $Date: 2005/11/01 23:05:22 $
+ * @version $Revision: 1.11 $, $Date: 2005/11/20 04:52:19 $
  */
 
 public class TokenizerME implements Tokenizer {

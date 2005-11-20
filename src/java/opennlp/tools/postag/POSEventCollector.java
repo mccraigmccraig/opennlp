@@ -21,7 +21,6 @@ package opennlp.tools.postag;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.Reader;
-import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -39,7 +38,7 @@ import opennlp.tools.util.Pair;
  * An event generator for the maxent POS Tagger.
  *
  * @author      Gann Bierner
- * @version     $Revision: 1.6 $, $Date: 2005/10/06 11:09:56 $
+ * @version     $Revision: 1.7 $, $Date: 2005/11/20 04:52:19 $
  */
 
 public class POSEventCollector implements EventCollector {
@@ -112,7 +111,7 @@ public class POSEventCollector implements EventCollector {
    */
   public Event[] getEvents(boolean evalMode) {
     ArrayList elist = new ArrayList();
-    int numMatches;
+    //int numMatches;
     //Set frequent;
     /*
      if(!evalMode) {

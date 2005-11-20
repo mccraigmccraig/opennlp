@@ -18,17 +18,14 @@
 
 package opennlp.tools.postag;
 
-import java.util.List;
-
 import opennlp.tools.util.BeamSearchContextGenerator;
-import opennlp.tools.util.Sequence;
 
 
 /**
  * The interface for a context generator for the POS Tagger.
  *
  * @author      Gann Bierner
- * @version     $Revision: 1.7 $, $Date: 2004/08/13 16:58:14 $
+ * @version     $Revision: 1.8 $, $Date: 2005/11/20 04:52:19 $
  */
 
 public interface  POSContextGenerator extends BeamSearchContextGenerator { 
