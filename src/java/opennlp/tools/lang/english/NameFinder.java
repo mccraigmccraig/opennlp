@@ -216,7 +216,6 @@ public class NameFinder extends NameFinderME {
         addNames(tags[fi],names,tokens);
       }
       p.show();
-      System.out.println();
     }
   }
       
