@@ -59,7 +59,7 @@ public abstract class MaxentResolver extends AbstractResolver {
   public static final String DEFAULT = "default";
 
   private static final Pattern endsWithPeriod = Pattern.compile("\\.$");
-  private final double minSimProb = 0.66;
+  private final double minSimProb = 0.60;
 
   private final String SIM_COMPATIBLE = "sim.compatible";
   private final String SIM_INCOMPATIBLE = "sim.incompatible";
