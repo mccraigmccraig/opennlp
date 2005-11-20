@@ -244,7 +244,11 @@ public class ParserME {
             }
           }
           else {
-            System.err.println("Couldn't advance parse "+i+" stage "+j+"!\n");
+            if (reportFailedParse) {
+              System.err.println("Couldn't advance parse "+i+" stage "+j+"!\n");
+            }
+            advanceTop(tp);
+            parses.add(tp);
           }
         }
         i++;
@@ -311,6 +315,15 @@ public class ParserME {
     p.setType(TOP_NODE);
   }
 
+  /**
+   * Determines the mapping between the specified index into the specified parses without punctuation to 
+   * the coresponding index into the specified parses.
+   * @param index An index into the parses without punctuation.
+   * @param nonPunctParses The parses without punctuation.
+   * @param parses The parses wit punctuation.
+   * @return An index into the specified parses which coresponds to the same node the specified index
+   * into the parses with punctuation.
+   */
   private int mapParseIndex(int index, Parse[] nonPunctParses, Parse[] parses) {
     int parseIndex = index;
     while (parses[parseIndex] != nonPunctParses[index]) {
@@ -339,6 +352,9 @@ public class ParserME {
     Parse[] originalChildren = p.getChildren();
     Parse[] children = collapsePunctuation(originalChildren,punctSet);
     int numNodes = children.length;
+    if (numNodes == 0) {
+      return null;
+    }
     //determines which node needs to be labeled and prior labels.
     for (advanceNodeIndex = 0; advanceNodeIndex < numNodes; advanceNodeIndex++) {
       advanceNode = children[advanceNodeIndex];
@@ -353,7 +369,7 @@ public class ParserME {
       }
     }
     int originalAdvanceIndex = mapParseIndex(advanceNodeIndex,children,originalChildren);
-    ArrayList newParsesList = new ArrayList(buildModel.getNumOutcomes());
+    List newParsesList = new ArrayList(buildModel.getNumOutcomes());
     //call build
     buildModel.eval(buildContextGenerator.getContext(children, advanceNodeIndex), bprobs);
     double bprobSum = 0;
