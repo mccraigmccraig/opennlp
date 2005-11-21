@@ -33,15 +33,20 @@ import java.util.List;
  */
 public class TokSpanEventStream implements EventStream {
 
-  private static final ContextGenerator cg = new TokContextGenerator();
+  private ContextGenerator cg;
   private List events;
   private int eventIndex;
   private boolean skipAlphaNumerics;
 
-  public TokSpanEventStream(boolean skipAlphaNumerics) {
+  public TokSpanEventStream(boolean skipAlphaNumerics, ContextGenerator cg) {
     this.skipAlphaNumerics = skipAlphaNumerics;
     events = new ArrayList(50);
     eventIndex = 0;
+    this.cg = cg;
+  }
+  
+  public TokSpanEventStream(boolean skipAlphaNumerics) {
+    this(skipAlphaNumerics, new TokContextGenerator());
   }
 
   public void addEvents(Span[] tokens, String text) {

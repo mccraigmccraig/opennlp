@@ -43,7 +43,7 @@ import opennlp.tools.util.Span;
  * homepage: <http://www.cis.upenn.edu/~jcreynar>.
  *
  * @author      Tom Morton
- * @version $Revision: 1.11 $, $Date: 2005/11/20 04:52:19 $
+ * @version $Revision: 1.12 $, $Date: 2005/11/21 23:08:02 $
  */
 
 public class TokenizerME implements Tokenizer {
@@ -203,14 +203,6 @@ public class TokenizerME implements Tokenizer {
     new SuffixSensitiveGISModelWriter(tokModel, output).persist();
   }
 
-  public static void train(String[] args) throws IOException {
-      FileReader datafr = new FileReader(new File(args[0]));
-      File output = new File(args[1]);
-      EventStream evc =
-        new EventCollectorAsStream(new TokEventCollector(datafr));
-      train(evc, output);
-  }
-
   /**
    * Used to have the tokenizer ignore tokens which only contain alpha-numeric characters.
    * @param opt set to true to use the optimization, false otherwise.
@@ -225,14 +217,6 @@ public class TokenizerME implements Tokenizer {
  */
   public boolean useAlphaNumericOptimization() {
     return ALPHA_NUMERIC_OPTIMIZATION;
-  }
-
-  /**
-   * Trains a new model. Call from the command line with "java
-   * opennlp.tokenize.TokenizerME trainingdata modelname"
-   */
-  public static void main(String[] args) throws IOException {
-    TokenizerME.train(args);
   }
 
 }
