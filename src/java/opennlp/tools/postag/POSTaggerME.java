@@ -21,6 +21,7 @@ package opennlp.tools.postag;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.Reader;
@@ -33,6 +34,7 @@ import java.util.StringTokenizer;
 import opennlp.maxent.DataStream;
 import opennlp.maxent.Evalable;
 import opennlp.maxent.EventCollector;
+import opennlp.maxent.EventCollectorAsStream;
 import opennlp.maxent.EventStream;
 import opennlp.maxent.GISModel;
 import opennlp.maxent.MaxentModel;
@@ -41,6 +43,7 @@ import opennlp.maxent.TwoPassDataIndexer;
 import opennlp.maxent.io.SuffixSensitiveGISModelWriter;
 import opennlp.tools.ngram.Dictionary;
 import opennlp.tools.ngram.MutableDictionary;
+import opennlp.tools.tokenize.TokEventCollector;
 import opennlp.tools.util.BeamSearch;
 import opennlp.tools.util.Pair;
 import opennlp.tools.util.Sequence;
@@ -51,7 +54,7 @@ import opennlp.tools.util.Sequence;
  * surrounding context.
  *
  * @author      Gann Bierner
- * @version $Revision: 1.16 $, $Date: 2005/11/14 19:50:43 $
+ * @version $Revision: 1.17 $, $Date: 2005/11/21 23:08:31 $
  */
 public class POSTaggerME implements Evalable, POSTagger {
 
@@ -258,6 +261,11 @@ public class POSTaggerME implements Evalable, POSTagger {
       probs[max] = 0;
     }
     return (orderedTags);
+  }
+  
+  public static void train(EventStream evc, File modelFile) throws IOException {
+    GISModel model = train(evc, 100,5);
+    new SuffixSensitiveGISModelWriter(model, modelFile).persist();
   }
 
   public static GISModel train(EventStream es, int iterations, int cut) throws IOException {

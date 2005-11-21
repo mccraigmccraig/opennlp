@@ -38,7 +38,7 @@ import opennlp.tools.util.Pair;
  * An event generator for the maxent POS Tagger.
  *
  * @author      Gann Bierner
- * @version     $Revision: 1.7 $, $Date: 2005/11/20 04:52:19 $
+ * @version     $Revision: 1.8 $, $Date: 2005/11/21 23:08:31 $
  */
 
 public class POSEventCollector implements EventCollector {
@@ -77,59 +77,13 @@ public class POSEventCollector implements EventCollector {
   public Event[] getEvents() {
     return getEvents(false);
   }
-  
-  private Set getFrequent(BufferedReader br) {
-    HashMap map = new HashMap();
     
-    try {
-      for(String s = br.readLine(); s!=null; s=br.readLine()) {
-        StringTokenizer st = new StringTokenizer(s);
-        while(st.hasMoreTokens()) {
-          String tok = (String)split(st.nextToken()).a;
-          Counter c = (Counter)map.get(tok);
-          if(c!=null)
-            c.increment();
-          else
-            map.put(tok, new Counter());
-        }
-      }
-    } catch (IOException e) { e.printStackTrace(); }
-    
-    HashSet set = new HashSet();
-    for(Iterator i=map.entrySet().iterator(); i.hasNext();) {
-      Map.Entry entry = (Map.Entry)i.next();
-      if(((Counter)entry.getValue()).passesCutoff(5))
-        set.add(entry.getKey());
-    }
-    
-    return set;
-  }
-  
   /** 
    * Builds up the list of features using the Reader as input.  For now, this
    * should only be used to create training data.
    */
   public Event[] getEvents(boolean evalMode) {
     ArrayList elist = new ArrayList();
-    //int numMatches;
-    //Set frequent;
-    /*
-     if(!evalMode) {
-     //System.out.println("Reading in all the data");
-      try {
-      StringBuffer sb = new StringBuffer();
-      for(String s = br.readLine(); s!=null; s=br.readLine())
-      sb.append(s+"\n");
-      //System.out.println("Getting most frequent words");
-       frequent =
-       getFrequent(new BufferedReader(
-       new StringReader(sb.toString())));
-       br = new BufferedReader(new StringReader(sb.toString()));
-       sb=null;
-       } catch (IOException e) { e.printStackTrace(); }
-       }
-       */
-    //System.out.println("Collecting events");
     try {
       String s = br.readLine();
       
@@ -147,7 +101,10 @@ public class POSEventCollector implements EventCollector {
         }
         s = br.readLine();
       }
-    } catch (Exception e) { e.printStackTrace(); }
+    } 
+    catch (Exception e) { 
+      e.printStackTrace(); 
+    }
     
     Event[] events = new Event[elist.size()];
     for(int i=0; i<events.length; i++)
