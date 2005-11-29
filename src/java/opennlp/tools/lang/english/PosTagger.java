@@ -37,7 +37,7 @@ import opennlp.tools.postag.TagDictionary;
  * achieved >96% accuracy on unseen data.
  *
  * @author      Gann Bierner
- * @version     $Revision: 1.5 $, $Date: 2005/11/20 04:47:57 $
+ * @version     $Revision: 1.6 $, $Date: 2005/11/29 18:01:16 $
  */
 
 public class PosTagger extends POSTaggerME {
@@ -63,6 +63,14 @@ public class PosTagger extends POSTaggerME {
       return null;
     }
   }
+  
+  public static void usage() {
+    System.err.println("Usage: PosTagger [-d tagdict] [-di case_insensiteve_tagdict] [-k 5] model < tokenized_sentences");
+    System.err.println("-d tagdict Specifies that a tag dictionary file should be used.");
+    System.err.println("-di tagdict Specifies that a case-insensitive tag dictionary should be used.");
+    System.err.println("-k n tagdict Specifies that the top n tagging should be reported.");
+    System.exit(1);    
+  }
 
   /**
    * <p>Part-of-speech tag a string passed in on the command line. For
@@ -72,13 +80,13 @@ public class PosTagger extends POSTaggerME {
    */
   public static void main(String[] args) throws IOException {
     if (args.length == 0) {
-      System.err.println("Usage: PosTagger [-d tagdict] [-di case_insensiteve_tagdict] model < tokenized_sentences");
-      System.exit(1);
+      usage();
     }
     int ai=0;
     boolean test = false;
     String tagdict = null;
     boolean caseSensitive = true;
+    int numTaggings = 1;
     while(ai < args.length && args[ai].startsWith("-")) {
       if (args[ai].equals("-d")) {
         tagdict = args[ai+1];
@@ -88,6 +96,10 @@ public class PosTagger extends POSTaggerME {
         tagdict = args[ai+1];
         ai+=2;
         caseSensitive = false;
+      }
+      else if (args[ai].equals("-k")) {
+        numTaggings = Integer.parseInt(args[ai+1]);
+        ai+=2;
       }
     }
     POSTaggerME tagger;
@@ -120,7 +132,22 @@ public class PosTagger extends POSTaggerME {
       BufferedReader in = new BufferedReader(new InputStreamReader(System.in));
       
       for (String line = in.readLine(); line != null; line = in.readLine()) {
-        System.out.println(tagger.tag(line));
+        if (numTaggings == 1) {
+          System.out.println(tagger.tag(line));
+        }
+        else {
+          String[] tokens = line.split(" ");
+          String[][] taggings = tagger.tag(numTaggings, tokens);
+          for (int ti=0;ti<taggings.length;ti++) {
+            for (int wi=0;wi<tokens.length;wi++) {
+              if (wi != 0) {
+                System.out.print(" ");
+              }
+              System.out.print(tokens[wi]+"/"+taggings[ti][wi]);
+            }
+            System.out.println();
+          }
+        }
       }
     }
   }
