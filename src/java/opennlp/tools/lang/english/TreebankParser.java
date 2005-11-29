@@ -188,6 +188,10 @@ public class TreebankParser {
       	ai++;
         break;
       }
+      else {
+        System.err.println("Unknown option "+args[ai]);
+        usage();
+      }
       ai++;
     }
     ParserME parser;
