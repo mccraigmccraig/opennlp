@@ -127,9 +127,9 @@ public class TreebankChunker extends ChunkerME {
         String[] tokens = new String[tts.length];
         String[] tags = new String[tts.length];
         for (int ti=0,tn=tts.length;ti<tn;ti++) {
-          String[] tt = tts[ti].split("/");
-          tokens[ti]=tt[0];
-          tags[ti]=tt[1]; 
+          int si = tts[ti].lastIndexOf("/");
+          tokens[ti]=tts[ti].substring(0,si);
+          tags[ti]=tts[ti].substring(si+1);
         }
         String[] chunks = chunker.chunk(tokens,tags);
         //System.err.println(java.util.Arrays.asList(chunks));
