@@ -134,7 +134,8 @@ public class CheckContextGenerator implements ContextGenerator {
 
     //default 
     features.add("default");
-
+    //first constituent label
+    features.add("fl="+constituents[0].getLabel());
     Parse pstart = constituents[start];
     Parse pend = constituents[end];
     checkcons(pstart, "begin", type, features);
