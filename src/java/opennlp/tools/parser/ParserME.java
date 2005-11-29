@@ -766,9 +766,9 @@ public class ParserME {
     }
     if (tag || all) {
       System.err.println("Training tagger");
-      System.err.println("Loading Dictionary");
-      Dictionary tridict = new Dictionary(dictFile.toString());
-      opennlp.maxent.EventStream tes = new ParserEventStream(new opennlp.maxent.PlainTextByLineDataStream(new java.io.FileReader(inFile)), rules, EventTypeEnum.TAG,tridict);
+      //System.err.println("Loading Dictionary");
+      //Dictionary tridict = new Dictionary(dictFile.toString());
+      opennlp.maxent.EventStream tes = new ParserEventStream(new opennlp.maxent.PlainTextByLineDataStream(new java.io.FileReader(inFile)), rules, EventTypeEnum.TAG);
       GISModel tagModel = train(tes, iterations, cutoff);
       System.out.println("Saving the tagger model as: " + tagFile);
       new opennlp.maxent.io.SuffixSensitiveGISModelWriter(tagModel, tagFile).persist();
