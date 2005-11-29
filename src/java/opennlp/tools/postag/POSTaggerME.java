@@ -54,7 +54,7 @@ import opennlp.tools.util.Sequence;
  * surrounding context.
  *
  * @author      Gann Bierner
- * @version $Revision: 1.17 $, $Date: 2005/11/21 23:08:31 $
+ * @version $Revision: 1.18 $, $Date: 2005/11/29 18:01:48 $
  */
 public class POSTaggerME implements Evalable, POSTagger {
 
@@ -91,27 +91,56 @@ public class POSTaggerME implements Evalable, POSTagger {
   /** The search object used for search multiple sequences of tags. */
   protected  BeamSearch beam;
 
-  public POSTaggerME(MaxentModel mod, Dictionary dict) {
-    this(mod, new DefaultPOSContextGenerator(dict));
+  /**
+   * Creates a new tagger with the specified model and n-gram dictionary.
+   * @param model The model used for tagging.
+   * @param dict The n-gram dictionary used for feature generation.
+   */
+  public POSTaggerME(MaxentModel model, Dictionary dict) {
+    this(model, new DefaultPOSContextGenerator(dict));
   }
   
-  public POSTaggerME(MaxentModel mod,Dictionary dict,TagDictionary tagdict) {
-      this(DEFAULT_BEAM_SIZE,mod, new DefaultPOSContextGenerator(dict),tagdict);
-    }
-  
-  public POSTaggerME(MaxentModel mod, POSContextGenerator cg) {
-    this(DEFAULT_BEAM_SIZE,mod,cg,null);
-  }
-  
-  public POSTaggerME(MaxentModel mod, POSContextGenerator cg, TagDictionary dict) {
-      this(DEFAULT_BEAM_SIZE,mod,cg,dict);
+  /**
+   * Creates a new tagger with the specified model, n-gram dictionary, and tag dictionary.
+   * @param model The model used for tagging.
+   * @param dict The n-gram dictionary used for feature generation.
+   * @param tagdict The dictionary which specifies the valid set of tags for some words. 
+   */
+  public POSTaggerME(MaxentModel model,Dictionary dict,TagDictionary tagdict) {
+      this(DEFAULT_BEAM_SIZE,model, new DefaultPOSContextGenerator(dict),tagdict);
     }
 
-  public POSTaggerME(int beamSize, MaxentModel mod, POSContextGenerator cg, TagDictionary tagdict) {
+  /**
+   * Creates a new tagger with the specified model and context generator.
+   * @param model The model used for tagging.
+   * @param cg The context generator used for feature creation.
+   */
+  public POSTaggerME(MaxentModel model, POSContextGenerator cg) {
+    this(DEFAULT_BEAM_SIZE,model,cg,null);
+  }
+  
+  /**
+   * Creates a new tagger with the specified model, context generator, and tag dictionary.
+   * @param model The model used for tagging.
+   * @param cg The context generator used for feature creation.
+   * @param tagdict The dictionary which specifies the valid set of tags for some words.
+   */
+  public POSTaggerME(MaxentModel model, POSContextGenerator cg, TagDictionary tagdict) {
+      this(DEFAULT_BEAM_SIZE,model,cg,tagdict);
+    }
+
+  /**
+   * Creates a new tagger with the specified beam size, model, context generator, and tag dictionary.
+   * @param beamSize The number of alturnate tagging considered when tagging. 
+   * @param model The model used for tagging.
+   * @param cg The context generator used for feature creation.
+   * @param tagdict The dictionary which specifies the valid set of tags for some words.
+   */
+  public POSTaggerME(int beamSize, MaxentModel model, POSContextGenerator cg, TagDictionary tagdict) {
     size = beamSize;
-    _posModel = mod;
+    _posModel = model;
     _contextGen = cg;
-    beam = new PosBeamSearch(size, cg, mod);
+    beam = new PosBeamSearch(size, cg, model);
     tagDictionary = tagdict;
   }
 
@@ -137,14 +166,39 @@ public class POSTaggerME implements Evalable, POSTagger {
   }
 
   public String[] tag(String[] sentence) {
-    List t = tag(Arrays.asList(sentence));
+    bestSequence = beam.bestSequence(sentence,null);
+    List t = bestSequence.getOutcomes();
     return ((String[]) t.toArray(new String[t.size()]));
   }
+  
+  /**
+   * Returns at most the specified number of taggings for the specified sentence.
+   * @param numTaggings The number of tagging to be returned.
+   * @param sentence An array of tokens which make up a sentence.
+   * @return At most the specified number of taggings for the specified sentence.
+   */
+  public String[][] tag(int numTaggings, String[] sentence) {
+    Sequence[] bestSequences = beam.bestSequences(numTaggings, sentence,null);
+    String[][] tags = new String[bestSequences.length][];
+    for (int si=0;si<tags.length;si++) {
+      List t = bestSequences[si].getOutcomes();
+      tags[si] = (String[]) t.toArray(new String[t.size()]);
+    }
+    return tags;
+  }
 
+  /**
+   * Populates the specified array with the probabilities for each tag of the last tagged sentence. 
+   * @param probs An array to put the probabilities into.
+   */
   public void probs(double[] probs) {
     bestSequence.getProbs(probs);
   }
 
+  /**
+   * Returns an array with the probabilities for each tag of the last tagged sentence.
+   * @return an array with the probabilities for each tag of the last tagged sentence.
+   */
   public double[] probs() {
     return bestSequence.getProbs();
   }
