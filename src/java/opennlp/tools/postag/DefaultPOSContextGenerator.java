@@ -30,7 +30,7 @@ import opennlp.tools.util.Cache;
  *
  * @author      Gann Bierner
  * @author      Tom Morton
- * @version     $Revision: 1.10 $, $Date: 2005/11/06 23:14:58 $
+ * @version     $Revision: 1.11 $, $Date: 2005/11/29 22:16:13 $
  */
 
 public class DefaultPOSContextGenerator implements POSContextGenerator {
@@ -141,7 +141,7 @@ public class DefaultPOSContextGenerator implements POSContextGenerator {
       }
     }
     List e = new ArrayList();
-    e.add("def");
+    e.add("default");
     // add the word itself
     e.add("w=" + lex);
     dictGram[0] = lex;
