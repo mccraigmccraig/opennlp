@@ -44,7 +44,7 @@ public class HeadRules implements opennlp.tools.parser.HeadRules {
     punctSet.add(",");
     punctSet.add("``");
     punctSet.add("''");
-    //punctSet.add(":");
+    punctSet.add(":");
   }
   
   public HeadRules(Map ruleMap) {
@@ -60,65 +60,65 @@ public class HeadRules implements opennlp.tools.parser.HeadRules {
       return null;
     }
     HeadRule hr;
-      if (type.equals("NP") || type.equals("NX")) {
-        String[] tags1 = { "NN", "NNP", "NNPS", "NNS", "NX", "JJR", "POS" };
-        for (int ci = constituents.length - 1; ci >= 0; ci--) {
-          for (int ti = tags1.length - 1; ti >= 0; ti--) {
-            if (constituents[ci].getType().equals(tags1[ti])) {
-              return (constituents[ci].getHead());
-            }
-          }
-        }
-        for (int ci = 0; ci < constituents.length; ci++) {
-          if (constituents[ci].getType().equals("NP")) {
+    if (type.equals("NP") || type.equals("NX")) {
+      String[] tags1 = { "NN", "NNP", "NNPS", "NNS", "NX", "JJR", "POS" };
+      for (int ci = constituents.length - 1; ci >= 0; ci--) {
+        for (int ti = tags1.length - 1; ti >= 0; ti--) {
+          if (constituents[ci].getType().equals(tags1[ti])) {
             return (constituents[ci].getHead());
           }
         }
-        String[] tags2 = { "$", "ADJP", "PRN" };
-        for (int ci = constituents.length - 1; ci >= 0; ci--) {
-          for (int ti = tags2.length - 1; ti >= 0; ti--) {
-            if (constituents[ci].getType().equals(tags2[ti])) {
-              return (constituents[ci].getHead());
-            }
-          }
-        }
-        String[] tags3 = { "JJ", "JJS", "RB", "QP" };
-        for (int ci = constituents.length - 1; ci >= 0; ci--) {
-          for (int ti = tags3.length - 1; ti >= 0; ti--) {
-            if (constituents[ci].getType().equals(tags3[ti])) {
-              return (constituents[ci].getHead());
-            }
-          }
-        }
-        return (constituents[constituents.length - 1].getHead());
       }
-      else if ((hr = (HeadRule) headRules.get(type)) != null) {
-        String[] tags = hr.tags;
-        int cl = constituents.length;
-        int tl = tags.length;
-        if (hr.leftToRight) {
-          for (int ti = 0; ti < tl; ti++) {
-            for (int ci = 0; ci < cl; ci++) {
-              if (constituents[ci].getType().equals(tags[ti])) {
-                return (constituents[ci].getHead());
-              }
-            }
-          }
-          return (constituents[0].getHead());
+      for (int ci = 0; ci < constituents.length; ci++) {
+        if (constituents[ci].getType().equals("NP")) {
+          return (constituents[ci].getHead());
         }
-        else {
-          for (int ti = 0; ti < tl; ti++) {
-            for (int ci = cl - 1; ci >= 0; ci--) {
-              if (constituents[ci].getType().equals(tags[ti])) {
-                return (constituents[ci].getHead());
-              }
-            }
+      }
+      String[] tags2 = { "$", "ADJP", "PRN" };
+      for (int ci = constituents.length - 1; ci >= 0; ci--) {
+        for (int ti = tags2.length - 1; ti >= 0; ti--) {
+          if (constituents[ci].getType().equals(tags2[ti])) {
+            return (constituents[ci].getHead());
           }
-          return (constituents[cl - 1].getHead());
+        }
+      }
+      String[] tags3 = { "JJ", "JJS", "RB", "QP" };
+      for (int ci = constituents.length - 1; ci >= 0; ci--) {
+        for (int ti = tags3.length - 1; ti >= 0; ti--) {
+          if (constituents[ci].getType().equals(tags3[ti])) {
+            return (constituents[ci].getHead());
+          }
         }
       }
       return (constituents[constituents.length - 1].getHead());
     }
+    else if ((hr = (HeadRule) headRules.get(type)) != null) {
+      String[] tags = hr.tags;
+      int cl = constituents.length;
+      int tl = tags.length;
+      if (hr.leftToRight) {
+        for (int ti = 0; ti < tl; ti++) {
+          for (int ci = 0; ci < cl; ci++) {
+            if (constituents[ci].getType().equals(tags[ti])) {
+              return (constituents[ci].getHead());
+            }
+          }
+        }
+        return (constituents[0].getHead());
+      }
+      else {
+        for (int ti = 0; ti < tl; ti++) {
+          for (int ci = cl - 1; ci >= 0; ci--) {
+            if (constituents[ci].getType().equals(tags[ti])) {
+              return (constituents[ci].getHead());
+            }
+          }
+        }
+        return (constituents[cl - 1].getHead());
+      }
+    }
+    return (constituents[constituents.length - 1].getHead());
+  }
     
   private void readHeadRules(String file) throws IOException {
     BufferedReader str = new BufferedReader(new FileReader(file));
