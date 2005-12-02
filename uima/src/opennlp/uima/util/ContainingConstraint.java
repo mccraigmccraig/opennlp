@@ -29,14 +29,26 @@ import com.ibm.uima.cas.text.AnnotationFS;
  * TODO: add javadoc comment
  * 
  * @author <a href="mailto:kottmann@gmail.com">Joern Kottmann</a>
- * @version $Revision: 1.1 $, $Date: 2005/12/02 01:53:05 $
+ * @version $Revision: 1.2 $, $Date: 2005/12/02 16:02:32 $
  */
-public class ContainingConstraint implements FSMatchConstraint {
+public final class ContainingConstraint implements FSMatchConstraint {
   private static final long serialVersionUID = 1;
 
   private Collection<AnnotationFS> mContainingAnnotations = 
       new LinkedList<AnnotationFS>();
 
+  /**
+   * Default constructor
+   */
+  public ContainingConstraint()
+  {
+  }
+  
+  public ContainingConstraint(AnnotationFS containingAnnotation)
+  {
+    add(containingAnnotation);
+  }
+  
   public boolean match(FeatureStructure featureStructure) {
     if (!(featureStructure instanceof AnnotationFS)) {
       return false;
