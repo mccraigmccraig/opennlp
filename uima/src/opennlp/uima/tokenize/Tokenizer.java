@@ -14,7 +14,8 @@
 //You should have received a copy of the GNU Lesser General Public
 //License along with this program; if not, write to the Free Software
 //Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
-////////////////////////////////////////////////////////////////////////////// 
+//////////////////////////////////////////////////////////////////////////////
+
 package opennlp.uima.tokenize;
 
 import java.io.DataInputStream;
@@ -24,12 +25,12 @@ import java.util.Iterator;
 
 import opennlp.maxent.io.BinaryGISModelReader;
 import opennlp.tools.tokenize.TokenizerME;
-import opennlp.uima.UIMAUtil;
+import opennlp.uima.util.AnnotatorUtil;
+import opennlp.uima.util.UIMAUtil;
 
 import com.ibm.uima.analysis_engine.ResultSpecification;
 import com.ibm.uima.analysis_engine.annotator.AnnotatorConfigurationException;
 import com.ibm.uima.analysis_engine.annotator.AnnotatorContext;
-import com.ibm.uima.analysis_engine.annotator.AnnotatorContextException;
 import com.ibm.uima.analysis_engine.annotator.AnnotatorInitializationException;
 import com.ibm.uima.analysis_engine.annotator.AnnotatorProcessException;
 import com.ibm.uima.analysis_engine.annotator.Annotator_ImplBase;
@@ -44,9 +45,10 @@ import com.ibm.uima.cas.text.TCAS;
  * TODO: add javadoc comment here
  * 
  * @author <a href="mailto:kottmann@gmail.com">Joern Kottmann</a>
- * @version
+ * @version $Revision: 1.2 $, $Date: 2005/12/02 16:03:56 $
  */
-public class Tokenizer extends Annotator_ImplBase implements TextAnnotator {
+public final class Tokenizer extends Annotator_ImplBase 
+    implements TextAnnotator {
   private AnnotatorContext mContext;
 
   private TokenizerME mTokenizer;
@@ -60,26 +62,15 @@ public class Tokenizer extends Annotator_ImplBase implements TextAnnotator {
       throws AnnotatorInitializationException, AnnotatorConfigurationException {
     mContext = context;
 
-    String modelName = UIMAUtil.getRequiredParameter(mContext,
+    String modelName = AnnotatorUtil.getRequiredParameter(mContext,
         UIMAUtil.MODEL_PARAMETER);
 
-    InputStream inModel;
+    InputStream inModel = AnnotatorUtil.getResourceAsStream(
+        mContext, modelName);
+    
     try {
-      inModel = mContext.getResourceAsStream(modelName);
-
-      if (inModel == null) {
-        throw new AnnotatorConfigurationException(
-            AnnotatorConfigurationException.RESOURCE_NOT_FOUND,
-            new Object[] { "Unable to load model!" });
-      }
-
       mTokenizer = new TokenizerME(new BinaryGISModelReader(
           new DataInputStream(inModel)).getModel());
-    } catch (AnnotatorContextException e) {
-      throw new AnnotatorConfigurationException(
-          AnnotatorConfigurationException.STANDARD_MESSAGE_CATALOG, 
-          new Object[] {
-          "There is an internal error in the UIMA SDK, sorry", e });
     } catch (IOException e) {
       throw new AnnotatorInitializationException(
           AnnotatorInitializationException.STANDARD_MESSAGE_CATALOG,
@@ -94,7 +85,7 @@ public class Tokenizer extends Annotator_ImplBase implements TextAnnotator {
   @Override
   public void typeSystemInit(TypeSystem typeSystem)
       throws AnnotatorInitializationException, AnnotatorConfigurationException {
-    String containgTypeName = UIMAUtil.getRequiredParameter(mContext,
+    String containgTypeName = AnnotatorUtil.getRequiredParameter(mContext,
         UIMAUtil.SENTENCE_TYPE_PARAMETER);
 
     mSentenceType = typeSystem.getType(containgTypeName);
@@ -105,7 +96,7 @@ public class Tokenizer extends Annotator_ImplBase implements TextAnnotator {
           new Object[] { "Unable to retrive containing type!" });
     }
 
-    String tokenTypeName = UIMAUtil.getRequiredParameter(mContext,
+    String tokenTypeName = AnnotatorUtil.getRequiredParameter(mContext,
         UIMAUtil.TOKEN_TYPE_PARAMETER);
 
     mTokenType = typeSystem.getType(tokenTypeName);
