@@ -45,8 +45,15 @@ import com.ibm.uima.cas.text.TCAS;
 /**
  * TODO: add javadoc comment here
  * 
+ * Required parametes:
+ *  opennlp.uima.ModelName - the name of the model file
+ *  opennlp.uima.SentenceType - the full name of the sentence type
+ *  opennlp.uima.TokenType - the full name of the token type
+ *  opennlp.uima.tokenizer.IsAlphaNumericOptimization - use alpha numeric
+ *      optimization ? @see opennlp.tools.tokenizer.TokenizerME
+ *      
  * @author <a href="mailto:kottmann@gmail.com">Joern Kottmann</a>
- * @version $Revision: 1.3 $, $Date: 2005/12/02 16:18:20 $
+ * @version $Revision: 1.4 $, $Date: 2005/12/02 16:46:04 $
  */
 public final class Tokenizer extends Annotator_ImplBase 
     implements TextAnnotator {
@@ -111,7 +118,7 @@ public final class Tokenizer extends Annotator_ImplBase
     Iterator sentencesIterator = sentences.iterator();
 
     while (sentencesIterator.hasNext()) {
-      AnnotationFS sentence = (AnnotationFS) 
+      AnnotationFS sentence = (AnnotationFS)
           sentencesIterator.next();
 
       Span[] tokenSpans = mTokenizer.tokenizePos
