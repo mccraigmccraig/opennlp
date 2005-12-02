@@ -25,6 +25,7 @@ import java.util.Iterator;
 
 import opennlp.maxent.io.BinaryGISModelReader;
 import opennlp.tools.tokenize.TokenizerME;
+import opennlp.tools.util.Span;
 import opennlp.uima.util.AnnotatorUtil;
 import opennlp.uima.util.UIMAUtil;
 
@@ -45,7 +46,7 @@ import com.ibm.uima.cas.text.TCAS;
  * TODO: add javadoc comment here
  * 
  * @author <a href="mailto:kottmann@gmail.com">Joern Kottmann</a>
- * @version $Revision: 1.2 $, $Date: 2005/12/02 16:03:56 $
+ * @version $Revision: 1.3 $, $Date: 2005/12/02 16:18:20 $
  */
 public final class Tokenizer extends Annotator_ImplBase 
     implements TextAnnotator {
@@ -78,60 +79,50 @@ public final class Tokenizer extends Annotator_ImplBase
           e });
     }
 
-    // TODO: add a configuration parameter for this
-    mTokenizer.setAlphaNumericOptimization(true);
+    String isAlphaNumericOptimizationString = 
+        AnnotatorUtil.getRequiredParameter(
+        mContext, "opennlp.uima.tokenizer.IsAlphaNumericOptimization");
+    
+    mTokenizer.setAlphaNumericOptimization(
+        Boolean.valueOf(isAlphaNumericOptimizationString));
   }
 
   @Override
   public void typeSystemInit(TypeSystem typeSystem)
       throws AnnotatorInitializationException, AnnotatorConfigurationException {
-    String containgTypeName = AnnotatorUtil.getRequiredParameter(mContext,
+    String sentenceTypeName = AnnotatorUtil.getRequiredParameter(mContext,
         UIMAUtil.SENTENCE_TYPE_PARAMETER);
 
-    mSentenceType = typeSystem.getType(containgTypeName);
-
-    if (mSentenceType == null) {
-      throw new AnnotatorConfigurationException(
-          AnnotatorConfigurationException.STANDARD_MESSAGE_CATALOG,
-          new Object[] { "Unable to retrive containing type!" });
-    }
+    mSentenceType = AnnotatorUtil.getType(typeSystem, sentenceTypeName);
 
     String tokenTypeName = AnnotatorUtil.getRequiredParameter(mContext,
         UIMAUtil.TOKEN_TYPE_PARAMETER);
 
-    mTokenType = typeSystem.getType(tokenTypeName);
-
-    if (mTokenType == null) {
-      throw new AnnotatorConfigurationException(
-          AnnotatorConfigurationException.STANDARD_MESSAGE_CATALOG,
-          new Object[] { "Unable to retrive token type!" });
-    }
+    mTokenType = AnnotatorUtil.getType(typeSystem, tokenTypeName);
   }
 
   public void process(TCAS tcas, ResultSpecification specification)
       throws AnnotatorProcessException {
-    String documentText = tcas.getDocumentText();
 
     // TODO: can this here return null ?
     // do i need here a return ?: if (containgAnnotations == null) return;
-    FSIndex containgAnnotations = tcas.getAnnotationIndex(mSentenceType);
+    FSIndex sentences = tcas.getAnnotationIndex(mSentenceType);
 
-    Iterator containgAnnotationsIterator = containgAnnotations.iterator();
+    Iterator sentencesIterator = sentences.iterator();
 
-    while (containgAnnotationsIterator.hasNext()) {
-      AnnotationFS containgAnnotation = (AnnotationFS) 
-          containgAnnotationsIterator.next();
+    while (sentencesIterator.hasNext()) {
+      AnnotationFS sentence = (AnnotationFS) 
+          sentencesIterator.next();
 
-      opennlp.tools.util.Span[] spans = mTokenizer
-          .tokenizePos(documentText.substring(containgAnnotation.getBegin(),
-          containgAnnotation.getEnd()));
+      Span[] tokenSpans = mTokenizer.tokenizePos
+          (sentence.getCoveredText());
 
-      int containingAnnotationOffset = containgAnnotation.getBegin();
+      int sentenceOffset = sentence.getBegin();
 
-      for (int i = 0; i < spans.length; i++) {
+      for (int i = 0; i < tokenSpans.length; i++) {
         AnnotationFS token = tcas.createAnnotation(mTokenType,
-            containingAnnotationOffset + spans[i].getStart(),
-            containingAnnotationOffset + spans[i].getEnd());
+            sentenceOffset + tokenSpans[i].getStart(),
+            sentenceOffset + tokenSpans[i].getEnd());
 
         tcas.getIndexRepository().addFS(token);
       }
