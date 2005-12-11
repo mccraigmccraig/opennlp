@@ -24,6 +24,7 @@ import java.io.EOFException;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -63,7 +64,10 @@ public class Dictionary {
    * @param dictionaryFile A file storing a dictionary.
    */
   public Dictionary(String dictionaryFile) throws IOException {
-    DataInputStream input = new DataInputStream(new GZIPInputStream(new FileInputStream(new File(dictionaryFile))));
+    this(new GZIPInputStream(new FileInputStream(new File(dictionaryFile))));
+  }
+  public Dictionary(InputStream in) throws IOException {
+    DataInputStream input = new DataInputStream(new GZIPInputStream(in));
     input.readUTF();
     int numWords = input.readInt();
     //System.err.println("Reading: "+numWords+" words");
