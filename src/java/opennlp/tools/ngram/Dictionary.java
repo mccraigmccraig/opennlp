@@ -67,7 +67,7 @@ public class Dictionary {
     this(new GZIPInputStream(new FileInputStream(new File(dictionaryFile))));
   }
   public Dictionary(InputStream in) throws IOException {
-    DataInputStream input = new DataInputStream(new GZIPInputStream(in));
+    DataInputStream input = new DataInputStream(in);
     input.readUTF();
     int numWords = input.readInt();
     //System.err.println("Reading: "+numWords+" words");
