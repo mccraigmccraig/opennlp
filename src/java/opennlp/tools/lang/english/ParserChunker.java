@@ -6,6 +6,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import opennlp.maxent.MaxentModel;
 import opennlp.maxent.io.SuffixSensitiveGISModelReader;
 import opennlp.tools.chunker.ChunkerME;
 import opennlp.tools.parser.ChunkContextGenerator;
@@ -21,8 +22,23 @@ public class ParserChunker extends ChunkerME implements opennlp.tools.parser.Par
     this(modelFile,K,K);
   }
   
+  public ParserChunker(MaxentModel model) throws IOException {
+    this(model,K,K);
+  }
+  
   public ParserChunker(String modelFile, int beamSize, int cacheSize) throws IOException {
     super(new SuffixSensitiveGISModelReader(new File(modelFile)).getModel(), new ChunkContextGenerator(cacheSize), beamSize);
+    this.beamSize = beamSize;
+    init();
+  }
+  
+  public ParserChunker(MaxentModel model, int beamSize, int cacheSize) throws IOException {
+    super(model, new ChunkContextGenerator(cacheSize), beamSize);
+    this.beamSize = beamSize;
+    init();
+  }
+  
+  protected void init() {
     continueStartMap = new HashMap(model.getNumOutcomes());
     for (int oi=0,on=model.getNumOutcomes();oi<on;oi++) {
       String outcome = model.getOutcome(oi);
@@ -30,7 +46,6 @@ public class ParserChunker extends ChunkerME implements opennlp.tools.parser.Par
         continueStartMap.put(outcome,ParserME.START+outcome.substring(ParserME.CONT.length()));
       }
     }
-    this.beamSize = beamSize;
   }
 
   public Sequence[] topKSequences(List sentence, List tags) {
