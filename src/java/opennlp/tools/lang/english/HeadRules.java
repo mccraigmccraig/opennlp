@@ -17,13 +17,18 @@
 //////////////////////////////////////////////////////////////////////////////   
 package opennlp.tools.lang.english;
 
+import java.io.BufferedReader;
+import java.io.FileReader;
+import java.io.IOException;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
-import java.util.HashMap;
 import java.util.Set;
+import java.util.Stack;
 import java.util.StringTokenizer;
-import java.io.*;
 
+import opennlp.tools.parser.Constituent;
+import opennlp.tools.parser.GapLabeler;
 import opennlp.tools.parser.Parse;
 import opennlp.tools.parser.ParserME;
 
@@ -31,14 +36,27 @@ import opennlp.tools.parser.ParserME;
  * Class for storing the English head rules associated with parsing. 
  *
  */
-public class HeadRules implements opennlp.tools.parser.HeadRules {
+public class HeadRules implements opennlp.tools.parser.HeadRules, GapLabeler {
   
   private Map headRules;
   private Set punctSet;
   
-  public HeadRules(String ruleDir) throws IOException {
-    readHeadRules(ruleDir);
-    punctSet = new HashSet();
+  /**
+   * Creates a new set of head rules based on the specified head rules file.
+   * @param ruleFile the head rules file.
+   * @throws IOException if the head rules file can not be read.
+   */
+  public HeadRules(String ruleFile) throws IOException {
+    this(new BufferedReader(new FileReader(ruleFile)));
+  }
+  
+  /**
+   * Creates a new set of head rules based on the specified reader.
+   * @param rulesReader the head rules reader. 
+   * @throws IOException if the head rules reader can not be read.
+   */
+  public HeadRules(BufferedReader rulesReader) throws IOException {
+    readHeadRules(rulesReader);
     punctSet = new HashSet();
     punctSet.add(".");
     punctSet.add(",");
@@ -46,15 +64,11 @@ public class HeadRules implements opennlp.tools.parser.HeadRules {
     punctSet.add("''");
     punctSet.add(":");
   }
-  
-  public HeadRules(Map ruleMap) {
-    headRules = ruleMap;
-  }
-  
+    
   public Set getPunctuationTags() {
     return punctSet;
   }
-  
+    
   public Parse getHead(Parse[] constituents, String type) {
     if (constituents[0].getType() == ParserME.TOK_NODE) {
       return null;
@@ -120,8 +134,7 @@ public class HeadRules implements opennlp.tools.parser.HeadRules {
     return (constituents[constituents.length - 1].getHead());
   }
     
-  private void readHeadRules(String file) throws IOException {
-    BufferedReader str = new BufferedReader(new FileReader(file));
+  private void readHeadRules(BufferedReader str) throws IOException {
     String line;
     headRules = new HashMap(30);
     while ((line = str.readLine()) != null) {
@@ -138,6 +151,8 @@ public class HeadRules implements opennlp.tools.parser.HeadRules {
       headRules.put(type, new HeadRule(dir.equals("1"), tags));
     }
   }
+  
+  
 
 
   private static class HeadRule {
@@ -146,6 +161,31 @@ public class HeadRules implements opennlp.tools.parser.HeadRules {
     public HeadRule(boolean l2r, String[] tags) {
       leftToRight = l2r;
       this.tags = tags;
+    }
+  }
+
+
+  public void labelGaps(Stack stack) {
+    if (stack.size() > 4) {
+      //Constituent con0 = (Constituent) stack.get(stack.size()-1);
+      Constituent con1 = (Constituent) stack.get(stack.size()-2);
+      Constituent con2 = (Constituent) stack.get(stack.size()-3);
+      Constituent con3 = (Constituent) stack.get(stack.size()-4);
+      Constituent con4 = (Constituent) stack.get(stack.size()-5);
+      //System.err.println("con0="+con0.label+" con1="+con1.label+" con2="+con2.label+" con3="+con3.label+" con4="+con4.label);
+      //subject extraction
+      if (con1.getLabel().equals("NP") && con2.getLabel().equals("S") && con3.getLabel().equals("SBAR")) {
+        con1.setLabel(con1.getLabel()+"-G");
+        con2.setLabel(con2.getLabel()+"-G");
+        con3.setLabel(con3.getLabel()+"-G");
+      }
+      //object extraction
+      else if (con1.getLabel().equals("NP") && con2.getLabel().equals("VP") && con3.getLabel().equals("S") && con4.getLabel().equals("SBAR")) {
+        con1.setLabel(con1.getLabel()+"-G");
+        con2.setLabel(con2.getLabel()+"-G");
+        con3.setLabel(con3.getLabel()+"-G");
+        con4.setLabel(con4.getLabel()+"-G");
+      }
     }
   }
 }
