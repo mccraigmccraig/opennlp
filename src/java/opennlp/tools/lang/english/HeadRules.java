@@ -30,7 +30,7 @@ import java.util.StringTokenizer;
 import opennlp.tools.parser.Constituent;
 import opennlp.tools.parser.GapLabeler;
 import opennlp.tools.parser.Parse;
-import opennlp.tools.parser.ParserME;
+import opennlp.tools.parser.chunking.Parser;
 
 /**
  * Class for storing the English head rules associated with parsing. 
@@ -70,7 +70,7 @@ public class HeadRules implements opennlp.tools.parser.HeadRules, GapLabeler {
   }
     
   public Parse getHead(Parse[] constituents, String type) {
-    if (constituents[0].getType() == ParserME.TOK_NODE) {
+    if (constituents[0].getType() == Parser.TOK_NODE) {
       return null;
     }
     HeadRule hr;

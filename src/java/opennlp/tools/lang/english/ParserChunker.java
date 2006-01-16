@@ -10,7 +10,7 @@ import opennlp.maxent.MaxentModel;
 import opennlp.maxent.io.SuffixSensitiveGISModelReader;
 import opennlp.tools.chunker.ChunkerME;
 import opennlp.tools.parser.ChunkContextGenerator;
-import opennlp.tools.parser.ParserME;
+import opennlp.tools.parser.chunking.Parser;
 import opennlp.tools.util.Sequence;
 
 public class ParserChunker extends ChunkerME implements opennlp.tools.parser.ParserChunker {
@@ -42,8 +42,8 @@ public class ParserChunker extends ChunkerME implements opennlp.tools.parser.Par
     continueStartMap = new HashMap(model.getNumOutcomes());
     for (int oi=0,on=model.getNumOutcomes();oi<on;oi++) {
       String outcome = model.getOutcome(oi);
-      if (outcome.startsWith(ParserME.CONT)){
-        continueStartMap.put(outcome,ParserME.START+outcome.substring(ParserME.CONT.length()));
+      if (outcome.startsWith(Parser.CONT)){
+        continueStartMap.put(outcome,Parser.START+outcome.substring(Parser.CONT.length()));
       }
     }
   }
@@ -70,7 +70,7 @@ public class ParserChunker extends ChunkerME implements opennlp.tools.parser.Par
         if (lastTag.equals(continueStartMap.get(outcome))) {
           return true;
         }
-        if (lastTag.equals(ParserME.OTHER)) {
+        if (lastTag.equals(Parser.OTHER)) {
           return (false);
         }
         return false;
@@ -94,7 +94,7 @@ public class ParserChunker extends ChunkerME implements opennlp.tools.parser.Par
         if (lastTag.equals(continueStartMap.get(outcome))) {
           return true;
         }
-        if (lastTag.equals(ParserME.OTHER)) {
+        if (lastTag.equals(Parser.OTHER)) {
           return (false);
         }
         return false;

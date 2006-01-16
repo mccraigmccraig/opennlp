@@ -29,15 +29,12 @@ import java.util.List;
 import java.util.Map;
 
 import opennlp.tools.coref.*;
-import opennlp.tools.coref.DiscourseEntity;
-import opennlp.tools.coref.Linker;
-import opennlp.tools.coref.LinkerMode;
 import opennlp.tools.coref.mention.DefaultParse;
 import opennlp.tools.coref.mention.Mention;
 import opennlp.tools.coref.mention.MentionContext;
 import opennlp.tools.coref.mention.PTBMentionFinder;
 import opennlp.tools.parser.Parse;
-import opennlp.tools.parser.ParserME;
+import opennlp.tools.parser.chunking.Parser;
 import opennlp.tools.util.Span;
 
 /**
@@ -112,7 +109,8 @@ public class TreebankLinker extends DefaultLinker {
           //System.err.println("PennTreebankLiner.main: "+ei+" "+extents[ei]);
           
           if (extents[ei].getParse() == null) {
-            Parse snp = new Parse(p.getText(),extents[ei].getSpan(),"NML",1.0);
+            //not sure how to get head index, but its not used at this point.
+            Parse snp = new Parse(p.getText(),extents[ei].getSpan(),"NML",1.0,0);
             p.insert(snp);
             extents[ei].setParse(new DefaultParse(snp,sentenceNumber));
           }
@@ -161,7 +159,7 @@ class CorefParse {
   private void show(Parse p) {
     int start;
     start = p.getSpan().getStart();
-    if (!p.getType().equals(ParserME.TOK_NODE)) {
+    if (!p.getType().equals(Parser.TOK_NODE)) {
       System.out.print("(");
       System.out.print(p.getType());
       if (parseMap.containsKey(p)) {
@@ -181,7 +179,7 @@ class CorefParse {
       start = s.getEnd();
     }
     System.out.print(p.getText().substring(start, p.getSpan().getEnd()));
-    if (!p.getType().equals(ParserME.TOK_NODE)) {
+    if (!p.getType().equals(Parser.TOK_NODE)) {
       System.out.print(")");
     }
   }
