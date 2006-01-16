@@ -32,11 +32,17 @@ import java.util.List;
  * Created: Sat Oct 27 11:42:07 2001
  *
  * @author Eric D. Friedman
- * @version $Id: EndOfSentenceScanner.java,v 1.1 2003/11/05 03:31:04 tsmorton Exp $
+ * @version $Id: EndOfSentenceScanner.java,v 1.2 2006/01/16 17:51:49 tsmorton Exp $
  */
 
 public interface EndOfSentenceScanner {
 
+  /**
+   * Returns an array of character which can indicate the end of a sentence.
+   * @return an array of character which can indicate the end of a sentence.
+   */
+   public char[] getEndOfSentenceCharacters();
+   
     /**
      * The receiver scans `s' for sentence ending characters and
      * returns their offsets.
