@@ -31,7 +31,7 @@ import opennlp.tools.sentdetect.SentenceDetectorME;
  * Journal text).
  *
  * @author      Jason Baldridge and Tom Morton
- * @version     $Revision: 1.2 $, $Date: 2005/11/19 17:05:38 $
+ * @version     $Revision: 1.3 $, $Date: 2006/01/16 17:41:23 $
  */
 
 public class SentenceDetector extends SentenceDetectorME {
@@ -42,10 +42,11 @@ public class SentenceDetector extends SentenceDetectorME {
    */
   public SentenceDetector(String modelName) throws IOException {
     super((new SuffixSensitiveGISModelReader(new File(modelName))).getModel());
+    this.useTokenEnd = true;
   }
 
   /**
-   * Perform sentence detection the input stream.  A blank line will be treated as a paragraph boundry.
+   * Perform sentence detection the input stream.  A newline will be treated as a paragraph boundry.
    * <p>java opennlp.tools.sentdetect.EnglishSentenceDetectorME model < "First sentence. Second sentence? Here is another one. And so on and so forth - you get the idea."
    */
   public static void main(String[] args) throws IOException {

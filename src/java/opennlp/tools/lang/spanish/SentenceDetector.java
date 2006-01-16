@@ -30,7 +30,7 @@ import opennlp.tools.sentdetect.SentenceDetectorME;
 /**
  * A sentence detector which uses a model trained on Spanish data 
  *
- * @author      Jason Baldridge and Tom Morton
+ * @author Tom Morton
  */
 
 public class SentenceDetector extends SentenceDetectorME {
@@ -40,10 +40,11 @@ public class SentenceDetector extends SentenceDetectorME {
    */
   public SentenceDetector(String name) throws IOException {
     super((new SuffixSensitiveGISModelReader(new File(name))).getModel());
+    this.useTokenEnd = true;
   }
 
   /**
-   * Perform sentence detection the input stream.  A blank line will be treated as a paragraph boundry.
+   * Perform sentence detection the input stream.  A newline will be treated as a paragraph boundry.
    * <p>java opennlp.tools.lang.spanish.SentenceDetector model < "First sentence. Second sentence? Here is another one. And so on and so forth - you get the idea."
    */
   public static void main(String[] args) throws IOException {
