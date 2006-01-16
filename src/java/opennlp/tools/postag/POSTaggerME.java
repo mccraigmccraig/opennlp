@@ -21,7 +21,6 @@ package opennlp.tools.postag;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.Reader;
@@ -34,7 +33,6 @@ import java.util.StringTokenizer;
 import opennlp.maxent.DataStream;
 import opennlp.maxent.Evalable;
 import opennlp.maxent.EventCollector;
-import opennlp.maxent.EventCollectorAsStream;
 import opennlp.maxent.EventStream;
 import opennlp.maxent.GISModel;
 import opennlp.maxent.MaxentModel;
@@ -43,7 +41,6 @@ import opennlp.maxent.TwoPassDataIndexer;
 import opennlp.maxent.io.SuffixSensitiveGISModelWriter;
 import opennlp.tools.ngram.Dictionary;
 import opennlp.tools.ngram.MutableDictionary;
-import opennlp.tools.tokenize.TokEventCollector;
 import opennlp.tools.util.BeamSearch;
 import opennlp.tools.util.Pair;
 import opennlp.tools.util.Sequence;
@@ -54,7 +51,7 @@ import opennlp.tools.util.Sequence;
  * surrounding context.
  *
  * @author      Gann Bierner
- * @version $Revision: 1.18 $, $Date: 2005/11/29 18:01:48 $
+ * @version $Revision: 1.19 $, $Date: 2006/01/16 17:55:31 $
  */
 public class POSTaggerME implements Evalable, POSTagger {
 
