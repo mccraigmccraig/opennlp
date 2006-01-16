@@ -129,7 +129,7 @@ public class NameFinder extends NameFinderME {
       if (commonParent != null) {
         Span nameSpan = new Span(startToken.getSpan().getStart(),endToken.getSpan().getEnd());
         if (nameSpan.equals(commonParent.getSpan())) {
-          commonParent.insert(new Parse(commonParent.getText(),nameSpan,tag,1.0));
+          commonParent.insert(new Parse(commonParent.getText(),nameSpan,tag,1.0,endToken.getHeadIndex()));
         }
         else {
           Parse[] kids = commonParent.getChildren();
@@ -140,13 +140,13 @@ public class NameFinder extends NameFinderME {
             }
           }
           if (!crossingKids) {
-            commonParent.insert(new Parse(commonParent.getText(),nameSpan,tag,1.0));
+            commonParent.insert(new Parse(commonParent.getText(),nameSpan,tag,1.0,endToken.getHeadIndex()));
           }
           else {
             if (commonParent.getType().equals("NP")) {
               Parse[] grandKids = kids[0].getChildren();
               if (grandKids.length > 1 && nameSpan.contains(grandKids[grandKids.length-1].getSpan())) {
-                commonParent.insert(new Parse(commonParent.getText(),commonParent.getSpan(),tag,1.0));
+                commonParent.insert(new Parse(commonParent.getText(),commonParent.getSpan(),tag,1.0,commonParent.getHeadIndex()));
               }
             }
           }
