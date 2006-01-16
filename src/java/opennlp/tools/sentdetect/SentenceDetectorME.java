@@ -37,6 +37,7 @@ import opennlp.maxent.IntegerPool;
 import opennlp.maxent.MaxentModel;
 import opennlp.maxent.PlainTextByLineDataStream;
 import opennlp.maxent.io.SuffixSensitiveGISModelWriter;
+import opennlp.tools.lang.thai.SentenceContextGenerator;
 import opennlp.tools.util.Pair;
 
 /**
@@ -45,7 +46,7 @@ import opennlp.tools.util.Pair;
  * string to determine if they signify the end of a sentence.
  *
  * @author      Jason Baldridge and Tom Morton
- * @version     $Revision: 1.13 $, $Date: 2005/12/07 12:55:40 $
+ * @version     $Revision: 1.14 $, $Date: 2006/01/16 17:54:16 $
  */
 
 public class SentenceDetectorME implements SentenceDetector {
@@ -64,6 +65,8 @@ public class SentenceDetectorME implements SentenceDetector {
   
   /** The list of probabilities associated with each decision. */
   private List sentProbs;
+  
+  protected boolean useTokenEnd;
 
   /**
    * Constructor which takes a MaxentModel and calls the three-arg
@@ -74,7 +77,7 @@ public class SentenceDetectorME implements SentenceDetector {
    *          evaluate end-of-sentence decisions.
    */
   public SentenceDetectorME(MaxentModel m) {
-    this(m, new SDContextGenerator(DefaultEndOfSentenceScanner.eosCharacters), new DefaultEndOfSentenceScanner());
+    this(m, new SDContextGenerator(opennlp.tools.lang.english.EndOfSentenceScanner.eosCharacters), new opennlp.tools.lang.english.EndOfSentenceScanner());
   }
 
   /**
@@ -88,7 +91,7 @@ public class SentenceDetectorME implements SentenceDetector {
    *           evaluate.
    */
   public SentenceDetectorME(MaxentModel m, ContextGenerator cg) {
-    this(m, cg, new DefaultEndOfSentenceScanner());
+    this(m, cg, new opennlp.tools.lang.english.EndOfSentenceScanner());
   }
 
   /**
@@ -122,11 +125,14 @@ public class SentenceDetectorME implements SentenceDetector {
 	return new String[] {s};
     }
 
-    boolean leftover = starts[starts.length - 1] != s.length();
+    boolean leftover = starts[starts.length - 1] != s.length() && useTokenEnd;
+    //System.err.println("sentDetect leftover="+leftover+" length="+s.length());
     String[] sents = new String[leftover? starts.length + 1 : starts.length];
     sents[0] = s.substring(0,starts[0]);
+    //System.err.println("sentDetect:0 "+starts[0]);
     for (int si = 1; si < starts.length; si++) {
       sents[si] = s.substring(starts[si - 1], starts[si]);
+      //System.err.println("sentDetect:"+si+" "+starts[si]);
     }
 
     if (leftover) {
@@ -176,9 +182,15 @@ public class SentenceDetectorME implements SentenceDetector {
       double[] probs = model.eval(cgen.getContext(pair));
       String bestOutcome = model.getBestOutcome(probs);
       sentProb *= probs[model.getIndex(bestOutcome)];
+      //System.err.println("sentPosDetect: cand="+cint+" index="+index+" "+bestOutcome+" "+probs[model.getIndex(bestOutcome)]+" "+s.substring(0,cint));
       if (bestOutcome.equals("T") && isAcceptableBreak(s, index, cint)) {
         if (index != cint) {
-          positions.add(INT_POOL.get(getFirstNonWS(s, getFirstWS(s,cint + 1))));
+          if (useTokenEnd) {
+            positions.add(INT_POOL.get(getFirstNonWS(s, getFirstWS(s,cint + 1))));
+          }
+          else {
+            positions.add(INT_POOL.get(getFirstNonWS(s,cint)));
+          }
           sentProbs.add(new Double(probs[model.getIndex(bestOutcome)]));
         }
         index = cint + 1;
@@ -246,7 +258,11 @@ public class SentenceDetectorME implements SentenceDetector {
   }
   
   private static void usage() {
-    System.err.println("Usage: SentenceDetectorME trainData modelName");
+    System.err.println("Usage: SentenceDetectorME [-encoding charset] [-lang language] trainData modelName");
+    System.err.println("-encoding charset specifies the encoding which should be used ");
+    System.err.println("                  for reading and writing text.");
+    System.err.println("-lang language    specifies the language (english|spanish|thai) which ");
+    System.err.println("                  is being processed.");
     System.exit(1);    
   }
 
@@ -259,6 +275,10 @@ public class SentenceDetectorME implements SentenceDetector {
   public static void main(String[] args) throws IOException {
     int ai=0;
     String encoding = null;
+    String lang = null;
+    if (args.length == 0) {
+      usage();
+    }
     while (args[ai].startsWith("-")) {
       if (args[ai].equals("-encoding")) {
         ai++;
@@ -270,13 +290,40 @@ public class SentenceDetectorME implements SentenceDetector {
           usage();
         }
       }
+      else if (args[ai].equals("-lang")) {
+        ai++;
+        if (ai < args.length) {
+          lang = args[ai];
+          ai++;
+        }
+        else {
+          usage();
+        }
+      }
+      else {
+        usage();
+      }
     }
+    
     File inFile = new File(args[ai++]);
     File outFile = new File(args[ai++]);
     GISModel mod;
     
     try {
-      EventStream es = new SDEventStream(new PlainTextByLineDataStream(new InputStreamReader(new FileInputStream(inFile),encoding)));
+      EndOfSentenceScanner scanner = null;
+      SDContextGenerator cg = null;
+      if (lang == null || lang.equals("english") || lang.equals("spanish")) {
+        scanner = new opennlp.tools.lang.english.EndOfSentenceScanner();
+        cg = new SDContextGenerator(scanner.getEndOfSentenceCharacters());
+      }
+      else if (lang.equals("thai")) {
+        scanner = new opennlp.tools.lang.thai.EndOfSentenceScanner();
+        cg = new SentenceContextGenerator();
+      }
+      else {
+        usage();
+      }
+      EventStream es = new SDEventStream(new PlainTextByLineDataStream(new InputStreamReader(new FileInputStream(inFile),encoding)),scanner,cg);
 
       if (args.length > ai)
         mod = train(es, Integer.parseInt(args[ai++]), Integer.parseInt(args[ai++]));
