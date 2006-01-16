@@ -84,7 +84,7 @@ public class TokSpanEventStream implements EventStream {
             }
             else {
               System.err.println(
-                "Bad training token: " + tokens[ti] + " cand: " + cSpan);
+                "Bad training token: " + tokens[ti] + " cand: " + cSpan+" token="+text.substring(tokens[ti].getStart(),tokens[ti].getEnd()));
             }
           }
           // create training data
