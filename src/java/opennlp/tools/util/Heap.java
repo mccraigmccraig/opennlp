@@ -17,6 +17,8 @@
 //////////////////////////////////////////////////////////////////////////////
 package opennlp.tools.util;
 
+import java.util.Iterator;
+
 /** Inteface for interacting with a Heap data structure.  
  * This implementation extract objects from smallest to largest based on either
  * their natural ordering or the comparator provided to an implementation.
@@ -35,11 +37,17 @@ public interface Heap  {
    * Returns the smallest element of the heap.
    * @return The top element of the heap.
    */
-  public Object top();
+  public Object first();
+  
+  /**
+   * Returns the largest element of the heap.
+   * @return The largest element of the heap.
+   */
+  public Object last();
   
   /**
    * Adds the specified object to the heap.
-   * @param o The objec tto add to the heap.
+   * @param o The object to add to the heap.
    */
   public void add(Object o);
   
@@ -55,9 +63,16 @@ public interface Heap  {
   */
   public boolean isEmpty();
 
+  /**
+   * Returns an iterator over the elements of the heap.  No specific ordering of these 
+   * elements is gaurenteed. 
+   * @return An iterator over the elements of the heap.
+   */
+  public Iterator iterator();
   
   /**
    * Clears the contents of the heap.
    */
   public void clear();
+  
 }

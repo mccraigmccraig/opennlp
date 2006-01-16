@@ -24,8 +24,10 @@ import java.util.Comparator;
 
 /**
  * This class implements the heap interface using a {@link java.util.List} as the underlying
- * data structure.  This heap allows values which are equals to be inserted, however
- * the order in which they are extracted is arbitrary.
+ * data structure.  This heap allows values which are equals to be inserted.  The heap will
+ * return the top K values which have been added where K is specified by the size passed to
+ * the constructor. K+1 values are not gaurenteed to be kept in the heap or returned in a
+ * particular order.     
  */
 public class ListHeap implements Heap {
   private List list;
@@ -38,7 +40,7 @@ public class ListHeap implements Heap {
 
   /**
    * Creates a new heap with the specified size using the sorted based on the
-   * specified comparator.
+   * specified comparator.  
    * @param sz The size of the heap.
    * @param c The comparator to be used to sort heap elements.
    */
@@ -138,32 +140,22 @@ public class ListHeap implements Heap {
     return top;
   }
 
-  public void setSize() {
-    setSize(size);
-  }
-
-  public void setSize(int sz) {
-    if (sz > list.size()) {
-      return;
-    }
-    else {
-      List t = new ArrayList(sz);
-      for (int i = 0; i < sz; i++) {
-        t.add(this.extract());
-      }
-      list = t;
-    }
-  }
-
-  public Object top() {
+  public Object first() {
     if (list.size() == 0) {
       throw new RuntimeException("Heap Underflow");
     }
     return (list.get(0));
   }
+  
+  public Object last() {
+    if (list.size() == 0) {
+      throw new RuntimeException("Heap Underflow");
+    }
+    return (max);
+  }
 
   public void add(Object o) {
-    /* keep track of min to prevent unnecessary insertion */
+    /* keep track of max to prevent unnecessary insertion */
     if (max == null) {
       max = o;
     }

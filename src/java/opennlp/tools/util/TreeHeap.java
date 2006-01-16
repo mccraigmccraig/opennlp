@@ -1,5 +1,6 @@
 package opennlp.tools.util;
 
+import java.util.Iterator;
 import java.util.SortedSet;
 import java.util.TreeSet;
 
@@ -33,8 +34,16 @@ public class TreeHeap implements Heap {
     return rv;
   }
 
-  public Object top() {
+  public Object first() {
     return tree.first();
+  }
+  
+  public Object last() {
+    return tree.last();
+  }
+  
+  public Iterator iterator() {
+    return tree.iterator();
   }
 
   public void add(Object o) {
@@ -48,10 +57,6 @@ public class TreeHeap implements Heap {
   public void clear() {
     tree.clear();
   }
-
-  public void setSize() {}
-
-  public void setSize(int size) {}
   
   public boolean isEmpty(){
     return this.tree.isEmpty();
