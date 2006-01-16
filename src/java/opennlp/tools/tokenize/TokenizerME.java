@@ -19,14 +19,12 @@
 package opennlp.tools.tokenize;
 
 import java.io.File;
-import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Pattern;
 
 import opennlp.maxent.ContextGenerator;
-import opennlp.maxent.EventCollectorAsStream;
 import opennlp.maxent.EventStream;
 import opennlp.maxent.GISModel;
 import opennlp.maxent.MaxentModel;
@@ -43,7 +41,7 @@ import opennlp.tools.util.Span;
  * homepage: <http://www.cis.upenn.edu/~jcreynar>.
  *
  * @author      Tom Morton
- * @version $Revision: 1.12 $, $Date: 2005/11/21 23:08:02 $
+ * @version $Revision: 1.13 $, $Date: 2006/01/16 17:49:39 $
  */
 
 public class TokenizerME implements Tokenizer {
@@ -199,7 +197,7 @@ public class TokenizerME implements Tokenizer {
   }
 
   public static void train(EventStream evc, File output) throws IOException {
-    GISModel tokModel = opennlp.maxent.GIS.trainModel(100,new TwoPassDataIndexer(evc, 5),true);
+    GISModel tokModel = opennlp.maxent.GIS.trainModel(100,new TwoPassDataIndexer(evc, 5),true,true);
     new SuffixSensitiveGISModelWriter(tokModel, output).persist();
   }
 
