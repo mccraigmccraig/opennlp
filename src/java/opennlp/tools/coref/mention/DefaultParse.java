@@ -26,7 +26,7 @@ import java.util.Set;
 
 import opennlp.tools.lang.english.NameFinder;
 import opennlp.tools.parser.Parse;
-import opennlp.tools.parser.ParserME;
+import opennlp.tools.parser.chunking.Parser;
 import opennlp.tools.util.Span;
 
 /**
@@ -156,7 +156,7 @@ public class DefaultParse extends AbstractParse {
   }
 
   public boolean isSentence() {
-    return parse.getType().equals(ParserME.TOP_NODE);
+    return parse.getType().equals(Parser.TOP_NODE);
   }
 
   public boolean isToken() {
