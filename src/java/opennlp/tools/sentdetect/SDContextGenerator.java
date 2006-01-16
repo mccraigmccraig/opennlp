@@ -31,13 +31,15 @@ import opennlp.tools.util.Pair;
  *
  * @author      Jason Baldridge
  * @author      Eric D. Friedman
- * @version     $Revision: 1.3 $, $Date: 2004/01/27 22:12:07 $
+ * @version     $Revision: 1.4 $, $Date: 2006/01/16 17:53:20 $
  */
 
 public class SDContextGenerator implements ContextGenerator {
 
-  private StringBuffer buf = new StringBuffer();
-  private List collectFeats = new ArrayList();
+  /** String buffer for generating features. */
+  protected StringBuffer buf;
+  /** List for holding features as they are generated. */
+  protected List collectFeats;
   private Set inducedAbbreviations;
   private char[] eosCharacters;
 
@@ -61,13 +63,30 @@ public class SDContextGenerator implements ContextGenerator {
   public SDContextGenerator(Set inducedAbbreviations, char[] eosCharacters) {
     this.inducedAbbreviations = inducedAbbreviations;
     this.eosCharacters = eosCharacters;
+    buf = new StringBuffer();
+    collectFeats = new ArrayList();
   }
-
-  /**
-   * Builds up the list of features, anchored around a position within the
-   * StringBuffer. 
-   */
+  
   public String[] getContext(Object o) {
+    Object first = ((Pair) o).a;
+    int position = ((Integer) ((Pair) o).b).intValue();
+    if (first instanceof String[]) {
+      return getContext((String[])first, position);
+    }
+    else {
+      return getContext((StringBuffer) first,position);
+    }
+  }
+  
+  /**
+   * Returns an array of contextual features for the potential sentence boundry at the
+   * specified position within the specified string buffer. 
+   * @param sb The string buffer for whihch sentences are being determined.
+   * @param position An index into the specified string buffer when a sentece boundry may occur.
+   * @return an array of contextual features for the potential sentence boundry at the
+   * specified position within the specified string buffer.
+   */
+  public String[] getContext(StringBuffer sb, int position) {
     /** String preceeding the eos character in the eos token. */
     String prefix;
     /** Space delimited token preceeding token containing eos character. */
@@ -76,75 +95,108 @@ public class SDContextGenerator implements ContextGenerator {
     String suffix;
     /** Space delimited token following token containsing eos character. */
     String next;
-    Object first = ((Pair) o).a;
-    /** Character offset of eos character in */
-    int position = ((Integer) ((Pair) o).b).intValue();
-
-    if (first instanceof String[]) {
-      String[] $_ = (String[]) first;
-      previous = $_[0];
-      String current = $_[1];
-      prefix = current.substring(0, position);
-      suffix = current.substring(position + 1);
-      if (suffix.startsWith(" "))
+    
+    int lastIndex = sb.length() - 1;
+    { // compute space previous and space next features.
+      if (position > 0 && sb.charAt(position - 1) == ' ')
+        collectFeats.add("sp");
+      if (position < lastIndex && sb.charAt(position + 1) == ' ')
         collectFeats.add("sn");
-      if (prefix.endsWith(" "))
-        collectFeats.add("pn");
-      collectFeats.add("eos=" + current.charAt(position));
-      next = $_[2];
+      collectFeats.add("eos=" + sb.charAt(position));
     }
-    else { //compute previous, next, prefix and suffix Strings and space previous, space next features and eos features. 
-      StringBuffer sb = (StringBuffer) ((Pair) o).a;
-      int lastIndex = sb.length() - 1;
-      { // compute space previous and space next features.
-        if (position > 0 && sb.charAt(position - 1) == ' ')
-          collectFeats.add("sp");
-        if (position < lastIndex && sb.charAt(position + 1) == ' ')
-          collectFeats.add("sn");
-        collectFeats.add("eos=" + sb.charAt(position));
-      }
-      int prefixStart = previousSpaceIndex(sb, position);
-
-      int c = position;
-      { ///assign prefix, stop if you run into a period though otherwise stop at space
-        while (--c > prefixStart) {
-          for (int eci = 0, ecl = eosCharacters.length; eci < ecl; eci++) {
-            if (sb.charAt(c) == eosCharacters[eci]) {
-              prefixStart = c;
-              c++; // this gets us out of while loop.
-              break;
-            }
-          }
-        }
-        prefix = sb.substring(prefixStart, position).trim();
-      }
-      int prevStart = previousSpaceIndex(sb, prefixStart);
-      previous = sb.substring(prevStart, prefixStart).trim();
-
-      int suffixEnd = nextSpaceIndex(sb, position, lastIndex);
-      {
-        c = position;
-        while (++c < suffixEnd) {
-          for (int eci = 0, ecl = eosCharacters.length; eci < ecl; eci++) {
-            if (sb.charAt(c) == eosCharacters[eci]) {
-              suffixEnd = c;
-              c--; // this gets us out of while loop.
-              break;
-            }
+    int prefixStart = previousSpaceIndex(sb, position);
+    
+    int c = position;
+    { ///assign prefix, stop if you run into a period though otherwise stop at space
+      while (--c > prefixStart) {
+        for (int eci = 0, ecl = eosCharacters.length; eci < ecl; eci++) {
+          if (sb.charAt(c) == eosCharacters[eci]) {
+            prefixStart = c;
+            c++; // this gets us out of while loop.
+            break;
           }
         }
       }
-      int nextEnd = nextSpaceIndex(sb, suffixEnd + 1, lastIndex + 1);
-      if (position == lastIndex) {
-        suffix = "";
-        next = "";
-      }
-      else {
-        suffix = sb.substring(position + 1, suffixEnd).trim();
-        next = sb.substring(suffixEnd + 1, nextEnd).trim();
+      prefix = sb.substring(prefixStart, position).trim();
+    }
+    int prevStart = previousSpaceIndex(sb, prefixStart);
+    previous = sb.substring(prevStart, prefixStart).trim();
+    
+    int suffixEnd = nextSpaceIndex(sb, position, lastIndex);
+    {
+      c = position;
+      while (++c < suffixEnd) {
+        for (int eci = 0, ecl = eosCharacters.length; eci < ecl; eci++) {
+          if (sb.charAt(c) == eosCharacters[eci]) {
+            suffixEnd = c;
+            c--; // this gets us out of while loop.
+            break;
+          }
+        }
       }
     }
-
+    int nextEnd = nextSpaceIndex(sb, suffixEnd + 1, lastIndex + 1);
+    if (position == lastIndex) {
+      suffix = "";
+      next = "";
+    }
+    else {
+      suffix = sb.substring(position + 1, suffixEnd).trim();
+      next = sb.substring(suffixEnd + 1, nextEnd).trim();
+    }
+    
+    collectFeatures(prefix,suffix,previous,next);
+    
+    String[] context = new String[collectFeats.size()];
+    context = (String[]) collectFeats.toArray(context);
+    collectFeats.clear();
+    return context;
+  }
+  
+  /**
+   * Creates features for the specified array of tokens at the specified posiiton index.
+   * @param first The tokens.
+   * @param position The index of the token where the decision is being made.
+   * @return The features to predict sentence a sentence boundry at in the 
+   * specified tokens at the specified position. 
+   */
+  public String[] getContext(String[] first, int position) {
+    /** String preceeding the eos character in the eos token. */
+    String prefix;
+    /** Space delimited token preceeding token containing eos character. */
+    String previous;
+    /** String following the eos character in the eos token. */
+    String suffix;
+    /** Space delimited token following token containsing eos character. */
+    String next;
+    
+    String[] $_ = (String[]) first;
+    previous = $_[0];
+    String current = $_[1];
+    prefix = current.substring(0, position);
+    suffix = current.substring(position + 1);
+    if (suffix.startsWith(" "))
+      collectFeats.add("sn");
+    if (prefix.endsWith(" "))
+      collectFeats.add("pn");
+    collectFeats.add("eos=" + current.charAt(position));
+    next = $_[2];
+    
+    collectFeatures(prefix,suffix,previous,next);
+    String[] context = new String[collectFeats.size()];
+    context = (String[]) collectFeats.toArray(context);
+    collectFeats.clear();
+    return context;
+  }
+  
+  /**
+   * Determines some of the features for the sentence detector and adds them to list features.
+   * @param prefix String preceeding the eos character in the eos token.
+   * @param suffix String following the eos character in the eos token.
+   * @param previous Space delimited token preceeding token containing eos character.
+   * @param next Space delimited token following token containsing eos character.
+   */
+  protected void collectFeatures(String prefix, String suffix, String previous, String next) {
     buf.append("x=");
     buf.append(prefix);
     collectFeats.add(buf.toString());
@@ -197,11 +249,6 @@ public class SDContextGenerator implements ContextGenerator {
         collectFeats.add("nabbrev");
       }
     }
-
-    String[] context = new String[collectFeats.size()];
-    context = (String[]) collectFeats.toArray(context);
-    collectFeats.clear();
-    return context;
   }
 
   private static final boolean isFirstUpper(String s) {

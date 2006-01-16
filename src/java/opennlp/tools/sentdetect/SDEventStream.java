@@ -17,15 +17,14 @@
 //////////////////////////////////////////////////////////////////////////////   
 package opennlp.tools.sentdetect;
 
+import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.Iterator;
 
-import opennlp.maxent.ContextGenerator;
 import opennlp.maxent.DataStream;
 import opennlp.maxent.Event;
 import opennlp.maxent.EventStream;
 import opennlp.maxent.PlainTextByLineDataStream;
-import opennlp.tools.util.Pair;
 
 /**
  * An implementation of EventStream which assumes that it is receiving
@@ -37,13 +36,14 @@ import opennlp.tools.util.Pair;
  *
  * @author      Jason Baldridge
  * @author      Eric D. Friedman
- * @version     $Revision: 1.3 $, $Date: 2004/01/27 22:12:07 $
+ * @author      Thomas Morton
+ * @version     $Revision: 1.4 $, $Date: 2006/01/16 17:53:47 $
  */
 public class SDEventStream implements EventStream {
     private DataStream data;
     private String next;
     private SDEvent head = null, tail = null;
-    private ContextGenerator cg;
+    private SDContextGenerator cg;
     private StringBuffer sBuffer = new StringBuffer();
     private EndOfSentenceScanner scanner;
 
@@ -54,7 +54,7 @@ public class SDEventStream implements EventStream {
      * @param d a <code>DataStream</code> value
      */
     public SDEventStream(DataStream d) {
-      this(d,new DefaultEndOfSentenceScanner(), new SDContextGenerator(DefaultEndOfSentenceScanner.eosCharacters));
+      this(d,new opennlp.tools.lang.english.EndOfSentenceScanner(), new SDContextGenerator(opennlp.tools.lang.english.EndOfSentenceScanner.eosCharacters));
     }
     
     /**
@@ -62,16 +62,18 @@ public class SDEventStream implements EventStream {
      * sentence endings.
      */
     public SDEventStream (DataStream d, EndOfSentenceScanner s) {
-      this(d,s,new SDContextGenerator(DefaultEndOfSentenceScanner.eosCharacters));
+      this(d,s,new SDContextGenerator(s.getEndOfSentenceCharacters()));
     }
 
-    public SDEventStream(DataStream d, EndOfSentenceScanner s, ContextGenerator cg) {
+    public SDEventStream(DataStream d, EndOfSentenceScanner s, SDContextGenerator cg) {
         data = d;
         scanner = s;
         this.cg = cg;
         if (data.hasNext()) {
           String current = (String) data.nextToken();
-          if (data.hasNext()) next = (String)data.nextToken();
+          if (data.hasNext()) {
+            next = (String)data.nextToken();
+          }
           addNewEvents(current);
         } 
     }
@@ -88,9 +90,9 @@ public class SDEventStream implements EventStream {
     private void addNewEvents (String s) {
         StringBuffer sb = sBuffer;
         sb.append(s.trim());        
-        int sentEndPos = sb.length()-1;
         //add following word to sb
-        if(next !=null && !s.equals("")) {
+        if (!s.equals("")) {
+          if(next !=null) { 
             int posAfterFirstWordInNext = next.indexOf(" ");
             if (posAfterFirstWordInNext != -1) {
                 // should maybe changes this so that it usually adds a space
@@ -98,14 +100,20 @@ public class SDEventStream implements EventStream {
                 sb.append(" ");
                 sb.append(next.substring(0, posAfterFirstWordInNext));
             }
+            else {
+              sb.append(" ");
+              sb.append(next);
+            }
+          }
+          else {
+            sb.append(" ");
+          }
         }
-
-        for (Iterator i = scanner.getPositions(sb).iterator();
-             i.hasNext();) {
+        //TODO: Should only send sentence string to scanner, and sentence + next word to context generator.
+        for (Iterator i = scanner.getPositions(sb).iterator();i.hasNext();) {
             Integer candidate = (Integer)i.next();
-            Pair p = new Pair(sb, candidate);
-            String type = (candidate.intValue() == sentEndPos) ? "T" : "F";
-            SDEvent evt = new SDEvent(type,cg.getContext(p));
+            String type = (i.hasNext()) ? "F" : "T";
+            SDEvent evt = new SDEvent(type,cg.getContext(sb,candidate.intValue()));
 
             if (null != tail) {
                 tail.next = evt;
@@ -134,8 +142,54 @@ public class SDEventStream implements EventStream {
         return (null != head);
     }
     
-    public static void main(String[] args) {
-      EventStream es =  new SDEventStream(new PlainTextByLineDataStream(new InputStreamReader(System.in)));
+    private static void usage() {
+      System.err.println("SDEventStream [-encoding charset] [-lang (english|spanish|thai)] < trainingData");
+      System.exit(1);
+    }
+    
+    public static void main(String[] args) throws IOException {
+      int ai=0;
+      String encoding = "US-ASCII";
+      String lang = "english";
+      while (ai <args.length && args[ai].startsWith("-")) {
+        if (args[ai].equals("-encoding")) {
+          ai++;
+          if (ai < args.length) {
+            encoding = args[ai];
+            ai++;
+          }
+          else {
+            usage();
+          }
+        }
+        else if (args[ai].equals("-lang")) {
+          ai++;
+          if (ai < args.length) {
+            lang = args[ai];
+            ai++;
+          }
+          else {
+            usage();
+          }
+        }
+        else {
+          usage();
+        }
+      }
+      EndOfSentenceScanner scanner = null;
+      SDContextGenerator cg = null;
+      if (lang == null || lang.equals("english") || lang.equals("spanish")) {
+        scanner = new opennlp.tools.lang.english.EndOfSentenceScanner();
+        cg = new SDContextGenerator(scanner.getEndOfSentenceCharacters());
+      }
+      else if (lang.equals("thai")) {
+        scanner = new opennlp.tools.lang.thai.EndOfSentenceScanner();
+        cg = new opennlp.tools.lang.thai.SentenceContextGenerator();
+      }
+      else {
+        usage();
+      }
+      EventStream es =  new SDEventStream(new PlainTextByLineDataStream(new InputStreamReader(System.in,encoding)),scanner,cg);
       while(es.hasNext()) {
         System.out.println(es.nextEvent());
       }
