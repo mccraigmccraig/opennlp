@@ -18,6 +18,7 @@
 package opennlp.tools.postag;
 
 import java.io.BufferedReader;
+import java.io.FileInputStream;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -33,18 +34,35 @@ public class POSDictionary implements TagDictionary {
   private Map dictionary;
   private boolean caseSensitive;
 
-  public POSDictionary(String file) throws IOException {
-    this(file, true);
-  }
-
   /**
-   * Create tag dictionary object with contents of specified file and using specified case to determine how to access entries in the tag dictionary.
+   * Creates a tag dictionary with contents of specified file.
+   * @param file The file name for the tag dictionary.
+   * @throws IOException when the specified file can not be read.
+   */
+  public POSDictionary(String file) throws IOException {
+    this(file, null, true);
+  }
+  
+  /**
+   * Creates a tag dictionary with contents of specified file and using specified case to determine how to access entries in the tag dictionary.
    * @param file The file name for the tag dictionary.
    * @param caseSensitive Specifies whether the tag dictionary is case sensitive or not.
    * @throws IOException when the specified file can not be read.
    */
   public POSDictionary(String file, boolean caseSensitive) throws IOException {
-    this(new BufferedReader(new FileReader(file)), caseSensitive);
+    this(file, null, caseSensitive);
+  }
+
+
+  /**
+   * Creates a tag dictionary with contents of specified file and using specified case to determine how to access entries in the tag dictionary.
+   * @param file The file name for the tag dictionary.
+   * @param encoding The encoding of the tag dictionary file.
+   * @param caseSensitive Specifies whether the tag dictionary is case sensitive or not.
+   * @throws IOException when the specified file can not be read.
+   */
+  public POSDictionary(String file, String encoding, boolean caseSensitive) throws IOException {
+    this(new BufferedReader((encoding == null) ? new FileReader(file) : new InputStreamReader(new FileInputStream(file),encoding)), caseSensitive);
   }
 
   /**
