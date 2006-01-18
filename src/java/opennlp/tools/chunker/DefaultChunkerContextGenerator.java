@@ -18,7 +18,6 @@
 
 package opennlp.tools.chunker;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import opennlp.tools.util.Sequence;
@@ -49,13 +48,15 @@ public class DefaultChunkerContextGenerator implements ChunkerContextGenerator {
   }  
   
   public String[] getContext(int i, Object[] toks, String[] tags, String[] preds) {
-    List features = new ArrayList(45);
-    /** Words in a 5-word window **/
+	// Words in a 5-word window
     String w_2, w_1, w0, w1, w2;
-    /** Tags in a 5-word window **/
+    
+    // Tags in a 5-word window
     String t_2, t_1, t0, t1, t2;
-    /** Previous predictions **/
+    
+    // Previous predictions
     String p_2, p_1;
+    
     if (i < 2) {
       w_2 = "w_2=bos";
       t_2 = "t_2=bos";
@@ -66,6 +67,7 @@ public class DefaultChunkerContextGenerator implements ChunkerContextGenerator {
       t_2 = "t_2=" + tags[i - 2];
       p_2 = "p_2" + preds[i - 2];
     }
+    
     if (i < 1) {
       w_1 = "w_1=bos";
       t_1 = "t_1=bos";
@@ -76,8 +78,10 @@ public class DefaultChunkerContextGenerator implements ChunkerContextGenerator {
       t_1 = "t_1=" + tags[i - 1];
       p_1 = "p_1=" + preds[i - 1];
     }
+    
     w0 = "w0=" + toks[i];
     t0 = "t0=" + tags[i];
+    
     if (i + 1 >= toks.length) {
       w1 = "w1=eos";
       t1 = "t1=eos";
@@ -86,6 +90,7 @@ public class DefaultChunkerContextGenerator implements ChunkerContextGenerator {
       w1 = "w1=" + toks[i + 1];
       t1 = "t1=" + tags[i + 1];
     }
+    
     if (i + 2 >= toks.length) {
       w2 = "w2=eos";
       t2 = "t2=eos";
@@ -94,53 +99,61 @@ public class DefaultChunkerContextGenerator implements ChunkerContextGenerator {
       w2 = "w2=" + toks[i + 2];
       t2 = "t2=" + tags[i + 2];
     }
-    //add word features
-    features.add(w_2);
-    features.add(w_1);
-    features.add(w0);
-    features.add(w1);
-    features.add(w2);
-    features.add(w_1 + w0);
-    features.add(w0 + w1);
-    //add tag features
-    features.add(t_2);
-    features.add(t_1);
-    features.add(t0);
-    features.add(t1);
-    features.add(t2);
-    features.add(t_2 + t_1);
-    features.add(t_1 + t0);
-    features.add(t0 + t1);
-    features.add(t1 + t2);
-    features.add(t_2 + t_1 + t0);
-    features.add(t_1 + t0 + t1);
-    features.add(t0 + t1 + t2);
-    //add pred tags
-    features.add(p_2);
-    features.add(p_1);
-    features.add(p_2 + p_1);
-    //add pred and tag
-    features.add(p_1 + t_2);
-    features.add(p_1 + t_1);
-    features.add(p_1 + t0);
-    features.add(p_1 + t1);
-    features.add(p_1 + t2);
-    features.add(p_1 + t_2 + t_1);
-    features.add(p_1 + t_1 + t0);
-    features.add(p_1 + t0 + t1);
-    features.add(p_1 + t1 + t2);
-    features.add(p_1 + t_2 + t_1 + t0);
-    features.add(p_1 + t_1 + t0 + t1);
-    features.add(p_1 + t0 + t1 + t2);
-    //add pred and word
-    features.add(p_1 + w_2);
-    features.add(p_1 + w_1);
-    features.add(p_1 + w0);
-    features.add(p_1 + w1);
-    features.add(p_1 + w2);
-    features.add(p_1 + w_1 + w0);
-    features.add(p_1 + w0 + w1);
-    return ((String[]) features.toArray(new String[features.size()]));
+    
+    String[] features = new String[] {
+        //add word features
+        w_2,
+        w_1,
+        w0,
+        w1,
+        w2,
+        w_1 + w0,
+        w0 + w1,
+    		
+        //add tag features
+        t_2,
+        t_1,
+        t0,
+        t1,
+        t2,
+        t_2 + t_1,
+        t_1 + t0,
+        t0 + t1,
+        t1 + t2,
+        t_2 + t_1 + t0,
+        t_1 + t0 + t1,
+        t0 + t1 + t2,
+        
+        //add pred tags
+        p_2,
+        p_1,
+        p_2 + p_1,
+        
+        //add pred and tag
+        p_1 + t_2,
+        p_1 + t_1,
+        p_1 + t0,
+        p_1 + t1,
+        p_1 + t2,
+        p_1 + t_2 + t_1,
+        p_1 + t_1 + t0,
+        p_1 + t0 + t1,
+        p_1 + t1 + t2,
+        p_1 + t_2 + t_1 + t0,
+        p_1 + t_1 + t0 + t1,
+        p_1 + t0 + t1 + t2,
+        
+        //add pred and word
+        p_1 + w_2,
+        p_1 + w_1,
+        p_1 + w0,
+        p_1 + w1,
+        p_1 + w2,
+        p_1 + w_1 + w0,
+        p_1 + w0 + w1
+    };
+    
+    return features;
   }
 
 }
