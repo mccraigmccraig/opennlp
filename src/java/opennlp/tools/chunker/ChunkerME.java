@@ -146,7 +146,7 @@ public class ChunkerME implements Chunker {
   }
 
   
-  private static GISModel train(opennlp.maxent.EventStream es, int iterations, int cut) throws java.io.IOException {
+  public static GISModel train(opennlp.maxent.EventStream es, int iterations, int cut) throws java.io.IOException {
     return opennlp.maxent.GIS.trainModel(iterations, new TwoPassDataIndexer(es, cut));
   }
 
