@@ -28,18 +28,15 @@ import opennlp.maxent.Event;
  * Created: Sat Oct 27 11:53:55 2001
  *
  * @author Eric D. Friedman
- * @version $Id: SDEvent.java,v 1.1 2003/11/05 03:31:04 tsmorton Exp $
+ * @version $Id: SDEvent.java,v 1.2 2006/01/19 01:01:29 joernkottmann Exp $
  */
 
 class SDEvent extends Event  {
-    SDEvent next;
+  private static final long serialVersionUID = 1;
+  
+  SDEvent next;
     
-    /**
-     * package access only
-     *
-     */
-    SDEvent(String oc, String[] c) {
-        super(oc,c);
-    }
-    
-} // SDEvent
+  SDEvent(String oc, String[] c) {
+    super(oc,c);
+  }   
+}
