@@ -18,38 +18,19 @@
 
 package opennlp.tools.postag;
 
-import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.Reader;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Iterator;
-import java.util.List;
-import java.util.StringTokenizer;
 
 import opennlp.maxent.DataStream;
-import opennlp.maxent.Evalable;
-import opennlp.maxent.EventCollector;
-import opennlp.maxent.EventStream;
 import opennlp.maxent.GISModel;
-import opennlp.maxent.MaxentModel;
-import opennlp.maxent.PlainTextByLineDataStream;
-import opennlp.maxent.TwoPassDataIndexer;
 import opennlp.maxent.io.SuffixSensitiveGISModelReader;
 import opennlp.tools.ngram.Dictionary;
-import opennlp.tools.ngram.MutableDictionary;
-import opennlp.tools.util.BeamSearch;
-import opennlp.tools.util.Pair;
-import opennlp.tools.util.Sequence;
 
 /**
  * Invoke a part-of-speech tagging model from the command line.
  *
  * @author   Jason Baldridge
- * @version $Revision: 1.3 $, $Date: 2005/11/15 18:08:52 $
+ * @version $Revision: 1.4 $, $Date: 2006/01/19 00:50:48 $
  */
 public class BatchTagger {
 
@@ -69,11 +50,11 @@ public class BatchTagger {
     }
     int ai=0;
     try {
-      String encoding = null;
+      //String encoding = null;
 
       String dictFile = "";
       String tagDictFile = "";
-      int cutoff = 0;
+      //int cutoff = 0;
       while (args[ai].startsWith("-")) {
 	if (args[ai].equals("-dict")) {
           ai++;

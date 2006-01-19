@@ -36,7 +36,6 @@ import opennlp.tools.coref.resolver.ProperNounResolver;
 import opennlp.tools.coref.resolver.ResolverMode;
 import opennlp.tools.coref.resolver.SingularPronounResolver;
 import opennlp.tools.coref.resolver.SpeechPronounResolver;
-import opennlp.tools.coref.sim.Context;
 import opennlp.tools.coref.sim.Gender;
 import opennlp.tools.coref.sim.MaxentCompatibilityModel;
 import opennlp.tools.coref.sim.Number;

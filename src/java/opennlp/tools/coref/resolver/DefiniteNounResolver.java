@@ -23,7 +23,6 @@ import java.util.List;
 
 import opennlp.tools.coref.DiscourseEntity;
 import opennlp.tools.coref.mention.MentionContext;
-import opennlp.tools.coref.mention.Parse;
 
 /**
  * Resolves coreference between definite noun-phrases. 

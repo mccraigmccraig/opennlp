@@ -19,17 +19,10 @@
 package opennlp.tools.postag;
 
 import java.io.BufferedReader;
-import java.io.IOException;
 import java.io.Reader;
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.Map;
-import java.util.Set;
 import java.util.StringTokenizer;
 
-import opennlp.maxent.Counter;
 import opennlp.maxent.Event;
 import opennlp.maxent.EventCollector;
 import opennlp.tools.util.Pair;
@@ -38,7 +31,7 @@ import opennlp.tools.util.Pair;
  * An event generator for the maxent POS Tagger.
  *
  * @author      Gann Bierner
- * @version     $Revision: 1.8 $, $Date: 2005/11/21 23:08:31 $
+ * @version     $Revision: 1.9 $, $Date: 2006/01/19 00:49:26 $
  */
 
 public class POSEventCollector implements EventCollector {

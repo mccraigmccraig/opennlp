@@ -17,7 +17,6 @@
 //////////////////////////////////////////////////////////////////////////////
 package opennlp.tools.coref.sim;
 
-import opennlp.tools.coref.mention.MentionContext;
 
 /**
  * Interface for testing a similarity model. 
