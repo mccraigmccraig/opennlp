@@ -28,6 +28,8 @@ import java.util.HashMap;
  */
 public class HashList extends HashMap {
 
+  private static final long serialVersionUID = 1;
+  
   public HashList() {
     super();
   }
