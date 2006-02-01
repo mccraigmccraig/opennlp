@@ -146,7 +146,7 @@ public abstract class AbstractMentionFinder implements MentionFinder {
     for (int ti = lastNpTokenIndex - 1; ti >= 0; ti--) {
       Parse tok = (Parse) npTokens.get(ti);
       String tokStr = tok.toString();
-      if (tokStr.equals("and") || tokStr.equals("or")) {
+      if ((tokStr.equals("and") || tokStr.equals("or")) && !isPartOfName(tok)) {
         if (lastNpTokenIndex != ti) {
           if (ti - 1 >= 0 && ((Parse) npTokens.get(ti - 1)).getSyntacticType().startsWith("NN")) {
             Span npSpan = new Span(((Parse) npTokens.get(ti + 1)).getSpan().getStart(), ((Parse) npTokens.get(lastNpTokenIndex)).getSpan().getEnd());
