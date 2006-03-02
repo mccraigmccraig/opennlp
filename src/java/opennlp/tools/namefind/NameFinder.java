@@ -20,6 +20,8 @@ package opennlp.tools.namefind;
 import java.util.List;
 import java.util.Map;
 
+import opennlp.tools.util.Span;
+
 /**
  * The interface for name finders which provide name tags for a sequence of tokens.
  * @author      Thomas Morton
@@ -39,4 +41,20 @@ public interface NameFinder {
    * @return an array of chunk tags for each token in the sequence.
    */
   public String[] find(Object[] toks, Map prevTags);
+
+  /** Generates name tags for the given sentence returng the result as an list 
+   * of spans.
+   * @param sentence - the sentence
+   * @param toks - a list of token spans
+   * @return a list of the detected name spans
+   */
+  public List find(String sentence, List toks, Map prevMap);
+  
+  /** Generates name tags for the given sentence returng the result as an array 
+   * of spans.
+   * @param sentence - the sentence
+   * @param toks - an array of token spans
+   * @return an array of the detected name spans
+   */
+  public Span[] find(String sentence, Span[] toks, Map prevMap);
 }
