@@ -21,6 +21,10 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
@@ -33,6 +37,7 @@ import opennlp.maxent.TwoPassDataIndexer;
 import opennlp.maxent.io.SuffixSensitiveGISModelWriter;
 import opennlp.tools.util.BeamSearch;
 import opennlp.tools.util.Sequence;
+import opennlp.tools.util.Span;
 
 /**
  * Class for creating a maximum-entropy-based name finder.  
@@ -90,6 +95,83 @@ public class NameFinderME implements NameFinder {
     return (String[]) c.toArray(new String[c.size()]);
   }
 
+  /* inherieted javadoc */
+  public List find(String sentence, List toks, Map prevMap) {
+
+    List tokenStrings = new LinkedList();
+    Iterator tokenIterator = toks.iterator();
+
+    while (tokenIterator.hasNext()) {
+      Span tokenSpan = (Span) tokenIterator.next();
+      tokenStrings.add(sentence.substring(tokenSpan.getStart(), 
+          tokenSpan.getEnd()));
+    }
+
+    List result = find(tokenStrings, prevMap);
+
+    List detectedNames = new LinkedList();
+
+    Span startSpan = null;
+    Span endSpan = null;
+
+    boolean insideName = false;
+
+    int length = tokenStrings.size();
+
+    for (int i = 0; i < length; i++) {
+
+      Span annotation = (Span) toks.get(i);
+
+      if (insideName) {
+
+        // check if insideName ends here
+        if (!result.get(i).equals(NameFinderME.CONTINUE)) {
+
+          Span entitySpan = new Span(startSpan.getStart(), endSpan.getEnd()
+              - startSpan.getStart());
+
+          detectedNames.add(entitySpan);
+
+          startSpan = null;
+          insideName = false;
+          endSpan = null;
+        }
+      } 
+      else {
+        if (result.get(i).equals(NameFinderME.START)) {
+          startSpan = annotation;
+          insideName = true;
+        }
+      }
+
+      if (insideName) {
+        endSpan = annotation;
+      }
+    }
+
+    // is last start in sent
+    if (insideName) {
+      Span entitySpan = startSpan;
+
+      detectedNames.add(entitySpan);
+    }
+
+    return detectedNames;
+  }
+  
+  /* inherieted javadoc */
+  public Span[] find(String sentence, Span[] toks, Map prevMap) {
+    
+    List tokList = new LinkedList();
+    Collections.addAll(tokList, toks);
+    
+    List resultList = find(sentence, tokList, prevMap);
+    
+    Span[] result = new Span[toks.length];
+    resultList.toArray(result);
+    
+    return result;
+  }
   /** 
    * This method determines wheter the outcome is valid for the preceeding sequence.  
    * This can be used to implement constraints on what sequences are valid.  
@@ -151,6 +233,70 @@ public class NameFinderME implements NameFinder {
   public double[] probs() {
     return bestSequence.getProbs();
   }
+  
+  /**
+   * Creates the map with the previous result.
+   * 
+   * @param token -
+   *          the previous tokens as array of String or null (if first time)
+   * @param outcome -
+   *          the previous outcome as array of String or null (if first time)
+   * @return - the previous map
+   */
+  public static Map createPrevMap(String[] token, String[] outcome) {
+    Map prevMap = new HashMap();
+
+    if (token != null | outcome != null) {
+
+      if (token.length != outcome.length) {
+        throw new IllegalArgumentException(
+            "The sent and outcome arrays MUST have the same size!");
+      }
+
+      for (int i = 0; i < token.length; i++) {
+        prevMap.put(token[i], outcome[i]);
+      }
+    } 
+    else {
+      prevMap = Collections.EMPTY_MAP;
+    }
+
+    return prevMap;
+  }
+  
+  /**
+   * Creates the map with the previous result.
+   * 
+   * @param token -
+   *          the previous tokens as List of String or null
+   * @param outcome -
+   *          the previous outcome as List of Strings or null
+   * @return - the previous map or an empty map if token or outcome is null
+   */
+  public static Map createPrevMap(List token, List outcome) {
+
+    Map prevMap = new HashMap();
+
+    if (token != null | outcome != null) {
+
+      if (token.size() != outcome.size()) {
+        throw new IllegalArgumentException(
+            "The sent and outcome arrays MUST have the same size!");
+      }
+
+      Iterator tokenIterator = token.iterator();
+      Iterator outcomeIterator = outcome.iterator();
+
+      while (tokenIterator.hasNext() && outcomeIterator.hasNext()) {
+        prevMap.put(tokenIterator.next(), outcomeIterator.next());
+      }
+    } 
+    else {
+      prevMap = Collections.EMPTY_MAP;
+    }
+
+    return prevMap;
+  }
 
   private static GISModel train(EventStream es, int iterations, int cut) throws IOException {
     return GIS.trainModel(iterations, new TwoPassDataIndexer(es, cut));
@@ -199,5 +345,4 @@ public class NameFinderME implements NameFinder {
     }
 
   }
-
 }
