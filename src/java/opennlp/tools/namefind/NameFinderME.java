@@ -127,8 +127,7 @@ public class NameFinderME implements NameFinder {
         // check if insideName ends here
         if (!result.get(i).equals(NameFinderME.CONTINUE)) {
 
-          Span entitySpan = new Span(startSpan.getStart(), endSpan.getEnd()
-              - startSpan.getStart());
+          Span entitySpan = new Span(startSpan.getStart(), endSpan.getEnd());
 
           detectedNames.add(entitySpan);
 
@@ -151,9 +150,7 @@ public class NameFinderME implements NameFinder {
 
     // is last start in sent
     if (insideName) {
-      Span entitySpan = startSpan;
-
-      detectedNames.add(entitySpan);
+      detectedNames.add(startSpan);
     }
 
     return detectedNames;
@@ -204,6 +201,7 @@ public class NameFinderME implements NameFinder {
      * @param size The size of the beam.
      * @param cg The context generator used with the specified model.
      * @param model The model used to determine names.
+     * @param beamSize 
      */
     public NameBeamSearch(int size, NameContextGenerator cg, MaxentModel model, int beamSize) {
       super(size, cg, model, beamSize);
@@ -237,24 +235,24 @@ public class NameFinderME implements NameFinder {
   /**
    * Creates the map with the previous result.
    * 
-   * @param token -
-   *          the previous tokens as array of String or null (if first time)
-   * @param outcome -
-   *          the previous outcome as array of String or null (if first time)
+   * @param tokens - the previous tokens as array of String or 
+   * null (if first time)
+   * @param outcomes - the previous outcome as array of String or null 
+   * (if first time)
    * @return - the previous map
    */
-  public static Map createPrevMap(String[] token, String[] outcome) {
+  public static Map createPrevMap(String[] tokens, String[] outcomes) {
     Map prevMap = new HashMap();
 
-    if (token != null | outcome != null) {
+    if (tokens != null | outcomes != null) {
 
-      if (token.length != outcome.length) {
+      if (tokens.length != outcomes.length) {
         throw new IllegalArgumentException(
             "The sent and outcome arrays MUST have the same size!");
       }
 
-      for (int i = 0; i < token.length; i++) {
-        prevMap.put(token[i], outcome[i]);
+      for (int i = 0; i < tokens.length; i++) {
+        prevMap.put(tokens[i], outcomes[i]);
       }
     } 
     else {
@@ -265,27 +263,25 @@ public class NameFinderME implements NameFinder {
   }
   
   /**
-   * Creates the map with the previous result.
+   * Creates the prevMap with the previous result.
    * 
-   * @param token -
-   *          the previous tokens as List of String or null
-   * @param outcome -
-   *          the previous outcome as List of Strings or null
+   * @param tokens - the previous tokens as List of String or null
+   * @param outcomes - the previous outcome as List of Strings or null
    * @return - the previous map or an empty map if token or outcome is null
    */
-  public static Map createPrevMap(List token, List outcome) {
+  public static Map createPrevMap(List tokens, List outcomes) {
 
     Map prevMap = new HashMap();
 
-    if (token != null | outcome != null) {
+    if (tokens != null | outcomes != null) {
 
-      if (token.size() != outcome.size()) {
+      if (tokens.size() != outcomes.size()) {
         throw new IllegalArgumentException(
             "The sent and outcome arrays MUST have the same size!");
       }
 
-      Iterator tokenIterator = token.iterator();
-      Iterator outcomeIterator = outcome.iterator();
+      Iterator tokenIterator = tokens.iterator();
+      Iterator outcomeIterator = outcomes.iterator();
 
       while (tokenIterator.hasNext() && outcomeIterator.hasNext()) {
         prevMap.put(tokenIterator.next(), outcomeIterator.next());
@@ -298,6 +294,76 @@ public class NameFinderME implements NameFinder {
     return prevMap;
   }
 
+  /**
+   * Creates the prevMap with the previous result.
+   * 
+   * @param sentence
+   * @param tokens - the previous tokens as list of Span or 
+   * null (if first time)
+   * @param outcomes - the previous outcome as list of Span or null 
+   * (if first time)
+   * @return - the previous map
+   */
+  public static Map createPrevMap(String sentence, List tokens, List outcomes) {
+    Map prevMap;
+    
+    if (sentence != null && tokens != null && 
+        outcomes != null & tokens.size() > 0) {
+      
+      if (tokens.size() < outcomes.size()) {
+        throw new IllegalArgumentException("The number of tokens must be " +
+            "less or equal compared to the number of outcomes");
+      }
+      
+      Iterator outcomeIterator = outcomes.iterator();
+           
+      Span outcomeSpan;
+      
+      if (outcomeIterator.hasNext()) {
+        outcomeSpan = (Span) outcomeIterator.next();
+      }
+      else {
+        outcomeSpan = new Span(0, 0);
+      }
+ 
+      boolean isInsideSpan = false;
+      
+      prevMap = new HashMap();
+      
+      for (Iterator i = tokens.iterator(); i.hasNext();) {
+        
+        Span token = (Span) i.next();
+        
+        if (!outcomeSpan.contains(token)) {
+          prevMap.put(token.getCoveredText(sentence), 
+              NameFinderME.OTHER);
+          
+          if (isInsideSpan) {
+            if (outcomeIterator.hasNext()) {
+              outcomeSpan = (Span) outcomeIterator.next();
+            }
+            isInsideSpan = false;
+          }
+        } 
+        else if (outcomeSpan.startsWith(token)) {
+          prevMap.put(token.getCoveredText(sentence), 
+              NameFinderME.START);
+          
+          isInsideSpan = true;
+        }
+        // isContained
+        else {
+          prevMap.put(token.getCoveredText(sentence), 
+              NameFinderME.CONTINUE);
+        }
+      }
+    }
+    else {
+      prevMap = Collections.EMPTY_MAP;
+    }
+    return prevMap;
+  }
+  
   private static GISModel train(EventStream es, int iterations, int cut) throws IOException {
     return GIS.trainModel(iterations, new TwoPassDataIndexer(es, cut));
   }
