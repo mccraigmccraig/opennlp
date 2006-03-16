@@ -103,8 +103,10 @@ public class Parse implements Cloneable, Comparable {
    */
   public Parse(String text, Span span, String type, double p, Parse h) {
     this(text, span, type, p, 0);
-    this.head = h;
-    this.headIndex = h.headIndex;
+    if (h != null) {
+      this.head = h;
+      this.headIndex = h.headIndex;
+    }
   }
   
   public Object clone() {
