@@ -33,9 +33,13 @@ import opennlp.tools.util.Sequence;
  */
 public class ChunkerME implements Chunker {
 
+  private static final int DEFAULT_BEAM_SIZE = 10;
+  
   /** The beam used to search for sequences of chunk tag assignments. */
   protected BeamSearch beam;
+  
   private Sequence bestSequence;
+  
   /** The model used to assign chunk tags to a sequence of tokens. */
   protected MaxentModel model;
 
@@ -44,7 +48,7 @@ public class ChunkerME implements Chunker {
    * @param mod The maximum entropy model for this chunker.
    */
   public ChunkerME(MaxentModel mod) {
-    this(mod, new DefaultChunkerContextGenerator(), 10);
+    this(mod, new DefaultChunkerContextGenerator(), DEFAULT_BEAM_SIZE);
   }
 
   /**
@@ -53,7 +57,7 @@ public class ChunkerME implements Chunker {
    * @param cg The context generator to be used by the specified model.
    */
   public ChunkerME(MaxentModel mod, ChunkerContextGenerator cg) {
-    this(mod, cg, 10);
+    this(mod, cg, DEFAULT_BEAM_SIZE);
   }
 
   /**
