@@ -17,6 +17,10 @@ public class ParserTagger extends POSTaggerME implements opennlp.tools.parser.Pa
   private static final int K = 10;
   int beamSize;
 
+  public ParserTagger(MaxentModel model, Dictionary dict) {
+    super(model, dict);
+  }
+  
   public ParserTagger(String modelFile,Dictionary dict) throws IOException {
     this(modelFile,K,K,dict);
   }
