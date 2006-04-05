@@ -41,7 +41,7 @@ import opennlp.tools.util.Span;
  * homepage: <http://www.cis.upenn.edu/~jcreynar>.
  *
  * @author      Tom Morton
- * @version $Revision: 1.13 $, $Date: 2006/01/16 17:49:39 $
+ * @version $Revision: 1.14 $, $Date: 2006/04/05 16:28:05 $
  */
 
 public class TokenizerME implements Tokenizer {
@@ -197,7 +197,7 @@ public class TokenizerME implements Tokenizer {
   }
 
   public static void train(EventStream evc, File output) throws IOException {
-    GISModel tokModel = opennlp.maxent.GIS.trainModel(100,new TwoPassDataIndexer(evc, 5),true,true);
+    GISModel tokModel = opennlp.maxent.GIS.trainModel(100,new TwoPassDataIndexer(evc, 5),true,false);
     new SuffixSensitiveGISModelWriter(tokModel, output).persist();
   }
 
