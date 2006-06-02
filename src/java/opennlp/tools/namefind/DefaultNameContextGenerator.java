@@ -168,7 +168,7 @@ public class DefaultNameContextGenerator implements NameContextGenerator {
     * @return a list of the features for <code>toks[i]</code> that can
     * be safely cached.
     */
-  private List getStaticFeatures(Object[] toks, int i, Map prevTags) {
+  protected List getStaticFeatures(Object[] toks, int i, Map prevTags) {
     List feats = new ArrayList();
     feats.add("def");
 
@@ -250,7 +250,7 @@ public class DefaultNameContextGenerator implements NameContextGenerator {
     *
     * @param word The word whose features should be returned.
     */
-  private String wordFeature(String word) {
+  protected String wordFeature(String word) {
     //String feat = (String) wordFeatureCache.get(word);
     //if (feat != null) {
     //  return(feat);
