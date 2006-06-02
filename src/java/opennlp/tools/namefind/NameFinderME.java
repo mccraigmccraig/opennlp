@@ -364,7 +364,7 @@ public class NameFinderME implements NameFinder {
     return prevMap;
   }
   
-  private static GISModel train(EventStream es, int iterations, int cut) throws IOException {
+  public static GISModel train(EventStream es, int iterations, int cut) throws IOException {
     return GIS.trainModel(iterations, new TwoPassDataIndexer(es, cut));
   }
   
