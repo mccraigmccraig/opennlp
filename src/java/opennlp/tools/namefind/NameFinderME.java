@@ -150,7 +150,7 @@ public class NameFinderME implements NameFinder {
 
     // is last start in sent
     if (insideName) {
-      detectedNames.add(startSpan);
+      detectedNames.add(new Span(startSpan.getStart(), endSpan.getEnd()));
     }
 
     return detectedNames;

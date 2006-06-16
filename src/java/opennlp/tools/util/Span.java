@@ -116,7 +116,8 @@ public class Span implements Comparable {
    */
   public String getCoveredText(String text) {
     if (getEnd() > text.length()) {
-      throw new IllegalArgumentException("The span is outside the given text!");
+      throw new IllegalArgumentException("The span " + toString() + 
+          " is outside the given text!");
     }
     
     return text.substring(getStart(), getEnd());
