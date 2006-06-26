@@ -1,3 +1,11 @@
+1.3.2
+
+Summary
+=======
+This minor release adds processing for the Thai language and restructures 
+the parsing packages in support of work in upcoming releases.
+
+
 1.3.0
 
 Summary
