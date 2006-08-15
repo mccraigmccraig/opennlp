@@ -24,7 +24,7 @@ import opennlp.maxent.DataStream;
 import opennlp.maxent.Event;
 import opennlp.maxent.EventCollector;
 import opennlp.maxent.EventStream;
-import opennlp.tools.ngram.Dictionary;
+import opennlp.tools.dictionary.Dictionary;
 
 /**
  * An implementation of EventStream whcih assumes the data stream gives a

@@ -16,7 +16,7 @@
 //Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 //////////////////////////////////////////////////////////////////////////////
 
-package opennlp.tools.ngram;
+package opennlp.tools.dictionary;
 
 import java.io.BufferedReader;
 import java.io.DataInputStream;

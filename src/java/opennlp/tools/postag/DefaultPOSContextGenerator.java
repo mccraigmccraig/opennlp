@@ -22,7 +22,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Pattern;
 
-import opennlp.tools.ngram.Dictionary;
+import opennlp.tools.dictionary.Dictionary;
 import opennlp.tools.util.Cache;
 
 /**
@@ -30,7 +30,7 @@ import opennlp.tools.util.Cache;
  *
  * @author      Gann Bierner
  * @author      Tom Morton
- * @version     $Revision: 1.11 $, $Date: 2005/11/29 22:16:13 $
+ * @version     $Revision: 1.12 $, $Date: 2006/08/15 21:08:29 $
  */
 
 public class DefaultPOSContextGenerator implements POSContextGenerator {

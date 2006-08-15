@@ -21,7 +21,7 @@ import java.util.List;
 
 import opennlp.maxent.DataStream;
 import opennlp.maxent.Event;
-import opennlp.tools.ngram.Dictionary;
+import opennlp.tools.dictionary.Dictionary;
 import opennlp.tools.parser.AbstractBottomUpParser;
 import opennlp.tools.parser.AbstractParserEventStream;
 import opennlp.tools.parser.HeadRules;

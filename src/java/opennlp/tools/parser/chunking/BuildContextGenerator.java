@@ -23,7 +23,7 @@ import java.util.Iterator;
 import java.util.List;
 
 import opennlp.maxent.ContextGenerator;
-import opennlp.tools.ngram.Dictionary;
+import opennlp.tools.dictionary.Dictionary;
 import opennlp.tools.parser.Parse;
 
 /**

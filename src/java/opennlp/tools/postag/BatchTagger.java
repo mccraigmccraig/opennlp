@@ -24,13 +24,13 @@ import java.io.IOException;
 import opennlp.maxent.DataStream;
 import opennlp.maxent.GISModel;
 import opennlp.maxent.io.SuffixSensitiveGISModelReader;
-import opennlp.tools.ngram.Dictionary;
+import opennlp.tools.dictionary.Dictionary;
 
 /**
  * Invoke a part-of-speech tagging model from the command line.
  *
  * @author   Jason Baldridge
- * @version $Revision: 1.4 $, $Date: 2006/01/19 00:50:48 $
+ * @version $Revision: 1.5 $, $Date: 2006/08/15 21:08:29 $
  */
 public class BatchTagger {
 

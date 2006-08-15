@@ -26,7 +26,7 @@ import opennlp.maxent.DataStream;
 import opennlp.maxent.Event;
 import opennlp.maxent.EventStream;
 import opennlp.tools.chunker.ChunkerContextGenerator;
-import opennlp.tools.ngram.Dictionary;
+import opennlp.tools.dictionary.Dictionary;
 import opennlp.tools.parser.chunking.Parser;
 import opennlp.tools.postag.DefaultPOSContextGenerator;
 import opennlp.tools.postag.POSContextGenerator;

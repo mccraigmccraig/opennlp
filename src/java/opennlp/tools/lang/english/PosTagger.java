@@ -25,7 +25,7 @@ import java.io.InputStreamReader;
 
 import opennlp.maxent.MaxentModel;
 import opennlp.maxent.io.SuffixSensitiveGISModelReader;
-import opennlp.tools.ngram.Dictionary;
+import opennlp.tools.dictionary.Dictionary;
 import opennlp.tools.postag.DefaultPOSContextGenerator;
 import opennlp.tools.postag.POSDictionary;
 import opennlp.tools.postag.POSTaggerME;
@@ -37,7 +37,7 @@ import opennlp.tools.postag.TagDictionary;
  * achieved >96% accuracy on unseen data.
  *
  * @author      Gann Bierner
- * @version     $Revision: 1.6 $, $Date: 2005/11/29 18:01:16 $
+ * @version     $Revision: 1.7 $, $Date: 2006/08/15 21:08:29 $
  */
 
 public class PosTagger extends POSTaggerME {

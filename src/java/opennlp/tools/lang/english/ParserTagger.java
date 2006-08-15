@@ -6,7 +6,7 @@ import java.util.List;
 
 import opennlp.maxent.MaxentModel;
 import opennlp.maxent.io.SuffixSensitiveGISModelReader;
-import opennlp.tools.ngram.Dictionary;
+import opennlp.tools.dictionary.Dictionary;
 import opennlp.tools.postag.DefaultPOSContextGenerator;
 import opennlp.tools.postag.POSDictionary;
 import opennlp.tools.postag.POSTaggerME;

@@ -39,8 +39,8 @@ import opennlp.maxent.MaxentModel;
 import opennlp.maxent.PlainTextByLineDataStream;
 import opennlp.maxent.TwoPassDataIndexer;
 import opennlp.maxent.io.SuffixSensitiveGISModelWriter;
-import opennlp.tools.ngram.Dictionary;
-import opennlp.tools.ngram.MutableDictionary;
+import opennlp.tools.dictionary.Dictionary;
+import opennlp.tools.dictionary.MutableDictionary;
 import opennlp.tools.util.BeamSearch;
 import opennlp.tools.util.Pair;
 import opennlp.tools.util.Sequence;
@@ -51,7 +51,7 @@ import opennlp.tools.util.Sequence;
  * surrounding context.
  *
  * @author      Gann Bierner
- * @version $Revision: 1.19 $, $Date: 2006/01/16 17:55:31 $
+ * @version $Revision: 1.20 $, $Date: 2006/08/15 21:08:29 $
  */
 public class POSTaggerME implements Evalable, POSTagger {
 
