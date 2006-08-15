@@ -31,7 +31,7 @@ import java.util.Map;
  * A Profile 
  *
  * @author <a href="mailto:kottmann@gmail.com">Joern Kottmann</a>
- * @version $Revision: 1.1 $, $Date: 2006/08/15 21:08:29 $
+ * @version $Revision: 1.2 $, $Date: 2006/08/15 21:15:37 $
  */
 public class Profile {
 
@@ -92,6 +92,14 @@ public class Profile {
     }
     
     return counter;
+  }
+  
+  public Profile merge(Profile mergeProfile) {
+    return merge(new Profile[]{mergeProfile});
+  }
+
+  public Profile merge(int cutoff, Profile mergeProfile) {
+    return merge(new Profile[]{mergeProfile});
   }
   
   /**

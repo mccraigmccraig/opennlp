@@ -19,7 +19,6 @@ package opennlp.tools.coref.mention;
 
 import java.io.IOException;
 
-
 import net.didion.jwnl.JWNLException;
 
 /** Factory class used to get an instance of a dictionary object. 

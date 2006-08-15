@@ -18,21 +18,21 @@
 
 package opennlp.tools.tokenize;
 
-import opennlp.maxent.Event;
-import opennlp.maxent.EventCollector;
-import opennlp.maxent.ContextGenerator;
-import opennlp.tools.util.ObjectIntPair;
-
 import java.io.BufferedReader;
 import java.io.Reader;
 import java.util.ArrayList;
+
+import opennlp.maxent.ContextGenerator;
+import opennlp.maxent.Event;
+import opennlp.maxent.EventCollector;
+import opennlp.tools.util.ObjectIntPair;
 
 /**
  * Generate event contexts for maxent decisions for tokenization detection.
  * This procedure isn't currrently used for tokenization event creation.
  *
  * @author      Jason Baldridge
- * @version     $Revision: 1.4 $, $Date: 2004/11/29 02:52:11 $
+ * @version     $Revision: 1.5 $, $Date: 2006/08/15 21:15:36 $
  */
 
 public class TokEventCollector implements EventCollector {

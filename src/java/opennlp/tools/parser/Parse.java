@@ -30,7 +30,6 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import opennlp.tools.util.Span;
-//import java.text.DecimalFormat;
 
 /** Data structure for holding parse constitents. */
 public class Parse implements Cloneable, Comparable {

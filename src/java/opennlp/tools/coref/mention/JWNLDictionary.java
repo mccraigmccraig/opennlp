@@ -23,7 +23,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-
 import net.didion.jwnl.JWNLException;
 import net.didion.jwnl.data.Adjective;
 import net.didion.jwnl.data.FileDictionaryElementFactory;

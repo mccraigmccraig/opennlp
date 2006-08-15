@@ -28,7 +28,10 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
-import opennlp.tools.coref.*;
+import opennlp.tools.coref.DefaultLinker;
+import opennlp.tools.coref.DiscourseEntity;
+import opennlp.tools.coref.Linker;
+import opennlp.tools.coref.LinkerMode;
 import opennlp.tools.coref.mention.DefaultParse;
 import opennlp.tools.coref.mention.Mention;
 import opennlp.tools.coref.mention.MentionContext;
