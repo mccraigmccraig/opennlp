@@ -21,6 +21,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -160,8 +161,7 @@ public class NameFinderME implements NameFinder {
   public Span[] find(String sentence, Span[] toks, Map prevMap) {
     
     List tokList = new LinkedList();
-    Collections.addAll(tokList, toks);
-    
+    tokList.addAll(Arrays.asList(toks));
     List resultList = find(sentence, tokList, prevMap);
     
     Span[] result = new Span[toks.length];
