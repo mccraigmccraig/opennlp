@@ -21,13 +21,18 @@ package opennlp.tools.ngram;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.io.OutputStreamWriter;
-import java.io.UnsupportedEncodingException;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+
+import javax.xml.transform.OutputKeys;
+import javax.xml.transform.Transformer;
+import javax.xml.transform.TransformerConfigurationException;
+import javax.xml.transform.sax.SAXTransformerFactory;
+import javax.xml.transform.sax.TransformerHandler;
+import javax.xml.transform.stream.StreamResult;
 
 import org.xml.sax.Attributes;
 import org.xml.sax.ContentHandler;
@@ -38,15 +43,12 @@ import org.xml.sax.XMLReader;
 import org.xml.sax.helpers.AttributesImpl;
 import org.xml.sax.helpers.XMLReaderFactory;
 
-import com.sun.org.apache.xml.internal.serialize.OutputFormat;
-import com.sun.org.apache.xml.internal.serialize.XMLSerializer;
-
 /**
  * This class serializes and deserialies an {@link Profile} object to an or from
  * an xml byte stream.
  *
  * @author <a href="mailto:kottmann@gmail.com">Joern Kottmann</a>
- * @version $Revision: 1.1 $, $Date: 2006/08/15 21:08:29 $
+ * @version $Revision: 1.2 $, $Date: 2006/08/20 22:37:44 $
  */
 public final class ProfileSerializer { 
   
@@ -237,26 +239,31 @@ public final class ProfileSerializer {
   public static void serialize(Profile profile, OutputStream out) 
       throws IOException {
     
-    OutputStreamWriter writer;
+    StreamResult streamResult = new StreamResult(out);
+    SAXTransformerFactory tf = (SAXTransformerFactory) 
+        SAXTransformerFactory.newInstance();
+    
+    TransformerHandler hd;
+    try {
+      hd = tf.newTransformerHandler();
+    } catch (TransformerConfigurationException e1) {
+      throw new AssertionError("The Tranformer configuration must be valid!");
+    }
+   
+    Transformer serializer = hd.getTransformer();
+    serializer.setOutputProperty(OutputKeys.ENCODING, CHARSET);
+    serializer.setOutputProperty(OutputKeys.INDENT, "yes");
+    
+    hd.setResult(streamResult);
     
     try {
-        writer = new OutputStreamWriter(out, CHARSET);
-    }
-    catch (UnsupportedEncodingException e) {
-      throw new AssertionError("The above OutputStreamWriter is not " +
-            "configured correctly!");
-    }
-    
-    XMLSerializer xmlSerialzer = new XMLSerializer(writer,
-            new OutputFormat("XML", CHARSET, true));
-    try {
-        xmlSerialzer.startDocument();
+        hd.startDocument();
         
         AttributesImpl ngramsAttributes = new AttributesImpl();
-        ngramsAttributes.addAttribute("", NAME_ATTRIBUTE,
-                "", "", profile.getName());
+        ngramsAttributes.addAttribute("", "", NAME_ATTRIBUTE,
+                "", profile.getName());
         
-        xmlSerialzer.startElement("", NGRAMS_ELEMENT, "", ngramsAttributes);
+        hd.startElement("", "", NGRAMS_ELEMENT, ngramsAttributes);
         
         
         for (Iterator it = profile.iterator(); it.hasNext();) {
@@ -264,23 +271,22 @@ public final class ProfileSerializer {
           Ngram ngram = (Ngram) it.next();
           
           AttributesImpl ngramAttributes = new AttributesImpl();
-          ngramAttributes.addAttribute("", OCCURENCE_ATTRIBUTE,
-                  "", "", Integer.toString(ngram.getOccurenceCount()));
+          ngramAttributes.addAttribute("", "", OCCURENCE_ATTRIBUTE,
+                  "", Integer.toString(ngram.getOccurenceCount()));
 
           
-          xmlSerialzer.startElement("", NGRAM_ELEMENT, "", ngramAttributes); 
-          xmlSerialzer.characters(ngram.getGramText().toCharArray(), 
+          hd.startElement("", "", NGRAM_ELEMENT, ngramAttributes); 
+          hd.characters(ngram.getGramText().toCharArray(), 
               0, ngram.length());
-          xmlSerialzer.endElement(NGRAM_ELEMENT);
+          hd.endElement("", "", NGRAM_ELEMENT);
         }
         
-        xmlSerialzer.endElement(NGRAMS_ELEMENT);
+        hd.endElement("", "", NGRAMS_ELEMENT);
         
-        xmlSerialzer.endDocument();
+        hd.endDocument();
     }
     catch (SAXException e) {
-      // TODO: here con occure an IOException handle it
-      throw new AssertionError("This exception should never be thrown!");
+      throw new IOException("There was an error during serialization!");
     }
   }
 }
