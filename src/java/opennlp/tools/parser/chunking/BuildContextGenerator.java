@@ -19,21 +19,19 @@ package opennlp.tools.parser.chunking;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Iterator;
 import java.util.List;
 
-import opennlp.maxent.ContextGenerator;
 import opennlp.tools.dictionary.Dictionary;
+import opennlp.tools.parser.AbstractContextGenerator;
+import opennlp.tools.parser.Cons;
 import opennlp.tools.parser.Parse;
 
 /**
  * Class to generator predictive contexts for deciding how constituents should be combined together.
  * @author Tom Morton
  */
-public class BuildContextGenerator implements ContextGenerator {
+public class BuildContextGenerator extends AbstractContextGenerator {
 
-  private static final String EOS = "eos";
-  private boolean zeroBackOff;
   private Dictionary dict;
   private String[] unigram;
   private String[] bigram;
@@ -59,64 +57,6 @@ public class BuildContextGenerator implements ContextGenerator {
   public String[] getContext(Object o) {
     Object[] params = (Object[]) o;
     return getContext((Parse[]) params[0], ((Integer) params[1]).intValue());
-  }
-  
-  /**
-   * Creates punctuation feature for the specified punctuation at the specfied index based on the punctuation mark.
-   * @param punct The punctuation which is in context.
-   * @param i The index of the punctuation with relative to the parse.
-   * @return Punctuation feature for the specified parse and the specified punctuation at the specfied index.
-   */
-  private String punct(Parse punct, int i) {
-    StringBuffer feat = new StringBuffer(5);
-    feat.append(i).append("=");
-    feat.append(punct.toString());
-    return (feat.toString());
-  }
-
-
-  /**
-   * Creates punctuation feature for the specified punctuation at the specfied index based on the punctuation's tag.
-   * @param punct The punctuation which is in context.
-   * @param i The index of the punctuation with relative to the parse.
-   * @return Punctuation feature for the specified parse and the specified punctuation at the specfied index.
-   */
-  private String punctbo(Parse punct, int i) {
-    StringBuffer feat = new StringBuffer(5);
-    feat.append(i).append("=");
-    feat.append(punct.getType());
-    return (feat.toString());
-  }
-
-
-  private String cons(Parse p, int i) {
-    StringBuffer feat = new StringBuffer(20);
-    feat.append(i).append("=");
-    if (p != null) {
-      if (i < 0) {
-        feat.append(p.getLabel()).append("|");
-      }
-      feat.append(p.getType()).append("|").append(p.getHead().toString());
-    }
-    else {
-      feat.append(EOS);
-    }
-    return (feat.toString());
-  }
-
-  private String consbo(Parse p, int i) { //cons back-off
-    StringBuffer feat = new StringBuffer(20);
-    feat.append(i).append("*=");
-    if (p != null) {
-      if (i < 0) {
-        feat.append(p.getLabel()).append("|");
-      }
-      feat.append(p.getType());
-    }
-    else {
-      feat.append(EOS);
-    }
-    return (feat.toString());
   }
   
   /**
@@ -256,6 +196,12 @@ public class BuildContextGenerator implements ContextGenerator {
     String consbop1 = consbo(p1, 1);
     String consbop2 = consbo(p2, 2);
     
+    Cons c_2 = new Cons(consp_2,consbop_2,-2,u_2);
+    Cons c_1 = new Cons(consp_1,consbop_1,-1,u_1);
+    Cons c0 = new Cons(consp0,consbop0,0,u0);
+    Cons c1 = new Cons(consp1,consbop1,1,u1);
+    Cons c2 = new Cons(consp2,consbop2,2,u2);
+    
     //default 
     features.add("default");
     //first constituent label
@@ -278,361 +224,15 @@ public class BuildContextGenerator implements ContextGenerator {
     features.add(consbop1);
     if (u2) features.add(consp2);
     features.add(consbop2);
-
-    
     
     //cons(0),cons(1)
-    //features.add("stage=cons(0),cons(1)");
-    if (punct1s != null) {
-      for (Iterator pi=punct1s.iterator();pi.hasNext();) {
-        Parse p = (Parse) pi.next();
-        String punct = punct(p,1);
-        String punctbo = punctbo(p,1);
-        //punct(1)
-        features.add(punct);
-        //punctbo(1);
-        features.add(punctbo);
-        //cons(0)punctbo(1)
-        if (u0) features.add(consp0+","+punctbo);
-        features.add(consbop0+","+punctbo);
-        //cons(0)punctbo(1)cons(1)
-        if (b01) features.add(consp0+","+punctbo+","+consp1);
-        if (u1)  features.add(consbop0+","+punctbo+","+consp1);
-        if (u0)  features.add(consp0+","+punctbo+","+consbop1);
-        features.add(consbop0+","+punctbo+","+consbop1);
-      }
-    }
-    else {
-      //cons(0),cons(1)
-      if (b01) features.add(consp0 + "," + consp1);
-      if (u1)  features.add(consbop0 + "," + consp1);
-      if (u0)  features.add(consp0 + "," + consbop1);
-      features.add(consbop0 + "," + consbop1);      
-    }
-    
-    //features.add("stage=cons(-1),cons(0)");
-    //cons(-1,0)
-    if (punct_1s != null) {
-      for (Iterator pi=punct_1s.iterator();pi.hasNext();) {
-        Parse p = (Parse) pi.next();
-        String punct = punct(p,-1);
-        String punctbo = punctbo(p,-1);
-        //punct(-1)
-        features.add(punct);
-        //punctbo(-1)
-        features.add(punctbo);
-        //punctbo(-1)cons(0)
-        if (u0) features.add(punctbo+","+consp0);
-        features.add(punctbo+","+consbop0);
-        //cons(-1)punctbo(-1)cons(0)
-        if (b_10) features.add(consp_1+","+punctbo+","+consp0);
-        if (u0)   features.add(consbop_1+","+punctbo+","+consp0);
-        if (u_1)  features.add(consp_1+","+punctbo+","+consbop0);
-        features.add(consbop_1+","+punctbo+","+consbop0);
-      }
-    }
-    else {
-      // cons(-1,0)
-      if (b_10) features.add(consp_1 + "," + consp0);
-      if (u0) features.add(consbop_1 + "," + consp0);
-      if (u_1) features.add(consp_1 + "," + consbop0);
-      features.add(consbop_1 + "," + consbop0);      
-    }
+    cons2(features,c0,c1,punct1s,b01);
+    //cons(-1),cons(0)
+    cons2(features,c_1,c0,punct_1s,b_10);
     //features.add("stage=cons(0),cons(1),cons(2)");
-    if (punct2s != null) {
-      for (Iterator pi=punct2s.iterator();pi.hasNext();) {
-        Parse p = (Parse) pi.next();
-        String punct = punct(p,2);
-        String punctbo = punctbo(p,2);
-        //punct(2)
-        features.add(punct);
-        //punctbo(2)
-        features.add(punctbo);
-      }
-      if (punct1s != null) {
-        //cons(0),punctbo(1),cons(1),punctbo(2),cons(2)
-        for (Iterator pi2=punct2s.iterator();pi2.hasNext();) {
-          String punctbo2 = punctbo((Parse) pi2.next(),2);
-          for (Iterator pi1=punct1s.iterator();pi1.hasNext();) {
-            String punctbo1 = punctbo((Parse) pi1.next(),1);
-            if (t012) features.add(consp0   + "," + punctbo1+","+consp1   + "," + punctbo2+","+consp2);
-            
-            if (b12) features.add(consbop0 + "," + punctbo1+","+consp1   + "," + punctbo2+","+consp2);
-            if (u0 && u2) features.add(consp0   + "," + punctbo1+","+consbop1 + "," + punctbo2+","+consp2);
-            if (b01) features.add(consp0   + "," + punctbo1+","+consp1   + "," + punctbo2+","+consbop2);
-            
-            if (u2) features.add(consbop0 + "," + punctbo1+","+consbop1 + "," + punctbo2+","+consp2);
-            if (u1) features.add(consbop0 + "," + punctbo1+","+consp1   + "," + punctbo2+","+consbop2);
-            if (u0) features.add(consp0   + "," + punctbo1+","+consbop1 + "," + punctbo2+","+consbop2);
-            
-            features.add(consbop0 + "," + punctbo1+","+consbop1 + "," + punctbo2+","+consbop2);
-            if (zeroBackOff) {
-              if (b01) features.add(consp0   + "," + punctbo1+","+consp1   + "," + punctbo2);
-              if (u1)  features.add(consbop0 + "," + punctbo1+","+consp1   + "," + punctbo2);
-              if (u0)  features.add(consp0   + "," + punctbo1+","+consbop1 + "," + punctbo2);
-              features.add(consbop0 + "," + punctbo1+","+consbop1 + "," + punctbo2);
-            }
-          }
-        }
-      }
-      else {
-        //cons(0),cons(1),punctbo(2),cons(2)
-        for (Iterator pi2=punct2s.iterator();pi2.hasNext();) {
-          String punctbo2 = punctbo((Parse) pi2.next(),2);
-          if (t012) features.add(consp0   + "," + consp1   + "," + punctbo2+","+consp2);
-          
-          if (b12) features.add(consbop0 + "," + consp1   +","  + punctbo2+ "," + consp2);
-          if (u0 && u2) features.add(consp0   + "," + consbop1 + "," + punctbo2+","+consp2);
-          if (b01) features.add(consp0   + "," + consp1   + "," + punctbo2+","+consbop2);
-          
-          if (u2) features.add(consbop0 + "," + consbop1 + "," + punctbo2+","+consp2);
-          if (u1) features.add(consbop0 + "," + consp1   + "," + punctbo2+","+consbop2);
-          if (u0) features.add(consp0   + "," + consbop1 + "," + punctbo2+","+consbop2);
-          
-          features.add(consbop0 + "," + consbop1 + "," + punctbo2+","+consbop2);
-          
-          if (zeroBackOff) {
-            if (b01) features.add(consp0   + "," + consp1   + "," + punctbo2);
-            if (u1)  features.add(consbop0 + "," + consp1   + "," + punctbo2);
-            if (u0)  features.add(consp0   + "," + consbop1 + "," + punctbo2);
-            features.add(consbop0 + "," + consbop1 + "," + punctbo2);
-          }
-        }
-      }
-    }
-    else {
-      if (punct1s != null) {
-        //cons(0),punctbo(1),cons(1),cons(2)
-        for (Iterator pi1=punct1s.iterator();pi1.hasNext();) {
-          String punctbo1 = punctbo((Parse) pi1.next(),1);
-          if (t012) features.add(consp0     + "," + punctbo1   +","+ consp1   +","+consp2);
-          
-          if (b12) features.add(consbop0    + "," + punctbo1   +","+ consp1   +","+consp2);
-          if (u0 && u2) features.add(consp0 + "," + punctbo1   +","+ consbop1 +","+consp2);
-          if (b01) features.add(consp0      + "," + punctbo1   +","+ consp1   +","+consbop2);
-          
-          if (u2) features.add(consbop0     + "," + punctbo1   +","+ consbop1 +","+consp2);
-          if (u1) features.add(consbop0     + "," + punctbo1   +","+ consp1 +","+consbop2);
-          if (u0) features.add(consp0       + "," + punctbo1   +","+ consbop1 +","+consbop2);   
-          
-          features.add(consbop0 + "," + punctbo1   +","+ consbop1 +","+consbop2);
-          
-          //zero backoff case covered by cons(0)cons(1)
-        }
-      }
-      else {
-        //cons(0),cons(1),cons(2)
-        if (t012) features.add(consp0   + "," + consp1   + "," + consp2);
-        
-        if (b12) features.add(consbop0 + "," + consp1   + "," + consp2);
-        if (u0 && u2) features.add(consp0   + "," + consbop1 + "," + consp2);
-        if (b01) features.add(consp0   + "," + consp1   + "," + consbop2);
-        
-        if (u2) features.add(consbop0 + "," + consbop1 + "," + consp2);
-        if (u1) features.add(consbop0 + "," + consp1   + "," + consbop2);
-        if (u0) features.add(consp0   + "," + consbop1 + "," + consbop2);
-        
-        features.add(consbop0 + "," + consbop1 + "," + consbop2);
-      }
-    }
-    //features.add("stage=cons(-2),cons(-1),cons(0)");
-    if (punct_2s != null) {
-      for (Iterator pi=punct_2s.iterator();pi.hasNext();) {
-        Parse p = (Parse) pi.next();
-        String punct = punct(p,-2);
-        String punctbo = punctbo(p,-2);
-        //punct(-2)
-        features.add(punct);
-        //punctbo(-2)
-        features.add(punctbo);
-      }
-      if (punct_1s != null) {
-        //cons(-2),punctbo(-2),cons(-1),punctbo(-1),cons(0)
-        for (Iterator pi_2=punct_2s.iterator();pi_2.hasNext();) {
-          String punctbo_2 = punctbo((Parse) pi_2.next(),-2);
-          for (Iterator pi_1=punct_1s.iterator();pi_1.hasNext();) {
-            String punctbo_1 = punctbo((Parse) pi_1.next(),-1);
-            if (t_2_10) features.add(consp_2   + "," + punctbo_2+","+consp_1   + "," + punctbo_1+","+consp0);
-            
-            if (b_10) features.add(consbop_2 + "," + punctbo_2+","+consp_1   + "," + punctbo_1+","+consp0);
-            if (u_2 && u0) features.add(consp_2   + "," + punctbo_2+","+consbop_1 + "," + punctbo_1+","+consp0);
-            if (b_2_1) features.add(consp_2   + "," + punctbo_2+","+consp_1   + "," + punctbo_1+","+consbop0);
-            
-            if (u0)  features.add(consbop_2 + "," + punctbo_2+","+consbop_1 + "," + punctbo_1+","+consp0);
-            if (u_1) features.add(consbop_2 + "," + punctbo_2+","+consp_1   + "," + punctbo_1+","+consbop0);
-            if (u_2) features.add(consp_2   + "," + punctbo_2+","+consbop_1 + "," + punctbo_1+","+consbop0);
-
-            features.add(consbop_2 + "," + punctbo_2+","+consbop_1 + "," + punctbo_1+","+consbop0);
-            if (zeroBackOff) {
-              if (b_10) features.add(punctbo_2+","+consp_1   + "," + punctbo_1+","+consp0);
-              if (u0)   features.add(punctbo_2+","+consbop_1 + "," + punctbo_1+","+consp0);
-              if (u_1)  features.add(punctbo_2+","+consp_1   + "," + punctbo_1+","+consbop0);
-              features.add(punctbo_2+","+consbop_1 + "," + punctbo_1+","+consbop0);
-            }
-          }
-        }
-      }
-      else {
-        //cons(-2),punctbo(-2),cons(-1),cons(0)
-        for (Iterator pi_2=punct_2s.iterator();pi_2.hasNext();) {
-          String punctbo_2 = punctbo((Parse) pi_2.next(),-2);
-          if (t_2_10) features.add(consp_2   + "," + punctbo_2+","+consp_1   + ","+consp0);
-          
-          if (b_10) features.add(consbop_2 + "," + punctbo_2+","+consp_1   + ","+consp0);
-          if (u_2 && u0) features.add(consp_2   + "," + punctbo_2+","+consbop_1 + ","+consp0);
-          if (b_2_1) features.add(consp_2   + "," + punctbo_2+","+consp_1   + ","+consbop0);
-          
-          if (u0)  features.add(consbop_2 + "," + punctbo_2+","+consbop_1 + ","+consp0);
-          if (u_1) features.add(consbop_2 + "," + punctbo_2+","+consp_1   + ","+consbop0);
-          if (u_2) features.add(consp_2   + "," + punctbo_2+","+consbop_1 + ","+consbop0);
-          
-          features.add(consbop_2 + "," + punctbo_2+","+consbop_1 + ","+consbop0);
-          
-          if (zeroBackOff) {
-            if (b_10) features.add(punctbo_2+","+consp_1   + ","+consp0);
-            if (u0)   features.add(punctbo_2+","+consbop_1 + ","+consp0);
-            if (u_1)  features.add(punctbo_2+","+consp_1   + ","+consbop0);
-            features.add(punctbo_2+","+consbop_1 + ","+consbop0);
-          }
-        }
-      }
-    }
-    else {
-      if (punct_1s != null) {
-        //cons(-2),cons(-1),punctbo(-1),cons(0)
-        for (Iterator pi_1=punct_1s.iterator();pi_1.hasNext();) {
-          String punctbo_1 = punctbo((Parse) pi_1.next(),-1);
-          if (t_2_10) features.add(consp_2   + "," + consp_1   + "," + punctbo_1+","+consp0);
-          
-          if (b_10) features.add(consbop_2 + "," + consp_1   + "," + punctbo_1+","+consp0);
-          if (u_2 && u0) features.add(consp_2   + "," + consbop_1 + "," + punctbo_1+","+consp0);
-          if (b_2_1) features.add(consp_2   + "," + consp_1   + "," + punctbo_1+","+consbop0);
-          
-          if (u0)  features.add(consbop_2 + "," + consbop_1 + "," + punctbo_1+","+consp0);
-          if (u_1) features.add(consbop_2 + "," + consp_1 + "," + punctbo_1+","+consbop0);
-          if (u_2) features.add(consp_2   + "," + consbop_1 + "," + punctbo_1+","+consbop0);
-
-          
-          features.add(consbop_2 + "," + consbop_1 + "," + punctbo_1+","+consbop0);
-          
-          //zero backoff case covered by cons(-1)cons(0)
-        }        
-      }
-      else {
-        //cons(-2),cons(-1),cons(0)
-        if (t_2_10) features.add(consp_2   + "," + consp_1   + "," +consp0);
-        
-        if (b_10) features.add(consbop_2 + "," + consp_1   + "," +consp0);
-        if (u_2 && u0) features.add(consp_2   + "," + consbop_1 + "," +consp0);
-        if (b_2_1)features.add(consp_2   + "," + consp_1   + "," +consbop0);
-        
-        if (u0)  features.add(consbop_2 + "," + consbop_1 + "," +consp0);
-        if (u_1) features.add(consbop_2 + "," + consp_1   + "," +consbop0);
-        if (u_2) features.add(consp_2   + "," + consbop_1 + "," +consbop0);
-        
-        features.add(consbop_2 + "," + consbop_1 + "," +consbop0);
-      }
-    }
-    //features.add("stage=cons(-1),cons(0),cons(1)");
-    if (punct_1s !=null) {
-      if (punct1s != null) {
-        //cons(-1),punctbo(-1),cons(0),punctbo(1),cons(1)
-        for (Iterator pi_1=punct_1s.iterator();pi_1.hasNext();) {
-          String punctbo_1 = punctbo((Parse) pi_1.next(),-1);
-          for (Iterator pi1=punct1s.iterator();pi1.hasNext();) {
-            String punctbo1 = punctbo((Parse) pi1.next(),1);
-            if (t_101) features.add(consp_1   + "," + punctbo_1+","+consp0   + "," + punctbo1+","+consp1);
-            
-            if (b01) features.add(consbop_1 + "," + punctbo_1+","+consp0   + "," + punctbo1+","+consp1);
-            if (u_1 && u1) features.add(consp_1   + "," + punctbo_1+","+consbop0 + "," + punctbo1+","+consp1);
-            if (b_10) features.add(consp_1   + "," + punctbo_1+","+consp0   + "," + punctbo1+","+consbop1);
-            
-            if (u1)  features.add(consbop_1 + "," + punctbo_1+","+consbop0 + "," + punctbo1+","+consp1);
-            if (u0)  features.add(consbop_1 + "," + punctbo_1+","+consp0   + "," + punctbo1+","+consbop1);
-            if (u_1) features.add(consp_1   + "," + punctbo_1+","+consbop0 + "," + punctbo1+","+consbop1);
-            
-            features.add(consbop_1 + "," + punctbo_1+","+consbop0 + "," + punctbo1+","+consbop1);
-            
-            if (zeroBackOff) {
-              if (b_10) features.add(consp_1   + "," + punctbo_1+","+consp0   + "," + punctbo1);
-              if (u0)   features.add(consbop_1 + "," + punctbo_1+","+consp0   + "," + punctbo1);
-              if (u_1)  features.add(consp_1   + "," + punctbo_1+","+consbop0 + "," + punctbo1);
-              features.add(consbop_1 + "," + punctbo_1+","+consbop0 + "," + punctbo1);
-            
-              if (b01) features.add(punctbo_1+","+consp0   + "," + punctbo1+","+consp1);
-              if (u1)  features.add(punctbo_1+","+consbop0 + "," + punctbo1+","+consp1);
-              if (u0)  features.add(punctbo_1+","+consp0   + "," + punctbo1+","+consbop1);
-              features.add(punctbo_1+","+consbop0 + "," + punctbo1+","+consbop1);
-            }
-          }
-        }
-      }
-      else {
-        //cons(-1),punctbo(-1),cons(0),cons(1)
-        for (Iterator pi_1=punct_1s.iterator();pi_1.hasNext();) {
-          String punctbo_1 = punctbo((Parse) pi_1.next(),-1);
-          if (t_101) features.add(consp_1   + "," + punctbo_1+","+consp0   + "," + consp1);
-          
-          if (b01)features.add(consbop_1 + "," + punctbo_1+","+consp0   + "," + consp1);
-          if (u_1 && u1) features.add(consp_1   + "," + punctbo_1+","+consbop0 + "," + consp1);
-          if (u0) features.add(consp_1   + "," + punctbo_1+","+consp0   + "," + consbop1);
-          
-          if (u1)  features.add(consbop_1 + "," + punctbo_1+","+consbop0 + "," + consp1);
-          if (u0)  features.add(consbop_1 + "," + punctbo_1+","+consp0   + "," + consbop1);
-          if (u_1) features.add(consp_1   + "," + punctbo_1+","+consbop0 + "," + consbop1);
-          
-          features.add(consbop_1 + "," + punctbo_1+","+consbop0 + "," + consbop1);
-          
-          if(zeroBackOff) {
-            if (b01) features.add(punctbo_1+","+consp0   + "," + consp1);
-            if (u1)  features.add(punctbo_1+","+consbop0   + "," + consp1);
-            if (u0)  features.add(punctbo_1+","+consp0   + "," + consbop1);
-            features.add(punctbo_1+","+consbop0   + "," + consbop1);
-          }
-        }
-      }
-    }
-    else {
-      if (punct1s != null) {
-        //cons(-1),cons(0),punctbo(1),cons(1)
-        for (Iterator pi1=punct1s.iterator();pi1.hasNext();) {
-          String punctbo1 = punctbo((Parse) pi1.next(),1);
-          if (t_101) features.add(consp_1   + "," + consp0   + "," + punctbo1+","+consp1);
-          
-          if (b01) features.add(consbop_1 + "," + consp0   + "," + punctbo1+","+consp1);
-          if (u_1 && u1) features.add(consp_1   + "," + consbop0 + "," + punctbo1+","+consp1);
-          if (b_10) features.add(consp_1   + "," + consp0   + "," + punctbo1+","+consbop1);
-          
-          if (u1)  features.add(consbop_1 + "," + consbop0 + "," + punctbo1+","+consp1);
-          if (u0)  features.add(consbop_1 + "," + consp0   + "," + punctbo1+","+consbop1);
-          if (u_1) features.add(consp_1   + "," + consbop0 + "," + punctbo1+","+consbop1);
-          
-          features.add(consbop_1 + "," + consbop0 + "," + punctbo1+","+consbop1);
-          
-          if (zeroBackOff) {
-            if (b_10) features.add(consp_1   + "," + consp0   + "," + punctbo1);
-            if (u0)   features.add(consbop_1 + "," + consp0   + "," + punctbo1);
-            if (u_1)  features.add(consp_1   + "," + consbop0 + "," + punctbo1);
-            features.add(consbop_1 + "," + consbop0 + "," + punctbo1);
-          }
-        }
-      }
-      else {
-        //cons(-1),cons(0),cons(1)
-        if (t_101) features.add(consp_1   + "," + consp0   + "," +consp1);
-        
-        if (b01)       features.add(consbop_1 + "," + consp0   + "," +consp1);
-        if (u_1 && u1) features.add(consp_1   + "," + consbop0 + "," +consp1);
-        if (b_10)      features.add(consp_1   + "," + consp0   + "," +consbop1);
-        
-        if (u1)  features.add(consbop_1 + "," + consbop0 + "," +consp1);
-        if (u0)  features.add(consbop_1   + "," + consp0 + "," +consbop1);
-        if (u_1) features.add(consp_1   + "," + consbop0 + "," +consbop1);
-        
-        features.add(consbop_1 + "," + consbop0 + "," +consbop1);
-      }
-    }
-
+    cons3(features,c0,c1,c2,punct1s,punct2s,t012,b01,b12);
+    cons3(features,c_2,c_1,c0,punct_2s,punct_1s,t_2_10,b_2_1,b_10);
+    cons3(features,c_1,c0,c1,punct_1s,punct_1s,t_101,b_10,b01);
     //features.add("stage=other");
     String p0Tag = p0.getType();
     if (p0Tag.equals("-RRB-")) {

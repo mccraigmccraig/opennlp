@@ -24,6 +24,8 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
+import opennlp.tools.parser.AbstractContextGenerator;
+import opennlp.tools.parser.Cons;
 import opennlp.tools.parser.Parse;
 
 public class AttachContextGenerator extends AbstractContextGenerator {
@@ -52,14 +54,18 @@ public class AttachContextGenerator extends AbstractContextGenerator {
     punct_1s=p0.getPreviousPunctuationSet();
     punct1s=p0.getNextPunctuationSet();
 
-    
+    String consf = cons(fn,-1);    
     String consp0 = cons(p0,0);
-    String consbop0 = cons(p0,0);
-    String consf = cons(fn,-1);
-    String consbof = consbo(fn,-1);
     String consp1 = cons(p1,1);
-    String consbop1 = cons(p1,1);
     
+    String consbof = consbo(fn,-1);
+    String consbop0 = consbo(p0,0);
+    String consbop1 = consbo(p1,1);
+    
+    Cons cf = new Cons(consf,consbof,-1,true);
+    Cons c0 = new Cons(consp0,consbop0,0,true);
+    Cons c1 = new Cons(consp1,consbop1,1,true);
+
     //default 
     features.add("default");
 
@@ -88,102 +94,10 @@ public class AttachContextGenerator extends AbstractContextGenerator {
     
     //bi-grams
     //cons(fn),cons(0)
-    if (punct_1s != null) {
-      for (Iterator pi=punct_1s.iterator();pi.hasNext();) {
-        Parse p = (Parse) pi.next();
-        String punct = punct(p,-1);
-        String punctbo = punctbo(p,-1);
-        //punct(-1)
-        features.add(punct);
-        //punctbo(-1);
-        features.add(punctbo);
-        
-        features.add(consf+","+punctbo+","+consp0);
-        features.add(consf+","+punctbo+","+consbop0);
-        features.add(consbof+","+punctbo+","+consp0);
-        features.add(consbof+","+punctbo+","+consbop0);
-        features.add(consbof+","+punctbo+","+consbop0+","+nodeDistance);
-      }
-    }
-    else {
-      features.add(consf+","+consp0);
-      features.add(consf+","+consbop0);
-      features.add(consbof+","+consp0);
-      features.add(consbof+","+consbop0);
-      features.add(consbof+","+consbop0+","+nodeDistance);
-    }
-    //cons(p0),cons(p1)
-    if (punct1s != null) {
-      for (Iterator pi=punct1s.iterator();pi.hasNext();) {
-        Parse p = (Parse) pi.next();
-        String punct = punct(p,1);
-        String punctbo = punctbo(p,1);
-        //punct(1)
-        features.add(punct);
-        //punctbo(1);
-        features.add(punctbo);
-        
-        features.add(consp0+","+punctbo+","+consp1);
-        features.add(consp0+","+punctbo+","+consbop1);
-        features.add(consbop0+","+punctbo+","+consp1);
-        features.add(consbop0+","+punctbo+","+consbop1);
-      }
-    }
-    else {
-      features.add(consp0+","+consp1);
-      features.add(consp0+","+consbop1);
-      features.add(consbop0+","+consp1);
-      features.add(consbop0+","+consbop1);
-    }
-    //tri-grams
-    if (punct_1s != null && punct1s != null) {
-      for (Iterator pi_1=punct_1s.iterator();pi_1.hasNext();) {
-        String punctbo_1 = punctbo((Parse) pi_1.next(),-1);
-        for (Iterator pi1=punct1s.iterator();pi1.hasNext();) {
-          String punctbo1 = punctbo((Parse) pi1.next(),1);
-          features.add(consf  +","+punctbo_1+","+consp0  +","+punctbo1+","+consp1);
-          features.add(consbof+","+punctbo_1+","+consp0  +","+punctbo1+","+consp1);
-          features.add(consf  +","+punctbo_1+","+consbop0+","+punctbo1+","+consp1);
-          features.add(consf  +","+punctbo_1+","+consp0  +","+punctbo1+","+consbop1);
-          features.add(consbof+","+punctbo_1+","+consbop0+","+punctbo1+","+consp1);
-          features.add(consf  +","+punctbo_1+","+consbop0+","+punctbo1+","+consbop1);
-          features.add(consbof+","+punctbo_1+","+consbop0+","+punctbo1+","+consbop1);
-        }
-      }
-    }
-    else if (punct_1s != null) {
-      for (Iterator pi_1=punct_1s.iterator();pi_1.hasNext();) {
-        String punctbo_1 = punctbo((Parse) pi_1.next(),-1);
-        features.add(consf  +","+punctbo_1+","+consp0  +","+consp1);
-        features.add(consbof+","+punctbo_1+","+consp0  +","+consp1);
-        features.add(consf  +","+punctbo_1+","+consbop0+","+consp1);
-        features.add(consf  +","+punctbo_1+","+consp0  +","+consbop1);
-        features.add(consbof+","+punctbo_1+","+consbop0+","+consp1);
-        features.add(consf  +","+punctbo_1+","+consbop0+","+consbop1);
-        features.add(consbof+","+punctbo_1+","+consbop0+","+consbop1);
-      }
-    }
-    else if (punct1s != null) {
-      for (Iterator pi1=punct1s.iterator();pi1.hasNext();) {
-        String punctbo1 = punctbo((Parse) pi1.next(),1);
-        features.add(consf  +","+consp0  +","+punctbo1+","+consp1);
-        features.add(consbof+","+consp0  +","+punctbo1+","+consp1);
-        features.add(consf  +","+consbop0+","+punctbo1+","+consp1);
-        features.add(consf  +","+consp0  +","+punctbo1+","+consbop1);
-        features.add(consbof+","+consbop0+","+punctbo1+","+consp1);
-        features.add(consf  +","+consbop0+","+punctbo1+","+consbop1);
-        features.add(consbof+","+consbop0+","+punctbo1+","+consbop1);
-      }
-    }
-    else {
-      features.add(consf  +","+consp0  +","+consp1);
-      features.add(consbof+","+consp0  +","+consp1);
-      features.add(consf  +","+consbop0+","+consp1);
-      features.add(consf  +","+consp0  +","+consbop1);
-      features.add(consbof+","+consbop0+","+consp1);
-      features.add(consf  +","+consbop0+","+consbop1);
-      features.add(consbof+","+consbop0+","+consbop1);
-    }
+    cons2(features,cf,c0,punct_1s,true);
+    cons2(features,c0,c1,punct1s,true);
+    cons3(features,cf,c0,c1,punct_1s,punct1s,true,true,true);
+    
     for (Iterator ji=jumpedNodes.iterator();ji.hasNext();) {
       Parse jn = (Parse) ji.next();
       features.add("jn="+jn.getType());
