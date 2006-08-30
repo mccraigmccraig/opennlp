@@ -18,6 +18,7 @@
 
 package opennlp.tools.parser.treeinsert;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -25,6 +26,8 @@ import java.util.Set;
 
 import opennlp.maxent.DataStream;
 import opennlp.maxent.Event;
+import opennlp.maxent.GISModel;
+import opennlp.maxent.io.SuffixSensitiveGISModelReader;
 import opennlp.tools.dictionary.Dictionary;
 import opennlp.tools.parser.AbstractBottomUpParser;
 import opennlp.tools.parser.AbstractParserEventStream;
@@ -188,12 +191,15 @@ public class ParserEventStream extends AbstractParserEventStream {
   
   public static void main(String[] args) throws java.io.IOException {
     if (args.length == 0) {
-      System.err.println("Usage ParserEventStream -[tag|chunk|choose|build|attach] [-fun] head_rules [dictionary] < parses");
+      System.err.println("Usage ParserEventStream -[tag|chunk|choose|build|attach] [-fun] [-dict dictionary] head_rules [model]< parses");
       System.exit(1);
     }
     ParserEventTypeEnum etype = null;
     boolean fun = false;
     int ai = 0;
+    Dictionary dict = null;
+    GISModel model = null;
+
     while (ai < args.length && args[ai].startsWith("-")) {
       if (args[ai].equals("-build")) {
         etype = ParserEventTypeEnum.BUILD;
@@ -210,6 +216,14 @@ public class ParserEventStream extends AbstractParserEventStream {
       else if (args[ai].equals("-fun")) {
         fun = true;
       }
+      else if (args[ai].equals("-dict")) {
+        ai++;
+        dict = new Dictionary(args[ai]);
+      }
+      else if (args[ai].equals("-model")) {
+        ai++;
+        model = (new SuffixSensitiveGISModelReader(new File(args[ai]))).getModel();
+      }
       else {
         System.err.println("Invalid option " + args[ai]);
         System.exit(1);
@@ -217,16 +231,16 @@ public class ParserEventStream extends AbstractParserEventStream {
       ai++;
     }
     HeadRules rules = new opennlp.tools.lang.english.HeadRules(args[ai++]);
-    Dictionary dict = null;
-    if (ai < args.length) {
-      dict = new Dictionary(args[ai++]);
-    }
     if (fun) {
       Parse.useFunctionTags(true);
     }
     opennlp.maxent.EventStream es = new ParserEventStream(new opennlp.maxent.PlainTextByLineDataStream(new java.io.InputStreamReader(System.in)), rules, etype, dict);
     while (es.hasNext()) {
-      System.out.println(es.nextEvent());
+      Event e = es.nextEvent();
+      if (model != null) {
+        System.out.print(model.eval(e.getContext())[model.getIndex(e.getOutcome())]+" ");
+      }
+      System.out.println(e);
     }
   }
 }
