@@ -59,7 +59,7 @@ public class NameFinderME implements NameFinder {
    * @param mod The model to be used to find names.
    */
   public NameFinderME(MaxentModel mod) {
-    this(mod, new DefaultNameContextGenerator(10), 10);
+    this(mod, new NameContextGenerator(10), 10);
   }
 
   /**

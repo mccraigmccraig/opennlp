@@ -17,23 +17,165 @@
 //////////////////////////////////////////////////////////////////////////////
 package opennlp.tools.namefind;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
 import opennlp.tools.util.BeamSearchContextGenerator;
+import opennlp.tools.util.Cache;
+import opennlp.tools.util.Sequence;
 
-/**
- * Interface for the context generator used in name finding.
+
+/** 
+ * Class for determining contextual features for a tag/chunk style 
+ * named-entity recognizer.
+ * 
+ * @version $Revision: 1.5 $, $Date: 2006/09/26 08:19:02 $
  */
-public interface NameContextGenerator extends BeamSearchContextGenerator {
+public class NameContextGenerator implements BeamSearchContextGenerator {
+  
+  private Cache contextsCache;
+  private Object wordsKey;
+  private int pi = -1;
+  private List prevStaticFeatures;
+  
+  private FeatureGenerator mFeatureGenerators[];
   
   /**
-   * Returns the contexts for chunking of the specified index.
+   * Creates a name context generator.
+   */
+  public NameContextGenerator() {
+    this(0, null);
+  }
+
+  public NameContextGenerator(int cacheSize) {
+    this(cacheSize, null);
+  }
+  
+  /**
+   * Creates a name context generator with the specified cach size.
+   */
+  public NameContextGenerator(int cacheSize, 
+      FeatureGenerator featureGenerators[]) {
+    
+    if (featureGenerators != null) {
+      mFeatureGenerators = featureGenerators;
+    }
+    else {
+      mFeatureGenerators =  new FeatureGenerator[] 
+        {new TokenContextFeatureGenerator()};
+    }
+    
+    if (cacheSize > 0) {
+      contextsCache = new Cache(cacheSize);
+    }
+  }
+
+  public String[] getContext(Object o) {
+    Object[] data = (Object[]) o;
+    return (getContext(((Integer) data[0]).intValue(), (List) data[1], (List) data[2], (Map) data[3]));
+  }
+  
+  public String[] getContext(int index, List sequence, Sequence s, Object[] additionalContext) {
+    return getContext(index,sequence,s.getOutcomes(),(Map) additionalContext[0]);
+  }
+
+  public String[] getContext(int i, List toks, List preds, Map prevTags) {
+    return (getContext(i, toks.toArray(), (String[]) preds.toArray(new String[preds.size()]),prevTags));
+  }
+  
+  public String[] getContext(int index, Object[] sequence, String[] priorDecisions, Object[] additionalContext) {
+    return getContext(index,sequence,priorDecisions,(Map) additionalContext[0]);
+  }
+
+  /**
+   * Return the context for finding names at the specified index.
    * @param i The index of the token in the specified toks array for which the context should be constructed. 
    * @param toks The tokens of the sentence.  The <code>toString</code> methods of these objects should return the token text.
    * @param preds The previous decisions made in the taging of this sequence.  Only indices less than i will be examined.
-   * @param prevTags A mapping between tokens and the previous outcome for these tokens. 
-   * @return An array of predictive contexts on which a model basis its decisions.
+   * @param prevTags  A mapping between tokens and the previous outcome for these tokens. 
+   * @return the context for finding names at the specified index.
    */
-  public abstract String[] getContext(int i, List toks,List preds, Map prevTags);
+  public String[] getContext(int i, Object[] toks, String[] preds, Map prevTags) {
+    String po=NameFinderME.OTHER;
+    String ppo=NameFinderME.OTHER;
+    if (i > 1){
+      ppo = preds[i-2];
+    }
+    if (i > 0) {
+      po = preds[i-1];
+    }
+    String cacheKey = i+po+ppo;
+    if (contextsCache != null) {
+      if (wordsKey == toks){
+        String[] cachedContexts = (String[]) contextsCache.get(cacheKey);    
+        if (cachedContexts != null) {
+          return cachedContexts;
+        }
+      }
+      else {
+        contextsCache.clear();
+        wordsKey = toks;
+      }
+    }
+    List features;
+    if (wordsKey == toks && i == pi) {
+      features =prevStaticFeatures; 
+    }
+    else {
+      features = getStaticFeatures(toks,i);
+      
+      String pt = (String) prevTags.get(toks[i].toString());
+      features.add("pd="+pt);
+      if (i == 0) {
+        features.add("df=it");
+      }
+      
+      pi=i;
+      prevStaticFeatures=features;
+    }
+    
+    int fn = features.size();
+    String[] contexts = new String[fn+4];
+    for (int fi=0;fi<fn;fi++) {
+      contexts[fi]=(String) features.get(fi);
+    }
+    contexts[fn]="po="+po;
+    contexts[fn+1]="pow="+po+toks[i];
+    contexts[fn+2]="powf="+po+FeatureGeneratorUtil.tokenFeature(toks[i].toString());
+    contexts[fn+3]="ppo="+ppo;
+    
+    if (contextsCache != null) {
+      contextsCache.put(cacheKey,contexts);
+    }
+    
+    return contexts;
+  }
+
+  /**
+    * Returns a list of the features for <code>toks[i]</code> that can
+    * be safely cached.  In other words, return a list of all
+    * features that do not depend on previous outcome or decision
+    * features.  This method is called by <code>search</code>.
+    *
+    * @param toks The list of tokens being processed.
+    * @param i The index of the token whose features should be returned.
+    * @return a list of the features for <code>toks[i]</code> that can
+    * be safely cached.
+    */
+  protected List getStaticFeatures(Object[] toks, int index) {
+    List feats = new ArrayList();
+    
+    String tokens[] = new String[toks.length];
+    
+    for (int i = 0; i < toks.length; i++) {
+      tokens[i] = toks[i].toString();
+    }
+    
+    for (int i = 0; i < mFeatureGenerators.length; i++) {
+      mFeatureGenerators[i].createFeatures(feats, tokens, index);
+    }
+    
+    return (feats);
+  }
 }

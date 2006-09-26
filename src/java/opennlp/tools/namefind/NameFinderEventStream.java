@@ -46,7 +46,7 @@ public class NameFinderEventStream implements EventStream {
    * @param d The data stream for this event stream.
    */
   public NameFinderEventStream(DataStream d) {
-    this(d, new DefaultNameContextGenerator());
+    this(d, new NameContextGenerator());
   }
 
   /**
