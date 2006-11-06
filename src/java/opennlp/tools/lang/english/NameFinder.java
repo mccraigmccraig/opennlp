@@ -31,6 +31,7 @@ import opennlp.maxent.io.SuffixSensitiveGISModelReader;
 import opennlp.tools.namefind.NameContextGenerator;
 import opennlp.tools.namefind.NameFinderME;
 import opennlp.tools.parser.Parse;
+import opennlp.tools.tokenize.SimpleTokenizer;
 import opennlp.tools.util.Span;
 
 /**
@@ -113,10 +114,6 @@ public class NameFinder extends NameFinderME {
       tokens[si] = s.substring(spans[si].getStart(), spans[si].getEnd());
     }
     return tokens;
-  }
-
-  public static String[] tokenize(String s) {
-    return spansToStrings(tokenizeToSpans(s), s);
   }
   
   private static void addNames(String tag, List names, Parse[] tokens) {
@@ -228,14 +225,15 @@ public class NameFinder extends NameFinderME {
    */
   private static void processText(NameFinder[] finders, String[] tags, BufferedReader input) throws IOException {
     String[][] finderTags = new String[finders.length][];
-    Map[] prevTokenMaps = createPrevTokenMaps(finders); 
+    Map[] prevTokenMaps = createPrevTokenMaps(finders);
+    opennlp.tools.tokenize.Tokenizer tokenizer = new SimpleTokenizer();
     for (String line = input.readLine(); null != line; line = input.readLine()) {
       if (line.equals("")) {
         clearPrevTokenMaps(prevTokenMaps);
         System.out.println();
         continue;
       }
-      Span[] spans = tokenizeToSpans(line);
+      Span[] spans = tokenizer.tokenizePos(line);
       String[] tokens = spansToStrings(spans,line);
       for (int fi = 0, fl = finders.length; fi < fl; fi++) {
         finderTags[fi] = finders[fi].find(tokens, prevTokenMaps[fi]);
