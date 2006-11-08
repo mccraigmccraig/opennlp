@@ -29,7 +29,7 @@ import java.util.Map;
  * a text.
  *
  * @author <a href="mailto:kottmann@gmail.com">Joern Kottmann</a>
- * @version $Revision: 1.1 $, $Date: 2006/08/15 21:08:29 $
+ * @version $Revision: 1.2 $, $Date: 2006/11/08 19:25:25 $
  */
 public class Ngram implements Comparable {
   private String mGram;
@@ -50,7 +50,7 @@ public class Ngram implements Comparable {
   }
   
   /**
-   * Initializes a new {@link Ngram} instance. This consructor should 
+   * Initializes a new {@link Ngram} instance. This constructor should 
    * only be called from the {@link ProfileSerializer}.
    * 
    * @param gram
@@ -88,7 +88,6 @@ public class Ngram implements Comparable {
   public String getGramText() {
     return mGram;
   }
-  
   
   /**
    * Compares the given instance to the current one.
@@ -149,8 +148,8 @@ public class Ngram implements Comparable {
    * @param length
    * @return the {@link Profile} containing the {@link Ngram} objects.
    */
-  public static Profile create(String profileName, String text, int length) {
-    return create(profileName, 0, text, length);
+  public static Profile create(String profileName, String text[], int length) {
+    return create(profileName, 0, Integer.MAX_VALUE, text, length);
   }
   
   /**
@@ -158,14 +157,84 @@ public class Ngram implements Comparable {
    * and cutoff (remove ngrams which do not coccur less than cutoff value).
    * 
    * @param profileName the name of the created profile
-   * @param cutoff
+   * @param cutoffUnder the number how often a ngram must be seen to be included
+   * @param cutoffOver the number how a ngram must be seen to not be included
    * @param text
    * @param length
    * @return the {@link Profile} containing the {@link Ngram} objects.
    */
-  public static Profile create(String profileName, int cutoff, String text, 
-      int length) {
-    return create(profileName, cutoff, text, length, length);
+  public static Profile create(String profileName, int cutoffUnder, 
+      int cutoffOver, String text[], int length) {
+    return create(profileName, cutoffUnder, cutoffOver, text, length, length);
+  }
+  
+  /**
+   * Creates all {@link Ngram}s with the speciefied min until max
+   * (string) length.
+   * 
+   * @param profileName the name of the created profile
+   * @param text
+   * @param minLength
+   * @param maxLength
+   * @return the {@link Profile} containing the {@link Ngram} objects.
+   */
+  public static Profile create(String profileName, String text[], int minLength, 
+      int maxLength) {
+    return create(profileName, 0, Integer.MAX_VALUE, 
+        text, minLength, maxLength);
+  }
+  
+  /**
+   * Creates all n-grams from the geiven piece of text, with the speciefied
+   * lengths and cutoff.
+   * 
+   * @param profileName the name of the created profile
+   * @param text the text to create ngrams form
+   * @param cutoffUnder the number how often a ngram must be seen to be included
+   * @param cutoffOver the number how a ngram must be seen to not be included
+   * @param minLength the minimal ngram length
+   * @param maxLength the maximal ngram length
+   * 
+   * @return the {@link Profile} containing the {@link Ngram} objects.
+   */
+  public static Profile create(String profileName, int cutoffUnder, 
+      int cutoffOver, String text[], int minLength, int maxLength) {
+    
+    Map ngrams = new HashMap();
+    
+    for (int i = 0; i < text.length; i++) {
+      createNgram(ngrams, text[i], minLength, maxLength);
+    }
+    
+    return new Profile(profileName, ngrams, cutoffUnder, cutoffOver);
+  }
+  
+  /**
+   * Creates all {@link Ngram}s with the speciefied (string) length.
+   * 
+   * @param profileName the name of the created profile
+   * @param text
+   * @param length
+   * @return the {@link Profile} containing the {@link Ngram} objects.
+   */
+  public static Profile create(String profileName, String text, int length) {
+    return create(profileName, 0, Integer.MAX_VALUE, text, length);
+  }
+  
+  /**
+   * Creates all {@link Ngram}s with the speciefied (string) length 
+   * and cutoff (remove ngrams which do not coccur less than cutoff value).
+   * 
+   * @param profileName the name of the created profile
+   * @param cutoffUnder the number how often a ngram must be seen to be included
+   * @param cutoffOver the number how a ngram must be seen to not be included
+   * @param text
+   * @param length
+   * @return the {@link Profile} containing the {@link Ngram} objects.
+   */
+  public static Profile create(String profileName, int cutoffUnder, 
+      int cutoffOver, String text, int length) {
+    return create(profileName, cutoffUnder, cutoffOver, text, length, length);
   }
   
   /**
@@ -180,7 +249,8 @@ public class Ngram implements Comparable {
    */
   public static Profile create(String profileName, String text, int minLength, 
       int maxLength) {
-    return create(profileName, 0, text, minLength, maxLength);
+    return create(profileName, 0, Integer.MAX_VALUE, 
+        text, minLength, maxLength);
   }
   
   /**
@@ -189,21 +259,42 @@ public class Ngram implements Comparable {
    * 
    * @param profileName the name of the created profile
    * @param text the text to create ngrams form
-   * @param cutoff the number how often an ngram must be seen
+   * @param cutoffUnder the number how often a ngram must be seen to be included
+   * @param cutoffOver the number how a ngram must be seen to not be included
    * @param minLength the minimal ngram length
    * @param maxLength the maximal ngram length
    * 
    * @return the {@link Profile} containing the {@link Ngram} objects.
    */
-  public static Profile create(String profileName, int cutoff, String text, 
-      int minLength, int maxLength) {
+  public static Profile create(String profileName, int cutoffUnder, 
+      int cutoffOver, String text, int minLength, int maxLength) {
     
     Map ngrams = new HashMap();
     
-    for (int lengthIndex = minLength; lengthIndex < maxLength + 1; lengthIndex++) {
+    createNgram(ngrams, text, minLength, maxLength);
+    
+    return new Profile(profileName, ngrams, cutoffUnder, cutoffOver);
+  }
+
+  /**
+   * Creates n-grams and adds them to the map. The map, maps the gram text
+   * to the gram object. The gram can then be looked up to increase the 
+   * occurence counter.
+   * 
+   * @param ngrams
+   * @param cutoff
+   * @param text
+   * @param minLength
+   * @param maxLength
+   */
+  private static void createNgram(Map ngrams, String text, int minLength, 
+      int maxLength) {
+    
+    for (int lengthIndex = minLength; lengthIndex < maxLength + 1; 
+        lengthIndex++) {
       for (int i = 0; i + lengthIndex - 1 < text.length(); i++) {
 
-        String gram = text.substring(i, i + lengthIndex);
+        String gram = text.substring(i, i + lengthIndex).toLowerCase();
 
         Ngram existingNGram = (Ngram) ngrams.get(gram);
 
@@ -215,7 +306,5 @@ public class Ngram implements Comparable {
         }
       }
     }
-    
-    return new Profile(profileName, ngrams, cutoff);
   }
 }

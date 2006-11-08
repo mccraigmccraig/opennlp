@@ -16,20 +16,20 @@
 //Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 ////////////////////////////////////////////////////////////////////////////// 
 
-package opennlp.tools.ngram;
+package opennlp.tools.util;
 
 /**
  * This exception is thrown if the profile data stream has
  * an invalid format e.g. non valid xml.
  *
  * @author <a href="mailto:kottmann@gmail.com">Joern Kottmann</a>
- * @version $Revision: 1.1 $, $Date: 2006/08/15 21:08:29 $
+ * @version $Revision: 1.1 $, $Date: 2006/11/08 19:26:00 $
  */
 public class InvalidFormatException extends Exception {
   
   private static final long serialVersionUID = 0;
   
-  InvalidFormatException(String message, Throwable throwable) {
+  public InvalidFormatException(String message, Throwable throwable) {
     super(message, throwable);
   }
 }

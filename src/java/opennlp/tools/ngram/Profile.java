@@ -24,14 +24,9 @@ import java.util.Iterator;
 import java.util.Map;
 
 /**
- * Iterate over the ngrams, immbutable, compute likeliehood 
- * 
- *  Optional: merge
- * 
- * A Profile 
  *
  * @author <a href="mailto:kottmann@gmail.com">Joern Kottmann</a>
- * @version $Revision: 1.2 $, $Date: 2006/08/15 21:15:37 $
+ * @version $Revision: 1.3 $, $Date: 2006/11/08 19:25:38 $
  */
 public class Profile {
 
@@ -39,41 +34,44 @@ public class Profile {
   
   private Map mNGrams;
   
-  
   /**
    * Initializes a new instance of the Profile.
    * @param ngrams
    */
-  Profile(String name, Map ngrams) {
-    this(name, ngrams, 0);
+  protected Profile(String name, Map ngrams) {
+    this(name, ngrams, 0, Integer.MAX_VALUE);
   }
  
-  
   /**
    * Initializes a new instance of the Profile.
    * 
+   * @param cutoffUnder - use 0 to not cutoff anything
+   * @param cutoffOver - use {@link Integer#MAX_VALUE} to not cutoff anything
+   * 
    * @param name
    */
-  Profile(String name, Map ngrams, int cutoff) {
-    
-    mNGrams = Collections.unmodifiableMap(ngrams);
-    
-    if (cutoff > 0) {
-      
-      for (Iterator it = iterator(); it.hasNext();) {
-        
-        Ngram ngram = (Ngram) it.next();
-        
-        if (ngram.getOccurenceCount() <= cutoff) {
-          ngrams.remove(ngram.getGramText());
-        }
-      }
-    }
+  protected Profile(String name, Map ngrams, int cutoffUnder, int cutoffOver) {
     
     if (name == null) {
       throw new IllegalArgumentException("Name parameter must not be null!");
     }
+    
     mName = name;
+    
+    mNGrams = Collections.unmodifiableMap(ngrams);
+
+    if (cutoffUnder > 0 || cutoffOver < Integer.MAX_VALUE) {
+      
+      for (Iterator it = ngrams.values().iterator(); it.hasNext();) {
+        
+        Ngram ngram = (Ngram) it.next();
+        
+        if (ngram.getOccurenceCount() <= cutoffUnder || 
+            ngram.getOccurenceCount() >= cutoffOver) {
+          it.remove();
+        }
+      }
+    }
   }
   
   /**
@@ -94,11 +92,27 @@ public class Profile {
     return counter;
   }
   
+  /**
+   * Merges the other profile with the current instance.
+   * 
+   * @param mergeProfile
+   * 
+   * @return the merged profile
+   */
   public Profile merge(Profile mergeProfile) {
-    return merge(new Profile[]{mergeProfile});
+    return merge(new Profile[]{mergeProfile}, 0, Integer.MAX_VALUE);
   }
 
-  public Profile merge(int cutoff, Profile mergeProfile) {
+  /**
+   * Merges the other profile with the current instance.
+   * 
+   * @param mergeProfile
+   * @param cutoffUnder - use 0 to not cutoff anything
+   * @param cutoffOver - use {@link Integer#MAX_VALUE} to not cutoff anything
+   * 
+   * @return the merged profile
+   */
+  public Profile merge(Profile mergeProfile, int cutoffUnder, int cutoffOver) {
     return merge(new Profile[]{mergeProfile});
   }
   
@@ -110,18 +124,20 @@ public class Profile {
    * @return the merged {@link Profile}
    */
   public Profile merge(Profile mergeProfiles[]) {
-    return merge(0, mergeProfiles);
+    return merge(mergeProfiles, 0, Integer.MAX_VALUE);
   }
   
   /**
    * Merges n profiles into one. 
    * 
-   * @param cutoff 
+   * @param cutoffUnder - use 0 to not cutoff anything
+   * @param cutoffOver - use {@link Integer#MAX_VALUE} to not cutoff anything
    * 
    * @param mergeProfiles
    * @return the merged {@link Profile}
    */
-  public Profile merge(int cutoff, Profile mergeProfiles[]) {
+  public Profile merge(Profile mergeProfiles[], int cutoffUnder, 
+      int cutoffOver) {
     
     // create a map with the current ngrams 
     Map newProfileMap = new HashMap();
@@ -154,22 +170,24 @@ public class Profile {
       }
     }
     
-    return new Profile(mName, newProfileMap, cutoff);
-    
+    return new Profile(mName, newProfileMap, cutoffUnder, cutoffOver);
   }
   
   /**
-   * Removes ngrams which do occur less than the cutoff value.
+   * Removes ngrams which do occur less than the cutoffUnder value and more
+   * often than cutoffOver.
    * 
-   * @param cutoff
+   * @param cutoffUnder - use 0 to not cutoff anything
+   * @param cutoffOver - use {@link Integer#MAX_VALUE} to not cutoff anything
+   * 
    * @return the profiles without cutoff ngrams
    */
-  public Profile cutoff(int cutoff) {
+  public Profile cutoff(int cutoffUnder, int cutoffOver) {
     
     Map ngrams = new HashMap();
     ngrams.putAll(mNGrams);
     
-    return new Profile(mName, ngrams, cutoff);
+    return new Profile(mName, ngrams, cutoffUnder, cutoffOver);
   }
   
   /**
@@ -182,8 +200,13 @@ public class Profile {
     return mNGrams.containsKey(searchGram);
   }
   
-  public boolean contains(String searchGrams[])
-  {
+  /**
+   * Checks if the given grams are contained in this profile.
+   * 
+   * @param searchGrams
+   * @return true if alle grams are containd, otherwise false
+   */
+  public boolean contains(String searchGrams[]) {
     for (int i = 0; i < searchGrams.length; i++) {
       if (contains(searchGrams[i])) {
         return true;
@@ -200,7 +223,7 @@ public class Profile {
    * @return the searched ngram
    */
   public Ngram getGram(String gramText) {
-    return (Ngram) mNGrams.get(gramText);
+    return (Ngram) mNGrams.get(gramText.toLowerCase());
   }
   
   /**
@@ -208,7 +231,7 @@ public class Profile {
    * frequence summing.
    * 
    * @param profile
-   * @return a value between 0 and 1 which indicates thw matching areas.
+   * @return a value between 0 and 1 which indicates the matching areas.
    */
   public double likelihood(Profile profile) {
     double frequenceSum = 0;

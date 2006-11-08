@@ -34,6 +34,8 @@ import javax.xml.transform.sax.SAXTransformerFactory;
 import javax.xml.transform.sax.TransformerHandler;
 import javax.xml.transform.stream.StreamResult;
 
+import opennlp.tools.util.InvalidFormatException;
+
 import org.xml.sax.Attributes;
 import org.xml.sax.ContentHandler;
 import org.xml.sax.InputSource;
@@ -48,7 +50,7 @@ import org.xml.sax.helpers.XMLReaderFactory;
  * an xml byte stream.
  *
  * @author <a href="mailto:kottmann@gmail.com">Joern Kottmann</a>
- * @version $Revision: 1.2 $, $Date: 2006/08/20 22:37:44 $
+ * @version $Revision: 1.3 $, $Date: 2006/11/08 19:25:38 $
  */
 public final class ProfileSerializer { 
   
