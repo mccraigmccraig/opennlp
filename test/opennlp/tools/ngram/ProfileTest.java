@@ -25,22 +25,34 @@ import junit.framework.TestCase;
  * 
  *
  * @author <a href="mailto:kottmann@gmail.com">Joern Kottmann</a>
- * @version $Revision: 1.1 $, $Date: 2006/08/15 21:16:00 $
+ * @version $Revision: 1.2 $, $Date: 2006/11/09 15:34:45 $
  */
 public class ProfileTest extends TestCase {
 
   /**
-   * Tests that cutoff works. 
+   * Tests that cutoff under works. 
    * 
    *@see Profile#cutoff(int)
    */
-  public void testCutoff() {
+  public void testCutoffUnder() {
     String text = "aaab";
     
     for (int i = 1; i < 3; i++) {
-      Profile gram = Ngram.create("test", i, text, 1);
+      Profile gram = Ngram.create("test", i, Integer.MAX_VALUE, text, 1);
       assertTrue(gram.numberOfGrams() == 3);
     }
+  }
+  
+  /**
+   * Tests that cutoff overs works. 
+   * 
+   *@see Profile#cutoff(int)
+   */
+  public void testCutoffOver() {
+    String text = "aaab";
+    
+    Profile gram = Ngram.create("test", 0, 2, text, 1);
+    assertTrue(gram.numberOfGrams() == 1);
   }
 
   /**

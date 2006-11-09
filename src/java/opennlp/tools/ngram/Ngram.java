@@ -29,7 +29,7 @@ import java.util.Map;
  * a text.
  *
  * @author <a href="mailto:kottmann@gmail.com">Joern Kottmann</a>
- * @version $Revision: 1.2 $, $Date: 2006/11/08 19:25:25 $
+ * @version $Revision: 1.3 $, $Date: 2006/11/09 15:34:16 $
  */
 public class Ngram implements Comparable {
   private String mGram;
@@ -114,17 +114,16 @@ public class Ngram implements Comparable {
    */
   public boolean equals(Object obj) {
     
+    boolean result;
+    
     if (obj == this) {
-      return true;
+      result = true;
     }
-    
-    boolean result = false;
-    
-      if (obj != null && obj instanceof Ngram) {
-        Ngram ngram = (Ngram) obj;
+    else if (obj != null && obj instanceof Ngram) {
+      Ngram ngram = (Ngram) obj;
         
-        result = mGram.equals(ngram.mGram) && 
-            mNumberOfOccurence == ngram.mNumberOfOccurence;
+      result = mGram.equals(ngram.mGram) && 
+          mNumberOfOccurence == ngram.mNumberOfOccurence;
       }
       else {
         result = false;

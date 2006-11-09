@@ -23,6 +23,8 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 
+import opennlp.tools.util.InvalidFormatException;
+
 import junit.framework.TestCase;
 
 /**
@@ -30,7 +32,7 @@ import junit.framework.TestCase;
  * 
  *
  * @author <a href="mailto:kottmann@gmail.com">Joern Kottmann</a>
- * @version $Revision: 1.1 $, $Date: 2006/08/15 21:16:00 $
+ * @version $Revision: 1.2 $, $Date: 2006/11/09 15:34:45 $
  */
 public class ProfileSerializerTest extends TestCase {
  
