@@ -20,29 +20,21 @@ package opennlp.tools.ngram;
 
 import java.util.Arrays;
 import java.util.Iterator;
+import java.util.NoSuchElementException;
 
 
 /**
  * 
  * @author <a href="mailto:kottmann@gmail.com">Joern Kottmann</a>
- * @version $Revision: 1.1 $, $Date: 2006/11/09 15:34:16 $
+ * @version $Revision: 1.2 $, $Date: 2006/11/11 04:13:17 $
  */
 public class TokenList {
   
   private Token mTokens[];
   
-  public TokenList(Token token) {
-    
-    if (token == null) {
-      throw new IllegalArgumentException();
-    }
-    
-    mTokens = new Token[] {token};
-  }
-  
   public TokenList(Token tokens[]) {
     
-    if (tokens == null || tokens.length == 1) {
+    if (tokens == null || tokens.length == 0) {
       throw new IllegalArgumentException();
     }
     
@@ -52,10 +44,15 @@ public class TokenList {
   }
   
   public TokenList(String tokens[]) {
+    
+    if (tokens == null || tokens.length == 0) {
+      throw new IllegalArgumentException();
+    }
+    
     mTokens = new Token[tokens.length];
     
     for (int i = 0; i < tokens.length; i++) {
-      mTokens[i] = Token.parse(tokens[i]);
+      mTokens[i] = Token.create(tokens[i]);
     }
   }
   
@@ -63,12 +60,34 @@ public class TokenList {
     return mTokens[index];
   }
   
-  public int numberOfTokens() {
+  public int size() {
     return mTokens.length;
   }
   
-  Iterator iterator() {
-    return null;
+  public Iterator iterator() {
+    return new Iterator() {
+      
+      private int mIndex;
+      
+      public boolean hasNext() {
+        return mIndex < size();
+      }
+
+      public Object next() {
+        
+        if (hasNext()) {
+          return getToken(mIndex++);
+        }
+        else {
+          throw new NoSuchElementException();
+        }
+      }
+
+      public void remove() {
+        throw new UnsupportedOperationException();
+      }
+      
+    };
   }
   
   public boolean equals(Object obj) {
@@ -89,13 +108,39 @@ public class TokenList {
     
     return result;
   }
+  
   /**
    * TODO: implement it
    */
   public int hashCode() {
-    return 0; 
+    int numBitsRegular = 32 / size();
+    int numExtra = 32 % size();
+    int maskExtra = 0xFFFFFFFF >>> (32 - numBitsRegular + 1);
+    int maskRegular = 0xFFFFFFFF >>> 32 - numBitsRegular;
+    int code = 0x000000000;
+    int leftMostBit = 0;
+
+    for (int wi = 0; wi < size(); wi++) {
+      int word;
+      int mask;
+      int numBits;
+      if (wi < numExtra) {
+        mask = maskExtra;
+        numBits = numBitsRegular + 1;
+      } else {
+        mask = maskRegular;
+        numBits = numBitsRegular;
+      }
+      word = getToken(wi).hashCode() & mask; // mask off top bits
+      word <<= 32 - leftMostBit - numBits; // move to correct position
+      leftMostBit += numBits; // set for next interation
+      code |= word;
+    }
+    
+    return code;
   }
   
+  // TODO: implement it
   public String toString() {
     return super.toString();
   }

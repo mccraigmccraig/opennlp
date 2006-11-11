@@ -18,161 +18,43 @@
 
 package opennlp.tools.ngram;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
-import java.util.List;
 import java.util.Map;
 
-
 /**
- * This class is an orderd lookup dictionary.
+ * This class is a lookup dictionary.
+ * 
  * TODO: it should be possible to specify the capacity
  * 
  * @author <a href="mailto:kottmann@gmail.com">Joern Kottmann</a>
- * @version $Revision: 1.1 $, $Date: 2006/11/09 22:32:19 $
+ * @version $Revision: 1.2 $, $Date: 2006/11/11 04:13:17 $
  */
 public class MultiTokenDictionary {
   
-  /**
-   * The {@link Entry} contains the entry itself and its {@link Attributes}.
-   * 
-   */
-  private static class Entry {
-    
-    private TokenList mTokens;
-    private Attributes mAttributes;
-
-    /**
-     * Creates a new {@link Entry} instance.
-     * 
-     * @param entry the entry
-     * @param attributes the attributes of the entry, or if none null
-     */
-    private Entry(TokenList tokens, Attributes attributes) {
-      
-      if (tokens == null) {
-        throw new IllegalArgumentException();
-      }
-      
-      mTokens = tokens;
-      
-      mAttributes = attributes;
-    }
-    
-    /**
-     * Retrives the entry.
-     * 
-     * @return the entry
-     */
-    private TokenList getEntry() {
-      return mTokens;
-    }
-    
-    /**
-     * Retrives the value of a given attribute key.
-     * 
-     * @return attribute value, if not set null is returned
-     */
-    private Attributes getAttribute() {
-      return mAttributes;
-    }
-    
-  }
-  
-  private String mName;
-  
   private Map mEntryMap = new HashMap();
-  
-  private List mEntryList = new ArrayList();
-  
-  /**
-   * Creates a new {@link MultiTokenDictionary} object.
-   * 
-   * @param name the name of the dictionary
-   */
-  public MultiTokenDictionary(String name) {
-    
-    if (name == null) {
-      throw new IllegalArgumentException("name must not be null!");
-    }
-    
-    mName = name;
-  }
-  
-  /**
-   * Retrives the name of the current dictionary instance.
-   * 
-   * @return the name of the dictionary
-   */
-  public String getName() {
-    return mName;
-  }
   
   /**
    * Adds the tokens to the dicitionary as one new entry. 
-   * If the tokens already exists nothing happens. 
-   * 
-   * The new entry is added to the end of the dicitionary.
-   * 
-   * Note: Make sure that the entry was not previously added 
-   * to the dictionary, otherwise an {@link IllegalArgumentException} will be
-   * thrown.
+   * If the tokens already exists its {@link Attributes} are replaced
+   * with an empty {@link Attributes} object.
    * 
    * @param tokens the new entry
    */
-  public void add(TokenList tokens) {
-    add(tokens, null);
+  public void put(TokenList tokens) {
+    put(tokens, new Attributes());
   }
   
   /**
    * Adds the tokens to the dicitionary combinded with {@link Attributes} 
-   * as one new entry. If the tokens already exists nothing happens.
-   * 
-   * The new entry is added to the end of the dicitionary.
-   * 
-   * Note: Make sure that the entry was not previously added 
-   * to the dictionary, otherwise an {@link IllegalArgumentException} will be
-   * thrown.
+   * as one new entry. If the tokens already exists the {@link Attributes}
+   * are updated.
    * 
    * @param tokens the new entry
    * @param attributes the attributes of the entry
    */
-  public void add(TokenList tokens, Attributes attributes) {
-    add(tokens, attributes, mEntryList.size());
-  }
-  
-  /**
-   * Adds the tokens to the dicitionary combinded with {@link Attributes} 
-   * as one new entry. 
-   * If the tokens already exists nothing happens.
-   * The new entry is inserted at the given index.
-   * 
-   * Note: Make sure that the entry was not previously added 
-   * to the dictionary, otherwise an {@link IllegalArgumentException} will be
-   * thrown.
-   * 
-   * @param tokens the new entry
-   * @param attributes the attributes of the entry
-   * @param index position where the entry will be inserted
-   * 
-   * @throws IllegalArgumentException is thrown if the entry exist already.
-   */
-  public void add(TokenList tokens, Attributes attributes, int index) {
-    
-    Entry newEntry = new Entry(tokens, attributes);
-    
-    Attributes oldAttributes = (Attributes) mEntryMap.put(
-        tokens, newEntry);
-
-    if (oldAttributes != null) {
-      // restore old value
-      mEntryMap.put(tokens, oldAttributes);
-      
-      throw new IllegalArgumentException();
-    }
-    
-    mEntryList.add(index, newEntry);
+  public void put(TokenList tokens, Attributes attributes) {
+    mEntryMap.put(tokens, attributes);
   }
   
   /**
@@ -187,47 +69,23 @@ public class MultiTokenDictionary {
   }
   
   public Attributes get(TokenList tokens) {
-    return ((Entry) mEntryMap.get(tokens)).getAttribute();
-  }
-  
-  public String get(TokenList tokens, String key) {
-    return get(tokens).getValue(key);
-  }
-  
-  public Attributes get(int index) {
-    return ((Entry) mEntryList.get(index)).getAttribute();
-  }
-  
-  public TokenList getToken(int index) {
-    return ((Entry) mEntryList.get(index)).getEntry();
+    return (Attributes) mEntryMap.get(tokens);
   }
   
   public void remove(TokenList tokens) {
-    Entry removedEntry = (Entry) mEntryMap.remove(tokens);
-    
-    mEntryList.remove(removedEntry);
+    mEntryMap.remove(tokens);
   }
   
-  public void remove(int index) {
-    Entry removedEntry = (Entry) mEntryList.remove(index);
-    
-    mEntryMap.remove(removedEntry.getEntry());
+  public Iterator iterator() {
+    return mEntryMap.keySet().iterator();
   }
   
-  /**
-   * Iterates over all entires, this is only used internal.
-   * @return
-   */
-  Iterator entryIterator() {
-    return mEntryMap.values().iterator();
-  }
-
   public int size() {
-    return mEntryList.size();
+    return mEntryMap.size();
   }
   
-  // TODO: add tokens to the string ???
+  // TODO: add tokens to the string
   public String toString() {
-    return "Name: " + getName() + " size: " +size();
+    return "Size: " + size();
   }
 }

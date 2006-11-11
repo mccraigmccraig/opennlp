@@ -21,7 +21,7 @@ package opennlp.tools.ngram;
 import java.lang.ref.WeakReference;
 
 import opennlp.tools.ngram.Token;
-import opennlp.tools.ngram.TokenTable;
+import opennlp.tools.ngram.TokenSet;
 
 import junit.framework.TestCase;
 
@@ -31,14 +31,14 @@ import junit.framework.TestCase;
 public class TokenTest extends TestCase {
 
   /**
-   * Tests if the {@link TokenTable} really allows unreferenced 
+   * Tests if the {@link TokenSet} really allows unreferenced 
    * objects to be collected.
    * 
    * Note: Maybe this test can fail.
    */
   public void testTokenTableGarbageCollection() {
 
-    Token token = Token.parse("test");
+    Token token = Token.create("test");
     
     WeakReference weakToken = new WeakReference(token);
     token = null;
@@ -49,12 +49,12 @@ public class TokenTest extends TestCase {
   }
   
   /**
-   * Tests if the {@link TokenTable} lookup really works.
+   * Tests if the {@link TokenSet} lookup really works.
    */
   public void testTokenTableLookup() {
     
-    Token token1 = Token.parse("test");
-    Token token2 = Token.parse("test");
+    Token token1 = Token.create("test");
+    Token token2 = Token.create("test");
     
     assertTrue(token1 == token2);
   }
@@ -63,7 +63,7 @@ public class TokenTest extends TestCase {
    * Tests that {@link Token#hashCode()} does not throw an exception.
    */
   public void testHashCode() {
-    Token token = Token.parse("HashCodeTest");
+    Token token = Token.create("HashCodeTest");
     token.hashCode();
   }
 
@@ -72,7 +72,7 @@ public class TokenTest extends TestCase {
    * the result is not null.
    */
   public void testToString() {
-    Token token = Token.parse("HashCodeTest");
+    Token token = Token.create("HashCodeTest");
     assertTrue(token.toString() != null);
   }
 

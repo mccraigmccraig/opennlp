@@ -18,11 +18,10 @@
 
 package opennlp.tools.ngram;
 
-
 /**
  * 
  * @author <a href="mailto:kottmann@gmail.com">Joern Kottmann</a>
- * @version $Revision: 1.1 $, $Date: 2006/11/09 15:34:16 $
+ * @version $Revision: 1.2 $, $Date: 2006/11/11 04:13:17 $
  */
 public class Token {
 
@@ -32,7 +31,7 @@ public class Token {
    * Initializes a new Token object.
    * 
    * Note: 
-   * Tokens should only be created with {@link #parse(String)}.
+   * Tokens should only be created with {@link #create(String)}.
    * 
    * @param token
    */
@@ -78,12 +77,12 @@ public class Token {
    * 
    * @return
    */
-  public static Token parse(String token) {
+  public static Token create(String token) {
     
     if (token == null) {
       throw new IllegalArgumentException("token parameter must not be null!");
     }
     
-    return TokenTable.getInstance().insert(new Token(token));
+    return TokenSet.getInstance().insert(new Token(token));
   }
 }

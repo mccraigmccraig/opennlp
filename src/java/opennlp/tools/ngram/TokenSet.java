@@ -29,15 +29,15 @@ import java.util.WeakHashMap;
  * not used anymore.
  * 
  * @author <a href="mailto:kottmann@gmail.com">Joern Kottmann</a>
- * @version $Revision: 1.1 $, $Date: 2006/11/09 15:34:16 $
+ * @version $Revision: 1.1 $, $Date: 2006/11/11 04:13:17 $
  */
-class TokenTable {
+class TokenSet {
   
-  private static TokenTable sInstance;
+  private static TokenSet sInstance;
   
   private Map mTokenTable = new WeakHashMap();
   
-  private TokenTable() {
+  private TokenSet() {
   }
   
   Token insert(Token token) {
@@ -57,9 +57,9 @@ class TokenTable {
     }
   }
   
-  static TokenTable getInstance() {
+  static TokenSet getInstance() {
     if (sInstance == null) {
-      sInstance = new TokenTable();
+      sInstance = new TokenSet();
     }
     
     return sInstance;
