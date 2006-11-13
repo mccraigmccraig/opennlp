@@ -28,9 +28,9 @@ import java.util.Map;
  * TODO: it should be possible to specify the capacity
  * 
  * @author <a href="mailto:kottmann@gmail.com">Joern Kottmann</a>
- * @version $Revision: 1.2 $, $Date: 2006/11/11 04:13:17 $
+ * @version $Revision: 1.1 $, $Date: 2006/11/13 21:10:58 $
  */
-public class MultiTokenDictionary {
+public class AttributeDictionary {
   
   private Map mEntryMap = new HashMap();
   
