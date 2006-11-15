@@ -18,42 +18,13 @@
 
 package opennlp.tools.ngram;
 
-import java.util.HashMap;
 import java.util.Iterator;
-import java.util.Map;
 
 /**
- * The {@link Attributes} class stores name value pairs.
  * 
- * Problem: The HashMap for storing the name value pairs has a very high 
- * memory footprint, replace it.
+ * @author <a href="mailto:kottmann@gmail.com">Joern Kottmann</a>
+ * @version $Revision: 1.1 $, $Date: 2006/11/15 17:35:35 $
  */
-public class Attributes {
-  
-  private Map mNameValueMap = new HashMap();
-  
-  /**
-   * Retrives the value for the given key or null if attribute it not set.
-   * 
-   * @param key
-   * 
-   * @return the value
-   */
-  public  String getValue(String key) {
-    return (String) mNameValueMap.get(key);
-  }
-  
-  /**
-   * Sets a key/value pair.
-   * 
-   * @param key
-   * @param value
-   */
-  public void setValue(String key, String value) {
-    mNameValueMap.put(key, value);
-  }
-
-  public Iterator iterator() {
-    return mNameValueMap.keySet().iterator();
-  }
+public interface EntryInserter {
+  void insert(Entry entry);
 }

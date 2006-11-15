@@ -26,7 +26,7 @@ import java.util.NoSuchElementException;
 /**
  * 
  * @author <a href="mailto:kottmann@gmail.com">Joern Kottmann</a>
- * @version $Revision: 1.2 $, $Date: 2006/11/11 04:13:17 $
+ * @version $Revision: 1.3 $, $Date: 2006/11/15 17:35:58 $
  */
 public class TokenList {
   
@@ -109,9 +109,6 @@ public class TokenList {
     return result;
   }
   
-  /**
-   * TODO: implement it
-   */
   public int hashCode() {
     int numBitsRegular = 32 / size();
     int numExtra = 32 % size();
@@ -140,8 +137,22 @@ public class TokenList {
     return code;
   }
   
-  // TODO: implement it
   public String toString() {
-    return super.toString();
+    StringBuffer string = new StringBuffer();
+    
+    string.append('[');
+    
+    for (int i = 0; i < size(); i++) {
+      Token token = getToken(i);
+      string.append(token.getToken());
+      
+      if (i < size() - 1) {
+        string.append(',');
+      }
+    }
+    
+    string.append(']');
+    
+    return string.toString();
   }
 }

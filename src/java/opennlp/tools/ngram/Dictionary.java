@@ -18,6 +18,9 @@
 
 package opennlp.tools.ngram;
 
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
@@ -28,11 +31,23 @@ import java.util.Set;
  * TODO: it should be possible to specify the capacity
  * 
  * @author <a href="mailto:kottmann@gmail.com">Joern Kottmann</a>
- * @version $Revision: 1.10 $, $Date: 2006/11/13 21:10:57 $
+ * @version $Revision: 1.11 $, $Date: 2006/11/15 17:35:35 $
  */
 public class Dictionary {
   
   private Set mEntrySet = new HashSet();
+  
+  public Dictionary() {
+  }
+
+  public Dictionary(InputStream in) throws IOException {
+    DictionarySerializer.create(in, new EntryInserter() 
+        {
+          public void insert(Entry entry) {
+            put(entry.getTokens());
+          }
+        });
+  }
   
   /**
    * Adds the tokens to the dicitionary as one new entry. 
@@ -66,12 +81,56 @@ public class Dictionary {
     return mEntrySet.size();
   }
   
+  public void serialize(OutputStream out) throws IOException {
+    
+    Iterator entryIterator = new Iterator() 
+      {
+        private Iterator mDictionaryIterator = Dictionary.this.iterator();
+        
+        public boolean hasNext() {
+          return mDictionaryIterator.hasNext();
+        }
+
+        public Object next() {
+          
+          TokenList tokens = (TokenList) mDictionaryIterator.next();
+          
+          return new Entry(tokens, new Attributes());
+        }
+
+        public void remove() {
+          throw new UnsupportedOperationException();
+        }
+      
+      };
+      
+    DictionarySerializer.serialize(out, entryIterator);
+  }
+  
+  public boolean equals(Object obj) {
+    
+    boolean result;
+    
+    if (obj == this) {
+      result = true;
+    }
+    else if (obj != null && obj instanceof Dictionary) {
+      Dictionary dictionary  = (Dictionary) obj;
+      
+      result = mEntrySet.equals(dictionary.mEntrySet);
+    }
+    else {
+      result = false;
+    }
+    
+    return result;
+  }
+  
   public int hashCode() {
     return mEntrySet.hashCode();
   }
   
-  // TODO: add tokens to the string
   public String toString() {
-    return "Size: " + size();
+    return mEntrySet.toString();
   }
 }

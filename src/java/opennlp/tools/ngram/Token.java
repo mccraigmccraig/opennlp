@@ -21,7 +21,7 @@ package opennlp.tools.ngram;
 /**
  * 
  * @author <a href="mailto:kottmann@gmail.com">Joern Kottmann</a>
- * @version $Revision: 1.2 $, $Date: 2006/11/11 04:13:17 $
+ * @version $Revision: 1.3 $, $Date: 2006/11/15 17:35:58 $
  */
 public class Token {
 
@@ -39,6 +39,10 @@ public class Token {
     mToken = token;
   }
   
+  public String getToken() {
+    return mToken;
+  }
+
   public int hashCode() {
     return mToken.hashCode();
   }
