@@ -27,6 +27,9 @@ import junit.framework.TestCase;
 
 /**
  * Tests for the {@link Token} class.
+ * 
+ * @author <a href="mailto:kottmann@gmail.com">Joern Kottmann</a>
+ * @version $Revision: 1.3 $, $Date: 2006/11/15 17:47:39 $
  */
 public class TokenTest extends TestCase {
 
