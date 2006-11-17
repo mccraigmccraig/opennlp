@@ -23,13 +23,20 @@ package opennlp.tools.util;
  * an invalid format e.g. non valid xml.
  *
  * @author <a href="mailto:kottmann@gmail.com">Joern Kottmann</a>
- * @version $Revision: 1.1 $, $Date: 2006/11/08 19:26:00 $
+ * @version $Revision: 1.2 $, $Date: 2006/11/17 09:37:42 $
  */
 public class InvalidFormatException extends Exception {
   
   private static final long serialVersionUID = 0;
   
+  public InvalidFormatException() {
+  }
+  
   public InvalidFormatException(String message, Throwable throwable) {
     super(message, throwable);
+  }
+
+  public InvalidFormatException(String message) {
+    super(message);
   }
 }

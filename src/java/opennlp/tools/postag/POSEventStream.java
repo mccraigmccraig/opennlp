@@ -18,6 +18,7 @@
 
 package opennlp.tools.postag;
 
+import java.io.FileInputStream;
 import java.io.StringReader;
 
 import opennlp.maxent.DataStream;
@@ -86,7 +87,7 @@ public class POSEventStream implements EventStream {
       ei = 0;
       line = null;
     }
-    return ((Event) events[ei++]);
+    return events[ei++];
   }    
 
   private void addNewEvents(String sentence) {
@@ -97,7 +98,7 @@ public class POSEventStream implements EventStream {
   }
 
   public static void main(String[] args) throws java.io.IOException {
-    EventStream es = new POSEventStream(new opennlp.maxent.PlainTextByLineDataStream(new java.io.InputStreamReader(System.in)),new Dictionary(args[0]));
+    EventStream es = new POSEventStream(new opennlp.maxent.PlainTextByLineDataStream(new java.io.InputStreamReader(System.in)),new Dictionary(new FileInputStream(args[0])));
     while (es.hasNext()) {
       System.out.println(es.nextEvent());
     }

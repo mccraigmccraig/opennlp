@@ -37,7 +37,7 @@ public class LinkerMode {
 
 
   public String toString() {
-    return(name);
+    return name;
   }
 
 }

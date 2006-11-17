@@ -20,6 +20,7 @@ package opennlp.tools.lang.english;
 
 import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
 
@@ -37,7 +38,7 @@ import opennlp.tools.postag.TagDictionary;
  * achieved >96% accuracy on unseen data.
  *
  * @author      Gann Bierner
- * @version     $Revision: 1.7 $, $Date: 2006/08/15 21:08:29 $
+ * @version     $Revision: 1.8 $, $Date: 2006/11/17 09:37:22 $
  */
 
 public class PosTagger extends POSTaggerME {
@@ -111,7 +112,9 @@ public class PosTagger extends POSTaggerME {
     
     if (tagdict != null) {
       if (dictFile != null) {
-        tagger = new PosTagger(model,new Dictionary(dictFile),new POSDictionary(tagdict,caseSensitive));
+        tagger = new PosTagger(model,new Dictionary(
+            new FileInputStream(dictFile)), 
+            new POSDictionary(tagdict,caseSensitive));
       }
       else {
         tagger = new PosTagger(model,new POSDictionary(tagdict,caseSensitive));
@@ -119,7 +122,8 @@ public class PosTagger extends POSTaggerME {
     }
     else {
       if (dictFile != null) {
-        tagger = new PosTagger(model,new Dictionary(dictFile));
+        tagger = new PosTagger(model,
+            new Dictionary(new FileInputStream(dictFile)));
       }
       else {
         tagger = new PosTagger(model,(Dictionary)null);

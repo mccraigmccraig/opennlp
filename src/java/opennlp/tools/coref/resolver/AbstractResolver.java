@@ -52,7 +52,7 @@ public abstract class AbstractResolver implements Resolver {
    * @return the number of previous entities that resolver should consider.
    */
   protected int getNumEntities() {
-    return(numEntitiesBack);
+    return numEntitiesBack;
   }
   
   /**
@@ -69,7 +69,7 @@ public abstract class AbstractResolver implements Resolver {
    * @return number of entites that should be considered for resolution.
    */
   protected int getNumEntities(DiscourseModel dm) {
-    return(Math.min(dm.getNumEntities(),numEntitiesBack));
+    return Math.min(dm.getNumEntities(),numEntitiesBack);
   }
 
   /**
@@ -87,15 +87,15 @@ public abstract class AbstractResolver implements Resolver {
    * @return the index for the head word for the specified mention.
    */
   protected int getHeadIndex(MentionContext mention) {
-    Parse[] mtokens = (Parse[]) mention.getTokenParses();
+    Parse[] mtokens = mention.getTokenParses();
     for (int ti=mtokens.length-1;ti>=0;ti--) {
       Parse tok = mtokens[ti];
       if (!tok.getSyntacticType().equals("POS") && !tok.getSyntacticType().equals(",") &&
           !tok.getSyntacticType().equals(".")) {
-        return(ti);
+        return ti;
       }
     }
-    return(mtokens.length-1);
+    return mtokens.length-1;
   }
 
   /**
@@ -104,7 +104,7 @@ public abstract class AbstractResolver implements Resolver {
    * @return The text of the head word for the specified mention.
    */
   protected String getHeadString(MentionContext mention) {
-    return(mention.getHeadTokenText().toLowerCase());
+    return mention.getHeadTokenText().toLowerCase();
   }
 
   /**
@@ -131,25 +131,25 @@ public abstract class AbstractResolver implements Resolver {
    */
   protected boolean excluded(MentionContext mention, DiscourseEntity entity) {
     MentionContext cec = entity.getLastExtent();
-    return(mention.getSentenceNumber() == cec.getSentenceNumber() && 
-	   mention.getIndexSpan().getEnd() <= cec.getIndexSpan().getEnd());
+    return mention.getSentenceNumber() == cec.getSentenceNumber() && 
+	   mention.getIndexSpan().getEnd() <= cec.getIndexSpan().getEnd();
   }
 
   public DiscourseEntity retain(MentionContext mention, DiscourseModel dm) {
     int ei = 0;
     if (mention.getId() == -1) {
-      return(null);
+      return null;
     }
     for (; ei < dm.getNumEntities(); ei++) {
       DiscourseEntity cde = dm.getEntity(ei);
       MentionContext cec = cde.getLastExtent(); // candidate extent context
       if (cec.getId() == mention.getId()) {
         distances.add(new Integer(ei));
-        return (cde);
+        return cde;
       }
     }
     //System.err.println("AbstractResolver.retain: non-refering entity with id: "+ec.toText()+" id="+ec.id);
-    return(null);
+    return null;
   }
   
   /**
@@ -180,7 +180,7 @@ public abstract class AbstractResolver implements Resolver {
     int end=mention.getHeadTokenIndex()+1;
     if (start == end) {
       //System.err.println("stripNp: return null 1");
-      return(null);
+      return null;
     }
     //strip determiners
     if (mtokens[start].getSyntacticType().equals("DT")) {
@@ -188,7 +188,7 @@ public abstract class AbstractResolver implements Resolver {
     }
     if (start == end) {
       //System.err.println("stripNp: return null 2");
-      return(null);
+      return null;
     }
     //get to first NNP
     String type;
@@ -201,7 +201,7 @@ public abstract class AbstractResolver implements Resolver {
     }
     if (start == end) {
       //System.err.println("stripNp: return null 3");
-      return(null);
+      return null;
     }
     if (start+1 != end) { // don't do this on head words, to keep "U.S."
       //strip off honorifics in begining
@@ -210,7 +210,7 @@ public abstract class AbstractResolver implements Resolver {
       }
       if (start == end) {
         //System.err.println("stripNp: return null 4");
-        return(null);
+        return null;
       }
       //strip off and honerifics on the end
       if (Linker.designatorsPattern.matcher(mtokens[mtokens.length-1].toString()).find()) {
@@ -219,13 +219,13 @@ public abstract class AbstractResolver implements Resolver {
     }
     if (start == end) {
       //System.err.println("stripNp: return null 5");
-      return(null);
+      return null;
     }
     String strip=new String();
     for (int i=start;i<end;i++) {
       strip+=mtokens[i].toString()+" ";
     }
-    return(strip.trim());
+    return strip.trim();
   }
 
 
@@ -238,16 +238,16 @@ public abstract class AbstractResolver implements Resolver {
    */
   public static String getPronounGender(String pronoun) {
     if (Linker.malePronounPattern.matcher(pronoun).matches()) {
-      return ("m");
+      return "m";
     }
     else if (Linker.femalePronounPattern.matcher(pronoun).matches()) {
-      return ("f");
+      return "f";
     }
     else if (Linker.neuterPronounPattern.matcher(pronoun).matches()) {
-      return ("n");
+      return "n";
     }
     else {
-      return ("u");
+      return "u";
     }
   };
 }

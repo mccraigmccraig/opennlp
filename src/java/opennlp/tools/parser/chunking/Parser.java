@@ -17,6 +17,9 @@
 //////////////////////////////////////////////////////////////////////////////   
 package opennlp.tools.parser.chunking;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -28,7 +31,8 @@ import opennlp.maxent.GISModel;
 import opennlp.maxent.MaxentModel;
 import opennlp.maxent.TwoPassDataIndexer;
 import opennlp.tools.dictionary.Dictionary;
-import opennlp.tools.dictionary.MutableDictionary;
+import opennlp.tools.ngram.NGramModel;
+import opennlp.tools.ngram.Token;
 import opennlp.tools.parser.AbstractBottomUpParser;
 import opennlp.tools.parser.HeadRules;
 import opennlp.tools.parser.Parse;
@@ -266,26 +270,30 @@ public class Parser extends AbstractBottomUpParser {
    * @param cutoff The minimum number of entries required for the n-gram to be saved as part of the dictionary. 
    * @return A dictionary object.
    */
-  private static MutableDictionary buildDictionary(DataStream data, HeadRules rules, int cutoff) {
-    MutableDictionary mdict = new MutableDictionary(cutoff);
+  private static Dictionary buildDictionary(DataStream data, HeadRules rules, int cutoff) {
+    NGramModel mdict = new NGramModel();
     while(data.hasNext()) {
       String parseStr = (String) data.nextToken();
       Parse p = Parse.parseParse(parseStr);
       p.updateHeads(rules);
       Parse[] pwords = p.getTagNodes();
       String[] words = new String[pwords.length];
+      
       //add all uni-grams
-      for (int wi=0;wi<words.length;wi++) {
+      for (int wi=0; wi < words.length; wi++) {
         words[wi] = pwords[wi].toString();
       }
-      mdict.add(words,1,true);
+      
+      mdict.add(Token.create(words), 1, 1);
       //add tri-grams and bi-grams for inital sequence
       Parse[] chunks = collapsePunctuation(ParserEventStream.getInitialChunks(p),rules.getPunctuationTags());
       String[] cwords = new String[chunks.length];
       for (int wi=0;wi<cwords.length;wi++) {
         cwords[wi] = chunks[wi].getHead().toString();
       }
-      mdict.add(cwords,3,false);
+      
+      mdict.add(Token.create(cwords), 1, 3);
+      
       //emulate reductions to produce additional n-grams 
       int ci = 0;
       while (ci < chunks.length) {
@@ -315,10 +323,10 @@ public class Parser extends AbstractBottomUpParser {
               window = subWindow;
             }
             if (window.length >=3) {
-              mdict.add(window,3,false);
+              mdict.add(Token.create(window), 1, 3);
             }
             else if (window.length == 2) {
-              mdict.add(window,2,false);
+              mdict.add(Token.create(window), 1, 2);
             }
           }
           ci=reduceStart-1; //ci will be incremented at end of loop
@@ -326,7 +334,10 @@ public class Parser extends AbstractBottomUpParser {
         ci++;
       }
     }
-    return mdict;
+    
+    mdict.cutoff(cutoff, Integer.MAX_VALUE);
+    
+    return mdict.toDictionary();
   }
 
   public static void main(String[] args) throws java.io.IOException {
@@ -373,14 +384,14 @@ public class Parser extends AbstractBottomUpParser {
       }
       argIndex++;
     }
-    java.io.File inFile = new java.io.File(args[argIndex++]);
+    File inFile = new java.io.File(args[argIndex++]);
     String modelDirectory = args[argIndex++];
     HeadRules rules = new opennlp.tools.lang.english.HeadRules(modelDirectory+"/head_rules");
-    java.io.File dictFile = new java.io.File(modelDirectory+"/dict.bin.gz");
-    java.io.File tagFile = new java.io.File(modelDirectory+"/tag.bin.gz");
-    java.io.File chunkFile = new java.io.File(modelDirectory+"/chunk.bin.gz");
-    java.io.File buildFile = new java.io.File(modelDirectory+"/build.bin.gz");
-    java.io.File checkFile = new java.io.File(modelDirectory+"/check.bin.gz");
+    File dictFile = new java.io.File(modelDirectory+"/dict.bin.gz");
+    File tagFile = new java.io.File(modelDirectory+"/tag.bin.gz");
+    File chunkFile = new java.io.File(modelDirectory+"/chunk.bin.gz");
+    File buildFile = new java.io.File(modelDirectory+"/build.bin.gz");
+    File checkFile = new java.io.File(modelDirectory+"/check.bin.gz");
     int iterations = 100;
     int cutoff = 5;
     if (args.length > argIndex) {
@@ -393,9 +404,9 @@ public class Parser extends AbstractBottomUpParser {
     if (dict || all) {
       System.err.println("Building dictionary");
       DataStream data = new opennlp.maxent.PlainTextByLineDataStream(new java.io.FileReader(inFile));
-      MutableDictionary mdict = buildDictionary(data, rules, cutoff);
+      Dictionary mdict = buildDictionary(data, rules, cutoff);
       System.out.println("Saving the dictionary");
-      mdict.persist(dictFile);
+      mdict.serialize(new FileOutputStream(dictFile));
     }
     if (tag || all) {
       System.err.println("Training tagger");
@@ -417,7 +428,8 @@ public class Parser extends AbstractBottomUpParser {
 
     if (build || all) {
       System.err.println("Loading Dictionary");
-      Dictionary tridict = new Dictionary(dictFile.toString());
+      Dictionary tridict = new Dictionary(new FileInputStream(
+          dictFile.toString()));
       System.err.println("Training builder");
       opennlp.maxent.EventStream bes = new ParserEventStream(new opennlp.maxent.PlainTextByLineDataStream(new java.io.FileReader(inFile)), rules, ParserEventTypeEnum.BUILD,tridict);
       GISModel buildModel = train(bes, iterations, cutoff);

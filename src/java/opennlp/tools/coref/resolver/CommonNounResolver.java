@@ -48,7 +48,7 @@ public class CommonNounResolver extends MaxentResolver {
       features.addAll(getContextFeatures(mention));
       features.addAll(getStringMatchFeatures(mention,entity));
     }
-    return (features);
+    return features;
   }
   
   public boolean canResolve(MentionContext mention) {
@@ -64,7 +64,7 @@ public class CommonNounResolver extends MaxentResolver {
     }
     else {
       MentionContext cec = de.getLastExtent();
-      return (!canResolve(cec) || super.excluded(ec, de));
+      return !canResolve(cec) || super.excluded(ec, de);
     }
   }
 }

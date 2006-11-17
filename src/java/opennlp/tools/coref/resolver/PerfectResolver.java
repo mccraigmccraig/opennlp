@@ -31,14 +31,14 @@ public class PerfectResolver extends  AbstractResolver {
   }
 
   public boolean canResolve(MentionContext ec) {
-    return(true);
+    return true;
   }
 
   protected boolean outOfRange(MentionContext ec, DiscourseEntity de) {
-    return(false);
+    return false;
   }
 
   public DiscourseEntity resolve(MentionContext ec, DiscourseModel dm) {
-    return(null);
+    return null;
   }
 }

@@ -22,12 +22,15 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 
+import opennlp.tools.dictionary.Dictionary;
+
 import junit.framework.TestCase;
 
 /**
+  * Tests for the {@link Dictionary} class.
   * 
   * @author <a href="mailto:kottmann@gmail.com">Joern Kottmann</a>
-  * @version $Revision: 1.1 $, $Date: 2006/11/15 17:47:40 $
+  * @version $Revision: 1.2 $, $Date: 2006/11/17 09:41:21 $
   */
 public class DictionaryTest extends TestCase  {
   

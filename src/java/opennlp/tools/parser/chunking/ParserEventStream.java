@@ -17,6 +17,7 @@
 //////////////////////////////////////////////////////////////////////////////   
 package opennlp.tools.parser.chunking;
 
+import java.io.FileInputStream;
 import java.util.List;
 
 import opennlp.maxent.DataStream;
@@ -201,7 +202,7 @@ public class ParserEventStream extends AbstractParserEventStream {
     HeadRules rules = new opennlp.tools.lang.english.HeadRules(args[ai++]);
     Dictionary dict = null;
     if (ai < args.length) {
-      dict = new Dictionary(args[ai++]);
+      dict = new Dictionary(new FileInputStream(args[ai++]));
     }
     if (fun) {
       Parse.useFunctionTags(true);

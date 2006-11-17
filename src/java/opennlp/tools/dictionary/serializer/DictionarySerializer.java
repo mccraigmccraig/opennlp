@@ -16,7 +16,7 @@
 //Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 //////////////////////////////////////////////////////////////////////////////
 
-package opennlp.tools.ngram;
+package opennlp.tools.dictionary.serializer;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -24,6 +24,8 @@ import java.io.OutputStream;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.zip.GZIPInputStream;
+import java.util.zip.GZIPOutputStream;
 
 import javax.xml.transform.OutputKeys;
 import javax.xml.transform.Transformer;
@@ -31,6 +33,10 @@ import javax.xml.transform.TransformerConfigurationException;
 import javax.xml.transform.sax.SAXTransformerFactory;
 import javax.xml.transform.sax.TransformerHandler;
 import javax.xml.transform.stream.StreamResult;
+
+import opennlp.tools.ngram.Token;
+import opennlp.tools.ngram.TokenList;
+import opennlp.tools.util.InvalidFormatException;
 
 import org.xml.sax.ContentHandler;
 import org.xml.sax.InputSource;
@@ -43,7 +49,7 @@ import org.xml.sax.helpers.XMLReaderFactory;
 /**
   * 
   * @author <a href="mailto:kottmann@gmail.com">Joern Kottmann</a>
-  * @version $Revision: 1.1 $, $Date: 2006/11/15 17:35:35 $
+  * @version $Revision: 1.1 $, $Date: 2006/11/17 09:37:22 $
   */
 public class DictionarySerializer {
   
@@ -113,7 +119,11 @@ public class DictionarySerializer {
          
          Entry entry = new Entry(new TokenList(tokens), mAttributes);
          
-         mInserter.insert(entry);
+         try {
+           mInserter.insert(entry);
+         } catch (InvalidFormatException e) {
+           throw new SAXException("Invalid dictionary format!");
+         }
          
          mTokenList.clear();
          mAttributes = null;
@@ -178,7 +188,7 @@ public class DictionarySerializer {
     try {
       xmlReader = XMLReaderFactory.createXMLReader();
       xmlReader.setContentHandler(profileContentHandler);
-      xmlReader.parse(new InputSource(in));
+      xmlReader.parse(new InputSource(new GZIPInputStream(in)));
     } 
     catch (SAXException e) {
       //throw new InvalidFormatException("The profile data stream has" +
@@ -189,7 +199,7 @@ public class DictionarySerializer {
   
   public static void serialize(OutputStream out, Iterator entries) 
       throws IOException {
-    StreamResult streamResult = new StreamResult(out);
+    StreamResult streamResult = new StreamResult(new GZIPOutputStream(out));
     SAXTransformerFactory tf = (SAXTransformerFactory) 
         SAXTransformerFactory.newInstance();
     
@@ -246,7 +256,7 @@ public class DictionarySerializer {
     
     for (Iterator it = tokens.iterator(); it.hasNext(); ) {
       
-      hd.startElement("", "", TOKEN_ELEMENT, entryAttributes); 
+      hd.startElement("", "", TOKEN_ELEMENT, new AttributesImpl()); 
 
       Token token = (Token) it.next();
       

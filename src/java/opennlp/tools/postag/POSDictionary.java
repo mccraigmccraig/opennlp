@@ -62,7 +62,7 @@ public class POSDictionary implements TagDictionary {
    * @throws IOException when the specified file can not be read.
    */
   public POSDictionary(String file, String encoding, boolean caseSensitive) throws IOException {
-    this(new BufferedReader((encoding == null) ? new FileReader(file) : new InputStreamReader(new FileInputStream(file),encoding)), caseSensitive);
+    this(new BufferedReader(encoding == null ? new FileReader(file) : new InputStreamReader(new FileInputStream(file),encoding)), caseSensitive);
   }
 
   /**

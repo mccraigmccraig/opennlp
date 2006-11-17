@@ -21,6 +21,7 @@ package opennlp.tools.postag;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.Reader;
@@ -40,7 +41,9 @@ import opennlp.maxent.PlainTextByLineDataStream;
 import opennlp.maxent.TwoPassDataIndexer;
 import opennlp.maxent.io.SuffixSensitiveGISModelWriter;
 import opennlp.tools.dictionary.Dictionary;
-import opennlp.tools.dictionary.MutableDictionary;
+import opennlp.tools.ngram.NGramModel;
+import opennlp.tools.ngram.Token;
+import opennlp.tools.ngram.TokenList;
 import opennlp.tools.util.BeamSearch;
 import opennlp.tools.util.Pair;
 import opennlp.tools.util.Sequence;
@@ -51,19 +54,19 @@ import opennlp.tools.util.Sequence;
  * surrounding context.
  *
  * @author      Gann Bierner
- * @version $Revision: 1.20 $, $Date: 2006/08/15 21:08:29 $
+ * @version $Revision: 1.21 $, $Date: 2006/11/17 09:37:41 $
  */
 public class POSTaggerME implements Evalable, POSTagger {
 
   /**
    * The maximum entropy model to use to evaluate contexts.
    */
-  protected MaxentModel _posModel;
+  protected MaxentModel posModel;
 
   /**
    * The feature context generator.
    */
-  protected POSContextGenerator _contextGen;
+  protected POSContextGenerator contextGen;
 
   /**
    * Tag dictionary used for restricting words to a fixed set of tags.
@@ -76,7 +79,7 @@ public class POSTaggerME implements Evalable, POSTagger {
    * Says whether a filter should be used to check whether a tag assignment
    * is to a word outside of a closed class.
    */
-  protected boolean _useClosedClassTagsFilter = false;
+  protected boolean useClosedClassTagsFilter = false;
   
   private static final int DEFAULT_BEAM_SIZE =3;
 
@@ -103,7 +106,7 @@ public class POSTaggerME implements Evalable, POSTagger {
    * @param dict The n-gram dictionary used for feature generation.
    * @param tagdict The dictionary which specifies the valid set of tags for some words. 
    */
-  public POSTaggerME(MaxentModel model,Dictionary dict,TagDictionary tagdict) {
+  public POSTaggerME(MaxentModel model, Dictionary dict, TagDictionary tagdict) {
       this(DEFAULT_BEAM_SIZE,model, new DefaultPOSContextGenerator(dict),tagdict);
     }
 
@@ -113,7 +116,7 @@ public class POSTaggerME implements Evalable, POSTagger {
    * @param cg The context generator used for feature creation.
    */
   public POSTaggerME(MaxentModel model, POSContextGenerator cg) {
-    this(DEFAULT_BEAM_SIZE,model,cg,null);
+    this(DEFAULT_BEAM_SIZE, model, cg, null);
   }
   
   /**
@@ -123,7 +126,7 @@ public class POSTaggerME implements Evalable, POSTagger {
    * @param tagdict The dictionary which specifies the valid set of tags for some words.
    */
   public POSTaggerME(MaxentModel model, POSContextGenerator cg, TagDictionary tagdict) {
-      this(DEFAULT_BEAM_SIZE,model,cg,tagdict);
+      this(DEFAULT_BEAM_SIZE, model, cg, tagdict);
     }
 
   /**
@@ -135,8 +138,8 @@ public class POSTaggerME implements Evalable, POSTagger {
    */
   public POSTaggerME(int beamSize, MaxentModel model, POSContextGenerator cg, TagDictionary tagdict) {
     size = beamSize;
-    _posModel = model;
-    _contextGen = cg;
+    posModel = model;
+    contextGen = cg;
     beam = new PosBeamSearch(size, cg, model);
     tagDictionary = tagdict;
   }
@@ -150,11 +153,11 @@ public class POSTaggerME implements Evalable, POSTagger {
    * @return the number of different tags predicted by this model.
    */
   public int getNumTags() {
-    return _posModel.getNumOutcomes();
+    return posModel.getNumOutcomes();
   }
 
   public EventCollector getEventCollector(Reader r) {
-    return new POSEventCollector(r, _contextGen);
+    return new POSEventCollector(r, contextGen);
   }
 
   public List tag(List sentence) {
@@ -165,7 +168,7 @@ public class POSTaggerME implements Evalable, POSTagger {
   public String[] tag(String[] sentence) {
     bestSequence = beam.bestSequence(sentence,null);
     List t = bestSequence.getOutcomes();
-    return ((String[]) t.toArray(new String[t.size()]));
+    return (String[]) t.toArray(new String[t.size()]);
   }
   
   /**
@@ -214,7 +217,7 @@ public class POSTaggerME implements Evalable, POSTagger {
 
   public void localEval(MaxentModel posModel, Reader r, Evalable e, boolean verbose) {
 
-    _posModel = posModel;
+    this.posModel = posModel;
     float total = 0, correct = 0, sentences = 0, sentsCorrect = 0;
     BufferedReader br = new BufferedReader(r);
     String line;
@@ -296,7 +299,7 @@ public class POSTaggerME implements Evalable, POSTagger {
   }
   
   public String[] getOrderedTags(List words, List tags, int index,double[] tprobs) {
-    double[] probs = _posModel.eval(_contextGen.getContext(index,words.toArray(),(String[]) tags.toArray(new String[tags.size()]),null));
+    double[] probs = posModel.eval(contextGen.getContext(index,words.toArray(),(String[]) tags.toArray(new String[tags.size()]),null));
     String[] orderedTags = new String[probs.length];
     for (int i = 0; i < probs.length; i++) {
       int max = 0;
@@ -305,13 +308,13 @@ public class POSTaggerME implements Evalable, POSTagger {
           max = ti;
         }
       }
-      orderedTags[i] = _posModel.getOutcome(max);
+      orderedTags[i] = posModel.getOutcome(max);
       if (tprobs != null){
         tprobs[i]=probs[max];
       }
       probs[max] = 0;
     }
-    return (orderedTags);
+    return orderedTags;
   }
   
   public static void train(EventStream evc, File modelFile) throws IOException {
@@ -380,35 +383,50 @@ public class POSTaggerME implements Evalable, POSTagger {
       GISModel mod;
       if (dict != null) {
         System.err.println("Building dictionary");
-        MutableDictionary mdict = new MutableDictionary(cutoff);
+        
+        NGramModel ngramModel = new NGramModel(); 
+        
         DataStream data = new opennlp.maxent.PlainTextByLineDataStream(new java.io.FileReader(inFile));
         while(data.hasNext()) {
           String tagStr = (String) data.nextToken();
           String[] tt = tagStr.split(" ");
-          String[] words = new String[tt.length];
+          Token[] words = new Token[tt.length];
           for (int wi=0;wi<words.length;wi++) {
-            words[wi] = tt[wi].substring(0,tt[wi].lastIndexOf('_'));
+            words[wi] = 
+                Token.create(tt[wi].substring(0,tt[wi].lastIndexOf('_')));
           }
-          mdict.add(words,1,true);
+          
+          ngramModel.add(new TokenList(words), 1, 1);
         }
+        
         System.out.println("Saving the dictionary");
-        mdict.persist(new File(dict));
+        
+        ngramModel.cutoff(cutoff, Integer.MAX_VALUE);
+        Dictionary dictionary = ngramModel.toDictionary();
+        
+        dictionary.serialize(new FileOutputStream(dict));
       }
       EventStream es;
       if (encoding == null) {
         if (dict == null) {
-          es = new POSEventStream(new PlainTextByLineDataStream(new InputStreamReader(new FileInputStream(inFile))));
+          es = new POSEventStream(new PlainTextByLineDataStream(
+              new InputStreamReader(new FileInputStream(inFile))));
         }
         else {
-          es = new POSEventStream(new PlainTextByLineDataStream(new InputStreamReader(new FileInputStream(inFile))), new Dictionary(dict));
+          es = new POSEventStream(new PlainTextByLineDataStream(
+              new InputStreamReader(new FileInputStream(inFile))), 
+              new Dictionary(new FileInputStream(dict)));
         }
       }
       else {
         if (dict == null) {
-          es = new POSEventStream(new PlainTextByLineDataStream(new InputStreamReader(new FileInputStream(inFile),encoding)));
+          es = new POSEventStream(new PlainTextByLineDataStream(
+              new InputStreamReader(new FileInputStream(inFile),encoding)));
         }
         else {
-          es = new POSEventStream(new PlainTextByLineDataStream(new InputStreamReader(new FileInputStream(inFile),encoding)), new Dictionary(dict));
+          es = new POSEventStream(new PlainTextByLineDataStream(
+              new InputStreamReader(new FileInputStream(inFile),encoding)), 
+              new Dictionary(new FileInputStream(dict)));
         }
       }
       mod = train(es, iterations, cutoff);

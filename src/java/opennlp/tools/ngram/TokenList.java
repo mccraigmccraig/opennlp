@@ -24,9 +24,10 @@ import java.util.NoSuchElementException;
 
 
 /**
+ * TODO: add a method for a subtoken list
  * 
  * @author <a href="mailto:kottmann@gmail.com">Joern Kottmann</a>
- * @version $Revision: 1.3 $, $Date: 2006/11/15 17:35:58 $
+ * @version $Revision: 1.4 $, $Date: 2006/11/17 09:37:42 $
  */
 public class TokenList {
   
@@ -41,19 +42,6 @@ public class TokenList {
     mTokens = new Token[tokens.length];
     
     System.arraycopy(tokens, 0, mTokens, 0, tokens.length);
-  }
-  
-  public TokenList(String tokens[]) {
-    
-    if (tokens == null || tokens.length == 0) {
-      throw new IllegalArgumentException();
-    }
-    
-    mTokens = new Token[tokens.length];
-    
-    for (int i = 0; i < tokens.length; i++) {
-      mTokens[i] = Token.create(tokens[i]);
-    }
   }
   
   public Token getToken(int index) {

@@ -83,11 +83,11 @@ public abstract class AbstractParserEventStream implements EventStream {
       addNewEvents();
       ei = 0;
     }
-    return ((Event) events[ei++]);
+    return events[ei++];
   }
 
   public boolean hasNext() {
-    return (ei < events.length || data.hasNext());
+    return ei < events.length || data.hasNext();
   }
   
   public static Parse[] getInitialChunks(Parse p) {
@@ -183,7 +183,7 @@ public abstract class AbstractParserEventStream implements EventStream {
     List toks = new ArrayList();
     List preds = new ArrayList();
     for (int ci = 0, cl = chunks.length; ci < cl; ci++) {
-      Parse c = (Parse) chunks[ci];
+      Parse c = chunks[ci];
       if (c.isPosTag()) {
         toks.add(c.toString());
         preds.add(c.getType());

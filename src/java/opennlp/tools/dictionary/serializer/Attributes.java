@@ -16,7 +16,7 @@
 //Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 //////////////////////////////////////////////////////////////////////////////
 
-package opennlp.tools.ngram;
+package opennlp.tools.dictionary.serializer;
 
 import java.util.HashMap;
 import java.util.Iterator;
@@ -53,6 +53,11 @@ public class Attributes {
     mNameValueMap.put(key, value);
   }
 
+  /**
+   * Iterates over the keys.
+   * 
+   * @return key-{@link Iterator}
+   */
   public Iterator iterator() {
     return mNameValueMap.keySet().iterator();
   }

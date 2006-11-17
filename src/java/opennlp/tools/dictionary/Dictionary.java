@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////////
-//Copyright (C) 2005 Thomas Morton
+//Copyright (C) 2006 Calcucare GmbH
 // 
 //This library is free software; you can redistribute it and/or
 //modify it under the terms of the GNU Lesser General Public
@@ -18,203 +18,155 @@
 
 package opennlp.tools.dictionary;
 
-import java.io.BufferedReader;
-import java.io.DataInputStream;
-import java.io.EOFException;
-import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.InputStreamReader;
+import java.io.OutputStream;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
-import java.util.zip.GZIPInputStream;
 
-import opennlp.tools.util.NumberedSet;
+import opennlp.tools.dictionary.serializer.Attributes;
+import opennlp.tools.dictionary.serializer.DictionarySerializer;
+import opennlp.tools.dictionary.serializer.Entry;
+import opennlp.tools.dictionary.serializer.EntryInserter;
+import opennlp.tools.ngram.TokenList;
 
 /**
- * This class allows for the the loading of n-gram dictionaries to facilitate feature generation 
- * for n-gram based models.
- * @see MutableDictionary
- * @author Tom Morton
- *
+ * This class is a dictionary.
+ * 
+ * TODO: it should be possible to specify the capacity
+ * 
+ * @author <a href="mailto:kottmann@gmail.com">Joern Kottmann</a>
+ * @version $Revision: 1.2 $, $Date: 2006/11/17 09:37:22 $
  */
 public class Dictionary {
-
-  /** The name of the file format used for storing a dictionary. */
-  public static String FILE_TYPE = "dict";
-  /** Mapping between words and a unique integer assigned to each words. 
-   * This structure also stores unigrams. **/
-  protected NumberedSet wordMap;
-  /** Set which contains all n-grams of size two or more. */
-  protected Set gramSet;
-  /** Specifies the number of time an n-gram needs to occur to be included when all n-grams are saved to a file. */ 
-  protected int cutoff;
-  /** Factory for creating n-grams. */
-  protected NGramFactory nGramFactory;
+  
+  private Set mEntrySet = new HashSet();
   
   /**
-   * Creates a new empty dictionary of n-grams.
-   *
+   * Iitalizes an empty {@link Dictionary}.
    */
-  protected Dictionary() {}
-
-  /** Constructor used to load a previously created dictionary for the specifed dictionary file.
-   * @param dictionaryFile A file storing a dictionary.
-   */
-  public Dictionary(String dictionaryFile) throws IOException {
-    this(new GZIPInputStream(new FileInputStream(new File(dictionaryFile))));
+  public Dictionary() {
   }
+
+  /**
+   * Initalize the {@link Dictionary} from an existing dictionary resource.
+   * 
+   * @param in
+   * @throws IOException
+   */
   public Dictionary(InputStream in) throws IOException {
-    DataInputStream input = new DataInputStream(in);
-    input.readUTF();
-    int numWords = input.readInt();
-    //System.err.println("Reading: "+numWords+" words");
-    wordMap = new NumberedSet(numWords);
-    for (int wi=0;wi<numWords;wi++) {
-      String word = input.readUTF();
-      int index = input.readInt();
-      wordMap.setIndex(word,index);
-    }
-    loadGrams(input);
-    nGramFactory = new NGramFactory(wordMap);
+    DictionarySerializer.create(in, new EntryInserter() 
+        {
+          public void insert(Entry entry) {
+            put(entry.getTokens());
+          }
+        });
   }
   
   /**
-   * Loads the contents of the specified input stream into this dictionary. 
-   * @param input A dictionary file.
-   * @throws IOException If the specified input stream can not be read. 
+   * Adds the tokens to the dicitionary as one new entry. 
+   * 
+   * @param tokens the new entry
    */
-  protected void loadGrams(DataInputStream input) throws IOException {
-    gramSet = new HashSet();
-    try {
-      while(true) {
-        int gramLength=input.readInt();
-      
-        int[] words = new int[gramLength];
-        for (int wi=0;wi<gramLength;wi++) {
-          words[wi]=input.readInt();
-        }
-        gramSet.add(new NGram(words));
-      }
-    }
-    catch(EOFException e) {
-      
-    }
+  public void put(TokenList tokens) {
+    mEntrySet.add(tokens);
   }
   
   /**
-   * Returns true if this dictionary contains the n-gram consisting of the specified words.
-   * @param words The words which make up the n-gram to look up in the dictionary.
-   * @return true if this dictionary contains the specified n-gram; false otherwise.
+   * Checks if this dictionary has the given entry.
+   * 
+   * @param tokens
+   * 
+   * @return true if it contains the entry otherwise false
    */
-  public boolean contains(String[] words) {
-    if (words.length == 1) {
-      return wordMap.contains(words[0]);
-    }
-    else {
-      NGram ngram = nGramFactory.createNGram(words);
-      if (ngram == null) {
-        return false;
-      }
-      else {
-        return gramSet.contains(ngram);
-      }
-    }
+  public boolean contains(TokenList tokens) {
+    return mEntrySet.contains(tokens);
   }
   
   /**
-   * Returns an iterator over all n-grams in this dictionary.
-   * @return an iterator over all n-grams in this dictionary.
+   * Removes the given tokens form the current instance.
+   * 
+   * @param tokens
+   */
+  public void remove(TokenList tokens) {
+    mEntrySet.remove(tokens);
+  }
+  
+  /**
+   * Retrives an Interator over all tokens.
+   * 
+   * @return token-{@link Iterator}
    */
   public Iterator iterator() {
-    return new DictionaryIterator(this);
+    return mEntrySet.iterator();
   }
   
   /**
-   * Allows a dictionery to be queried for specific n-grams from the command-line from statndard in using space delimited n-grams on a single line.
-   * @param args The dictionary file. 
-   * @throws IOException The dictionary file can not be read.
+   * Retrives the number of tokens in the current instance.
+   * 
+   * @return number of tokens
    */
-  public static void main(String[] args) throws IOException {
-    if (args.length == 0) {
-      System.err.println("Usage: Dictionary dictionary_file");
-      System.exit(0);
-    }
-    Dictionary dict = new Dictionary(args[0]);
-    BufferedReader in = new BufferedReader(new InputStreamReader(System.in));
-    String line;
-    while (null != (line = in.readLine())) {
-      String[] words = line.split(" ");
-      if (dict.contains(words)) {
-        System.out.println("Dictionary contains: "+line);
-      }
-      else {
-        System.out.println("Dictionary does not contain: "+line);
-      }
-    }
-    /*
-    for (Iterator di = dict.iterator();di.hasNext();) {
-      System.out.println(di.next());
-    }
-    */
+  public int size() {
+    return mEntrySet.size();
   }
-}
-
-class DictionaryIterator implements Iterator {
-
-  Iterator wordIterator;
-  Iterator gramIterator;
-  boolean onWords;
-  String[] words;
-  Dictionary dict;
   
-  public DictionaryIterator(Dictionary dict) {
-    /*
-    words = new String[dict.wordMap.size()+1];
-    for (Iterator wi=dict.wordMap.iterator();wi.hasNext();) {
-      String word = (String) wi.next();
-      words[dict.wordMap.getIndex(word)]=word;
-    }
-    */
-    wordIterator = dict.wordMap.iterator();
-    gramIterator = dict.gramSet.iterator();
-    onWords = true;
-    this.dict = dict;
-  }
-  public boolean hasNext() {
-    if (onWords) {
-      if (wordIterator.hasNext()) {
-        return true;
-      }
-      else {
-        onWords = false;
-      }
-    }
-    return gramIterator.hasNext();
-  }
+  /**
+   * Writes the current instance to the given {@link OutputStream}.
+   * 
+   * @param out
+   * @throws IOException
+   */
+  public void serialize(OutputStream out) throws IOException {
+    
+    Iterator entryIterator = new Iterator() 
+      {
+        private Iterator mDictionaryIterator = Dictionary.this.iterator();
+        
+        public boolean hasNext() {
+          return mDictionaryIterator.hasNext();
+        }
 
-  public Object next() {
-    if (onWords) {
-      String word = (String) wordIterator.next(); 
-      return word+"="+dict.wordMap.getIndex(word);
+        public Object next() {
+          
+          TokenList tokens = (TokenList) mDictionaryIterator.next();
+          
+          return new Entry(tokens, new Attributes());
+        }
+
+        public void remove() {
+          throw new UnsupportedOperationException();
+        }
+      
+      };
+      
+    DictionarySerializer.serialize(out, entryIterator);
+  }
+  
+  public boolean equals(Object obj) {
+    
+    boolean result;
+    
+    if (obj == this) {
+      result = true;
+    }
+    else if (obj != null && obj instanceof Dictionary) {
+      Dictionary dictionary  = (Dictionary) obj;
+      
+      result = mEntrySet.equals(dictionary.mEntrySet);
     }
     else {
-      int[] gramInts = ((NGram) gramIterator.next()).getWords();
-      StringBuffer sb = new StringBuffer();
-      for (int gi=0;gi<gramInts.length;gi++) {
-        //sb.append(words[gramInts[gi]]).append(",");
-        sb.append(gramInts[gi]).append(",");
-      }
-      sb.setLength(sb.length()-1);
-      return sb.toString();
+      result = false;
     }
-  }
-
-  public void remove() {
-    throw new UnsupportedOperationException("DictionaryIterator does not allow removal");
+    
+    return result;
   }
   
+  public int hashCode() {
+    return mEntrySet.hashCode();
+  }
   
+  public String toString() {
+    return mEntrySet.toString();
+  }
 }

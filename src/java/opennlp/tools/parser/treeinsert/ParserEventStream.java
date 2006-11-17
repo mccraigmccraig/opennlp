@@ -19,6 +19,7 @@
 package opennlp.tools.parser.treeinsert;
 
 import java.io.File;
+import java.io.FileInputStream;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -218,7 +219,7 @@ public class ParserEventStream extends AbstractParserEventStream {
       }
       else if (args[ai].equals("-dict")) {
         ai++;
-        dict = new Dictionary(args[ai]);
+        dict = new Dictionary(new FileInputStream(args[ai]));
       }
       else if (args[ai].equals("-model")) {
         ai++;

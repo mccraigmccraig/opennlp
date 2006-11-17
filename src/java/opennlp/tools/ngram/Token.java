@@ -21,7 +21,7 @@ package opennlp.tools.ngram;
 /**
  * 
  * @author <a href="mailto:kottmann@gmail.com">Joern Kottmann</a>
- * @version $Revision: 1.3 $, $Date: 2006/11/15 17:35:58 $
+ * @version $Revision: 1.4 $, $Date: 2006/11/17 09:37:42 $
  */
 public class Token {
 
@@ -36,6 +36,11 @@ public class Token {
    * @param token
    */
   private Token(String token) {
+
+    if (token == null || token.length() == 0) {
+      throw new IllegalArgumentException("token parameter must not be null!");
+    }
+
     mToken = token;
   }
   
@@ -82,11 +87,21 @@ public class Token {
    * @return
    */
   public static Token create(String token) {
+    return TokenSet.getInstance().insert(new Token(token));
+  }
+  
+  public static TokenList create(String tokenStrings[]) {
     
-    if (token == null) {
-      throw new IllegalArgumentException("token parameter must not be null!");
+    if (tokenStrings == null) {
+      throw new IllegalArgumentException();
     }
     
-    return TokenSet.getInstance().insert(new Token(token));
+    Token tokens[] = new Token[tokenStrings.length];
+    
+    for (int i = 0; i < tokenStrings.length; i++) {
+      tokens[i] = Token.create(tokenStrings[i]);
+    }
+    
+    return new TokenList(tokens);
   }
 }

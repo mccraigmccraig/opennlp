@@ -1,17 +1,21 @@
 package opennlp.tools.namefind;
 
-import opennlp.tools.ngram.Dictionary;
+import opennlp.tools.dictionary.Dictionary;
 import opennlp.tools.ngram.Token;
 import opennlp.tools.ngram.TokenList;
 import opennlp.tools.tokenize.SimpleTokenizer;
 import opennlp.tools.util.Span;
 import junit.framework.TestCase;
 
+/**
+  * 
+  * @author <a href="mailto:kottmann@gmail.com">Joern Kottmann</a>
+  * @version $Revision: 1.2 $, $Date: 2006/11/17 09:41:21 $
+  */
 public class DictionaryNameFinderTetst extends TestCase {
   
   private Dictionary mDictionary = new Dictionary();
   private NameFinder mNameFinder;
-  
   
   public DictionaryNameFinderTetst() {
     

@@ -35,7 +35,7 @@ public class NumberEnum {
   }
   
   public String toString(){
-    return(name);
+    return name;
   }
 
 }

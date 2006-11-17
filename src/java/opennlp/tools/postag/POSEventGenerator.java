@@ -58,7 +58,7 @@ public class POSEventGenerator implements EventStream {
   }
   
   public boolean hasNext() {
-    return (eventIndex < events.size());
+    return eventIndex < events.size();
   }
 
   public Event nextEvent() {
@@ -68,6 +68,6 @@ public class POSEventGenerator implements EventStream {
       events.clear();
       eventIndex = 0;
     }
-    return (e);
+    return e;
   }  
 }

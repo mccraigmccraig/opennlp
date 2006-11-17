@@ -96,7 +96,7 @@ public class JWNLDictionary implements Dictionary {
         pos = POS.NOUN;
       }
       List lemmas = morphy.lookupAllBaseForms(pos,word);
-      return((String[]) lemmas.toArray(new String[lemmas.size()]));
+      return (String[]) lemmas.toArray(new String[lemmas.size()]);
     }
     catch (JWNLException e) {
       e.printStackTrace();

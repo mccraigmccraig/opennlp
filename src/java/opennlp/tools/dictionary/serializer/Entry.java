@@ -16,12 +16,14 @@
 //Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 //////////////////////////////////////////////////////////////////////////////
 
-package opennlp.tools.ngram;
+package opennlp.tools.dictionary.serializer;
+
+import opennlp.tools.ngram.TokenList;
 
 /**
  * 
  * @author <a href="mailto:kottmann@gmail.com">Joern Kottmann</a>
- * @version $Revision: 1.1 $, $Date: 2006/11/15 17:35:36 $
+ * @version $Revision: 1.1 $, $Date: 2006/11/17 09:37:22 $
  */
 public class Entry {
   

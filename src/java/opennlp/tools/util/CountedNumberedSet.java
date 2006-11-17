@@ -85,10 +85,10 @@ public class CountedNumberedSet extends NumberedSet {
   public int getCount(Object o) {
     int[] nums = (int[]) cset.get(o);   
     if (nums == null ) {
-      return(0);
+      return 0;
     }
     else {
-      return(nums[0]);
+      return nums[0];
     }
   }
   
@@ -169,13 +169,13 @@ public class CountedNumberedSet extends NumberedSet {
   }
   
   public boolean remove(Object o) {
-    return (cset.remove(o) != null);
+    return cset.remove(o) != null;
   }
   
   public boolean removeAll(Collection c) {
     boolean changed =false;
     for (Iterator ki = cset.keySet().iterator();ki.hasNext();) {
-      changed = changed || (cset.remove(ki.next()) != null);
+      changed = changed || cset.remove(ki.next()) != null;
     }
     return changed;
   }

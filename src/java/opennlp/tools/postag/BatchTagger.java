@@ -19,6 +19,7 @@
 package opennlp.tools.postag;
 
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
 
 import opennlp.maxent.DataStream;
@@ -30,7 +31,7 @@ import opennlp.tools.dictionary.Dictionary;
  * Invoke a part-of-speech tagging model from the command line.
  *
  * @author   Jason Baldridge
- * @version $Revision: 1.5 $, $Date: 2006/08/15 21:08:29 $
+ * @version $Revision: 1.6 $, $Date: 2006/11/17 09:37:41 $
  */
 public class BatchTagger {
 
@@ -80,7 +81,7 @@ public class BatchTagger {
         }
       }
 
-      Dictionary dict = new Dictionary(dictFile);
+      Dictionary dict = new Dictionary(new FileInputStream(dictFile));
 
       File textFile = new File(args[ai++]);
       File modelFile = new File(args[ai++]);

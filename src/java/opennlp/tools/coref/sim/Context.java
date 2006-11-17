@@ -66,7 +66,7 @@ public class Context extends Mention {
     List tokenList = head.getTokens();
     headTokenIndex = headFinder.getHeadIndex(head);
     Parse headToken = headFinder.getHeadToken(head);
-    tokens = (Parse[]) tokenList.toArray(new Parse[tokenList.size()]);
+    tokens = tokenList.toArray(new Parse[tokenList.size()]);
     this.headTokenTag = headToken.getSyntacticType();
     this.headTokenText = headToken.toString();
     if (headTokenTag.startsWith("NN") && !headTokenTag.startsWith("NNP")) {

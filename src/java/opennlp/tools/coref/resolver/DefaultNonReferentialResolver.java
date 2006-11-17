@@ -93,7 +93,7 @@ public class DefaultNonReferentialResolver implements NonReferentialResolver {
       }
     }
     features.addAll(MaxentResolver.getContextFeatures(mention));
-    return (features);
+    return features;
   }
   
   public void train() throws IOException {

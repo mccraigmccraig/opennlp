@@ -141,7 +141,7 @@ public class Cache implements Map {
     ObjectWrapper o = (ObjectWrapper) map.get(key);
     if (o != null) {
       // Move it to the front
-      DoubleLinkedListElement e = (DoubleLinkedListElement) o.listItem;
+      DoubleLinkedListElement e = o.listItem;
 
       //move to front
       if (e != first) {
