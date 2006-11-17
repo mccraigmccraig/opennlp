@@ -31,7 +31,7 @@ import opennlp.tools.tokenize.Tokenizer;
 /**
 *
 * @author <a href="mailto:kottmann@gmail.com">Joern Kottmann</a>
-* @version $Revision: 1.1 $, $Date: 2006/11/08 18:43:25 $
+* @version $Revision: 1.2 $, $Date: 2006/11/17 13:33:13 $
 */
 public class DocumentCategorizerEventStream implements EventStream {
   
@@ -40,6 +40,9 @@ public class DocumentCategorizerEventStream implements EventStream {
   
   private Iterator mIterator;
   
+  /**
+   * Initializes the current instance.
+   */
   public DocumentCategorizerEventStream() {
 	  this(new FeatureGenerator[]{new BagOfWordsFeatureGenerator()});
   }
@@ -49,10 +52,22 @@ public class DocumentCategorizerEventStream implements EventStream {
 		  new DocumentCategorizerContextGenerator(featureGenerators);
   }
   
+  /**
+   * Adds the text with the category to the current instance.
+   * 
+   * @param category
+   * @param text
+   */
   public void add(String category, String[] text) {    
 	  mEvents.add(new Event(category, mContextGenerator.getContext(text)));
   }
 
+  /**
+   * Adds the text with the category to the current instance.
+   * 
+   * @param category
+   * @param documentText
+   */
   public void add(String category, String documentText) {
     Tokenizer tokenizer = new SimpleTokenizer();
     add(category, tokenizer.tokenize(documentText));
