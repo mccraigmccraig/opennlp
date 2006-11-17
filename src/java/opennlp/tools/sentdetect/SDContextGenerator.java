@@ -31,7 +31,7 @@ import opennlp.tools.util.Pair;
  *
  * @author      Jason Baldridge
  * @author      Eric D. Friedman
- * @version     $Revision: 1.5 $, $Date: 2006/11/17 09:35:49 $
+ * @version     $Revision: 1.6 $, $Date: 2006/11/17 12:24:58 $
  */
 
 public class SDContextGenerator implements ContextGenerator {
@@ -46,7 +46,8 @@ public class SDContextGenerator implements ContextGenerator {
   /**
    * Creates a new <code>SDContextGenerator</code> instance with
    * no induced abbreviations.
-   *
+   * 
+   * @param eosCharacters 
    */
   public SDContextGenerator(char[] eosCharacters) {
     this(Collections.EMPTY_SET, eosCharacters);
@@ -59,6 +60,8 @@ public class SDContextGenerator implements ContextGenerator {
    * @param inducedAbbreviations a <code>Set</code> of Strings
    * representing induced abbreviations in the training data.
    * Example: &quot;Mr.&quot;
+   * 
+   * @param eosCharacters 
    */
   public SDContextGenerator(Set inducedAbbreviations, char[] eosCharacters) {
     this.inducedAbbreviations = inducedAbbreviations;

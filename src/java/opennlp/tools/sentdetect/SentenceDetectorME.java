@@ -46,7 +46,7 @@ import opennlp.tools.util.Pair;
  * string to determine if they signify the end of a sentence.
  *
  * @author      Jason Baldridge and Tom Morton
- * @version     $Revision: 1.15 $, $Date: 2006/11/17 09:35:49 $
+ * @version     $Revision: 1.16 $, $Date: 2006/11/17 12:24:58 $
  */
 
 public class SentenceDetectorME implements SentenceDetector {
@@ -235,6 +235,15 @@ public class SentenceDetectorME implements SentenceDetector {
     return true;
   }
 
+  /**
+   * Trains a new model for the {@link SentenceDetectorME}.
+   * 
+   * @param es
+   * @param iterations
+   * @param cut
+   * @return the new model
+   * @throws IOException
+   */
   public static GISModel train(EventStream es, int iterations, int cut) throws IOException {
 
     return GIS.trainModel(es, iterations, cut);
@@ -244,6 +253,13 @@ public class SentenceDetectorME implements SentenceDetector {
    * Use this training method if you wish to supply an end of
    * sentence scanner which provides a different set of ending chars
    * other than the default ones.  They are "\\.|!|\\?|\\\"|\\)".
+   * 
+   * @param inFile 
+   * @param iterations 
+   * @param cut 
+   * @param scanner 
+   * @return the GISModel
+   * @throws IOException 
    *
    */
   public static GISModel train(File inFile, int iterations, int cut, EndOfSentenceScanner scanner) throws IOException {
@@ -270,7 +286,9 @@ public class SentenceDetectorME implements SentenceDetector {
    * <p>Trains a new sentence detection model.</p>
    *
    * <p>Usage: opennlp.tools.sentdetect.SentenceDetectorME data_file new_model_name (iterations cutoff)?</p>
-   *
+   * 
+   * @param args 
+   * @throws IOException 
    */
   public static void main(String[] args) throws IOException {
     int ai=0;

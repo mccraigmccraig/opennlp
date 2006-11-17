@@ -29,12 +29,19 @@ import opennlp.tools.util.ObjectIntPair;
  * Generate events for maxent decisions for tokenization.
  *
  * @author      Jason Baldridge
- * @version     $Revision: 1.4 $, $Date: 2006/08/15 21:15:36 $
+ * @version     $Revision: 1.5 $, $Date: 2006/11/17 12:20:38 $
  */
 
 public class TokContextGenerator implements ContextGenerator {
 
+  /**
+   * Constant indicates a token split.
+   */
   public static final String SPLIT ="T";
+  
+  /**
+   * Constant indicates no token split.
+   */
   public static final String NO_SPLIT ="F";
   
   /**

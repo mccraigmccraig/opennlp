@@ -37,7 +37,7 @@ import opennlp.maxent.PlainTextByLineDataStream;
  * @author      Jason Baldridge
  * @author      Eric D. Friedman
  * @author      Thomas Morton
- * @version     $Revision: 1.5 $, $Date: 2006/11/17 09:35:49 $
+ * @version     $Revision: 1.6 $, $Date: 2006/11/17 12:24:58 $
  */
 public class SDEventStream implements EventStream {
     private DataStream data;
@@ -60,11 +60,21 @@ public class SDEventStream implements EventStream {
     /**
      * Class constructor which uses the EndOfSentenceScanner to locate
      * sentence endings.
+     * 
+     * @param d 
+     * @param s 
      */
     public SDEventStream (DataStream d, EndOfSentenceScanner s) {
       this(d,s,new SDContextGenerator(s.getEndOfSentenceCharacters()));
     }
 
+    /**
+     * Initializes the current instance.
+     * 
+     * @param d
+     * @param s
+     * @param cg
+     */
     public SDEventStream(DataStream d, EndOfSentenceScanner s, SDContextGenerator cg) {
         data = d;
         scanner = s;
@@ -146,7 +156,12 @@ public class SDEventStream implements EventStream {
       System.err.println("SDEventStream [-encoding charset] [-lang (english|spanish|thai)] < trainingData");
       System.exit(1);
     }
-    
+
+    /**
+     * 
+     * @param args
+     * @throws IOException
+     */
     public static void main(String[] args) throws IOException {
       int ai=0;
       String encoding = "US-ASCII";

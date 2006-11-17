@@ -31,11 +31,20 @@ import opennlp.tools.util.Span;
  */
 public class SimpleTokenizer implements Tokenizer {
 
+  /**
+   * Converts an array of {@link Span}s to an array of {@link String}s. 
+   * 
+   * @param spans
+   * @param s
+   * @return the strings
+   */
   public String[] spansToStrings(Span[] spans, String s) {
     String[] tokens = new String[spans.length];
+    
     for (int si = 0, sl = spans.length; si < sl; si++) {
-      tokens[si] = s.substring(spans[si].getStart(), spans[si].getEnd());
+      tokens[si] = spans[si].getCoveredText(s);
     }
+    
     return tokens;
   }
   
@@ -89,6 +98,8 @@ public class SimpleTokenizer implements Tokenizer {
   /**
    * 
    * @param args
+   * 
+   * @throws IOException 
    */
   public static void main(String[] args) throws IOException {
     if (args.length == 0) {
@@ -117,10 +128,10 @@ public class SimpleTokenizer implements Tokenizer {
 }
 
 class CharacterEnum {
-  public static final CharacterEnum WHITESPACE = new CharacterEnum("whitespace");
-  public static final CharacterEnum ALPHABETIC = new CharacterEnum("alphabetic");
-  public static final CharacterEnum NUMERIC = new CharacterEnum("numeric");
-  public static final CharacterEnum OTHER = new CharacterEnum("other");
+  static final CharacterEnum WHITESPACE = new CharacterEnum("whitespace");
+  static final CharacterEnum ALPHABETIC = new CharacterEnum("alphabetic");
+  static final CharacterEnum NUMERIC = new CharacterEnum("numeric");
+  static final CharacterEnum OTHER = new CharacterEnum("other");
 
   private String name;
 

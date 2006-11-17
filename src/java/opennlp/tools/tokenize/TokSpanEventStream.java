@@ -38,6 +38,12 @@ public class TokSpanEventStream implements EventStream {
   private int eventIndex;
   private boolean skipAlphaNumerics;
 
+  /**
+   * Initializes the current instance.
+   * 
+   * @param skipAlphaNumerics
+   * @param cg
+   */
   public TokSpanEventStream(boolean skipAlphaNumerics, ContextGenerator cg) {
     this.skipAlphaNumerics = skipAlphaNumerics;
     events = new ArrayList(50);
@@ -45,10 +51,21 @@ public class TokSpanEventStream implements EventStream {
     this.cg = cg;
   }
   
+  /**
+   * Initializes the current instance.
+   * 
+   * @param skipAlphaNumerics
+   */
   public TokSpanEventStream(boolean skipAlphaNumerics) {
     this(skipAlphaNumerics, new TokContextGenerator());
   }
 
+  /**
+   * Initializes the current instance.
+   * 
+   * @param tokens
+   * @param text
+   */
   public void addEvents(Span[] tokens, String text) {
     if (tokens.length > 0) {
       int start = tokens[0].getStart();

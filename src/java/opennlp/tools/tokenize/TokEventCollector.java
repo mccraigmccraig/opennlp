@@ -32,7 +32,7 @@ import opennlp.tools.util.ObjectIntPair;
  * This procedure isn't currrently used for tokenization event creation.
  *
  * @author      Jason Baldridge
- * @version     $Revision: 1.5 $, $Date: 2006/08/15 21:15:36 $
+ * @version     $Revision: 1.6 $, $Date: 2006/11/17 12:20:38 $
  */
 
 public class TokEventCollector implements EventCollector {
@@ -41,6 +41,8 @@ public class TokEventCollector implements EventCollector {
     
     /** 
      * Class constructor.
+     * 
+     * @param data 
      */
     public TokEventCollector(Reader data) {
 	br = new BufferedReader(data);
