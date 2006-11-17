@@ -18,27 +18,44 @@
 
 package opennlp.tools.dictionary.serializer;
 
+import opennlp.tools.ngram.Token;
 import opennlp.tools.ngram.TokenList;
 
 /**
  * 
  * @author <a href="mailto:kottmann@gmail.com">Joern Kottmann</a>
- * @version $Revision: 1.1 $, $Date: 2006/11/17 09:37:22 $
+ * @version $Revision: 1.2 $, $Date: 2006/11/17 13:10:19 $
  */
 public class Entry {
   
   private TokenList mTokens;
   private Attributes mAttributes;
   
+  /**
+   * Initializes the current instance.
+   * 
+   * @param tokens
+   * @param attributes
+   */
   public Entry(TokenList tokens, Attributes attributes) {
     mTokens = tokens;
     mAttributes = attributes;
   }
   
+  /**
+   * Retrives the {@link Token}s.
+   * 
+   * @return the {@link Token}s
+   */
   public TokenList getTokens() {
     return mTokens;
   }
   
+  /**
+   * Retrives the {@link Attributes}.
+   * 
+   * @return the {@link Attributes}
+   */
   public Attributes getAttributes() {
     return mAttributes;
   }
