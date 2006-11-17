@@ -66,12 +66,12 @@ public class ChunkerEventStream implements EventStream {
       addNewEvents();
       ei = 0;
     }
-    return ((Event) events[ei++]);
+    return events[ei++];
   }
 
   /* inherieted javadoc */
   public boolean hasNext() {
-    return (ei < events.length || data.hasNext());
+    return ei < events.length || data.hasNext();
   }
 
   private void addNewEvents() {

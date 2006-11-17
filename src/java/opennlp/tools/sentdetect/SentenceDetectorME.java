@@ -46,7 +46,7 @@ import opennlp.tools.util.Pair;
  * string to determine if they signify the end of a sentence.
  *
  * @author      Jason Baldridge and Tom Morton
- * @version     $Revision: 1.14 $, $Date: 2006/01/16 17:54:16 $
+ * @version     $Revision: 1.15 $, $Date: 2006/11/17 09:35:49 $
  */
 
 public class SentenceDetectorME implements SentenceDetector {
@@ -139,7 +139,7 @@ public class SentenceDetectorME implements SentenceDetector {
         sents[sents.length - 1] = s.substring(starts[starts.length - 1]);
     }
     
-    return (sents);
+    return sents;
   }
 
   private int getFirstWS(String s, int pos) {
@@ -174,7 +174,7 @@ public class SentenceDetectorME implements SentenceDetector {
       int cint = candidate.intValue();
       // skip over the leading parts of non-token final delimiters
       int fws = getFirstWS(s,cint + 1);
-      if (((i + 1) < end) && (((Integer) enders.get(i + 1)).intValue() < fws)) {
+      if (i + 1 < end && ((Integer) enders.get(i + 1)).intValue() < fws) {
         continue;
       }
 

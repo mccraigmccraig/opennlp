@@ -31,7 +31,7 @@ import opennlp.tools.util.Pair;
  *
  * @author      Jason Baldridge
  * @author      Eric D. Friedman
- * @version     $Revision: 1.4 $, $Date: 2006/01/16 17:53:20 $
+ * @version     $Revision: 1.5 $, $Date: 2006/11/17 09:35:49 $
  */
 
 public class SDContextGenerator implements ContextGenerator {
@@ -170,7 +170,7 @@ public class SDContextGenerator implements ContextGenerator {
     /** Space delimited token following token containsing eos character. */
     String next;
     
-    String[] $_ = (String[]) first;
+    String[] $_ = first;
     previous = $_[0];
     String current = $_[1];
     prefix = current.substring(0, position);

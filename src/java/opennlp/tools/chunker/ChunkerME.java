@@ -94,7 +94,7 @@ public class ChunkerME implements Chunker {
    * @return true is the outcome is valid for the sequence, false otherwise.
    */
   protected boolean validOutcome(String outcome, Sequence sequence) {
-    return (true);
+    return true;
   }
   
   /** 
@@ -105,7 +105,7 @@ public class ChunkerME implements Chunker {
     * @return true is the outcome is valid for the sequence, false otherwise.
     */
   protected boolean validOutcome(String outcome, String[] sequence) {
-    return (true);
+    return true;
   }
 
   /**

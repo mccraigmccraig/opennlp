@@ -40,7 +40,7 @@ public class DefaultChunkerContextGenerator implements ChunkerContextGenerator {
   public String[] getContext(Object o) {
     Object[] data = (Object[]) o;
     List outcomes = ((Sequence) data[2]).getOutcomes();
-    return (getContext(((Integer) data[0]).intValue(), (Object[]) data[1], (String[]) data[3], outcomes.toArray(new String[outcomes.size()])));
+    return getContext(((Integer) data[0]).intValue(), (Object[]) data[1], (String[]) data[3], outcomes.toArray(new String[outcomes.size()]));
   }
   
   public String[] getContext(int index, Object[] sequence, String[] priorDecisions, Object[] additionalContext) {

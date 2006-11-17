@@ -71,7 +71,7 @@ public class SimpleTokenizer implements Tokenizer {
         }
       }
       else {
-        if (charType != state || (charType == CharacterEnum.OTHER && c != pc)) {
+        if (charType != state || charType == CharacterEnum.OTHER && c != pc) {
           tokens.add(new Span(start, ci));
           start = ci;
         }
@@ -82,7 +82,7 @@ public class SimpleTokenizer implements Tokenizer {
     if (charType != CharacterEnum.WHITESPACE) {
       tokens.add(new Span(start, sl));
     }
-    return ((Span[]) tokens.toArray(new Span[tokens.size()]));
+    return (Span[]) tokens.toArray(new Span[tokens.size()]);
   }
 
 

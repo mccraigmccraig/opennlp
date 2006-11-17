@@ -37,7 +37,7 @@ import opennlp.maxent.PlainTextByLineDataStream;
  * @author      Jason Baldridge
  * @author      Eric D. Friedman
  * @author      Thomas Morton
- * @version     $Revision: 1.4 $, $Date: 2006/01/16 17:53:47 $
+ * @version     $Revision: 1.5 $, $Date: 2006/11/17 09:35:49 $
  */
 public class SDEventStream implements EventStream {
     private DataStream data;
@@ -112,7 +112,7 @@ public class SDEventStream implements EventStream {
         //TODO: Should only send sentence string to scanner, and sentence + next word to context generator.
         for (Iterator i = scanner.getPositions(sb).iterator();i.hasNext();) {
             Integer candidate = (Integer)i.next();
-            String type = (i.hasNext()) ? "F" : "T";
+            String type = i.hasNext() ? "F" : "T";
             SDEvent evt = new SDEvent(type,cg.getContext(sb,candidate.intValue()));
 
             if (null != tail) {
@@ -139,7 +139,7 @@ public class SDEventStream implements EventStream {
           else next = null;
           addNewEvents(current);
         }
-        return (null != head);
+        return null != head;
     }
     
     private static void usage() {
