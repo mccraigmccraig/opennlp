@@ -41,7 +41,7 @@ import opennlp.tools.util.Span;
  * homepage: <http://www.cis.upenn.edu/~jcreynar>.
  *
  * @author      Tom Morton
- * @version $Revision: 1.15 $, $Date: 2006/05/22 16:08:07 $
+ * @version $Revision: 1.16 $, $Date: 2006/11/17 10:57:10 $
  */
 
 public class TokenizerME implements Tokenizer {
@@ -58,6 +58,9 @@ public class TokenizerME implements Tokenizer {
 
   private static final Double ONE = new Double(1.0);
   
+  /**
+   * Alpha-Numeric Pattern
+   */
   public static Pattern alphaNumeric = Pattern.compile("^[A-Za-z0-9]+$");
 
   /** optimization flag to skip alpha numeric tokens for further
@@ -73,6 +76,8 @@ public class TokenizerME implements Tokenizer {
   /**
    * Class constructor which takes the string locations of the
    * information which the maxent model needs.
+   * 
+   * @param mod 
    */
   public TokenizerME(MaxentModel mod) {
     setAlphaNumericOptimization(false);
@@ -196,11 +201,24 @@ public class TokenizerME implements Tokenizer {
     return (Span[]) tokens.toArray(new Span[tokens.size()]);
   }
 
+  /**
+   * Trains the {@link TokenizerME}, use this to create a new model.
+   * 
+   * @param evc
+   * @return the new model
+   */
   public static GISModel train(EventStream evc) {
     return opennlp.maxent.GIS.trainModel(100, new TwoPassDataIndexer(evc, 5),
         true, false);
   }
   
+  /**
+   * Trains the {@link TokenizerME}, use this to create a new model.
+   * 
+   * @param evc
+   * @param output
+   * @throws IOException
+   */
   public static void train(EventStream evc, File output) throws IOException {
     new SuffixSensitiveGISModelWriter(TokenizerME.train(evc), output).persist();
   }
@@ -220,5 +238,4 @@ public class TokenizerME implements Tokenizer {
   public boolean useAlphaNumericOptimization() {
     return ALPHA_NUMERIC_OPTIMIZATION;
   }
-
 }
