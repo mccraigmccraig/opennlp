@@ -30,6 +30,12 @@ public class ShallowParseMentionFinder extends AbstractMentionFinder {
     collectCoordinatedNounPhrases=true;
   }
   
+  /**
+   * Retrives the one and only existing instance.
+   * 
+   * @param hf
+   * @return one and only existing instance
+   */
   public static ShallowParseMentionFinder getInstance(HeadFinder hf) {
     if (instance == null) {
       instance = new ShallowParseMentionFinder(hf);

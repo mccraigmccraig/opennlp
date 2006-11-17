@@ -31,7 +31,7 @@ import opennlp.tools.util.Pair;
  * An event generator for the maxent POS Tagger.
  *
  * @author      Gann Bierner
- * @version     $Revision: 1.9 $, $Date: 2006/01/19 00:49:26 $
+ * @version     $Revision: 1.10 $, $Date: 2006/11/17 12:30:19 $
  */
 
 public class POSEventCollector implements EventCollector {
@@ -39,6 +39,12 @@ public class POSEventCollector implements EventCollector {
   private BufferedReader br;
   private POSContextGenerator cg;
   
+  /**
+   * Initializes the current instance.
+   * 
+   * @param data
+   * @param gen
+   */
   public POSEventCollector(Reader data, POSContextGenerator gen) {
     br = new BufferedReader(data);
     cg = gen;

@@ -54,7 +54,7 @@ import opennlp.tools.util.Sequence;
  * surrounding context.
  *
  * @author      Gann Bierner
- * @version $Revision: 1.21 $, $Date: 2006/11/17 09:37:41 $
+ * @version $Revision: 1.22 $, $Date: 2006/11/17 12:30:19 $
  */
 public class POSTaggerME implements Evalable, POSTagger {
 
@@ -254,11 +254,11 @@ public class POSTaggerME implements Evalable, POSTagger {
 
   private class PosBeamSearch extends BeamSearch {
 
-    public PosBeamSearch(int size, POSContextGenerator cg, MaxentModel model) {
+    PosBeamSearch(int size, POSContextGenerator cg, MaxentModel model) {
       super(size, cg, model);
     }
     
-    public PosBeamSearch(int size, POSContextGenerator cg, MaxentModel model, int cacheSize) {
+    PosBeamSearch(int size, POSContextGenerator cg, MaxentModel model, int cacheSize) {
       super(size, cg, model, cacheSize);
     }
 
@@ -317,11 +317,27 @@ public class POSTaggerME implements Evalable, POSTagger {
     return orderedTags;
   }
   
+  /**
+   * Trains a new model.
+   * 
+   * @param evc
+   * @param modelFile
+   * @throws IOException
+   */
   public static void train(EventStream evc, File modelFile) throws IOException {
     GISModel model = train(evc, 100,5);
     new SuffixSensitiveGISModelWriter(model, modelFile).persist();
   }
 
+  /**
+   * Trains a new model
+   * 
+   * @param es
+   * @param iterations
+   * @param cut
+   * @return the new model
+   * @throws IOException
+   */
   public static GISModel train(EventStream es, int iterations, int cut) throws IOException {
     return opennlp.maxent.GIS.trainModel(iterations, new TwoPassDataIndexer(es, cut));
   }
@@ -335,11 +351,13 @@ public class POSTaggerME implements Evalable, POSTagger {
   }
 
   /**
-     * <p>Trains a new pos model.</p>
-     *
-     * <p>Usage: java opennlp.postag.POStaggerME [-encoding charset] [-d dict_file] data_file  new_model_name (iterations cutoff)?</p>
-     *
-     */
+   * <p>Trains a new pos model.</p>
+   *
+   * <p>Usage: java opennlp.postag.POStaggerME [-encoding charset] [-d dict_file] data_file  new_model_name (iterations cutoff)?</p>
+   * @param args 
+   * @throws IOException 
+   *
+   */
   public static void main(String[] args) throws IOException {
     if (args.length == 0){
       usage();

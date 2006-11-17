@@ -34,6 +34,12 @@ public class PTBMentionFinder extends AbstractMentionFinder {
     headFinder = hf;
   }
   
+  /**
+   * Retrives the one and only existing instance.
+   * 
+   * @param hf
+   * @return the one and only existing instance
+   */
   public static PTBMentionFinder getInstance(HeadFinder hf) {
     if (instance == null) {
       instance = new PTBMentionFinder(hf);

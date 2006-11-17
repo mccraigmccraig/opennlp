@@ -115,7 +115,7 @@ public class ChunkerME implements Chunker {
    */
   class ChunkBeamSearch extends BeamSearch {
     
-    public ChunkBeamSearch(int size, ChunkerContextGenerator cg, MaxentModel model) {
+    ChunkBeamSearch(int size, ChunkerContextGenerator cg, MaxentModel model) {
       super(size, cg, model);
     }
     
@@ -149,7 +149,15 @@ public class ChunkerME implements Chunker {
     return bestSequence.getProbs();
   }
 
-  
+  /**
+   * Trains a new model for the {@link ChunkerME}.
+   * 
+   * @param es
+   * @param iterations
+   * @param cut
+   * @return the new model
+   * @throws java.io.IOException
+   */
   public static GISModel train(opennlp.maxent.EventStream es, int iterations, int cut) throws java.io.IOException {
     return opennlp.maxent.GIS.trainModel(iterations, new TwoPassDataIndexer(es, cut));
   }

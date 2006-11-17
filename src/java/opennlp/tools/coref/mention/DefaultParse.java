@@ -39,6 +39,12 @@ public class DefaultParse extends AbstractParse {
   private int sentenceNumber;
   private static Set entitySet = new HashSet(Arrays.asList(NameFinder.NAME_TYPES));
   
+  /**
+   * Initializes the current instance.
+   * 
+   * @param parse
+   * @param sentenceNumber
+   */
   public DefaultParse(Parse parse, int sentenceNumber) {
     this.parse = parse;
     this.sentenceNumber = sentenceNumber;
@@ -254,6 +260,11 @@ public class DefaultParse extends AbstractParse {
     return (parse.hashCode());
   }
   
+  /**
+   * Retrives the {@link Parse}.
+   * 
+   * @return the {@link Parse}
+   */
   public Parse getParse() {
     return parse;
   }

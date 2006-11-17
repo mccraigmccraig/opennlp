@@ -27,12 +27,17 @@ import java.util.NoSuchElementException;
  * TODO: add a method for a subtoken list
  * 
  * @author <a href="mailto:kottmann@gmail.com">Joern Kottmann</a>
- * @version $Revision: 1.4 $, $Date: 2006/11/17 09:37:42 $
+ * @version $Revision: 1.5 $, $Date: 2006/11/17 12:33:54 $
  */
 public class TokenList {
   
   private Token mTokens[];
   
+  /**
+   * Initializes the current instance.
+   * 
+   * @param tokens
+   */
   public TokenList(Token tokens[]) {
     
     if (tokens == null || tokens.length == 0) {
@@ -44,14 +49,31 @@ public class TokenList {
     System.arraycopy(tokens, 0, mTokens, 0, tokens.length);
   }
   
+  /**
+   * Retrives a token from the given index.
+   * 
+   * @param index
+   * 
+   * @return token at the given index
+   */
   public Token getToken(int index) {
     return mTokens[index];
   }
   
+  /**
+   * Retrives teh number of tokens inside this list.
+   *  
+   * @return number of tokens
+   */
   public int size() {
     return mTokens.length;
   }
   
+  /**
+   * Retrives an {@link Iterator} over all {@link Token}s.
+   * 
+   * @return iterator over tokens
+   */
   public Iterator iterator() {
     return new Iterator() {
       

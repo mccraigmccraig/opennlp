@@ -21,7 +21,7 @@ package opennlp.tools.ngram;
 /**
  * 
  * @author <a href="mailto:kottmann@gmail.com">Joern Kottmann</a>
- * @version $Revision: 1.4 $, $Date: 2006/11/17 09:37:42 $
+ * @version $Revision: 1.5 $, $Date: 2006/11/17 12:33:54 $
  */
 public class Token {
 
@@ -44,6 +44,13 @@ public class Token {
     mToken = token;
   }
   
+  /**
+   * Retrives the token string.
+   * 
+   * Note: Do not use {@link #toString()} for token text retrival.
+   * 
+   * @return the token text
+   */
   public String getToken() {
     return mToken;
   }
@@ -84,12 +91,19 @@ public class Token {
    * 
    * @param token
    * 
-   * @return
+   * @return the new token
    */
   public static Token create(String token) {
     return TokenSet.getInstance().insert(new Token(token));
   }
   
+  /**
+   * Creates a token array from the provdided string array.
+   * 
+   * @param tokenStrings
+   * 
+   * @return the strings as tokens
+   */
   public static TokenList create(String tokenStrings[]) {
     
     if (tokenStrings == null) {

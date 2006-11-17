@@ -26,7 +26,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import opennlp.tools.ngram.Dictionary;
+import opennlp.tools.dictionary.Dictionary;
 import opennlp.tools.ngram.Token;
 import opennlp.tools.ngram.TokenList;
 import opennlp.tools.util.Span;
@@ -36,7 +36,7 @@ import opennlp.tools.util.Span;
  * for names inside a dictionary.
  * 
  * @author <a href="mailto:kottmann@gmail.com">Joern Kottmann</a>
- * @version $Revision: 1.1 $, $Date: 2006/11/15 16:52:55 $
+ * @version $Revision: 1.2 $, $Date: 2006/11/17 12:43:49 $
  */
 public class DictionaryNameFinder implements NameFinder {
 
@@ -64,6 +64,11 @@ public class DictionaryNameFinder implements NameFinder {
   private Dictionary mDictionary;
   private DictionaryIndex mMetaDictionary;
   
+  /**
+   * Initializes the current instance.
+   * 
+   * @param dictionary
+   */
   public DictionaryNameFinder(Dictionary dictionary) {
     mDictionary = dictionary;
     mMetaDictionary = new DictionaryIndex(dictionary);

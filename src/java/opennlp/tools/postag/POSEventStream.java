@@ -42,14 +42,31 @@ public class POSEventStream implements EventStream {
   /** The last line read in from the data file. */
   private String line;
 
+  /**
+   * Initializes the current instance.
+   * 
+   * @param d
+   */
   public POSEventStream(DataStream d) {
     this(d, new DefaultPOSContextGenerator(null));
   }
   
+  /**
+   * Initializes the current instance.
+   * 
+   * @param d
+   * @param dict
+   */
   public POSEventStream(DataStream d, Dictionary dict) {
     this(d, new DefaultPOSContextGenerator(dict));
   }
 
+  /**
+   * Initializes the current instance.
+   * 
+   * @param d
+   * @param cg
+   */
   public POSEventStream(DataStream d, POSContextGenerator cg) {
     this.cg = cg;
     data = d;
@@ -103,5 +120,4 @@ public class POSEventStream implements EventStream {
       System.out.println(es.nextEvent());
     }
   }
-
 }

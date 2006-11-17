@@ -31,7 +31,7 @@ import opennlp.tools.util.Cache;
  *
  * @author      Gann Bierner
  * @author      Tom Morton
- * @version     $Revision: 1.13 $, $Date: 2006/11/17 09:37:41 $
+ * @version     $Revision: 1.14 $, $Date: 2006/11/17 12:30:19 $
  */
 
 public class DefaultPOSContextGenerator implements POSContextGenerator {
@@ -50,10 +50,21 @@ public class DefaultPOSContextGenerator implements POSContextGenerator {
   private Dictionary dict;
   private String[] dictGram;
 
+  /**
+   * Initializes the current instance.
+   * 
+   * @param dict
+   */
   public DefaultPOSContextGenerator(Dictionary dict) {
     this(0,dict);
   }
   
+  /**
+   * Initializes the current instance.
+   * 
+   * @param cacheSize
+   * @param dict
+   */
   public DefaultPOSContextGenerator(int cacheSize, Dictionary dict) {
     this.dict = dict;
     dictGram = new String[1];
