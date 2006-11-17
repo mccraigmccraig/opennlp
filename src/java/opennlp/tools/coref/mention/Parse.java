@@ -60,6 +60,8 @@ public interface Parse extends Comparable {
 
   /** Returns a list of the tokens contained by this object.  The tokens in this list should also
    * implement the {@link Parse} inteface.  
+   * 
+   * @return the tokens
    */
   public List getTokens();
 

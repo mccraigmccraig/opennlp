@@ -87,7 +87,7 @@ public interface Linker {
   
   /** Returns a list of entities which group the mentions into entity classes. 
    * @param mentions A array of mentions. 
-   * return An array of discourse entities.
+   * @return An array of discourse entities.
    */
   public DiscourseEntity[] getEntities(Mention[] mentions);
   
@@ -98,7 +98,9 @@ public interface Linker {
    */
   public MentionContext[] constructMentionContexts(Mention[] mentions);
   
-  /** Trains the linker based on the data specified via calls to {@link #setEntities setEntities}. */ 
+  /** Trains the linker based on the data specified via calls to {@link #setEntities setEntities}. 
+   * @throws IOException 
+   */ 
   public void train() throws IOException;
     
   /**

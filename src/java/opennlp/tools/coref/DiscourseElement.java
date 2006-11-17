@@ -61,7 +61,10 @@ public abstract class DiscourseElement {
     return(extents.listIterator());
   }
 
-  /** Returns the number of mentions in this element. */
+  /** Returns the number of mentions in this element. 
+   * 
+   * @return number of mentions
+   */
   public int getNumMentions() {
     return(extents.size());
   }
