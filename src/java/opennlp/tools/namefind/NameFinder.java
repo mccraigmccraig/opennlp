@@ -46,6 +46,7 @@ public interface NameFinder {
    * of spans.
    * @param sentence - the sentence
    * @param toks - a list of token spans
+   * @param prevMap 
    * @return a list of the detected name spans
    */
   public List find(String sentence, List toks, Map prevMap);
@@ -54,6 +55,7 @@ public interface NameFinder {
    * of spans.
    * @param sentence - the sentence
    * @param toks - an array of token spans
+   * @param prevMap 
    * @return an array of the detected name spans
    */
   public Span[] find(String sentence, Span[] toks, Map prevMap);
