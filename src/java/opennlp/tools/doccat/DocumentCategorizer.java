@@ -21,7 +21,7 @@ package opennlp.tools.doccat;
 /**
 *
 * @author <a href="mailto:kottmann@gmail.com">Joern Kottmann</a>
-* @version $Revision: 1.1 $, $Date: 2006/11/08 18:43:25 $
+* @version $Revision: 1.2 $, $Date: 2006/11/17 13:31:01 $
 */
 public interface DocumentCategorizer {
 
@@ -41,4 +41,6 @@ public interface DocumentCategorizer {
   public int getNumberOfCategories();
 
   public double[] categorize(String documentText);
+
+  public String getAllResults(double results[]);
 }

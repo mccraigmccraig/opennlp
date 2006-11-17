@@ -29,17 +29,29 @@ import opennlp.tools.tokenize.Tokenizer;
 /**
 *
 * @author <a href="mailto:kottmann@gmail.com">Joern Kottmann</a>
-* @version $Revision: 1.1 $, $Date: 2006/11/08 18:43:25 $
+* @version $Revision: 1.2 $, $Date: 2006/11/17 13:31:01 $
 */
 public class DocumentCategorizerME implements DocumentCategorizer {
   
-  private MaxentModel mModel;
+  MaxentModel mModel;
   private ContextGenerator mContextGenerator;
   
+  /**
+   * Initializes the current instance with the given {@link MaxentModel}.
+   * 
+   * @param model
+   */
   public DocumentCategorizerME(MaxentModel model) {
     this(model, new FeatureGenerator[]{new BagOfWordsFeatureGenerator()});
   }
   
+  /**
+   * Initializes the current instance with a the given {@link MaxentModel}
+   * and {@link FeatureGenerator}s.
+   * 
+   * @param model
+   * @param featureGenerators
+   */
   public DocumentCategorizerME(MaxentModel model, 
       FeatureGenerator[] featureGenerators) {
     
@@ -82,6 +94,13 @@ public class DocumentCategorizerME implements DocumentCategorizer {
     return mModel.getAllOutcomes(results);
   }
   
+  /**
+   * Trains a new model for the {@link DocumentCategorizerME}.
+   * 
+   * @param eventStream
+   * 
+   * @return the new model
+   */
   public static GISModel train(DocumentCategorizerEventStream eventStream) {
     return GIS.trainModel(100, new TwoPassDataIndexer(eventStream, 5),
         true, false);
