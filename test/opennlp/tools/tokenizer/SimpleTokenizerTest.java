@@ -25,7 +25,7 @@ import opennlp.tools.tokenize.SimpleTokenizer;
  * Tests for the {@link SimpleTokenizer} class.
  * 
  * @author <a href="mailto:kottmann@gmail.com">Joern Kottmann</a>
- * @version $Revision: 1.1 $, $Date: 2006/11/17 10:43:47 $
+ * @version $Revision: 1.2 $, $Date: 2006/11/17 10:52:07 $
  */
 public class SimpleTokenizerTest extends TestCase {
   
@@ -78,15 +78,17 @@ public class SimpleTokenizerTest extends TestCase {
     assertTrue(tokenizedText.length == 2);
   }
   
-  public void testWordMinusTokenization() {
-    String text = "n-gram";
+  public void testWordWithOtherTokenization() {
+    String text = "rebecca.sleep()";
 
     String[] tokenizedText = mTokenizer.tokenize(text);
     
-    assertTrue("n".equals(tokenizedText[0]));
-    assertTrue("-".equals(tokenizedText[1]));
-    assertTrue("gram".equals(tokenizedText[2]));
+    assertTrue("rebecca".equals(tokenizedText[0]));
+    assertTrue(".".equals(tokenizedText[1]));
+    assertTrue("sleep".equals(tokenizedText[2]));
+    assertTrue("(".equals(tokenizedText[3]));
+    assertTrue(")".equals(tokenizedText[4]));
 
-    assertTrue(tokenizedText.length == 3);
+    assertTrue(tokenizedText.length == 5);
   }
 }
