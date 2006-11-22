@@ -27,19 +27,57 @@ import java.util.Map;
 import java.util.NoSuchElementException;
 
 import opennlp.tools.dictionary.Dictionary;
+import opennlp.tools.dictionary.serializer.Attributes;
+import opennlp.tools.dictionary.serializer.DictionarySerializer;
+import opennlp.tools.dictionary.serializer.Entry;
+import opennlp.tools.dictionary.serializer.EntryInserter;
+import opennlp.tools.util.InvalidFormatException;
 
 /**
  * 
  * @author <a href="mailto:kottmann@gmail.com">Joern Kottmann</a>
- * @version $Revision: 1.2 $, $Date: 2006/11/17 09:37:42 $
+ * @version $Revision: 1.3 $, $Date: 2006/11/22 14:35:18 $
  */
 public class NGramModel {
+  protected static final String COUNT = null;
   private Map mNGrams = new HashMap();
   
+  /**
+   * Initializes an empty instance.
+   */
   public NGramModel() {
   }
   
-  public NGramModel(InputStream stream) throws IOException {
+  /**
+   * Initializes the current instance.
+   * 
+   * @param in
+   * @throws IOException
+   */
+  public NGramModel(InputStream in) throws IOException {
+    DictionarySerializer.create(in, new EntryInserter() {
+      public void insert(Entry entry) throws InvalidFormatException {
+
+        int count;
+
+        try {
+          String countValueString = entry.getAttributes().getValue(COUNT);
+          
+          if (countValueString == null) {
+        	  throw new InvalidFormatException(
+        	      "The count attribute must be set!");
+          }
+          
+          count = Integer.parseInt(countValueString);
+        } catch (NumberFormatException e) {
+          throw new InvalidFormatException(
+              "The count attribute must be a nubmer!");
+        }
+        
+        add(entry.getTokens());
+        setCount(entry.getTokens(), count);
+      }
+    });
   }
 
   public int getCount(TokenList tokens) throws NoSuchElementException{
@@ -224,7 +262,33 @@ public class NGramModel {
     return null;
   }
   
-  public void serialize(OutputStream stream) throws IOException {
+  public void serialize(OutputStream out) throws IOException {
+	    Iterator entryIterator = new Iterator() 
+	      {
+	        private Iterator mDictionaryIterator = NGramModel.this.iterator();
+	        
+	        public boolean hasNext() {
+	          return mDictionaryIterator.hasNext();
+	        }
+
+	        public Object next() {
+	          
+	          TokenList tokens = (TokenList) mDictionaryIterator.next();
+	          
+	          Attributes attributes = new Attributes();
+	          
+	          attributes.setValue(COUNT, Integer.toString(getCount(tokens)));
+	          
+	          return new Entry(tokens, attributes);
+	        }
+
+	        public void remove() {
+	          throw new UnsupportedOperationException();
+	        }
+	      
+	      };
+	      
+	    DictionarySerializer.serialize(out, entryIterator);
   }
 
   public String toString() {
