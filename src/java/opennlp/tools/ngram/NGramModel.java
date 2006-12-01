@@ -36,10 +36,12 @@ import opennlp.tools.util.InvalidFormatException;
 /**
  * 
  * @author <a href="mailto:kottmann@gmail.com">Joern Kottmann</a>
- * @version $Revision: 1.3 $, $Date: 2006/11/22 14:35:18 $
+ * @version $Revision: 1.4 $, $Date: 2006/12/01 00:20:00 $
  */
 public class NGramModel {
-  protected static final String COUNT = null;
+  
+  protected static final String COUNT = "count";
+  
   private Map mNGrams = new HashMap();
   
   /**
@@ -291,6 +293,25 @@ public class NGramModel {
 	    DictionarySerializer.serialize(out, entryIterator);
   }
 
+  public boolean equals(Object obj) {
+    boolean result;
+    
+    if (obj == this) {
+      result = true;
+    }
+    else if (obj != null && obj instanceof NGramModel) {
+      NGramModel model  = (NGramModel) obj;
+      
+      result = mNGrams.equals(model.mNGrams);
+    }
+    else {
+      result = false;
+    }
+    
+    return result;  
+    
+    }
+  
   public String toString() {
     return "Size: " + size();
   }
