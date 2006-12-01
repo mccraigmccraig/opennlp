@@ -49,7 +49,7 @@ import org.xml.sax.helpers.XMLReaderFactory;
 /**
   * 
   * @author <a href="mailto:kottmann@gmail.com">Joern Kottmann</a>
-  * @version $Revision: 1.1 $, $Date: 2006/11/17 09:37:22 $
+  * @version $Revision: 1.2 $, $Date: 2006/12/01 00:20:22 $
   */
 public class DictionarySerializer {
   
@@ -58,8 +58,6 @@ public class DictionarySerializer {
     
     private EntryInserter mInserter;
     
-    private Entry mEntry;
-
     private boolean mIsInsideDictionaryElement;
     private boolean mIsInsideEntryElement;
     private boolean mIsInsideTokenElement;
@@ -115,7 +113,8 @@ public class DictionarySerializer {
        
        if (ENTRY_ELEMENT.equals(localName)) {
          
-         Token[] tokens = (Token[]) mTokenList.toArray(new Token[3]);
+         Token[] tokens = (Token[]) mTokenList.toArray(
+             new Token[mTokenList.size()]);
          
          Entry entry = new Entry(new TokenList(tokens), mAttributes);
          
@@ -199,7 +198,8 @@ public class DictionarySerializer {
   
   public static void serialize(OutputStream out, Iterator entries) 
       throws IOException {
-    StreamResult streamResult = new StreamResult(new GZIPOutputStream(out));
+    GZIPOutputStream gzipOut = new GZIPOutputStream(out);
+    StreamResult streamResult = new StreamResult(gzipOut);
     SAXTransformerFactory tf = (SAXTransformerFactory) 
         SAXTransformerFactory.newInstance();
     
@@ -236,6 +236,8 @@ public class DictionarySerializer {
     catch (SAXException e) {
       throw new IOException("There was an error during serialization!");
     }
+    
+    gzipOut.finish();
   }
   
   private static void serializeEntry(TransformerHandler hd, Entry entry) 

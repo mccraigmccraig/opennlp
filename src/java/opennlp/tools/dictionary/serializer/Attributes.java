@@ -50,6 +50,11 @@ public class Attributes {
    * @param value
    */
   public void setValue(String key, String value) {
+      
+    if (key == null || value == null) {
+      throw new IllegalArgumentException("null parameters are not allowwd!");
+    }
+    
     mNameValueMap.put(key, value);
   }
 
