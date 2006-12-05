@@ -21,7 +21,7 @@ package opennlp.tools.ngram;
 /**
  * 
  * @author <a href="mailto:kottmann@gmail.com">Joern Kottmann</a>
- * @version $Revision: 1.5 $, $Date: 2006/11/17 12:33:54 $
+ * @version $Revision: 1.6 $, $Date: 2006/12/05 22:25:27 $
  */
 public class Token {
 
@@ -60,21 +60,7 @@ public class Token {
   }
   
   public boolean equals(Object obj) {
-    boolean result;
-    
-    if (this == obj) {
-      result = true;
-    }
-    else if (obj != null && obj instanceof Token) {
-      Token token = (Token) obj;
-      
-      result = mToken.equals(token.mToken);
-    }
-    else {
-      result = false;
-    }
-    
-    return result;
+    return obj == this;
   }
   
   /**
