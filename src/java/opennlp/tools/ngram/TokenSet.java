@@ -21,6 +21,8 @@ package opennlp.tools.ngram;
 import java.lang.ref.WeakReference;
 import java.util.Map;
 import java.util.WeakHashMap;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * The token cache is based on a {@link WeakHashMap}. 
@@ -28,20 +30,57 @@ import java.util.WeakHashMap;
  * It uses weak references to allow garbage collection of tokens which are 
  * not used anymore.
  * 
+ * TODO: 
+ * + maybe give the client control over cache strategy weak 
+ * + weak vs. strong referneces ???
+ * 
  * @author <a href="mailto:kottmann@gmail.com">Joern Kottmann</a>
- * @version $Revision: 1.1 $, $Date: 2006/11/11 04:13:17 $
+ * @version $Revision: 1.2 $, $Date: 2006/12/05 22:14:26 $
  */
-class TokenSet {
+public class TokenSet {
+  
+  private final class StatisticLogger implements Runnable {
+    
+    private static final int INTERVAL = 5000;
+    public void run() {
+      
+      int lastSize = -1;
+      
+      while (true) {
+        try {
+          Thread.sleep(INTERVAL); 
+        } catch (InterruptedException e) {
+          // quit statistic logger thread
+          return;
+        }
+        
+        synchronized (TokenSet.this) {
+          // log only if it was changed
+          int currentSize = mTokenTable.size();
+          if (lastSize != currentSize) {
+            sLogger.info("Size: " + currentSize);
+            lastSize = currentSize;
+          }
+        }
+      }
+    }
+  }
+
+  private static Logger sLogger = Logger.getLogger(TokenSet.class.getName());
   
   private static TokenSet sInstance;
   
   private Map mTokenTable = new WeakHashMap();
   
   private TokenSet() {
+    if (sLogger.isLoggable(Level.INFO)) {
+      new Thread(new StatisticLogger(), "TokenSet Statistics Logger").start();
+    }
   }
   
-  Token insert(Token token) {
-    WeakReference weakCachedToken = (WeakReference) mTokenTable.get(token);
+  synchronized Token insert(Token token) {
+    WeakReference weakCachedToken = 
+      (WeakReference) mTokenTable.get(token.getToken());
     
     // Note: cachedToken == null is possible even if weakCachedToken != null,
     // then the referent was concurrently collected
@@ -52,12 +91,12 @@ class TokenSet {
       return cachedToken;
     }
     else {
-      mTokenTable.put(token, new WeakReference(token));
+      mTokenTable.put(token.getToken(), new WeakReference(token));
       return token;
     }
   }
   
-  static TokenSet getInstance() {
+  public static synchronized TokenSet getInstance() {
     if (sInstance == null) {
       sInstance = new TokenSet();
     }
