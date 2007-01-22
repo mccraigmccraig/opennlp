@@ -18,17 +18,21 @@
 
 package opennlp.tools.dictionary;
 
+import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.io.Reader;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
+import java.util.StringTokenizer;
 
 import opennlp.tools.dictionary.serializer.Attributes;
 import opennlp.tools.dictionary.serializer.DictionarySerializer;
 import opennlp.tools.dictionary.serializer.Entry;
 import opennlp.tools.dictionary.serializer.EntryInserter;
+import opennlp.tools.ngram.Token;
 import opennlp.tools.ngram.TokenList;
 
 /**
@@ -37,7 +41,7 @@ import opennlp.tools.ngram.TokenList;
  * TODO: it should be possible to specify the capacity
  * 
  * @author <a href="mailto:kottmann@gmail.com">Joern Kottmann</a>
- * @version $Revision: 1.2 $, $Date: 2006/11/17 09:37:22 $
+ * @version $Revision: 1.3 $, $Date: 2007/01/22 06:48:38 $
  */
 public class Dictionary {
   
@@ -168,5 +172,41 @@ public class Dictionary {
   
   public String toString() {
     return mEntrySet.toString();
+  }
+  
+  /**
+   * Reads a dictionary which has one entry per line. The tokens inside an
+   * entry are whitespace delimited. 
+   * 
+   * @param in
+   * 
+   * @return the parsed dictionary
+   * 
+   * @throws IOException
+   */
+  public static Dictionary parseOneEntryPerLine(Reader in) throws IOException {
+    BufferedReader lineReader = new BufferedReader(in);
+    
+    Dictionary dictionary = new Dictionary();
+    
+    String line;
+    
+    while ((line = lineReader.readLine()) != null) {
+      StringTokenizer whiteSpaceTokenizer = new StringTokenizer(line, " ");
+      
+      Token tokens[] = new Token[whiteSpaceTokenizer.countTokens()];
+      
+      if (tokens.length > 0) {
+        int tokenIndex = 0;
+        while (whiteSpaceTokenizer.hasMoreTokens()) {
+          tokens[tokenIndex++] = Token.create(whiteSpaceTokenizer.nextToken());
+        }
+        
+        
+        dictionary.put(new TokenList(tokens));
+      }
+    }
+    
+    return dictionary;
   }
 }
