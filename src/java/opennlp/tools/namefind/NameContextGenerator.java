@@ -30,7 +30,7 @@ import opennlp.tools.util.Sequence;
  * Class for determining contextual features for a tag/chunk style 
  * named-entity recognizer.
  * 
- * @version $Revision: 1.5 $, $Date: 2006/09/26 08:19:02 $
+ * @version $Revision: 1.6 $, $Date: 2007/01/22 06:50:16 $
  */
 public class NameContextGenerator implements BeamSearchContextGenerator {
   
@@ -73,7 +73,7 @@ public class NameContextGenerator implements BeamSearchContextGenerator {
 
   public String[] getContext(Object o) {
     Object[] data = (Object[]) o;
-    return (getContext(((Integer) data[0]).intValue(), (List) data[1], (List) data[2], (Map) data[3]));
+    return getContext(((Integer) data[0]).intValue(), (List) data[1], (List) data[2], (Map) data[3]);
   }
   
   public String[] getContext(int index, List sequence, Sequence s, Object[] additionalContext) {
@@ -81,7 +81,7 @@ public class NameContextGenerator implements BeamSearchContextGenerator {
   }
 
   public String[] getContext(int i, List toks, List preds, Map prevTags) {
-    return (getContext(i, toks.toArray(), (String[]) preds.toArray(new String[preds.size()]),prevTags));
+    return getContext(i, toks.toArray(), (String[]) preds.toArray(new String[preds.size()]),prevTags);
   }
   
   public String[] getContext(int index, Object[] sequence, String[] priorDecisions, Object[] additionalContext) {
@@ -176,6 +176,6 @@ public class NameContextGenerator implements BeamSearchContextGenerator {
       mFeatureGenerators[i].createFeatures(feats, tokens, index);
     }
     
-    return (feats);
+    return feats;
   }
 }

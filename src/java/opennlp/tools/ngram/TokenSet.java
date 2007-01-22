@@ -35,7 +35,7 @@ import java.util.logging.Logger;
  * + weak vs. strong referneces ???
  * 
  * @author <a href="mailto:kottmann@gmail.com">Joern Kottmann</a>
- * @version $Revision: 1.2 $, $Date: 2006/12/05 22:14:26 $
+ * @version $Revision: 1.3 $, $Date: 2007/01/22 06:49:27 $
  */
 public class TokenSet {
   
@@ -74,7 +74,12 @@ public class TokenSet {
   
   private TokenSet() {
     if (sLogger.isLoggable(Level.INFO)) {
-      new Thread(new StatisticLogger(), "TokenSet Statistics Logger").start();
+      Thread statisticLogger = 
+          new Thread(new StatisticLogger(), "TokenSet Statistics Logger");
+
+      statisticLogger.setDaemon(true);
+      
+      statisticLogger.start();
     }
   }
   

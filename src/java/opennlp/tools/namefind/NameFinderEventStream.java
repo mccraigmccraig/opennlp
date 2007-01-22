@@ -112,7 +112,7 @@ public class NameFinderEventStream implements EventStream {
       eventIndex = 0;
       line = null;
     }
-    return ((Event) events[eventIndex++]);
+    return events[eventIndex++];
   }
 
   public boolean hasNext() {

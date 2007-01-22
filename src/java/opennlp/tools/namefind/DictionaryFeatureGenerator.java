@@ -16,41 +16,38 @@
 //Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 //////////////////////////////////////////////////////////////////////////////
 
-package opennlp.tools.ngram;
+package opennlp.tools.namefind;
 
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
+import java.util.List;
 
 import opennlp.tools.dictionary.Dictionary;
 
-import junit.framework.TestCase;
-
 /**
-  * Tests for the {@link Dictionary} class.
-  * 
-  * @author <a href="mailto:kottmann@gmail.com">Joern Kottmann</a>
-  * @version $Revision: 1.2 $, $Date: 2006/11/17 09:41:21 $
-  */
-public class DictionaryTest extends TestCase  {
+ * 
+ * @author <a href="mailto:kottmann@gmail.com">Joern Kottmann</a>
+ * @version $Revision: 1.1 $, $Date: 2007/01/22 06:51:14 $
+ */
+public class DictionaryFeatureGenerator implements FeatureGenerator {
   
-  public void testDictionary() throws IOException {
-    Dictionary reference = new Dictionary();
-    
-    Token a1 = Token.create("a1");
-    Token a2 = Token.create("a2");
-    Token a3 = Token.create("a3");
-    Token a5 = Token.create("a5");
-    
-    reference.put(new TokenList(new Token[]{a1, a2, a3, a5,}));
-    
-    ByteArrayOutputStream out = new ByteArrayOutputStream();
-    
-    reference.serialize(out);
+  private DictionaryNameFinder mDictionary;
   
-    Dictionary recreated = new Dictionary(
-        new ByteArrayInputStream(out.toByteArray()));
+  private String mCurrentSentence[];
+  
+  private String mCurrentNames[];
+  
+  public DictionaryFeatureGenerator(Dictionary dictionary) {
+    mDictionary = new DictionaryNameFinder(dictionary);
+  }
+  
+  public void createFeatures(List features, String[] tokens, int index) {
+    // cache results sentence wise
+    if (mCurrentSentence != tokens) {
+      mCurrentNames = mDictionary.find(tokens, null);
+    }
     
-    assertTrue(reference.equals(recreated));
+    if (mCurrentNames[index].equals(NameFinderME.START) || 
+        mCurrentNames[index].equals(NameFinderME.CONTINUE)) {
+      features.add("w=dic");
+    }
   }
 }

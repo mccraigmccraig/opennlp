@@ -21,6 +21,7 @@ package opennlp.tools.dictionary;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.io.StringReader;
 
 import opennlp.tools.dictionary.Dictionary;
 import opennlp.tools.ngram.Token;
@@ -32,10 +33,15 @@ import junit.framework.TestCase;
   * Tests for the {@link Dictionary} class.
   * 
   * @author <a href="mailto:kottmann@gmail.com">Joern Kottmann</a>
-  * @version $Revision: 1.1 $, $Date: 2006/12/05 22:52:54 $
+  * @version $Revision: 1.2 $, $Date: 2007/01/22 06:52:12 $
   */
 public class DictionaryTest extends TestCase  {
   
+  /**
+   * Tests serialization and deserailization of the {@link Dictionary}.
+   * 
+   * @throws IOException
+   */
   public void testDictionary() throws IOException {
     Dictionary reference = new Dictionary();
     
@@ -54,5 +60,66 @@ public class DictionaryTest extends TestCase  {
         new ByteArrayInputStream(out.toByteArray()));
     
     assertTrue(reference.equals(recreated));
+  }
+  
+  /**
+   * Tests for the {@link Dictionary#parseOneEntryPerLine(java.io.Reader)} 
+   * method.
+   * 
+   * @throws IOException 
+   */
+  public void testParseOneEntryPerLine() throws IOException {
+  
+    String testDictionary = "1a 1b 1c 1d \n 2a 2b 2c \n 3a \n 4a    4b   ";
+  
+    Dictionary dictionay = 
+      Dictionary.parseOneEntryPerLine(new StringReader(testDictionary));
+    
+    assertTrue(dictionay.size() == 4);
+    
+    assertTrue(dictionay.contains(
+        Token.create(new String[]{"1a", "1b", "1c", "1d"})));
+
+    assertTrue(dictionay.contains(
+        Token.create(new String[]{"2a", "2b", "2c"})));
+
+    assertTrue(dictionay.contains(
+        Token.create(new String[]{"3a"})));
+
+    assertTrue(dictionay.contains(
+        Token.create(new String[]{"4a", "4b"})));
+  }
+  
+  /**
+   * Tests for the {@link Dictionary#equals(Object)} method.
+   */
+  public void testEquals() {
+    TokenList entry1 = Token.create(new String[]{"1a", "1b"});
+    TokenList entry2 = Token.create(new String[]{"2a", "2b"});
+    
+    Dictionary dictA = new Dictionary();
+    dictA.put(entry1);
+    dictA.put(entry2);
+    
+    Dictionary dictB = new Dictionary();
+    dictB.put(entry1);
+    dictB.put(entry2);
+    
+    assertTrue(dictA.equals(dictB));
+  }
+  
+  /**
+   * Tests for the {@link Dictionary#toString()} method.
+   */
+  public void testToString() {
+    TokenList entry1 = Token.create(new String[]{"1a", "1b"});
+    
+    Dictionary dictA = new Dictionary();
+
+    dictA.toString();
+
+    dictA.put(entry1);
+    
+    dictA.toString();
   }
 }

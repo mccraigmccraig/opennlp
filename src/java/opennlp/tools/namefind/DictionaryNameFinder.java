@@ -36,10 +36,14 @@ import opennlp.tools.util.Span;
  * for names inside a dictionary.
  * 
  * @author <a href="mailto:kottmann@gmail.com">Joern Kottmann</a>
- * @version $Revision: 1.2 $, $Date: 2006/11/17 12:43:49 $
+ * @version $Revision: 1.3 $, $Date: 2007/01/22 06:50:59 $
  */
 public class DictionaryNameFinder implements NameFinder {
 
+  /**
+   * This class indexes an dictionary, each token is one element in
+   * the index.
+   */
   private class DictionaryIndex {
     
     private Set mTokens = new HashSet();
@@ -62,6 +66,7 @@ public class DictionaryNameFinder implements NameFinder {
   }
 
   private Dictionary mDictionary;
+  
   private DictionaryIndex mMetaDictionary;
   
   /**
