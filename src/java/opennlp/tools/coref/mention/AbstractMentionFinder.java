@@ -63,11 +63,11 @@ public abstract class AbstractMentionFinder implements MentionFinder {
       Parse np = (Parse) nps.get(ni);
       gatherHeads(np, headMap);
     }
-    return (headMap);
+    return headMap;
   }
 
   public boolean isPrenominalNamedEntityCollection() {
-    return (collectPrenominalNamedEntities);
+    return collectPrenominalNamedEntities;
   }
 
   public void setPrenominalNamedEntityCollection(boolean b) {
@@ -75,7 +75,7 @@ public abstract class AbstractMentionFinder implements MentionFinder {
   }
 
   protected boolean isBasalNounPhrase(Parse np) {
-    return (np.getNounPhrases().size() == 0);
+    return np.getNounPhrases().size() == 0;
   }
   
   protected boolean isPossessive(Parse np) {
@@ -86,7 +86,7 @@ public abstract class AbstractMentionFinder implements MentionFinder {
         List ctoks = child0.getTokens();
         Parse tok = (Parse) ctoks.get(ctoks.size() - 1);
         if (tok.getSyntacticType().equals("POS")) {
-          return (true);
+          return true;
         }
       }
     }
@@ -95,7 +95,7 @@ public abstract class AbstractMentionFinder implements MentionFinder {
       Parse child1 = (Parse) parts.get(1);
       Parse child2 = (Parse) parts.get(2);
       if (child1.isToken() && child1.getSyntacticType().equals("POS") && child0.isNounPhrase() && child2.isNounPhrase()) {
-        return (true);
+        return true;
       }
     }
     return false;
@@ -111,12 +111,12 @@ public abstract class AbstractMentionFinder implements MentionFinder {
         if (cparts.size() == 2) {
           Parse child2 = (Parse) cparts.get(0);
           if (child2.isToken() && child2.toString().equals("of")) {
-            return (true);
+            return true;
           }
         }
       }
     }
-    return (false);
+    return false;
   }
 
   protected boolean isConjoinedBasal(Parse np) {
@@ -135,7 +135,7 @@ public abstract class AbstractMentionFinder implements MentionFinder {
         break;
       }
     }
-    return (allToken && hasConjunction);
+    return allToken && hasConjunction;
   }
 
   private void collectCoordinatedNounPhraseMentions(Parse np, List entities) {
@@ -180,9 +180,9 @@ public abstract class AbstractMentionFinder implements MentionFinder {
   }
   
   private boolean handledPronoun(String tok) {
-    return (Linker.singularThirdPersonPronounPattern.matcher(tok.toString()).find() || 
-                 Linker.pluralThirdPersonPronounPattern.matcher(tok.toString()).find() || 
-                 Linker.speechPronounPattern.matcher(tok.toString()).find());
+    return Linker.singularThirdPersonPronounPattern.matcher(tok).find() || 
+                 Linker.pluralThirdPersonPronounPattern.matcher(tok).find() || 
+                 Linker.speechPronounPattern.matcher(tok).find();
   }
 
   private void collectPossesivePronouns(Parse np, List entities) {
@@ -344,7 +344,7 @@ public abstract class AbstractMentionFinder implements MentionFinder {
     for (Parse parent = headToken.getParent(); parent != null; parent = parent.getParent()) {
       entityType = parent.getEntityType();
       if (entityType != null) {
-        return (entityType);
+        return entityType;
       }
       if (parent.isSentence()) {
         break;
@@ -356,10 +356,10 @@ public abstract class AbstractMentionFinder implements MentionFinder {
       Parse tchild = (Parse) tc.get(tcs - 1);
       entityType = tchild.getEntityType();
       if (entityType != null) {
-        return (entityType);
+        return entityType;
       }
     }
-    return (null);
+    return null;
   }
 
   private boolean isPartOfName(Parse np) {
@@ -370,7 +370,7 @@ public abstract class AbstractMentionFinder implements MentionFinder {
       if (entityType != null) {
         //System.err.println("npSpan = "+np.getSpan()+" parentSpan="+parent.getSpan());
         if (!np.getSpan().contains(parent.getSpan())) {
-          return (true);
+          return true;
         }
       }
       if (parent.isSentence()) {
@@ -396,7 +396,7 @@ public abstract class AbstractMentionFinder implements MentionFinder {
     Map headMap = constructHeadMap(nps);
     //System.err.println("AbstractMentionFinder.getMentions: got " + nps.size()); // + " nps, and " + nes.size() + " named entities");
     Mention[] mentions = collectMentions(nps, headMap);
-    return (mentions);
+    return mentions;
   }
 
   public boolean isCoordinatedNounPhraseCollection() {

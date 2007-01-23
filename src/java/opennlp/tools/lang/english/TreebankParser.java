@@ -106,7 +106,7 @@ public class TreebankParser {
       tokens.add(tok);
       sb.append(tok).append(" ");
     }
-    String text = sb.substring(0, sb.length() - 1).toString();
+    String text = sb.substring(0, sb.length() - 1);
     Parse p = new Parse(text, new Span(0, text.length()), AbstractBottomUpParser.INC_NODE, 1, 0);
     int start = 0;
     int i=0;

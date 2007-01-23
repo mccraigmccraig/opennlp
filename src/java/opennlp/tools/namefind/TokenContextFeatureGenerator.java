@@ -32,7 +32,7 @@ public class TokenContextFeatureGenerator implements FeatureGenerator {
     //current word
     String w = toks[i].toLowerCase();
     feats.add("w=" + w);
-    String wf = FeatureGeneratorUtil.tokenFeature(toks[i].toString());
+    String wf = FeatureGeneratorUtil.tokenFeature(toks[i]);
     feats.add("wf=" + wf);
     feats.add("w&wf=" + w + "," + wf);
     
