@@ -52,6 +52,8 @@ public interface Resolver {
    */ 
   public DiscourseEntity retain(MentionContext mention, DiscourseModel model);
 
-  /** Retrains model on examples for which retain was called.  */
+  /** Retrains model on examples for which retain was called.  
+   * @throws IOException 
+   */
   public void train() throws IOException;
 }

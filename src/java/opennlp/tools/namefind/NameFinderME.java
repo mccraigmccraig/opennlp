@@ -308,7 +308,7 @@ public class NameFinderME implements NameFinder {
     Map prevMap;
     
     if (sentence != null && tokens != null && 
-        outcomes != null & tokens.size() > 0) {
+        outcomes != null && tokens.size() > 0) {
       
       if (tokens.size() < outcomes.size()) {
         throw new IllegalArgumentException("The number of tokens must be " +
