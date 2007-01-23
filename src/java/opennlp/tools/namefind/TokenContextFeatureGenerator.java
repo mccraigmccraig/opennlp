@@ -41,7 +41,7 @@ public class TokenContextFeatureGenerator implements FeatureGenerator {
     if (i - 2 >= 0) {
       String ppw = toks[i - 2].toLowerCase();
       feats.add("ppw=" + ppw);
-      String ppwf = FeatureGeneratorUtil.tokenFeature(toks[i - 2].toString());
+      String ppwf = FeatureGeneratorUtil.tokenFeature(toks[i - 2]);
       feats.add("ppwf=" + ppwf);
       feats.add("ppw&f=" + ppw + "," + ppwf);
     }
