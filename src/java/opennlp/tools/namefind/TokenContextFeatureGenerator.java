@@ -57,7 +57,7 @@ public class TokenContextFeatureGenerator implements FeatureGenerator {
     else {
       String pw = toks[i - 1].toLowerCase();
       feats.add("pw=" + pw);
-      String pwf = FeatureGeneratorUtil.tokenFeature(toks[i - 1].toString());
+      String pwf = FeatureGeneratorUtil.tokenFeature(toks[i - 1]);
       feats.add("pwf=" + pwf);
       feats.add("pw&f=" + pw + "," + pwf);
       feats.add("pw=" + pw + ",w=" + w);
@@ -72,7 +72,7 @@ public class TokenContextFeatureGenerator implements FeatureGenerator {
     else {
       String nw = toks[i + 1].toLowerCase();
       feats.add("nw=" + nw);
-      String nwf = FeatureGeneratorUtil.tokenFeature(toks[i + 1].toString());
+      String nwf = FeatureGeneratorUtil.tokenFeature(toks[i + 1]);
       feats.add("nwf=" + nwf);
       feats.add("nw&f=" + nw + "," + nwf);
       feats.add("w=" + w + ",nw=" + nw);
@@ -84,7 +84,7 @@ public class TokenContextFeatureGenerator implements FeatureGenerator {
     else {
       String nnw = toks[i + 2].toLowerCase();
       feats.add("nnw=" + nnw);
-      String nnwf = FeatureGeneratorUtil.tokenFeature(toks[i + 2].toString());
+      String nnwf = FeatureGeneratorUtil.tokenFeature(toks[i + 2]);
       feats.add("nnwf=" + nnwf);
       feats.add("nnw&f=" + nnw + "," + nnwf);
     }
