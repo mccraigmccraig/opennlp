@@ -41,7 +41,7 @@ import opennlp.tools.util.Span;
  * homepage: <http://www.cis.upenn.edu/~jcreynar>.
  *
  * @author      Tom Morton
- * @version $Revision: 1.16 $, $Date: 2006/11/17 10:57:10 $
+ * @version $Revision: 1.17 $, $Date: 2007/01/23 09:58:33 $
  */
 
 public class TokenizerME implements Tokenizer {
@@ -61,7 +61,7 @@ public class TokenizerME implements Tokenizer {
   /**
    * Alpha-Numeric Pattern
    */
-  public static Pattern alphaNumeric = Pattern.compile("^[A-Za-z0-9]+$");
+  public static final Pattern alphaNumeric = Pattern.compile("^[A-Za-z0-9]+$");
 
   /** optimization flag to skip alpha numeric tokens for further
    * tokenization 
