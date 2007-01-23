@@ -253,11 +253,24 @@ public class DefaultParse extends AbstractParse {
   }
   
   public boolean equals(Object o) {
-    return (this.parse == ((DefaultParse) o).parse);
+    
+    boolean result;
+    
+    if (o == this) {
+      result = true;
+    }
+    else if (o instanceof DefaultParse) {
+      result = parse == ((DefaultParse) o).parse;
+    }
+    else {
+      result = false;
+    }
+    
+    return result;
   }
 
   public int hashCode() {
-    return (parse.hashCode());
+    return parse.hashCode();
   }
   
   /**
