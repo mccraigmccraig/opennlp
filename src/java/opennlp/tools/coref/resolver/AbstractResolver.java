@@ -221,9 +221,9 @@ public abstract class AbstractResolver implements Resolver {
       //System.err.println("stripNp: return null 5");
       return null;
     }
-    String strip=new String();
+    String strip = "";
     for (int i=start;i<end;i++) {
-      strip+=mtokens[i].toString()+" ";
+      strip += mtokens[i].toString() + ' ';
     }
     return strip.trim();
   }
