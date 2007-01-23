@@ -58,20 +58,20 @@ public abstract class MaxentResolver extends AbstractResolver {
   /** Default feature value. */
   public static final String DEFAULT = "default";
 
-  private static final Pattern endsWithPeriod = Pattern.compile("\\.$");
-  private final double minSimProb = 0.60;
+  private static final Pattern ENDS_WITH_PERIOD = Pattern.compile("\\.$");
+  private static final double MIN_SIM_PROB = 0.60;
 
-  private final String SIM_COMPATIBLE = "sim.compatible";
-  private final String SIM_INCOMPATIBLE = "sim.incompatible";
-  private final String SIM_UNKNOWN = "sim.unknown";
+  private static final String SIM_COMPATIBLE = "sim.compatible";
+  private static final String SIM_INCOMPATIBLE = "sim.incompatible";
+  private static final String SIM_UNKNOWN = "sim.unknown";
 
-  private final String NUM_COMPATIBLE = "num.compatible";
-  private final String NUM_INCOMPATIBLE = "num.incompatible";
-  private final String NUM_UNKNOWN = "num.unknown";
+  private static final String NUM_COMPATIBLE = "num.compatible";
+  private static final String NUM_INCOMPATIBLE = "num.incompatible";
+  private static final String NUM_UNKNOWN = "num.unknown";
 
-  private final String GEN_COMPATIBLE = "gen.compatible";
-  private final String GEN_INCOMPATIBLE = "gen.incompatible";
-  private final String GEN_UNKNOWN = "gen.unknown";
+  private static final String GEN_COMPATIBLE = "gen.compatible";
+  private static final String GEN_INCOMPATIBLE = "gen.incompatible";
+  private static final String GEN_UNKNOWN = "gen.unknown";
 
   private static boolean debugOn=false;
   
@@ -421,10 +421,10 @@ public abstract class MaxentResolver extends AbstractResolver {
           best = sim;
         }
       }
-      if (best > minSimProb) {
+      if (best > MIN_SIM_PROB) {
         return SIM_COMPATIBLE;
       }
-      else if (best > (1 - minSimProb)) {
+      else if (best > (1 - MIN_SIM_PROB)) {
         return SIM_UNKNOWN;
       }
       else {
@@ -875,7 +875,7 @@ public abstract class MaxentResolver extends AbstractResolver {
     List wordFeatures = new ArrayList();
     String word = token.toString().toLowerCase();
     String wf = "";
-    if (endsWithPeriod.matcher(word).find()) {
+    if (ENDS_WITH_PERIOD.matcher(word).find()) {
       wf = ",endWithPeriod";
     }
     String tokTag = token.getSyntacticType();
