@@ -158,11 +158,22 @@ public class Span implements Comparable {
    * Checks if the specified span is equal to the current span.
    */
   public boolean equals(Object o) {
+
+    boolean result;
+    
     if (o == null) {
-      return false;
+      result = false;
     }
-    Span s = (Span) o;
-    return getStart() == s.getStart() && getEnd() == s.getEnd();
+    else if (o instanceof Span) {
+      Span s = (Span) o;
+      
+      result = getStart() == s.getStart() && getEnd() == s.getEnd();
+    }
+    else {
+      result = false;
+    }
+    
+    return result;
   }
   
   /**
