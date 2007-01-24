@@ -31,7 +31,7 @@ import opennlp.tools.dictionary.Dictionary;
  * Invoke a part-of-speech tagging model from the command line.
  *
  * @author   Jason Baldridge
- * @version $Revision: 1.6 $, $Date: 2006/11/17 09:37:41 $
+ * @version $Revision: 1.7 $, $Date: 2007/01/24 17:13:07 $
  */
 public class BatchTagger {
 
@@ -42,9 +42,14 @@ public class BatchTagger {
   }
 
   /**
-     * <p>Applies a pos model.</p>
-     *
-     */
+   * <p>
+   * Applies a pos model.
+   * </p>
+   * 
+   * @param args
+   * @throws IOException
+   * 
+   */
   public static void main (String[] args) throws IOException {
     if (args.length == 0) {
       usage();
