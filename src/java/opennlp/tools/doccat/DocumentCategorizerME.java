@@ -29,7 +29,7 @@ import opennlp.tools.tokenize.Tokenizer;
 /**
 *
 * @author <a href="mailto:kottmann@gmail.com">Joern Kottmann</a>
-* @version $Revision: 1.2 $, $Date: 2006/11/17 13:31:01 $
+* @version $Revision: 1.3 $, $Date: 2007/03/15 04:55:24 $
 */
 public class DocumentCategorizerME implements DocumentCategorizer {
   
@@ -102,7 +102,6 @@ public class DocumentCategorizerME implements DocumentCategorizer {
    * @return the new model
    */
   public static GISModel train(DocumentCategorizerEventStream eventStream) {
-    return GIS.trainModel(100, new TwoPassDataIndexer(eventStream, 5),
-        true, false);
+    return GIS.trainModel(100, new TwoPassDataIndexer(eventStream, 5));
   }
 }
