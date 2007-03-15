@@ -54,7 +54,7 @@ import opennlp.tools.util.Sequence;
  * surrounding context.
  *
  * @author      Gann Bierner
- * @version $Revision: 1.22 $, $Date: 2006/11/17 12:30:19 $
+ * @version $Revision: 1.23 $, $Date: 2007/03/15 04:55:09 $
  */
 public class POSTaggerME implements Evalable, POSTagger {
 
@@ -324,8 +324,8 @@ public class POSTaggerME implements Evalable, POSTagger {
    * @param modelFile
    * @throws IOException
    */
-  public static void train(EventStream evc, File modelFile) throws IOException {
-    GISModel model = train(evc, 100,5);
+  public static void train(EventStream evc, File modelFile, String encoding) throws IOException {
+    GISModel model = train(evc, 100,5,encoding);
     new SuffixSensitiveGISModelWriter(model, modelFile).persist();
   }
 
@@ -338,8 +338,8 @@ public class POSTaggerME implements Evalable, POSTagger {
    * @return the new model
    * @throws IOException
    */
-  public static GISModel train(EventStream es, int iterations, int cut) throws IOException {
-    return opennlp.maxent.GIS.trainModel(iterations, new TwoPassDataIndexer(es, cut));
+  public static GISModel train(EventStream es, int iterations, int cut, String encoding) throws IOException {
+    return opennlp.maxent.GIS.trainModel(iterations, new TwoPassDataIndexer(es, cut, encoding));
   }
   
   private static void usage() {
@@ -447,7 +447,7 @@ public class POSTaggerME implements Evalable, POSTagger {
               new Dictionary(new FileInputStream(dict)));
         }
       }
-      mod = train(es, iterations, cutoff);
+      mod = train(es, iterations, cutoff,encoding);
       System.out.println("Saving the model as: " + outFile);
       new SuffixSensitiveGISModelWriter(mod, outFile).persist();
 

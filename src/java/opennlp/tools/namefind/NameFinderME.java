@@ -36,6 +36,7 @@ import opennlp.maxent.MaxentModel;
 import opennlp.maxent.PlainTextByLineDataStream;
 import opennlp.maxent.TwoPassDataIndexer;
 import opennlp.maxent.io.SuffixSensitiveGISModelWriter;
+import opennlp.tools.chunker.ChunkerEventStream;
 import opennlp.tools.util.BeamSearch;
 import opennlp.tools.util.Sequence;
 import opennlp.tools.util.Span;
@@ -364,8 +365,8 @@ public class NameFinderME implements NameFinder {
     return prevMap;
   }
   
-  public static GISModel train(EventStream es, int iterations, int cut) throws IOException {
-    return GIS.trainModel(iterations, new TwoPassDataIndexer(es, cut));
+  public static GISModel train(EventStream es, int iterations, int cut, String encoding) throws IOException {
+    return GIS.trainModel(iterations, new TwoPassDataIndexer(es, cut,encoding));
   }
   
   public static void usage(){
@@ -373,42 +374,56 @@ public class NameFinderME implements NameFinder {
     System.exit(1);
   }
 
-  public static void main(String[] args) throws IOException {
+  
+  public static void main(String[] args) throws java.io.IOException {
     if (args.length == 0) {
       usage();
     }
-    try {
-      int ai=0;
-      String encoding = null;
-      while (args[ai].startsWith("-")) {
-        if (args[ai].equals("-encoding")) {
-          ai++;
-          if (ai < args.length) {
-            encoding = args[ai];
-            ai++;
-          }
-          else {
-            usage();
-          }
-        }
+    int ai = 0;
+    String encoding = null;
+    while (args[ai].startsWith("-")) {
+      if (args[ai].equals("-encoding") && ai+1 < args.length) {
+        ai++;
+        encoding = args[ai];
       }
-      File inFile = new File(args[ai++]);
-      File outFile = new File(args[ai++]);
-      GISModel mod;
-
-      EventStream es = new NameFinderEventStream(new PlainTextByLineDataStream(new InputStreamReader(new FileInputStream(inFile),encoding)));
-      if (args.length > ai)
-        mod = train(es, Integer.parseInt(args[ai++]), Integer.parseInt(args[ai++]));
-      else
-        mod = train(es, 100, 5);
-
-      System.out.println("Saving the model as: " + outFile);
-      new SuffixSensitiveGISModelWriter(mod, outFile).persist();
-
+      else {
+        System.err.println("Unknown option: "+args[ai]);
+        usage();
+      }
+      ai++;
     }
-    catch (Exception e) {
-      e.printStackTrace();
+    java.io.File inFile = null;
+    java.io.File outFile = null;
+    if (ai < args.length) {
+      inFile = new java.io.File(args[ai++]);
     }
-
+    else {
+      usage();
+    }
+    if (ai < args.length) {
+      outFile = new java.io.File(args[ai++]);
+    }
+    else {
+      usage();
+    }
+    int iterations = 100;
+    int cutoff = 5;
+    if (args.length > ai) {
+      iterations = Integer.parseInt(args[ai++]);
+    }
+    if (args.length > ai) {
+      cutoff = Integer.parseInt(args[ai++]); 
+    }
+    GISModel mod;
+    opennlp.maxent.EventStream es;
+    if (encoding != null) {
+       es = new NameFinderEventStream(new opennlp.maxent.PlainTextByLineDataStream(new InputStreamReader(new FileInputStream(inFile),encoding)));
+    }
+    else {
+      es = new NameFinderEventStream(new opennlp.maxent.PlainTextByLineDataStream(new java.io.FileReader(inFile)));
+    }
+    mod = train(es, iterations, cutoff,encoding);
+    System.out.println("Saving the model as: " + args[1]);
+    new opennlp.maxent.io.SuffixSensitiveGISModelWriter(mod, outFile).persist();
   }
 }

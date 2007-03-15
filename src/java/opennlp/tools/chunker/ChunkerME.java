@@ -17,6 +17,8 @@
 //////////////////////////////////////////////////////////////////////////////
 package opennlp.tools.chunker;
 
+import java.io.FileInputStream;
+import java.io.InputStreamReader;
 import java.util.Arrays;
 import java.util.List;
 
@@ -158,8 +160,16 @@ public class ChunkerME implements Chunker {
    * @return the new model
    * @throws java.io.IOException
    */
-  public static GISModel train(opennlp.maxent.EventStream es, int iterations, int cut) throws java.io.IOException {
-    return opennlp.maxent.GIS.trainModel(iterations, new TwoPassDataIndexer(es, cut));
+  public static GISModel train(opennlp.maxent.EventStream es, int iterations, int cut, String encoding) throws java.io.IOException {
+    return opennlp.maxent.GIS.trainModel(iterations, new TwoPassDataIndexer(es, cut, encoding));
+  }
+  
+  private static void usage() {
+    System.err.println("Usage: ChunkerME [-encoding charset] trainingFile modelFile");
+    System.err.println();
+    System.err.println("Training file should be one word per line where each line consists of a ");
+    System.err.println("space-delimited triple of \"word pos outcome\".  Sentence breaks are indicated by blank lines.");
+    System.exit(1);
   }
 
   /**
@@ -172,21 +182,52 @@ public class ChunkerME implements Chunker {
    */
   public static void main(String[] args) throws java.io.IOException {
     if (args.length == 0) {
-      System.err.println("Usage: ChunkerME trainingFile modelFile");
-      System.err.println();
-      System.err.println("Training file should be one word per line where each line consists of a ");
-      System.err.println("space-delimited triple of \"word pos outcome\".  Sentence breaks are indicated by blank lines.");
-      System.exit(1);
+      usage();
     }
-    java.io.File inFile = new java.io.File(args[0]);
-    java.io.File outFile = new java.io.File(args[1]);
+    int ai = 0;
+    String encoding = null;
+    while (args[ai].startsWith("-")) {
+      if (args[ai].equals("-encoding") && ai+1 < args.length) {
+        ai++;
+        encoding = args[ai];
+      }
+      else {
+        System.err.println("Unknown option: "+args[ai]);
+        usage();
+      }
+      ai++;
+    }
+    java.io.File inFile = null;
+    java.io.File outFile = null;
+    if (ai < args.length) {
+      inFile = new java.io.File(args[ai++]);
+    }
+    else {
+      usage();
+    }
+    if (ai < args.length) {
+      outFile = new java.io.File(args[ai++]);
+    }
+    else {
+      usage();
+    }
+    int iterations = 100;
+    int cutoff = 5;
+    if (args.length > ai) {
+      iterations = Integer.parseInt(args[ai++]);
+    }
+    if (args.length > ai) {
+      cutoff = Integer.parseInt(args[ai++]); 
+    }
     GISModel mod;
-    opennlp.maxent.EventStream es = new ChunkerEventStream(new opennlp.maxent.PlainTextByLineDataStream(new java.io.FileReader(inFile)));
-    if (args.length > 3)
-      mod = train(es, Integer.parseInt(args[2]), Integer.parseInt(args[3]));
-    else
-      mod = train(es, 100, 5);
-
+    opennlp.maxent.EventStream es;
+    if (encoding != null) {
+       es = new ChunkerEventStream(new opennlp.maxent.PlainTextByLineDataStream(new InputStreamReader(new FileInputStream(inFile),encoding)));
+    }
+    else {
+      es = new ChunkerEventStream(new opennlp.maxent.PlainTextByLineDataStream(new java.io.FileReader(inFile)));
+    }
+    mod = train(es, iterations, cutoff,encoding);
     System.out.println("Saving the model as: " + args[1]);
     new opennlp.maxent.io.SuffixSensitiveGISModelWriter(mod, outFile).persist();
   }
