@@ -59,19 +59,7 @@ public class NameFinderEventStream implements EventStream {
     this.cg = cg;
     eventIndex = 0;
     prevTags = new HashMap();
-    // prime events with first line of data stream.
-    if (data.hasNext()) {
-      line = (String) d.nextToken();
-      if (line.equals("")) {
-        prevTags.clear();
-      }
-      else {
-        addEvents(line);
-      }
-    }
-    else {
-      events = new Event[0];
-    }
+    events = new Event[0];
   }
 
   /** Adds name events for the specified sentence.
