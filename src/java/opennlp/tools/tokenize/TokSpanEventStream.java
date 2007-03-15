@@ -61,10 +61,9 @@ public class TokSpanEventStream implements EventStream {
   }
 
   /**
-   * Initializes the current instance.
-   * 
-   * @param tokens
-   * @param text
+   * Adds training events to the event stream for each of the specified tokens.
+   * @param tokens charachter offsets into the specified text.
+   * @param text The text of the tokens.
    */
   public void addEvents(Span[] tokens, String text) {
     if (tokens.length > 0) {
