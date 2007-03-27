@@ -72,7 +72,7 @@ public class Mention implements Comparable {
    * @return The span representing the character offsets of this extent.
    */
   public Span getSpan() {
-    return(span);
+    return span;
   }
 
   /**
@@ -80,7 +80,7 @@ public class Mention implements Comparable {
    * @return The span representing the character offsets for the head of this extent.
    */
   public Span getHeadSpan() {
-    return(headSpan);
+    return headSpan;
   }
   
   /** 
@@ -93,7 +93,7 @@ public class Mention implements Comparable {
   
   public int compareTo(Object o) {
     Mention e = (Mention) o;
-    return(span.compareTo(e.span));
+    return span.compareTo(e.span);
   }
   
   /**
@@ -133,11 +133,11 @@ public class Mention implements Comparable {
    * @return the id associated with this mention.
    */
   public int getId() {
-    return(id);
+    return id;
   }
 
   public String toString() {
-    return("mention(span="+span+",hs="+headSpan+", type="+type+", id="+id+" "+parse+" )"); 
+    return "mention(span="+span+",hs="+headSpan+", type="+type+", id="+id+" "+parse+" )"; 
   }
 
 }

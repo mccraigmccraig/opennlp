@@ -15,11 +15,11 @@ public abstract class AbstractParse implements Parse {
         Parse child = (Parse) parts.get(pi);
         String ctype = child.getSyntacticType();
         if (ctype != null && ctype.equals("CC") && !child.toString().equals("&")) {
-          return (true);
+          return true;
         }
       }
     }
-    return (false);
+    return false;
   }
 
   public List getNounPhrases() {

@@ -168,7 +168,7 @@ public class MentionContext extends Context {
     for (int hsi = 0; hsi < tokens.length; hsi++) {
       headText.append(" ").append(tokens[hsi].toString());
     }
-    return (headText.toString().substring(1));
+    return headText.toString().substring(1);
   }
   
   public Parse getHead() {
@@ -268,7 +268,7 @@ public class MentionContext extends Context {
    * @return A space-delimited string of the tokens of this mention.
    */
   public String toText() {
-    return (parse.toString());
+    return parse.toString();
   }
   
   /*

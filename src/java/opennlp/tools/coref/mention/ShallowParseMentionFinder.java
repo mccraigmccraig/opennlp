@@ -43,7 +43,7 @@ public class ShallowParseMentionFinder extends AbstractMentionFinder {
     else if (instance.headFinder != hf) {
       instance = new ShallowParseMentionFinder(hf);
     }
-    return(instance);
+    return instance;
   }
 
   /*

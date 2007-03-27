@@ -47,7 +47,7 @@ public class PTBMentionFinder extends AbstractMentionFinder {
     else if (instance.headFinder != hf) {
       instance = new PTBMentionFinder(hf);
     }
-    return(instance);
+    return instance;
   }
   
   

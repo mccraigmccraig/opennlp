@@ -49,12 +49,12 @@ public final class PTBHeadFinder implements HeadFinder {
     if (instance == null) {
       instance = new PTBHeadFinder();
     }
-    return (instance);
+    return instance;
   }
 
   public Parse getHead(Parse p) {
     if (p == null) {
-      return (null);
+      return null;
     }
     if (p.isNounPhrase()) {
       List parts = p.getSyntacticChildren();
@@ -64,7 +64,7 @@ public final class PTBHeadFinder implements HeadFinder {
         Parse child1 = (Parse) parts.get(1);
         Parse child2 = (Parse) parts.get(2);
         if (child1.isToken() && child1.getSyntacticType().equals("POS") && child0.isNounPhrase() && child2.isNounPhrase()) {
-          return (child2);
+          return child2;
         }
       }
       //full parse POS
@@ -77,7 +77,7 @@ public final class PTBHeadFinder implements HeadFinder {
           }
           Parse tok = (Parse) ctoks.get(ctoks.size() - 1);
           if (tok.getSyntacticType().equals("POS")) {
-            return (null);
+            return null;
           }
         }
       }
@@ -86,7 +86,7 @@ public final class PTBHeadFinder implements HeadFinder {
         for (int pi = 1; pi < parts.size() - 1; pi++) {
           Parse child = (Parse) parts.get(pi);
           if (child.isToken() && child.getSyntacticType().equals("CC")) {
-            return (null);
+            return null;
           }
         }
       }
@@ -95,13 +95,13 @@ public final class PTBHeadFinder implements HeadFinder {
         Parse child = (Parse) parts.get(pi);
         //System.err.println("PTBHeadFinder.getHead: "+p.getSyntacticType()+" "+p+" child "+pi+"="+child.getSyntacticType()+" "+child);
         if (child.isNounPhrase()) {
-          return (child);
+          return child;
         }
       }
-      return (null);
+      return null;
     }
     else {
-      return (null);
+      return null;
     }
   }
 
@@ -132,11 +132,11 @@ public final class PTBHeadFinder implements HeadFinder {
     for (int ti = toks.size() - tokenCount -1; ti >= 0; ti--) {
       Parse tok = (Parse) toks.get(ti);
       if (!skipSet.contains(tok.getSyntacticType())) {
-        return (ti);
+        return ti;
       }
     }
     //System.err.println("PTBHeadFinder.getHeadIndex: "+p+" hi="+toks.size()+"-"+tokenCount+" -1 = "+(toks.size()-tokenCount -1));
-    return (toks.size() - tokenCount -1);
+    return toks.size() - tokenCount -1;
   }
 
   /** Returns the bottom-most head of a <code>Parse</code>.  If no
@@ -152,12 +152,12 @@ public final class PTBHeadFinder implements HeadFinder {
       p = head;
     }
     //System.err.println(" -> null");
-    return (p);
+    return p;
   }
 
   public Parse getHeadToken(Parse p) {
     List toks = p.getTokens();
-    return ((Parse) toks.get(getHeadIndex(p)));
+    return (Parse) toks.get(getHeadIndex(p));
   }
 
 }
