@@ -54,7 +54,7 @@ import opennlp.tools.util.Sequence;
  * surrounding context.
  *
  * @author      Gann Bierner
- * @version $Revision: 1.23 $, $Date: 2007/03/15 04:55:09 $
+ * @version $Revision: 1.24 $, $Date: 2007/03/28 19:16:29 $
  */
 public class POSTaggerME implements Evalable, POSTagger {
 
@@ -91,6 +91,16 @@ public class POSTaggerME implements Evalable, POSTagger {
   /** The search object used for search multiple sequences of tags. */
   protected  BeamSearch beam;
 
+  
+  /**
+   * Creates a new tagger with the specified model and tag dictionary.
+   * @param model The model used for tagging.
+   * @param tagdict The tag dictionary used for specifing a set of valid tags.
+   */
+  public POSTaggerME(MaxentModel model, TagDictionary tagdict) {
+    this(model, new DefaultPOSContextGenerator(null),tagdict);
+  }
+  
   /**
    * Creates a new tagger with the specified model and n-gram dictionary.
    * @param model The model used for tagging.
