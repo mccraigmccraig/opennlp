@@ -26,6 +26,7 @@ import opennlp.maxent.Event;
 import opennlp.maxent.EventCollector;
 import opennlp.maxent.EventStream;
 import opennlp.tools.dictionary.Dictionary;
+import opennlp.tools.util.InvalidFormatException;
 
 /**
  * An implementation of EventStream whcih assumes the data stream gives a
@@ -114,7 +115,7 @@ public class POSEventStream implements EventStream {
     //System.err.println("POSEventStream.addNewEvents: got "+events.length+" events");
   }
 
-  public static void main(String[] args) throws java.io.IOException {
+  public static void main(String[] args) throws java.io.IOException, InvalidFormatException {
     EventStream es = new POSEventStream(new opennlp.maxent.PlainTextByLineDataStream(new java.io.InputStreamReader(System.in)),new Dictionary(new FileInputStream(args[0])));
     while (es.hasNext()) {
       System.out.println(es.nextEvent());

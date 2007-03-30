@@ -39,6 +39,7 @@ import opennlp.tools.parser.Parse;
 import opennlp.tools.parser.ParserChunker;
 import opennlp.tools.parser.ParserEventTypeEnum;
 import opennlp.tools.parser.ParserTagger;
+import opennlp.tools.util.InvalidFormatException;
 import opennlp.tools.util.Span;
 
 /**
@@ -340,7 +341,7 @@ public class Parser extends AbstractBottomUpParser {
     return mdict.toDictionary();
   }
 
-  public static void main(String[] args) throws java.io.IOException {
+  public static void main(String[] args) throws java.io.IOException, InvalidFormatException {
     if (args.length < 3) {
       usage();
       System.exit(1);

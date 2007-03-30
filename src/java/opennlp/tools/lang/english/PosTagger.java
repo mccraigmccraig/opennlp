@@ -31,6 +31,7 @@ import opennlp.tools.postag.DefaultPOSContextGenerator;
 import opennlp.tools.postag.POSDictionary;
 import opennlp.tools.postag.POSTaggerME;
 import opennlp.tools.postag.TagDictionary;
+import opennlp.tools.util.InvalidFormatException;
 
 /**
  * A part of speech tagger that uses a model trained on English data from the
@@ -38,7 +39,7 @@ import opennlp.tools.postag.TagDictionary;
  * achieved >96% accuracy on unseen data.
  *
  * @author      Gann Bierner
- * @version     $Revision: 1.8 $, $Date: 2006/11/17 09:37:22 $
+ * @version     $Revision: 1.9 $, $Date: 2007/03/30 09:46:33 $
  */
 
 public class PosTagger extends POSTaggerME {
@@ -78,8 +79,9 @@ public class PosTagger extends POSTaggerME {
    * example: 
    *
    * <p>java opennlp.tools.postag.EnglishPOSTaggerME -test "Mr. Smith gave a car to his son on Friday."
+   * @throws InvalidFormatException 
    */
-  public static void main(String[] args) throws IOException {
+  public static void main(String[] args) throws InvalidFormatException, IOException {
     if (args.length == 0) {
       usage();
     }

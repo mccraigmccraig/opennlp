@@ -34,12 +34,13 @@ import opennlp.tools.dictionary.serializer.Entry;
 import opennlp.tools.dictionary.serializer.EntryInserter;
 import opennlp.tools.ngram.Token;
 import opennlp.tools.ngram.TokenList;
+import opennlp.tools.util.InvalidFormatException;
 
 /**
  * This class is a dictionary.
  * 
  * @author <a href="mailto:kottmann@gmail.com">Joern Kottmann</a>
- * @version $Revision: 1.4 $, $Date: 2007/03/30 09:30:10 $
+ * @version $Revision: 1.5 $, $Date: 2007/03/30 09:46:33 $
  */
 public class Dictionary {
   
@@ -97,8 +98,9 @@ public class Dictionary {
    * 
    * @param in
    * @throws IOException
+   * @throws InvalidFormatException 
    */
-  public Dictionary(InputStream in) throws IOException {
+  public Dictionary(InputStream in) throws IOException, InvalidFormatException {
     DictionarySerializer.create(in, new EntryInserter() 
         {
           public void insert(Entry entry) {

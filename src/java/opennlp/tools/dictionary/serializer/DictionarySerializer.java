@@ -49,7 +49,7 @@ import org.xml.sax.helpers.XMLReaderFactory;
 /**
   * 
   * @author <a href="mailto:kottmann@gmail.com">Joern Kottmann</a>
-  * @version $Revision: 1.2 $, $Date: 2006/12/01 00:20:22 $
+  * @version $Revision: 1.3 $, $Date: 2007/03/30 09:46:33 $
   */
 public class DictionarySerializer {
   
@@ -58,8 +58,8 @@ public class DictionarySerializer {
     
     private EntryInserter mInserter;
     
-    private boolean mIsInsideDictionaryElement;
-    private boolean mIsInsideEntryElement;
+//    private boolean mIsInsideDictionaryElement;
+//    private boolean mIsInsideEntryElement;
     private boolean mIsInsideTokenElement;
     
     private List mTokenList = new LinkedList();
@@ -177,8 +177,17 @@ public class DictionarySerializer {
   private static final String ENTRY_ELEMENT = "entry";
   private static final String TOKEN_ELEMENT = "token";
   
+  /**
+   * Creates {@link Entry}s form the given {@link InputStream} and
+   * forwards these {@link Entry}s to the {@link EntryInserter}.
+   * 
+   * @param in
+   * @param inserter
+   * @throws IOException
+   * @throws InvalidFormatException 
+   */
   public static void create(InputStream in, EntryInserter inserter) 
-      throws IOException {
+      throws IOException, InvalidFormatException {
     
     DictionaryContenthandler profileContentHandler = 
         new DictionaryContenthandler(inserter);
@@ -190,12 +199,19 @@ public class DictionarySerializer {
       xmlReader.parse(new InputSource(new GZIPInputStream(in)));
     } 
     catch (SAXException e) {
-      //throw new InvalidFormatException("The profile data stream has" +
-      //      "an invalid format!", e);
-      e.printStackTrace();
+      throw new InvalidFormatException("The profile data stream has" +
+            "an invalid format!", e);
     } 
   }
   
+  /**
+   * Serializes the given entries to the given {@link OutputStream}.
+   * 
+   * @param out 
+   * @param entries 
+   * 
+   * @throws IOException If an I/O error occurs
+   */
   public static void serialize(OutputStream out, Iterator entries) 
       throws IOException {
     GZIPOutputStream gzipOut = new GZIPOutputStream(out);

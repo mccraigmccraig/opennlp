@@ -36,7 +36,7 @@ import opennlp.tools.util.InvalidFormatException;
 /**
  * 
  * @author <a href="mailto:kottmann@gmail.com">Joern Kottmann</a>
- * @version $Revision: 1.4 $, $Date: 2006/12/01 00:20:00 $
+ * @version $Revision: 1.5 $, $Date: 2007/03/30 09:46:33 $
  */
 public class NGramModel {
   
@@ -55,8 +55,9 @@ public class NGramModel {
    * 
    * @param in
    * @throws IOException
+   * @throws InvalidFormatException 
    */
-  public NGramModel(InputStream in) throws IOException {
+  public NGramModel(InputStream in) throws IOException, InvalidFormatException {
     DictionarySerializer.create(in, new EntryInserter() {
       public void insert(Entry entry) throws InvalidFormatException {
 

@@ -28,6 +28,7 @@ import opennlp.tools.parser.AbstractParserEventStream;
 import opennlp.tools.parser.HeadRules;
 import opennlp.tools.parser.Parse;
 import opennlp.tools.parser.ParserEventTypeEnum;
+import opennlp.tools.util.InvalidFormatException;
 
 /**
  * Wrapper class for one of four parser event streams.  The particular event stram is specified 
@@ -169,7 +170,7 @@ public class ParserEventStream extends AbstractParserEventStream {
     }
   }
 
-  public static void main(String[] args) throws java.io.IOException {
+  public static void main(String[] args) throws java.io.IOException, InvalidFormatException {
     if (args.length == 0) {
       System.err.println("Usage ParserEventStream -[tag|chunk|build|check|fun] head_rules [dictionary] < parses");
       System.exit(1);

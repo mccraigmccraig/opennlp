@@ -45,6 +45,7 @@ import opennlp.tools.ngram.NGramModel;
 import opennlp.tools.ngram.Token;
 import opennlp.tools.ngram.TokenList;
 import opennlp.tools.util.BeamSearch;
+import opennlp.tools.util.InvalidFormatException;
 import opennlp.tools.util.Pair;
 import opennlp.tools.util.Sequence;
 
@@ -54,7 +55,7 @@ import opennlp.tools.util.Sequence;
  * surrounding context.
  *
  * @author      Gann Bierner
- * @version $Revision: 1.24 $, $Date: 2007/03/28 19:16:29 $
+ * @version $Revision: 1.25 $, $Date: 2007/03/30 09:46:32 $
  */
 public class POSTaggerME implements Evalable, POSTagger {
 
@@ -366,9 +367,10 @@ public class POSTaggerME implements Evalable, POSTagger {
    * <p>Usage: java opennlp.postag.POStaggerME [-encoding charset] [-d dict_file] data_file  new_model_name (iterations cutoff)?</p>
    * @param args 
    * @throws IOException 
+   * @throws InvalidFormatException 
    *
    */
-  public static void main(String[] args) throws IOException {
+  public static void main(String[] args) throws IOException, InvalidFormatException {
     if (args.length == 0){
       usage();
     }

@@ -27,7 +27,7 @@ import java.util.NoSuchElementException;
  * TODO: add a method for a subtoken list
  * 
  * @author <a href="mailto:kottmann@gmail.com">Joern Kottmann</a>
- * @version $Revision: 1.5 $, $Date: 2006/11/17 12:33:54 $
+ * @version $Revision: 1.6 $, $Date: 2007/03/30 09:46:33 $
  */
 public class TokenList {
   
@@ -99,6 +99,34 @@ public class TokenList {
       
     };
   }
+  
+  /**
+   * Compares to tokens list and ignores the case of the tokens.
+   * 
+   * Note: This can cause problems with some locals.
+   * 
+   * @param tokens
+   * 
+   * @return true if identicaly with ignore the case otherwise false
+   */
+  public boolean compareToIgnoreCase(TokenList tokens) {
+    
+    if (size() == tokens.size()) {
+      for (int i = 0; i < size(); i++) {
+        
+        if (getToken(i).getToken().compareToIgnoreCase(
+            tokens.getToken(i).getToken()) != 0) {
+          return false;
+        } 
+      }
+    }
+    else {
+      return false;
+    }
+    
+    return true;
+  }
+  
   
   public boolean equals(Object obj) {
     
