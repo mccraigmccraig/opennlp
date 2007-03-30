@@ -31,7 +31,7 @@ import opennlp.tools.util.Cache;
  *
  * @author      Gann Bierner
  * @author      Tom Morton
- * @version     $Revision: 1.14 $, $Date: 2006/11/17 12:30:19 $
+ * @version     $Revision: 1.15 $, $Date: 2007/03/30 06:36:56 $
  */
 
 public class DefaultPOSContextGenerator implements POSContextGenerator {
@@ -126,11 +126,11 @@ public class DefaultPOSContextGenerator implements POSContextGenerator {
 
     if (index - 1 >= 0) {
       prev =  tokens[index - 1].toString();
-      tagprev =  tags[index - 1].toString();
+      tagprev =  tags[index - 1];
 
       if (index - 2 >= 0) {
         prevprev = tokens[index - 2].toString();
-        tagprevprev = tags[index - 2].toString();
+        tagprevprev = tags[index - 2];
       }
       else {
         prevprev = SB; // Sentence Beginning
