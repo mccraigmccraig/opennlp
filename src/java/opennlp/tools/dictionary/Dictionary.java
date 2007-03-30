@@ -38,12 +38,51 @@ import opennlp.tools.ngram.TokenList;
 /**
  * This class is a dictionary.
  * 
- * TODO: it should be possible to specify the capacity
- * 
  * @author <a href="mailto:kottmann@gmail.com">Joern Kottmann</a>
- * @version $Revision: 1.3 $, $Date: 2007/01/22 06:48:38 $
+ * @version $Revision: 1.4 $, $Date: 2007/03/30 09:30:10 $
  */
 public class Dictionary {
+  
+  private static class IgnoreCaseTokenList {
+    
+    private TokenList mTokenList;
+    
+    private IgnoreCaseTokenList(TokenList tokenList) {
+      mTokenList = tokenList;
+    }
+    
+    private TokenList getTokenList() {
+      return mTokenList;
+    }
+    
+    public boolean equals(Object obj) {
+     
+      boolean result;
+      
+      if (obj == this) {
+        result = true;
+      }
+      else if (obj instanceof IgnoreCaseTokenList) {
+        IgnoreCaseTokenList other = (IgnoreCaseTokenList) obj;
+        
+        result = mTokenList.compareToIgnoreCase(other.getTokenList());
+      }
+      else {
+        result = false;
+      }
+      
+      return result;
+    }
+    
+    public int hashCode() {
+      // if lookup is too slow optimize this
+      return mTokenList.toString().toLowerCase().hashCode();
+    }
+    
+    public String toString() {
+      return mTokenList.toString();
+    }
+  }
   
   private Set mEntrySet = new HashSet();
   
@@ -74,7 +113,7 @@ public class Dictionary {
    * @param tokens the new entry
    */
   public void put(TokenList tokens) {
-    mEntrySet.add(tokens);
+    mEntrySet.add(new IgnoreCaseTokenList(tokens));
   }
   
   /**
@@ -85,7 +124,7 @@ public class Dictionary {
    * @return true if it contains the entry otherwise false
    */
   public boolean contains(TokenList tokens) {
-    return mEntrySet.contains(tokens);
+    return mEntrySet.contains(new IgnoreCaseTokenList(tokens));
   }
   
   /**
@@ -94,7 +133,7 @@ public class Dictionary {
    * @param tokens
    */
   public void remove(TokenList tokens) {
-    mEntrySet.remove(tokens);
+    mEntrySet.remove(new IgnoreCaseTokenList(tokens));
   }
   
   /**
@@ -103,7 +142,21 @@ public class Dictionary {
    * @return token-{@link Iterator}
    */
   public Iterator iterator() {
-    return mEntrySet.iterator();
+    final Iterator entries = mEntrySet.iterator();
+    
+    return new Iterator() {
+
+      public boolean hasNext() {
+        return entries.hasNext();
+      }
+
+      public Object next() {
+        return ((IgnoreCaseTokenList) entries.next()).getTokenList();
+      }
+
+      public void remove() {
+        entries.remove();
+      }};
   }
   
   /**
@@ -133,7 +186,8 @@ public class Dictionary {
 
         public Object next() {
           
-          TokenList tokens = (TokenList) mDictionaryIterator.next();
+          TokenList tokens = (TokenList)
+              mDictionaryIterator.next();
           
           return new Entry(tokens, new Attributes());
         }
@@ -201,7 +255,6 @@ public class Dictionary {
         while (whiteSpaceTokenizer.hasMoreTokens()) {
           tokens[tokenIndex++] = Token.create(whiteSpaceTokenizer.nextToken());
         }
-        
         
         dictionary.put(new TokenList(tokens));
       }
