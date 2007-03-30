@@ -33,16 +33,32 @@ import junit.framework.TestCase;
   * Tests for the {@link Dictionary} class.
   * 
   * @author <a href="mailto:kottmann@gmail.com">Joern Kottmann</a>
-  * @version $Revision: 1.2 $, $Date: 2007/01/22 06:52:12 $
+  * @version $Revision: 1.3 $, $Date: 2007/03/30 09:30:49 $
   */
 public class DictionaryTest extends TestCase  {
+  
+  /**
+   * Tests a basic lookup.
+   */
+  public void testLookup() {
+    
+    TokenList entry1 = Token.create(new String[]{"1a", "1b"});
+    TokenList entry2 = Token.create(new String[]{"1A", "1C"});
+    
+    Dictionary dict = new Dictionary();
+
+    dict.put(entry1);
+    
+    assertTrue(dict.contains(entry1));
+    assertTrue(!dict.contains(entry2));
+  }
   
   /**
    * Tests serialization and deserailization of the {@link Dictionary}.
    * 
    * @throws IOException
    */
-  public void testDictionary() throws IOException {
+  public void testSerialization() throws IOException {
     Dictionary reference = new Dictionary();
     
     Token a1 = Token.create("a1");
@@ -109,6 +125,21 @@ public class DictionaryTest extends TestCase  {
   }
   
   /**
+   * Tests the {@link Dictionary#hashCode()} method.
+   */
+  public void testHashCode() {
+    TokenList entry1 = Token.create(new String[]{"1a", "1b"});
+    
+    Dictionary dictA = new Dictionary();
+    dictA.put(entry1);
+
+    Dictionary dictB = new Dictionary();
+    dictB.put(entry1);
+
+    assertEquals(dictA.hashCode(), dictB.hashCode());
+  }
+  
+  /**
    * Tests for the {@link Dictionary#toString()} method.
    */
   public void testToString() {
@@ -121,5 +152,20 @@ public class DictionaryTest extends TestCase  {
     dictA.put(entry1);
     
     dictA.toString();
+  }
+  
+  /**
+   * Tests the lookup of tokens of different case.
+   */
+  public void testDifferentCaseLookup() {
+    
+    TokenList entry1 = Token.create(new String[]{"1a", "1b"});
+    TokenList entry2 = Token.create(new String[]{"1A", "1B"});
+    
+    Dictionary dict = new Dictionary();
+
+    dict.put(entry1);
+    
+    assertTrue(dict.contains(entry2));
   }
 }
