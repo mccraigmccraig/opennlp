@@ -35,9 +35,9 @@ import java.util.logging.Logger;
  * + weak vs. strong referneces ???
  * 
  * @author <a href="mailto:kottmann@gmail.com">Joern Kottmann</a>
- * @version $Revision: 1.3 $, $Date: 2007/01/22 06:49:27 $
+ * @version $Revision: 1.4 $, $Date: 2007/03/30 06:38:04 $
  */
-public class TokenSet {
+public final class TokenSet {
   
   private final class StatisticLogger implements Runnable {
     
@@ -101,6 +101,13 @@ public class TokenSet {
     }
   }
   
+  /**
+   * Retrives the one and only instance of the {@link TokenSet}.
+   * 
+   * Note: Instance is created on the first call to this method.
+   * 
+   * @return the single {@link TokenSet} instance.
+   */
   public static synchronized TokenSet getInstance() {
     if (sInstance == null) {
       sInstance = new TokenSet();

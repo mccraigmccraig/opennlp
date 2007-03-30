@@ -19,14 +19,13 @@
 package opennlp.tools.namefind;
 
 import java.util.Collections;
-import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import opennlp.tools.dictionary.Dictionary;
+import opennlp.tools.dictionary.Index;
 import opennlp.tools.ngram.Token;
 import opennlp.tools.ngram.TokenList;
 import opennlp.tools.util.Span;
@@ -36,38 +35,13 @@ import opennlp.tools.util.Span;
  * for names inside a dictionary.
  * 
  * @author <a href="mailto:kottmann@gmail.com">Joern Kottmann</a>
- * @version $Revision: 1.3 $, $Date: 2007/01/22 06:50:59 $
+ * @version $Revision: 1.4 $, $Date: 2007/03/30 06:42:23 $
  */
 public class DictionaryNameFinder implements NameFinder {
 
-  /**
-   * This class indexes an dictionary, each token is one element in
-   * the index.
-   */
-  private class DictionaryIndex {
-    
-    private Set mTokens = new HashSet();
-    
-    private DictionaryIndex(Dictionary dictionary) {
-      
-      for (Iterator it = dictionary.iterator(); it.hasNext();) {
-      
-        TokenList tokens = (TokenList) it.next();
-        
-        for (int i = 0; i < tokens.size(); i++) {
-          mTokens.add(tokens.getToken(i));
-        }
-      }
-    }
-    
-    private boolean contains(Token token) {
-      return mTokens.contains(token);
-    }
-  }
-
   private Dictionary mDictionary;
   
-  private DictionaryIndex mMetaDictionary;
+  private Index mMetaDictionary;
   
   /**
    * Initializes the current instance.
@@ -76,7 +50,7 @@ public class DictionaryNameFinder implements NameFinder {
    */
   public DictionaryNameFinder(Dictionary dictionary) {
     mDictionary = dictionary;
-    mMetaDictionary = new DictionaryIndex(dictionary);
+    mMetaDictionary = new Index(dictionary.iterator());
   }
   
   public List find(List toks, Map prevTags) {

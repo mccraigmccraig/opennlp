@@ -25,7 +25,7 @@ import opennlp.tools.dictionary.Dictionary;
 /**
  * 
  * @author <a href="mailto:kottmann@gmail.com">Joern Kottmann</a>
- * @version $Revision: 1.1 $, $Date: 2007/01/22 06:51:14 $
+ * @version $Revision: 1.2 $, $Date: 2007/03/30 06:42:23 $
  */
 public class DictionaryFeatureGenerator implements FeatureGenerator {
   
@@ -35,13 +35,19 @@ public class DictionaryFeatureGenerator implements FeatureGenerator {
   
   private String mCurrentNames[];
   
+  /**
+   * Initilizes the current instance.
+   * 
+   * @param dictionary
+   */
   public DictionaryFeatureGenerator(Dictionary dictionary) {
     mDictionary = new DictionaryNameFinder(dictionary);
   }
   
   public void createFeatures(List features, String[] tokens, int index) {
-    // cache results sentence wise
+    // cache results sentence
     if (mCurrentSentence != tokens) {
+      mCurrentSentence = tokens;
       mCurrentNames = mDictionary.find(tokens, null);
     }
     

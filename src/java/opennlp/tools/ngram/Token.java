@@ -19,9 +19,10 @@
 package opennlp.tools.ngram;
 
 /**
+ * TODO: add javadoc
  * 
  * @author <a href="mailto:kottmann@gmail.com">Joern Kottmann</a>
- * @version $Revision: 1.6 $, $Date: 2006/12/05 22:25:27 $
+ * @version $Revision: 1.7 $, $Date: 2007/03/30 06:43:27 $
  */
 public class Token {
 
@@ -72,8 +73,6 @@ public class Token {
   
   /**
    * Creates a new Token instance.
-   * 
-   * TODO: use a TokenCache or NameTable to store already created tokens
    * 
    * @param token
    * 
