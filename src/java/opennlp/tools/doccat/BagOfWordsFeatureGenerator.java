@@ -18,19 +18,19 @@
 
 package opennlp.tools.doccat;
 
+import java.util.ArrayList;
 import java.util.Collection;
-import java.util.LinkedList;
 
 /**
 *
 * @author <a href="mailto:kottmann@gmail.com">Joern Kottmann</a>
-* @version $Revision: 1.1 $, $Date: 2006/11/08 18:43:25 $
+* @version $Revision: 1.2 $, $Date: 2007/04/10 12:57:55 $
 */
 public class BagOfWordsFeatureGenerator implements FeatureGenerator {
 
   public Collection extractFeatures(String[] text) {
     
-    Collection bagOfWords = new LinkedList();
+    Collection bagOfWords = new ArrayList(text.length);
     
     for (int i = 0; i < text.length; i++) {
       bagOfWords.add("bow=" + text[i]);
