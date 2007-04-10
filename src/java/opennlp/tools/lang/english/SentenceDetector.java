@@ -31,7 +31,7 @@ import opennlp.tools.sentdetect.SentenceDetectorME;
  * Journal text).
  *
  * @author      Jason Baldridge and Tom Morton
- * @version     $Revision: 1.4 $, $Date: 2006/03/16 04:46:24 $
+ * @version     $Revision: 1.5 $, $Date: 2007/04/10 12:22:28 $
  */
 
 public class SentenceDetector extends SentenceDetectorME {
@@ -51,7 +51,7 @@ public class SentenceDetector extends SentenceDetectorME {
    */
   public static void main(String[] args) throws IOException {
     if (args.length == 0) {
-      System.err.print("Usage java opennlp.tools.lang.english.SentenceDetectorME model < text");
+      System.err.print("Usage java opennlp.tools.lang.english.SentenceDetector model < text");
       System.exit(1);
     }
     SentenceDetectorME sdetector = new SentenceDetector(args[0]);

@@ -18,83 +18,55 @@
 
 package opennlp.tools.doccat;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Iterator;
-
 import opennlp.maxent.ContextGenerator;
+import opennlp.maxent.DataStream;
 import opennlp.maxent.Event;
 import opennlp.maxent.EventStream;
-import opennlp.tools.tokenize.SimpleTokenizer;
-import opennlp.tools.tokenize.Tokenizer;
 
 /**
 *
 * @author <a href="mailto:kottmann@gmail.com">Joern Kottmann</a>
-* @version $Revision: 1.2 $, $Date: 2006/11/17 13:33:13 $
+* @version $Revision: 1.3 $, $Date: 2007/04/10 12:23:42 $
 */
 public class DocumentCategorizerEventStream implements EventStream {
   
   private ContextGenerator mContextGenerator;
-  private Collection mEvents = new ArrayList(); // TODO: intialize it ?
   
-  private Iterator mIterator;
+  private DataStream data;
   
   /**
    * Initializes the current instance.
+   * 
+   * @param data {@link DataStream} of {@link DocumentSample}s
+   * 
+   * @param featureGenerators
    */
-  public DocumentCategorizerEventStream() {
-	  this(new FeatureGenerator[]{new BagOfWordsFeatureGenerator()});
-  }
-  
-  DocumentCategorizerEventStream(FeatureGenerator featureGenerators[]) {
-	  mContextGenerator = 
-		  new DocumentCategorizerContextGenerator(featureGenerators);
+  public DocumentCategorizerEventStream(DataStream data, FeatureGenerator featureGenerators[]) {
+    
+    this.data = data;
+    
+    mContextGenerator = 
+      new DocumentCategorizerContextGenerator(featureGenerators);
   }
   
   /**
-   * Adds the text with the category to the current instance.
+   * Initializes the current instance.
    * 
-   * @param category
-   * @param text
+   * @param data {@link DataStream} of {@link DocumentSample}s
    */
-  public void add(String category, String[] text) {    
-	  mEvents.add(new Event(category, mContextGenerator.getContext(text)));
-  }
-
-  /**
-   * Adds the text with the category to the current instance.
-   * 
-   * @param category
-   * @param documentText
-   */
-  public void add(String category, String documentText) {
-    Tokenizer tokenizer = new SimpleTokenizer();
-    add(category, tokenizer.tokenize(documentText));
+  public DocumentCategorizerEventStream(DataStream data) {
+	  this(data, new FeatureGenerator[]{new BagOfWordsFeatureGenerator()});
   }
   
   public boolean hasNext() {
-	  
-    if (mIterator == null) {
-      mIterator = mEvents.iterator();
-    }
-    
-    if (!mIterator.hasNext()) {
-      
-      mEvents = null;
-      mIterator = null;
-      return false;
-    }
-    
-    return mIterator.hasNext();
+    return data.hasNext();
   }
 
   public Event nextEvent() {
 	  
-	if (mIterator == null) {
-	  mIterator = mEvents.iterator();
-	}
-	  
-    return (Event) mIterator.next();
+    DocumentSample sample = (DocumentSample) data.nextToken();
+    
+    return new Event(sample.getCategory(), 
+        mContextGenerator.getContext(sample.getText()));
   }
 }
