@@ -74,6 +74,7 @@ public class TreebankParser {
     return new opennlp.tools.parser.treeinsert.Parser(
         new SuffixSensitiveGISModelReader(new File(dataDir + "/build.bin.gz")).getModel(),
         new SuffixSensitiveGISModelReader(new File(dataDir + "/attach.bin.gz")).getModel(),
+        new SuffixSensitiveGISModelReader(new File(dataDir + "/check.bin.gz")).getModel(),
         new ParserTagger(dataDir + "/tag.bin.gz", dataDir + "/tagdict", useCaseSensitiveTagDictionary ),//, new Dictionary(dataDir+"/dict.bin.gz")),
         new ParserChunker(dataDir + "/chunk.bin.gz"),
         new HeadRules(dataDir + "/head_rules"),beamSize,advancePercentage);
