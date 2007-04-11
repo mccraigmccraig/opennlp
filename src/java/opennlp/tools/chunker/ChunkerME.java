@@ -160,8 +160,8 @@ public class ChunkerME implements Chunker {
    * @return the new model
    * @throws java.io.IOException
    */
-  public static GISModel train(opennlp.maxent.EventStream es, int iterations, int cut, String encoding) throws java.io.IOException {
-    return opennlp.maxent.GIS.trainModel(iterations, new TwoPassDataIndexer(es, cut, encoding));
+  public static GISModel train(opennlp.maxent.EventStream es, int iterations, int cut) throws java.io.IOException {
+    return opennlp.maxent.GIS.trainModel(iterations, new TwoPassDataIndexer(es, cut));
   }
   
   private static void usage() {
@@ -227,7 +227,7 @@ public class ChunkerME implements Chunker {
     else {
       es = new ChunkerEventStream(new opennlp.maxent.PlainTextByLineDataStream(new java.io.FileReader(inFile)));
     }
-    mod = train(es, iterations, cutoff,encoding);
+    mod = train(es, iterations, cutoff);
     System.out.println("Saving the model as: " + args[1]);
     new opennlp.maxent.io.SuffixSensitiveGISModelWriter(mod, outFile).persist();
   }

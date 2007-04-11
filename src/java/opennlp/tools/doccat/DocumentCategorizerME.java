@@ -18,6 +18,8 @@
 
 package opennlp.tools.doccat;
 
+import java.io.IOException;
+
 import opennlp.maxent.ContextGenerator;
 import opennlp.maxent.GIS;
 import opennlp.maxent.GISModel;
@@ -29,7 +31,7 @@ import opennlp.tools.tokenize.Tokenizer;
 /**
 *
 * @author <a href="mailto:kottmann@gmail.com">Joern Kottmann</a>
-* @version $Revision: 1.3 $, $Date: 2007/03/15 04:55:24 $
+* @version $Revision: 1.4 $, $Date: 2007/04/11 17:11:59 $
 */
 public class DocumentCategorizerME implements DocumentCategorizer {
   
@@ -101,7 +103,7 @@ public class DocumentCategorizerME implements DocumentCategorizer {
    * 
    * @return the new model
    */
-  public static GISModel train(DocumentCategorizerEventStream eventStream) {
+  public static GISModel train(DocumentCategorizerEventStream eventStream) throws IOException {
     return GIS.trainModel(100, new TwoPassDataIndexer(eventStream, 5));
   }
 }

@@ -365,8 +365,8 @@ public class NameFinderME implements NameFinder {
     return prevMap;
   }
   
-  public static GISModel train(EventStream es, int iterations, int cut, String encoding) throws IOException {
-    return GIS.trainModel(iterations, new TwoPassDataIndexer(es, cut,encoding));
+  public static GISModel train(EventStream es, int iterations, int cut) throws IOException {
+    return GIS.trainModel(iterations, new TwoPassDataIndexer(es, cut));
   }
   
   public static void usage(){
@@ -422,7 +422,7 @@ public class NameFinderME implements NameFinder {
     else {
       es = new NameFinderEventStream(new opennlp.maxent.PlainTextByLineDataStream(new java.io.FileReader(inFile)));
     }
-    mod = train(es, iterations, cutoff,encoding);
+    mod = train(es, iterations, cutoff);
     System.out.println("Saving the model as: " + args[1]);
     new opennlp.maxent.io.SuffixSensitiveGISModelWriter(mod, outFile).persist();
   }
