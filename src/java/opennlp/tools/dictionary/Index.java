@@ -9,12 +9,12 @@ import opennlp.tools.ngram.TokenList;
 
 /**
  * This classes indexes {@link TokenList}s. This makes it possible
- * to check if a certain {@link Token} is contained in at leat one of the 
+ * to check if a certain {@link Token} is contained in at least one of the 
  * {@link TokenList}s.
  */
 public class Index {
   
-  private Set mTokens = new HashSet();
+  private Set tokens = new HashSet();
   
   /**
    * Initializes the current instance with the given
@@ -29,7 +29,7 @@ public class Index {
       TokenList tokens = (TokenList) tokenLists.next();
       
       for (int i = 0; i < tokens.size(); i++) {
-        mTokens.add(tokens.getToken(i));
+        this.tokens.add(tokens.getToken(i));
       }
     }
   }
@@ -43,6 +43,6 @@ public class Index {
    * @return true if the {@link Token} is contained otherwise false.
    */
   public boolean contains(Token token) {
-    return mTokens.contains(token);
+    return tokens.contains(token);
   }
 }
