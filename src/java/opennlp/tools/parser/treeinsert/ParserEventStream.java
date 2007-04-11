@@ -21,9 +21,9 @@ package opennlp.tools.parser.treeinsert;
 import java.io.File;
 import java.io.FileInputStream;
 import java.util.ArrayList;
-import java.util.HashSet;
+import java.util.HashMap;
 import java.util.List;
-import java.util.Set;
+import java.util.Map;
 
 import opennlp.maxent.DataStream;
 import opennlp.maxent.Event;
@@ -42,6 +42,7 @@ public class ParserEventStream extends AbstractParserEventStream {
 
   protected AttachContextGenerator attachContextGenerator;
   protected BuildContextGenerator buildContextGenerator;
+  protected CheckContextGenerator checkContextGenerator;
   
   private static final boolean debug = false;
   
@@ -51,32 +52,91 @@ public class ParserEventStream extends AbstractParserEventStream {
   
   public void init() {
     buildContextGenerator = new BuildContextGenerator();
-    attachContextGenerator = new AttachContextGenerator();
+    attachContextGenerator = new AttachContextGenerator(punctSet);
+    checkContextGenerator = new CheckContextGenerator(punctSet);
   }
 
   public ParserEventStream(DataStream d, HeadRules rules, ParserEventTypeEnum etype) {
     super(d, rules, etype);
   }
   
-  private Set getNonAdjoinedParent(Parse node) {
-    Set parents = new HashSet();
+  /**
+   * Returns a set of parent nodes which consist of the immediate
+   * parent of the specified node and any of its parent which 
+   * share the same syntactic type.
+   * @param node The node whose parents are to be returned.
+   * @return a set of parent nodes.
+   */
+  private Map getNonAdjoinedParent(Parse node) {
+    Map parents = new HashMap();
     Parse parent = node.getParent();
-    parents.add(parent);
+    int index = indexOf(node,parent);
+    parents.put(parent,new Integer(index));
     while(parent.getType().equals(node.getType())) {
+      node = parent;
       parent = parent.getParent();
-      parents.add(parent);
+      index = indexOf(node,parent);
+      parents.put(parent,new Integer(index));
     }
     return parents;
   }
 
+  private int indexOf(Parse child, Parse parent) {
+    Parse[] kids = Parser.collapsePunctuation(parent.getChildren(),punctSet);
+    for (int ki=0;ki<kids.length;ki++) {
+      if (child == kids[ki]) {
+        return ki;
+      }
+    }
+    return -1;
+  }
+  
+  private int nonPunctChildCount(Parse node) {
+    return Parser.collapsePunctuation(node.getChildren(),punctSet).length;
+  }
+  /*  
+  private Set getNonAdjoinedParent(Parse node) {
+    Set parents = new HashSet();
+    Parse parent = node.getParent();
+    do {
+      parents.add(parent);
+      parent = parent.getParent();
+    }
+    while(parent.getType().equals(node.getType()));
+    return parents;
+  }
+  */
+  
+  protected boolean lastChild(Parse child, Parse parent) {
+    boolean lc = super.lastChild(child, parent);
+    while(!lc) {
+      Parse cp = child.getParent();
+      if (cp != parent && cp.getType().equals(child.getType())) {
+        lc = super.lastChild(cp,parent);
+        child = cp;
+      }
+      else {
+        break;
+      }
+    }
+    return lc;
+  }
+
   protected void addParseEvents(List parseEvents, Parse[] chunks) {
+    /** Frontier nodes built from node in a completed parse.  Specifically,
+     * they have all their children regardless of the stage of parsing.*/
     List rightFrontier = new ArrayList();
-    List newFrontier = new ArrayList();
+    List builtNodes = new ArrayList();
+    /** Nodes which characterize what the parse looks like to the parser as its being built.
+     * Specifically, these nodes don't have all their chilren attached like the parents of
+     * the chunk nodes do.*/
     Parse[] currentChunks = new Parse[chunks.length];
     for (int ci=0;ci<chunks.length;ci++) {
       currentChunks[ci] = (Parse) chunks[ci].clone();
       currentChunks[ci].setPrevPunctuation(chunks[ci].getPreviousPunctuationSet());
       currentChunks[ci].setNextPunctuation(chunks[ci].getNextPunctuationSet());
+      currentChunks[ci].setLabel(Parser.COMPLETE);
+      chunks[ci].setLabel(Parser.COMPLETE);
     }
     for (int ci=0;ci<chunks.length;ci++) {
       //System.err.println("parserEventStream.addParseEvents: chunks="+Arrays.asList(chunks));
@@ -85,16 +145,17 @@ public class ParserEventStream extends AbstractParserEventStream {
       int off = 0;
       //build un-built parents
       if (!chunks[ci].isPosTag()) {
-        newFrontier.add(off++,chunks[ci]);
+        builtNodes.add(off++,chunks[ci]);
       }
       //perform build stages
       while (!parent.getType().equals(AbstractBottomUpParser.TOP_NODE) && parent.getLabel() == null) {
         if (parent.getLabel() == null && !prevParent.getType().equals(parent.getType())) {
           //build level
+          if (debug) System.err.println("Build: "+parent.getType()+" for: "+currentChunks[ci]);
           if (etype == ParserEventTypeEnum.BUILD) {
             parseEvents.add(new Event(parent.getType(), buildContextGenerator.getContext(currentChunks, ci)));            
           }
-          newFrontier.add(off++,parent);
+          builtNodes.add(off++,parent);
           Parse newParent = new Parse(currentChunks[ci].getText(),currentChunks[ci].getSpan(),parent.getType(),1,0);
           newParent.add(currentChunks[ci],rules);
           newParent.setPrevPunctuation(currentChunks[ci].getPreviousPunctuationSet());
@@ -102,9 +163,26 @@ public class ParserEventStream extends AbstractParserEventStream {
           currentChunks[ci].setParent(newParent);
           currentChunks[ci] = newParent;
           newParent.setLabel(Parser.BUILT);
+          //see if chunk is complete
+          if (lastChild(chunks[ci], parent)) {
+            if (etype == ParserEventTypeEnum.CHECK) {
+              parseEvents.add(new Event(Parser.COMPLETE, checkContextGenerator.getContext(currentChunks[ci],currentChunks, ci,false)));
+            }
+            currentChunks[ci].setLabel(Parser.COMPLETE);
+            parent.setLabel(Parser.COMPLETE);
+          }
+          else {
+            if (etype == ParserEventTypeEnum.CHECK) {
+              parseEvents.add(new Event(Parser.INCOMPLETE, checkContextGenerator.getContext(currentChunks[ci],currentChunks,ci,false)));
+            }
+            currentChunks[ci].setLabel(Parser.INCOMPLETE);
+            parent.setLabel(Parser.COMPLETE);
+          }
+          
           chunks[ci] = parent;
           //System.err.println("build: "+newParent+" for "+parent);
         }
+        //TODO: Consider whether we need to set this label or train parses at all.
         parent.setLabel(Parser.BUILT);
         prevParent = parent;
         parent = parent.getParent();
@@ -115,70 +193,127 @@ public class ParserEventStream extends AbstractParserEventStream {
       }
       //attach node
       String attachType = null;
+      /** Node selected for attachment. */
       Parse attachNode = null;
+      int attachNodeIndex = -1;
       if (ci == 0){
         Parse top = new Parse(currentChunks[ci].getText(),new Span(0,currentChunks[ci].getText().length()),AbstractBottomUpParser.TOP_NODE,1,0);
         top.insert(currentChunks[ci]);
       }
       else {
+        /** Right frontier consisting of partially-built nodes based on current state of the parse.*/
         List currentRightFrontier = Parser.getRightFrontier(currentChunks[0],punctSet);
         if (currentRightFrontier.size() != rightFrontier.size()) {
-          System.err.println("fontiers mis-aligned: "+currentRightFrontier+" "+rightFrontier);
+          System.err.println("fontiers mis-aligned: "+currentRightFrontier.size()+" != "+rightFrontier.size()+" "+currentRightFrontier+" "+rightFrontier);
+          System.exit(1);
         }
-        Set jumpedNodes = new HashSet(currentRightFrontier.size());
-        for (int fi=0;fi<rightFrontier.size();fi++) {
-          Parse frontierNode = (Parse) rightFrontier.get(fi);
-          Set parents = getNonAdjoinedParent(chunks[ci]);
-          Parse cfn = (Parse) currentRightFrontier.get(fi);
-          if (debug) System.err.println("Looking at attachment site: "+cfn.getType()+" "+cfn+" :for "+currentChunks[ci].getType()+" "+currentChunks[ci]+" -> "+parents);
-          if (attachNode == null && parents.contains(frontierNode)) {
-            if (etype == ParserEventTypeEnum.ATTACH) {
-              parseEvents.add(new Event(Parser.ATTACH_DAUGHTER, attachContextGenerator.getContext(currentChunks, cfn, ci, jumpedNodes)));
+        Map parents = getNonAdjoinedParent(chunks[ci]);
+        //try daughters first.
+        for (int cfi=0;cfi<currentRightFrontier.size();cfi++) {
+          Parse frontierNode = (Parse) rightFrontier.get(cfi);
+          Parse cfn = (Parse) currentRightFrontier.get(cfi);
+          if (!Parser.checkComplete || !Parser.COMPLETE.equals(cfn.getLabel())) {
+            Integer i = (Integer) parents.get(frontierNode);
+            if (debug) System.err.println("Looking at attachment site ("+cfi+"): "+cfn.getType()+" ci="+i+" cs="+nonPunctChildCount(cfn)+", "+cfn+" :for "+currentChunks[ci].getType()+" "+currentChunks[ci]+" -> "+parents);
+            if (attachNode == null &&  i != null && i.intValue() == nonPunctChildCount(cfn)) {
+              attachType = Parser.ATTACH_DAUGHTER;
+              attachNodeIndex = cfi;
+              attachNode = cfn;
+              if (etype == ParserEventTypeEnum.ATTACH) {
+                parseEvents.add(new Event(attachType, attachContextGenerator.getContext(currentChunks, ci, currentRightFrontier, attachNodeIndex)));
+              }
+              //System.err.println("daughter attach "+attachNode+" at "+fi);
             }
-            attachType = Parser.ATTACH_DAUGHTER;
-            attachNode = cfn;
-            //System.err.println("daughter attach "+attachNode+" at "+fi);
           }
-          else if (attachNode == null && parents.contains(frontierNode.getParent()) && frontierNode.getType().equals(frontierNode.getParent().getType())) {
-            if (etype == ParserEventTypeEnum.ATTACH) {
-              parseEvents.add(new Event(Parser.ATTACH_SISTER, attachContextGenerator.getContext(currentChunks, cfn, ci, jumpedNodes)));
-            }
+          else {
+            if (debug) System.err.println("Skipping ("+cfi+"): "+cfn.getType()+","+cfn.getPreviousPunctuationSet()+" "+cfn+" :for "+currentChunks[ci].getType()+" "+currentChunks[ci]+" -> "+parents);
+          }
+          // Can't attach past first incomplete node.
+          if (Parser.checkComplete && cfn.getLabel().equals(Parser.INCOMPLETE)) {
+            if (debug) System.err.println("breaking on incomplete:"+cfn.getType()+" "+cfn);
+            break;
+          }
+        }
+        //try sisters, and generate non-attach events.
+        for (int cfi=0;cfi<currentRightFrontier.size();cfi++) {
+          Parse frontierNode = (Parse) rightFrontier.get(cfi);
+          Parse cfn = (Parse) currentRightFrontier.get(cfi);
+          if (attachNode == null && parents.containsKey(frontierNode.getParent()) 
+              && frontierNode.getType().equals(frontierNode.getParent().getType()) 
+              ){ //&& frontierNode.getParent().getLabel() == null) {
             attachType = Parser.ATTACH_SISTER;
             attachNode = cfn;
+            attachNodeIndex = cfi;
+            if (etype == ParserEventTypeEnum.ATTACH) {
+              parseEvents.add(new Event(Parser.ATTACH_SISTER, attachContextGenerator.getContext(currentChunks, ci, currentRightFrontier, cfi)));
+            }
             chunks[ci].getParent().setLabel(Parser.BUILT);
-            rightFrontier.set(fi,frontierNode.getParent());
-            //System.err.println("sister attach "+attachNode+" at "+fi);
+            //System.err.println("in search sister attach "+attachNode+" at "+cfi);
+          }
+          else if (cfi == attachNodeIndex) {
+            //skip over previously attached daughter.
           }
           else {
             if (etype == ParserEventTypeEnum.ATTACH) {
-              parseEvents.add(new Event(Parser.NON_ATTACH, attachContextGenerator.getContext(currentChunks, frontierNode, ci, jumpedNodes)));
-            }
-            //System.err.println("no attach an="+attachNode);
-            if (attachNode == null) {
-              rightFrontier.remove(fi);
-              currentRightFrontier.remove(fi);
-              fi--;
+              parseEvents.add(new Event(Parser.NON_ATTACH, attachContextGenerator.getContext(currentChunks, ci, currentRightFrontier, cfi)));
             }
           }
-          jumpedNodes.add(frontierNode);
+          //Can't attach past first incomplete node.
+          if (Parser.checkComplete && cfn.getLabel().equals(Parser.INCOMPLETE)) {
+            if (debug) System.err.println("breaking on incomplete:"+cfn.getType()+" "+cfn);
+            break;
+          }
         }
+        //attach Node
         if (attachNode != null) {
           if (attachType == Parser.ATTACH_DAUGHTER) {
             Parse daughter = currentChunks[ci];
-            if (debug) System.err.println("daughter attach a="+attachNode+" d="+daughter);
+            if (debug) System.err.println("daughter attach a="+attachNode.getType()+":"+attachNode+" d="+daughter+" com="+lastChild(chunks[ci], (Parse) rightFrontier.get(attachNodeIndex)));
             attachNode.add(daughter,rules);
             daughter.setParent(attachNode);
+            if (lastChild(chunks[ci], (Parse) rightFrontier.get(attachNodeIndex))) {
+              if (etype == ParserEventTypeEnum.CHECK) {
+                parseEvents.add(new Event(Parser.COMPLETE, checkContextGenerator.getContext(attachNode,currentChunks,ci,true)));
+              }
+              attachNode.setLabel(Parser.COMPLETE);
+            }
+            else {
+              if (etype == ParserEventTypeEnum.CHECK) {
+                parseEvents.add(new Event(Parser.INCOMPLETE, checkContextGenerator.getContext(attachNode,currentChunks,ci,true)));
+              }
+            }
           }
           else if (attachType == Parser.ATTACH_SISTER) {
+            Parse frontierNode = (Parse) rightFrontier.get(attachNodeIndex);
+            rightFrontier.set(attachNodeIndex,frontierNode.getParent());
             Parse sister = currentChunks[ci];
-            if (debug) System.err.println("sister attach a="+attachNode+" s="+sister+" ap="+attachNode.getParent());
+            if (debug) System.err.println("sister attach a="+attachNode.getType()+":"+attachNode+" s="+sister+" ap="+attachNode.getParent()+" com="+lastChild(chunks[ci], (Parse) rightFrontier.get(attachNodeIndex)));
             Parse newParent = attachNode.getParent().adjoin(sister,rules);
+            
             newParent.setParent(attachNode.getParent());
             attachNode.setParent(newParent);
             sister.setParent(newParent);
             if (attachNode == currentChunks[0]) {
               currentChunks[0]= newParent;
             }
+            if (lastChild(chunks[ci], (Parse) rightFrontier.get(attachNodeIndex))) {
+              if (etype == ParserEventTypeEnum.CHECK) {
+                parseEvents.add(new Event(Parser.COMPLETE, checkContextGenerator.getContext(newParent,currentChunks,ci,true)));
+              }
+              newParent.setLabel(Parser.COMPLETE);
+            }
+            else {
+              if (etype == ParserEventTypeEnum.CHECK) {
+                parseEvents.add(new Event(Parser.INCOMPLETE, checkContextGenerator.getContext(newParent,currentChunks,ci,true)));
+              }
+              newParent.setLabel(Parser.INCOMPLETE);
+            }
+
+          }
+          //update right frontier
+          for (int ni=0;ni<attachNodeIndex;ni++) {
+            //System.err.println("removing: "+rightFrontier.get(0));
+            rightFrontier.remove(0);
           }
         }
         else {
@@ -186,14 +321,14 @@ public class ParserEventStream extends AbstractParserEventStream {
           throw new RuntimeException("No Attachment: "+chunks[ci]);
         }
       }
-      rightFrontier.addAll(0,newFrontier);
-      newFrontier.clear();
+      rightFrontier.addAll(0,builtNodes);
+      builtNodes.clear();
     }
   }
   
   public static void main(String[] args) throws java.io.IOException, InvalidFormatException {
     if (args.length == 0) {
-      System.err.println("Usage ParserEventStream -[tag|chunk|choose|build|attach] [-fun] [-dict dictionary] head_rules [model]< parses");
+      System.err.println("Usage ParserEventStream -[tag|chunk|build|attach] [-fun] [-dict dictionary] [-model model] head_rules < parses");
       System.exit(1);
     }
     ParserEventTypeEnum etype = null;
@@ -211,6 +346,9 @@ public class ParserEventStream extends AbstractParserEventStream {
       }
       else if (args[ai].equals("-chunk")) {
         etype = ParserEventTypeEnum.CHUNK;
+      }
+      else if (args[ai].equals("-check")) {
+        etype = ParserEventTypeEnum.CHECK;
       }
       else if (args[ai].equals("-tag")) {
         etype = ParserEventTypeEnum.TAG;

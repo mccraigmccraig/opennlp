@@ -27,10 +27,18 @@ import opennlp.tools.parser.AbstractContextGenerator;
 import opennlp.tools.parser.Cons;
 import opennlp.tools.parser.Parse;
 
+/**
+ * Creates the features or contexts for the building phase of parsing. 
+ * This phase builds constituents from the left-most node of these 
+ * constituents.
+ */
 public class BuildContextGenerator extends AbstractContextGenerator {
 
+  private Parse[] leftNodes;
   
   public BuildContextGenerator() {
+    super();
+    leftNodes = new Parse[2];
   }
 
   public String[] getContext(Object o) {
@@ -76,27 +84,10 @@ public class BuildContextGenerator extends AbstractContextGenerator {
       //this isn't a root node so, punctSet won't be used and can be passed as empty.
       rf = Parser.getRightFrontier(constituents[0],Collections.EMPTY_SET);
     }
+    getFrontierNodes(rf,leftNodes);
+    p_1 = leftNodes[0];
+    p_2 = leftNodes[1];
     
-    int leftIndex = -1;
-    int prevHeadIndex = -1;
-    
-    for (int fi=0;fi<rf.size();fi++) {
-      Parse fn = (Parse) rf.get(fi);
-      int headIndex = fn.getHeadIndex();
-      if (headIndex != prevHeadIndex) {//skip nodes with the same head
-        if (leftIndex == -1) {
-          p_1=fn;
-        }
-        else if (leftIndex == -2) {
-          p_2 = fn;
-        }
-        leftIndex--;
-        prevHeadIndex = headIndex;
-        if (leftIndex <= -3) {
-          break;
-        }
-      }
-    }
     String consp_2 = cons(p_2, -2);
     String consp_1 = cons(p_1, -1);
     String consp0 = cons(p0, 0);
@@ -119,6 +110,10 @@ public class BuildContextGenerator extends AbstractContextGenerator {
     features.add("default");
     
     //unigrams
+    features.add(consp_2);
+    features.add(consbop_2);
+    features.add(consp_1);
+    features.add(consbop_1);
     features.add(consp0);
     features.add(consbop0);
     features.add(consp1);
