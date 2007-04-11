@@ -13,6 +13,12 @@ import opennlp.tools.parser.ChunkContextGenerator;
 import opennlp.tools.parser.chunking.Parser;
 import opennlp.tools.util.Sequence;
 
+/**
+ * Class which perform chunking for non-recursive constituents.  This follows the scheme used by
+ * the CONLL shared chunking task. http://www.cnts.ua.ac.be/conll2000/chunking/
+ * @author Tom Morton
+ *
+ */
 public class ParserChunker extends ChunkerME implements opennlp.tools.parser.ParserChunker {
   private static final int K = 10;
   private int beamSize;
