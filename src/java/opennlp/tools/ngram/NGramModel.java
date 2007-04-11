@@ -1,5 +1,4 @@
 ///////////////////////////////////////////////////////////////////////////////
-//Copyright (C) 2006 Calcucare GmbH
 // 
 //This library is free software; you can redistribute it and/or
 //modify it under the terms of the GNU Lesser General Public
@@ -34,9 +33,10 @@ import opennlp.tools.dictionary.serializer.EntryInserter;
 import opennlp.tools.util.InvalidFormatException;
 
 /**
+ * The {@link NGramModel} can be used to crate ngrams and character ngrams.
  * 
  * @author <a href="mailto:kottmann@gmail.com">Joern Kottmann</a>
- * @version $Revision: 1.5 $, $Date: 2007/03/30 09:46:33 $
+ * @version $Revision: 1.6 $, $Date: 2007/04/11 07:53:48 $
  */
 public class NGramModel {
   
@@ -83,24 +83,37 @@ public class NGramModel {
     });
   }
 
-  public int getCount(TokenList tokens) throws NoSuchElementException{
+  /**
+   * Retrives the count of the given ngram.
+   * 
+   * @param ngram
+   * 
+   * @return count of the ngram or 0 if it is not contained
+   * 
+   */
+  public int getCount(TokenList ngram) {
     
-    Integer count = (Integer) mNGrams.get(tokens);
+    Integer count = (Integer) mNGrams.get(ngram);
     
     if (count == null) {
-      throw new NoSuchElementException();
+      return 0;
     }
     
     return count.intValue();
   }
   
-  public void setCount(TokenList tokens, int count) 
-      throws NoSuchElementException {
+  /**
+   * Sets the count of an existing ngram.
+   * 
+   * @param ngram
+   * @param count
+   */
+  public void setCount(TokenList ngram, int count) {
     
-    Integer oldCount = (Integer) mNGrams.put(tokens, new Integer(count));
+    Integer oldCount = (Integer) mNGrams.put(ngram, new Integer(count));
     
     if (oldCount == null) {
-      mNGrams.remove(tokens);
+      mNGrams.remove(ngram);
       throw new NoSuchElementException();
     }
   }
@@ -108,17 +121,43 @@ public class NGramModel {
   /**
    * Adds one NGram, if it already exists the count increase by one.
    * 
-   * @param tokens
+   * @param ngram
    */
-  public void add(TokenList tokens) {
-    if (contains(tokens)) {
-      setCount(tokens, getCount(tokens) + 1);
+  public void add(TokenList ngram) {
+    if (contains(ngram)) {
+      setCount(ngram, getCount(ngram) + 1);
     }
     else {
-      mNGrams.put(tokens, new Integer(0));
+      mNGrams.put(ngram, new Integer(1));
     }
   }
 
+  /**
+   * Adds NGrams up to the specifed length to the current instance.
+   * 
+   * @param ngram the tokens to build the uni-grams, bi-grams, tri-grams, ..
+   *     from.
+   * @param minLength - minimal length
+   * @param maxLength - maximal length
+   */
+  public void add(TokenList ngram, int minLength, int maxLength) {
+    
+    for (int lengthIndex = minLength; lengthIndex < maxLength + 1; 
+    lengthIndex++) {
+      for (int textIndex = 0; 
+          textIndex + lengthIndex - 1 < ngram.size(); textIndex++) {
+        
+        Token[] grams = new Token[lengthIndex];
+        
+        for (int i = textIndex; i < textIndex + lengthIndex; i++) {
+          grams[i - textIndex] = ngram.getToken(i);
+        }
+        
+        add(new TokenList(grams));
+      }      
+    }    
+  }
+  
   /**
    * Adds character NGrams to the current instance.
    * 
@@ -142,32 +181,6 @@ public class NGramModel {
   }
   
   /**
-   * Adds NGrams up to the specifed length to the current instance.
-   * 
-   * @param tokens the tokens to build the uni-grams, bi-grams, tri-grams, ..
-   *     from.
-   * @param minLength - minimal length
-   * @param maxLength - maximal length
-   */
-  public void add(TokenList tokens, int minLength, int maxLength) {
-    
-    for (int lengthIndex = minLength; lengthIndex < maxLength + 1; 
-    lengthIndex++) {
-      for (int textIndex = 0; 
-          textIndex + lengthIndex - 1 < tokens.size(); textIndex++) {
-        
-        Token[] grams = new Token[lengthIndex];
-        
-        for (int i = textIndex; i < textIndex + lengthIndex; i++) {
-          grams[i - textIndex] = tokens.getToken(i);
-        }
-        
-        add(new TokenList(grams));
-      }      
-    }    
-  }
-  
-  /**
    * Removes the specified tokens form the NGram model, they are just dropped.
    * 
    * @param tokens
@@ -180,7 +193,8 @@ public class NGramModel {
    * Checks fit he given tokens are contained by the current instance.
    * 
    * @param tokens
-   * @return
+   * 
+   * @return true if the ngram is contained
    */
   public boolean contains(TokenList tokens) {
     return mNGrams.containsKey(tokens);
@@ -189,7 +203,7 @@ public class NGramModel {
   /**
    * Retrives the number of {@link TokenList} entries in the current instance.
    * 
-   * @return
+   * @return number of different grams
    */
   public int size() {
     return mNGrams.size();
@@ -198,7 +212,7 @@ public class NGramModel {
   /**
    * Retrives an {@link Iterator} over all {@link TokenList} entires.
    * 
-   * @return
+   * @return iterator over all grams
    */
   public Iterator iterator() {
     return mNGrams.keySet().iterator();
@@ -207,7 +221,7 @@ public class NGramModel {
   /**
    * Retrives the total count of all Ngrams.
    * 
-   * @return
+   * @return total count of all ngrams
    */
   public int numberOfGrams() {
     int counter = 0;
@@ -222,6 +236,13 @@ public class NGramModel {
     return counter;
   }
   
+  /**
+   * Deletes all ngram which do appear less than the cutoffUnder value
+   * and more often than the cutoffOver value.
+   * 
+   * @param cutoffUnder
+   * @param cutoffOver
+   */
   public void cutoff(int cutoffUnder, int cutoffOver) {
     
     if (cutoffUnder > 0 || cutoffOver < Integer.MAX_VALUE) {
@@ -240,31 +261,51 @@ public class NGramModel {
     }
   }
   
-  public double likelihood(NGramModel model) {
-    double frequenceSum = 0;
+//  public double likelihood(NGramModel model) {
+//    double frequenceSum = 0;
+//    
+//    int numberOfReferneceGrams = numberOfGrams();
+//    
+//    for (Iterator it = model.iterator(); it.hasNext();) {
+//      
+//      TokenList ngram = (TokenList) it.next();
+//      
+//      if (contains(ngram)) {
+//        double referenceNgramFrequence = 
+//            (double) getCount(ngram) / 
+//            (double) numberOfReferneceGrams;
+//        
+//        frequenceSum += referenceNgramFrequence * model.getCount(ngram);
+//      }
+//    }
+//    
+//    return frequenceSum;
+//  }
+  
+  
+  /**
+   * Creates a dictionary which contains all {@link TokenList}s which
+   * are in the current {@link NGramModel}.
+   * 
+   * @return the new dictionary
+   */
+  public Dictionary toDictionary() {
     
-    int numberOfReferneceGrams = numberOfGrams();
+    Dictionary dict = new Dictionary();
     
-    for (Iterator it = model.iterator(); it.hasNext();) {
-      
-      TokenList ngram = (TokenList) it.next();
-      
-      if (contains(ngram)) {
-        double referenceNgramFrequence = 
-            (double) getCount(ngram) / 
-            (double) numberOfReferneceGrams;
-        
-        frequenceSum += referenceNgramFrequence * model.getCount(ngram);
-      }
+    for (Iterator it = iterator(); it.hasNext();) {
+      dict.put((TokenList) it.next());
     }
     
-    return frequenceSum;
+    return dict;
   }
   
-  public Dictionary toDictionary() {
-    return null;
-  }
-  
+  /**
+   * Writes the ngram instance to the given {@link OutputStream}.
+   * 
+   * @param out
+   * @throws IOException if an I/O Error during writing occures
+   */
   public void serialize(OutputStream out) throws IOException {
 	    Iterator entryIterator = new Iterator() 
 	      {
@@ -300,7 +341,7 @@ public class NGramModel {
     if (obj == this) {
       result = true;
     }
-    else if (obj != null && obj instanceof NGramModel) {
+    else if (obj instanceof NGramModel) {
       NGramModel model  = (NGramModel) obj;
       
       result = mNGrams.equals(model.mNGrams);
@@ -310,8 +351,7 @@ public class NGramModel {
     }
     
     return result;  
-    
-    }
+   }
   
   public String toString() {
     return "Size: " + size();
