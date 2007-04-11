@@ -73,6 +73,10 @@ public abstract class AbstractBottomUpParser implements Parser {
   public static final String CONT = "C-";
   /** Outcome for token which is not contained in a basal constituent. */
   public static final String OTHER = "O";
+  /** Outcome used when a constituent is complete. */
+  public static final String COMPLETE = "c";
+  /** Outcome used when a constituent is incomplete. */
+  public static final String INCOMPLETE = "i";
  
   /** The pos-tagger that the parser uses. */
   protected ParserTagger tagger;
@@ -82,7 +86,7 @@ public abstract class AbstractBottomUpParser implements Parser {
   /** Specifies whether failed parses should be reported to standard error. */
   protected boolean reportFailedParse;
 
-  /** Specifies whether a derivation string should be created during parsing. This is useful for debugging. */
+  /** Specifies whether a derivation string should be created during parsing. This is useful for debuging. */
   protected boolean createDerivationString = false;
   
   /** Turns debug print on or off. */

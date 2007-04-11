@@ -136,8 +136,8 @@ public class Parse implements Cloneable, Comparable {
     }
   }
   /**
-   * Clones the right frontier of this root parse up to the specified node.
-   * @param node The last node in the right frontier of the parse tree whihc should be cloned.
+   * Clones the right frontier of this root parse up to and including the specified node.
+   * @param node The last node in the right frontier of the parse tree which should be cloned.
    * @param parseIndex The child index of the parse for this root node. 
    * @return A clone of this root parse and its right frontier up to and including the specified node.
    */
@@ -431,16 +431,23 @@ public class Parse implements Cloneable, Comparable {
     return adjNode;
   }
   
-  public Parse adjoin(Parse node, HeadRules rules) {
+  /**
+   * Sister adjoins this node's last child and the specified sister node and returns their
+   * new parent node.  The new parent node replace this nodes last child.
+   * @param sister The node to be adjoined.
+   * @param rules The head rules for the parser.
+   * @return The new parent node of this node and the specified sister node.
+   */
+  public Parse adjoin(Parse sister, HeadRules rules) {
     Parse lastChild = (Parse) parts.get(parts.size()-1);
-    Parse adjNode = new Parse(this.text,new Span(lastChild.getSpan().getStart(),node.getSpan().getEnd()),lastChild.getType(),1,rules.getHead(new Parse[]{lastChild,node},lastChild.getType()));
+    Parse adjNode = new Parse(this.text,new Span(lastChild.getSpan().getStart(),sister.getSpan().getEnd()),lastChild.getType(),1,rules.getHead(new Parse[]{lastChild,sister},lastChild.getType()));
     adjNode.parts.add(lastChild);
-    if (node.prevPunctSet != null) {
-      adjNode.parts.addAll(node.prevPunctSet);
+    if (sister.prevPunctSet != null) {
+      adjNode.parts.addAll(sister.prevPunctSet);
     } 
-    adjNode.parts.add(node);
+    adjNode.parts.add(sister);
     parts.set(parts.size()-1,adjNode);
-    this.span = new Span(span.getStart(),node.getSpan().getEnd());
+    this.span = new Span(span.getStart(),sister.getSpan().getEnd());
     this.head = rules.getHead(getChildren(),type);
     this.headIndex = head.headIndex;
     return adjNode;
@@ -510,8 +517,9 @@ public class Parse implements Cloneable, Comparable {
   }
 
   /**
-   * Assigns this parse the specified label.
-   * @param label A label indicating the constituent this parse node will become part of.
+   * Assigns this parse the specified label.  This is used by parsing schemes to
+   * tag parsing nodes while building.
+   * @param label A label indicating something about the stage of building for this parse node.
    */
   public void setLabel(String label) {
     this.label = label;
@@ -885,3 +893,4 @@ public class Parse implements Cloneable, Comparable {
     }
   }
 }
+

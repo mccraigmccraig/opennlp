@@ -143,6 +143,12 @@ public abstract class AbstractParserEventStream implements EventStream {
     this.events = (Event[]) newEvents.toArray(new Event[newEvents.size()]);
   }
   
+  /**
+   * Produces all events for the specified sentence chunks 
+   * and adds them to the specified list.
+   * @param newEvents A list of events to be added to.
+   * @param chunks Pre-chunked constituents of a sentence.
+   */
   protected abstract void addParseEvents(List newEvents, Parse[] chunks);
   
   private void addChunkEvents(List chunkEvents, Parse[] chunks) {
@@ -200,6 +206,17 @@ public abstract class AbstractParserEventStream implements EventStream {
     for (int ti = 0, tl = toks.size(); ti < tl; ti++) {
       tagEvents.add(new Event((String) preds.get(ti), tagContextGenerator.getContext(ti, toks.toArray(), (String[]) preds.toArray(new String[preds.size()]), null)));
     }
+  }
+
+  /**
+   * Returns true if the specified child is the last child of the specified parent.
+   * @param child The child parse.
+   * @param parent The parent parse.
+   * @return true if the specified child is the last child of the specified parent; false otherwise.
+   */
+  protected boolean lastChild(Parse child, Parse parent) {
+    Parse[] kids = AbstractBottomUpParser.collapsePunctuation(parent.getChildren(),punctSet);
+    return (kids[kids.length - 1] == child);
   }
 
 }
