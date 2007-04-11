@@ -17,7 +17,6 @@
 //////////////////////////////////////////////////////////////////////////////   
 package opennlp.tools.parser.chunking;
 
-import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.util.ArrayList;
@@ -55,11 +54,6 @@ public class Parser extends AbstractBottomUpParser {
 
   private double[] bprobs;
   private double[] cprobs;
-
-  /** Outcome used when a constituent is complete. */
-  public static final String COMPLETE = "c";
-  /** Outcome used when a constituent is incomplete. */
-  public static final String INCOMPLETE = "i";
 
   private static final String TOP_START = START + TOP_NODE;
   private int topStartIndex;
@@ -279,9 +273,8 @@ public class Parser extends AbstractBottomUpParser {
       p.updateHeads(rules);
       Parse[] pwords = p.getTagNodes();
       String[] words = new String[pwords.length];
-      
       //add all uni-grams
-      for (int wi=0; wi < words.length; wi++) {
+      for (int wi=0;wi<words.length;wi++) {
         words[wi] = pwords[wi].toString();
       }
       
@@ -385,14 +378,14 @@ public class Parser extends AbstractBottomUpParser {
       }
       argIndex++;
     }
-    File inFile = new java.io.File(args[argIndex++]);
+    java.io.File inFile = new java.io.File(args[argIndex++]);
     String modelDirectory = args[argIndex++];
     HeadRules rules = new opennlp.tools.lang.english.HeadRules(modelDirectory+"/head_rules");
-    File dictFile = new java.io.File(modelDirectory+"/dict.bin.gz");
-    File tagFile = new java.io.File(modelDirectory+"/tag.bin.gz");
-    File chunkFile = new java.io.File(modelDirectory+"/chunk.bin.gz");
-    File buildFile = new java.io.File(modelDirectory+"/build.bin.gz");
-    File checkFile = new java.io.File(modelDirectory+"/check.bin.gz");
+    java.io.File dictFile = new java.io.File(modelDirectory+"/dict.bin.gz");
+    java.io.File tagFile = new java.io.File(modelDirectory+"/tag.bin.gz");
+    java.io.File chunkFile = new java.io.File(modelDirectory+"/chunk.bin.gz");
+    java.io.File buildFile = new java.io.File(modelDirectory+"/build.bin.gz");
+    java.io.File checkFile = new java.io.File(modelDirectory+"/check.bin.gz");
     int iterations = 100;
     int cutoff = 5;
     if (args.length > argIndex) {

@@ -50,14 +50,19 @@ public class ParserEventStream extends AbstractParserEventStream {
    */
   public ParserEventStream(DataStream d, HeadRules rules, ParserEventTypeEnum etype, Dictionary dict) {
     super(d,rules,etype,dict);
+  }
+  
+  protected void init() {
     if (etype == ParserEventTypeEnum.BUILD) {
-      this.bcg = new BuildContextGenerator(dict);
+      this.bcg = new BuildContextGenerator();
     }
     else if (etype == ParserEventTypeEnum.CHECK) {
       this.kcg = new CheckContextGenerator();
     }
   }
-  
+
+
+
   public ParserEventStream(DataStream d, HeadRules rules, ParserEventTypeEnum etype) {
     this (d,rules,etype,null);
   }
@@ -72,17 +77,6 @@ public class ParserEventStream extends AbstractParserEventStream {
     return AbstractBottomUpParser.collapsePunctuation(parent.getChildren(),punctSet)[0] == child;
   }
 
-  /**
-   * Returns true if the specified child is the last child of the specified parent.
-   * @param child The child parse.
-   * @param parent The parent parse.
-   * @return true if the specified child is the last child of the specified parent; false otherwise.
-   */
-  protected boolean lastChild(Parse child, Parse parent) {
-    Parse[] kids = AbstractBottomUpParser.collapsePunctuation(parent.getChildren(),punctSet);
-    return (kids[kids.length - 1] == child);
-  }
-  
   public static  Parse[] reduceChunks(Parse[] chunks, int ci, Parse parent) {
     String type = parent.getType();
     //  perform reduce
@@ -138,7 +132,7 @@ public class ParserEventStream extends AbstractParserEventStream {
         else {
           outcome = AbstractBottomUpParser.CONT + type;
         }
-        //System.err.println("parserEventStream.addParseEvents: chunks["+ci+"]="+c+" label="+outcome);
+        //System.err.println("parserEventStream.addParseEvents: chunks["+ci+"]="+c+" label="+outcome+" bcg="+bcg);
         c.setLabel(outcome);
         if (etype == ParserEventTypeEnum.BUILD) {
           parseEvents.add(new Event(outcome, bcg.getContext(chunks, ci)));

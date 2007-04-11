@@ -22,7 +22,7 @@ import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 
-import opennlp.maxent.ContextGenerator;
+import opennlp.tools.parser.AbstractContextGenerator;
 import opennlp.tools.parser.Parse;
 
 /**
@@ -30,10 +30,8 @@ import opennlp.tools.parser.Parse;
  * @author Tom Morton
  *
  */
-public class CheckContextGenerator implements ContextGenerator {
+public class CheckContextGenerator extends AbstractContextGenerator {
 
-  private static final String EOS = "eos";
-  
   /**
    * Creates a new context generator for generating predictive context for deciding when a constituent is complete.
    */
@@ -46,80 +44,6 @@ public class CheckContextGenerator implements ContextGenerator {
     return getContext((Parse[]) params[0], (String) params[1], ((Integer) params[2]).intValue(), ((Integer) params[3]).intValue());
   }
 
-  private void surround(Parse p, int i, String type, Collection punctSet, List features) {
-    StringBuffer feat = new StringBuffer(20);
-    feat.append("s").append(i).append("=");
-    if (punctSet !=null) {
-      for (Iterator pi=punctSet.iterator();pi.hasNext();) {
-        Parse punct = (Parse) pi.next();
-        if (p != null) {
-          feat.append(p.getHead().toString()).append("|").append(type).append("|").append(p.getHead().getType()).append("|").append(punct.getType());
-        }
-        else {
-          feat.append(type).append("|").append(EOS).append("|").append(punct.getType());
-        }
-        features.add(feat.toString());
-        
-        feat.setLength(0);
-        feat.append("s").append(i).append("*=");
-        if (p != null) {
-          feat.append(type).append("|").append(p.getHead().getType()).append("|").append(punct.getType());
-        }
-        else {
-          feat.append(type).append("|").append(EOS).append("|").append(punct.getType());
-        }
-        features.add(feat.toString());
-
-        feat.setLength(0);
-        feat.append("s").append(i).append("*=");
-        feat.append(type).append("|").append(punct.getType());
-        features.add(feat.toString());
-      }
-    }
-    else {
-      if (p != null) {
-        feat.append(p.getHead().toString()).append("|").append(type).append("|").append(p.getHead().getType());
-      }
-      else {
-        feat.append(type).append("|").append(EOS);
-      }
-      features.add(feat.toString());
-      feat.setLength(0);
-      feat.append("s").append(i).append("*=");
-      if (p != null) {
-        feat.append(type).append("|").append(p.getHead().getType());
-      }
-      else {
-        feat.append(type).append("|").append(EOS);
-      }
-      features.add(feat.toString());
-    }
-  }
-
-  private void checkcons(Parse p, String i, String type, List features) {
-    StringBuffer feat = new StringBuffer(20);
-    feat.append("c").append(i).append("=").append(p.getType()).append("|").append(p.getHead().toString()).append("|").append(type);
-    features.add(feat.toString());
-    feat.setLength(0);
-    feat.append("c").append(i).append("*=").append(p.getType()).append("|").append(type);
-    features.add(feat.toString());
-  }
-
-  private void checkcons(Parse p1, Parse p2, String type, List features) {
-    StringBuffer feat = new StringBuffer(20);
-    feat.append("cil=").append(type).append(",").append(p1.getType()).append("|").append(p1.getHead().toString()).append(",").append(p2.getType()).append("|").append(p2.getHead().toString());
-    features.add(feat.toString());
-    feat.setLength(0);
-    feat.append("ci*l=").append(type).append(",").append(p1.getType()).append(",").append(p2.getType()).append("|").append(p2.getHead().toString());
-    features.add(feat.toString());
-    feat.setLength(0);
-    feat.append("cil*=").append(type).append(",").append(p1.getType()).append("|").append(p1.getHead().toString()).append(",").append(p2.getType());
-    features.add(feat.toString());
-    feat.setLength(0);
-    feat.append("ci*l*=").append(type).append(",").append(p1.getType()).append(",").append(p2.getType());
-    features.add(feat.toString());
-  }
-  
   /**
    * Returns predictive context for deciding whether the specified constituents between the specified start and end index 
    * can be combined to form a new constituent of the specified type.  
