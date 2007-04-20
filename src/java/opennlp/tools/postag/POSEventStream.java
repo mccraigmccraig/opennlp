@@ -29,7 +29,7 @@ import opennlp.tools.dictionary.Dictionary;
 import opennlp.tools.util.InvalidFormatException;
 
 /**
- * An implementation of EventStream whcih assumes the data stream gives a
+ * An implementation of EventStream which assumes the data stream gives a
  * sentence at a time with tokens as word_tag pairs.
  */
 
