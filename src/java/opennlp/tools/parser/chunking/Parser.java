@@ -32,6 +32,7 @@ import opennlp.maxent.TwoPassDataIndexer;
 import opennlp.tools.dictionary.Dictionary;
 import opennlp.tools.ngram.NGramModel;
 import opennlp.tools.ngram.Token;
+import opennlp.tools.ngram.TokenList;
 import opennlp.tools.parser.AbstractBottomUpParser;
 import opennlp.tools.parser.HeadRules;
 import opennlp.tools.parser.Parse;
@@ -247,7 +248,7 @@ public class Parser extends AbstractBottomUpParser {
   }
   
   private static void usage() {
-    System.err.println("Usage: ParserME -[dict|tag|chunk|build|check|fun] trainingFile parserModelDirectory [iterations cutoff]");
+    System.err.println("Usage: Parser -[dict|tag|chunk|build|check|fun] trainingFile parserModelDirectory [iterations cutoff]");
     System.err.println();
     System.err.println("Training file should be one sentence per line where each line consists of a Penn Treebank Style parse");
     System.err.println("-dict Just build the dictionaries.");
@@ -285,8 +286,7 @@ public class Parser extends AbstractBottomUpParser {
       for (int wi=0;wi<cwords.length;wi++) {
         cwords[wi] = chunks[wi].getHead().toString();
       }
-      
-      mdict.add(Token.create(cwords), 1, 3);
+      mdict.add(Token.create(cwords), 2, 3);
       
       //emulate reductions to produce additional n-grams 
       int ci = 0;
@@ -317,10 +317,10 @@ public class Parser extends AbstractBottomUpParser {
               window = subWindow;
             }
             if (window.length >=3) {
-              mdict.add(Token.create(window), 1, 3);
+              mdict.add(Token.create(window), 2, 3);
             }
             else if (window.length == 2) {
-              mdict.add(Token.create(window), 1, 2);
+              mdict.add(Token.create(window), 2, 2);
             }
           }
           ci=reduceStart-1; //ci will be incremented at end of loop
@@ -328,10 +328,9 @@ public class Parser extends AbstractBottomUpParser {
         ci++;
       }
     }
-    
+    //System.err.println("gas,and="+mdict.getCount((new TokenList(new String[] {"gas","and"}))));
     mdict.cutoff(cutoff, Integer.MAX_VALUE);
-    
-    return mdict.toDictionary();
+    return mdict.toDictionary(true);
   }
 
   public static void main(String[] args) throws java.io.IOException, InvalidFormatException {
@@ -422,8 +421,7 @@ public class Parser extends AbstractBottomUpParser {
 
     if (build || all) {
       System.err.println("Loading Dictionary");
-      Dictionary tridict = new Dictionary(new FileInputStream(
-          dictFile.toString()));
+      Dictionary tridict = new Dictionary(new FileInputStream(dictFile.toString()),true);
       System.err.println("Training builder");
       opennlp.maxent.EventStream bes = new ParserEventStream(new opennlp.maxent.PlainTextByLineDataStream(new java.io.FileReader(inFile)), rules, ParserEventTypeEnum.BUILD,tridict);
       GISModel buildModel = train(bes, iterations, cutoff);
