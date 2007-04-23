@@ -40,9 +40,10 @@ import opennlp.tools.util.InvalidFormatException;
  * This class is a dictionary.
  * 
  * @author <a href="mailto:kottmann@gmail.com">Joern Kottmann</a>
- * @version $Revision: 1.5 $, $Date: 2007/03/30 09:46:33 $
+ * @version $Revision: 1.6 $, $Date: 2007/04/23 03:05:48 $
  */
 public class Dictionary {
+  
   
   private static class IgnoreCaseTokenList {
     
@@ -86,13 +87,19 @@ public class Dictionary {
   }
   
   private Set mEntrySet = new HashSet();
+  private boolean caseSensitive;
   
   /**
    * Iitalizes an empty {@link Dictionary}.
    */
   public Dictionary() {
+    this(false);
   }
-
+  
+  public Dictionary(boolean caseSensitive) {
+    this.caseSensitive = caseSensitive;
+  }
+  
   /**
    * Initalize the {@link Dictionary} from an existing dictionary resource.
    * 
@@ -101,12 +108,17 @@ public class Dictionary {
    * @throws InvalidFormatException 
    */
   public Dictionary(InputStream in) throws IOException, InvalidFormatException {
+    this(in,false);
+  }
+  
+  public Dictionary(InputStream in, boolean caseSensitive) throws IOException, InvalidFormatException {
+    this.caseSensitive = caseSensitive;
     DictionarySerializer.create(in, new EntryInserter() 
-        {
-          public void insert(Entry entry) {
-            put(entry.getTokens());
-          }
-        });
+    {
+      public void insert(Entry entry) {
+        put(entry.getTokens());
+      }
+    });
   }
   
   /**
@@ -115,7 +127,12 @@ public class Dictionary {
    * @param tokens the new entry
    */
   public void put(TokenList tokens) {
-    mEntrySet.add(new IgnoreCaseTokenList(tokens));
+    if (caseSensitive) {
+      mEntrySet.add(tokens);
+    }
+    else {
+      mEntrySet.add(new IgnoreCaseTokenList(tokens));
+    }
   }
   
   /**
@@ -126,7 +143,12 @@ public class Dictionary {
    * @return true if it contains the entry otherwise false
    */
   public boolean contains(TokenList tokens) {
-    return mEntrySet.contains(new IgnoreCaseTokenList(tokens));
+    if (caseSensitive) {
+      return mEntrySet.contains(tokens);      
+    }
+    else {
+      return mEntrySet.contains(new IgnoreCaseTokenList(tokens));      
+    }
   }
   
   /**
@@ -135,7 +157,12 @@ public class Dictionary {
    * @param tokens
    */
   public void remove(TokenList tokens) {
-    mEntrySet.remove(new IgnoreCaseTokenList(tokens));
+    if (caseSensitive) {
+      mEntrySet.remove(tokens);
+    }
+    else {
+      mEntrySet.remove(new IgnoreCaseTokenList(tokens));
+    }
   }
   
   /**
@@ -153,7 +180,11 @@ public class Dictionary {
       }
 
       public Object next() {
-        return ((IgnoreCaseTokenList) entries.next()).getTokenList();
+        Object o = entries.next();
+        if (o instanceof IgnoreCaseTokenList) {
+          return ((IgnoreCaseTokenList) o).getTokenList();
+        }
+        return o; 
       }
 
       public void remove() {
