@@ -36,7 +36,7 @@ import opennlp.tools.util.InvalidFormatException;
  * The {@link NGramModel} can be used to crate ngrams and character ngrams.
  * 
  * @author <a href="mailto:kottmann@gmail.com">Joern Kottmann</a>
- * @version $Revision: 1.6 $, $Date: 2007/04/11 07:53:48 $
+ * @version $Revision: 1.7 $, $Date: 2007/04/23 03:07:43 $
  */
 public class NGramModel {
   
@@ -253,8 +253,8 @@ public class NGramModel {
         
         int count = getCount(ngram);
         
-        if (count <= cutoffUnder || 
-            count >= cutoffOver) {
+        if (count < cutoffUnder || 
+            count > cutoffOver) {
           it.remove();
         }
       }
@@ -283,18 +283,22 @@ public class NGramModel {
 //  }
   
   
+  public Dictionary toDictionary() {
+    return toDictionary(false);
+  }
+  
   /**
    * Creates a dictionary which contains all {@link TokenList}s which
    * are in the current {@link NGramModel}.
-   * 
+   * @param caseSensitive Specifies whether case distinctions should be kept in the creation of the dictionary.
    * @return the new dictionary
    */
-  public Dictionary toDictionary() {
+  public Dictionary toDictionary(boolean caseSensitive) {
     
-    Dictionary dict = new Dictionary();
+    Dictionary dict = new Dictionary(caseSensitive);
     
     for (Iterator it = iterator(); it.hasNext();) {
-      dict.put((TokenList) it.next());
+      dict.put((TokenList)it.next());
     }
     
     return dict;
