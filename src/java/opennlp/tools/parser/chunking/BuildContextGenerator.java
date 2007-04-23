@@ -45,6 +45,7 @@ public class BuildContextGenerator extends AbstractContextGenerator {
   public BuildContextGenerator() {
     super();
     zeroBackOff = false;
+    useLabel = true;
   }
   
   public BuildContextGenerator(Dictionary dict) {
@@ -233,7 +234,7 @@ public class BuildContextGenerator extends AbstractContextGenerator {
     //features.add("stage=cons(0),cons(1),cons(2)");
     cons3(features,c0,c1,c2,punct1s,punct2s,t012,b01,b12);
     cons3(features,c_2,c_1,c0,punct_2s,punct_1s,t_2_10,b_2_1,b_10);
-    cons3(features,c_1,c0,c1,punct_1s,punct_1s,t_101,b_10,b01);
+    cons3(features,c_1,c0,c1,punct_1s,punct1s,t_101,b_10,b01);
     //features.add("stage=other");
     String p0Tag = p0.getType();
     if (p0Tag.equals("-RRB-")) {
