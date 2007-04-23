@@ -32,6 +32,7 @@ public abstract class AbstractContextGenerator implements ContextGenerator {
   protected boolean zeroBackOff;
   /** Set of punctuation to be used in generating features. */
   protected Set punctSet;
+  protected boolean useLabel;
   
   /**
    * Creates punctuation feature for the specified punctuation at the specfied index based on the punctuation mark.
@@ -49,7 +50,7 @@ public abstract class AbstractContextGenerator implements ContextGenerator {
   /**
    * Creates punctuation feature for the specified punctuation at the specfied index based on the punctuation's tag.
    * @param punct The punctuation which is in context.
-   * @param i The index of the punctuation with relative to the parse.
+   * @param i The index of the punctuation relative to the parse.
    * @return Punctuation feature for the specified parse and the specified punctuation at the specfied index.
    */
   protected String punctbo(Parse punct, int i) {
@@ -63,6 +64,9 @@ public abstract class AbstractContextGenerator implements ContextGenerator {
     StringBuffer feat = new StringBuffer(20);
     feat.append(i).append("=");
     if (p != null) {
+      if (useLabel && i < 0) {
+        feat.append(p.getLabel()).append("|");
+      }
       feat.append(p.getType()).append("|").append(p.getHead().toString());
     }
     else {
@@ -75,6 +79,9 @@ public abstract class AbstractContextGenerator implements ContextGenerator {
     StringBuffer feat = new StringBuffer(20);
     feat.append(i).append("*=");
     if (p != null) {
+      if (useLabel && i < 0) {
+        feat.append(p.getLabel()).append("|");
+      }
       feat.append(p.getType());
     }
     else {
@@ -117,14 +124,26 @@ public abstract class AbstractContextGenerator implements ContextGenerator {
       for (Iterator pi=punct1s.iterator();pi.hasNext();) {
         Parse p = (Parse) pi.next();
         String punct = punct(p,c1.index);
-        String punctbo = punctbo(p,c1.index);
+        String punctbo = punctbo(p,c1.index <= 0 ? c1.index -1 : c1.index);
         //punct(1)
-        features.add(punct);
+        //TODO consider changing
+        if (false && !punct.equals(punctbo)) {
+          features.add(punct);
+        }
+        
         //punctbo(1);
         features.add(punctbo);
-        //cons(0)punctbo(1)
-        if (c0.unigram) features.add(c0.cons+","+punctbo);
-        features.add(c0.consbo+","+punctbo);
+        if (c0.index == 0) { //TODO look at removing case
+          //cons(0)punctbo(1)
+          if (c0.unigram) features.add(c0.cons+","+punctbo);
+          features.add(c0.consbo+","+punctbo);
+        }
+        if (c1.index == 0) { //TODO look at removing case
+          //punctbo(1)cons(1)
+          if (c1.unigram) features.add(punctbo+","+c1.cons);
+          features.add(punctbo+","+c1.consbo);
+        }
+        
         //cons(0)punctbo(1)cons(1)
         if (bigram) features.add(c0.cons+","+punctbo+","+c1.cons);
         if (c1.unigram)  features.add(c0.consbo+","+punctbo+","+c1.cons);
@@ -154,23 +173,42 @@ public abstract class AbstractContextGenerator implements ContextGenerator {
    * @param bigram2 Specifies whether lexical bi-gram features between the second and third node should be generated.
    */
   protected void cons3(List features, Cons c0, Cons c1, Cons c2, Collection punct1s, Collection punct2s, boolean trigram, boolean bigram1, boolean bigram2) {
-//  features.add("stage=cons(0),cons(1),cons(2)");
+    //  features.add("stage=cons(0),cons(1),cons(2)");
+    if (punct1s != null) {
+      if (c0.index == -2) {
+        for (Iterator pi=punct1s.iterator();pi.hasNext();) {
+          Parse p = (Parse) pi.next();
+          String punct = punct(p,c1.index);
+          String punctbo = punctbo(p,c1.index <= 0 ? c1.index -1 : c1.index);
+          //punct(-2)
+          //TODO consider changing
+          //features.add(punct);
+
+          //punctbo(-2)
+          features.add(punctbo);
+        }
+      }
+    }
     if (punct2s != null) {
-      for (Iterator pi=punct2s.iterator();pi.hasNext();) {
-        Parse p = (Parse) pi.next();
-        String punct = punct(p,c2.index);
-        String punctbo = punctbo(p,c2.index);
-        //punct(2)
-        features.add(punct);
-        //punctbo(2)
-        features.add(punctbo);
+      if (c2.index == 2) {
+        for (Iterator pi=punct2s.iterator();pi.hasNext();) {
+          Parse p = (Parse) pi.next();
+          String punct = punct(p,c2.index);
+          String punctbo = punctbo(p,c2.index <= 0 ? c2.index -1 : c2.index);
+          //punct(2)
+          //TODO consider changing
+          //features.add(punct);
+
+          //punctbo(2)
+          features.add(punctbo);
+        }
       }
       if (punct1s != null) {
         //cons(0),punctbo(1),cons(1),punctbo(2),cons(2)
         for (Iterator pi2=punct2s.iterator();pi2.hasNext();) {
-          String punctbo2 = punctbo((Parse) pi2.next(),c2.index);
+          String punctbo2 = punctbo((Parse) pi2.next(),c2.index <= 0 ? c2.index -1 : c2.index);
           for (Iterator pi1=punct1s.iterator();pi1.hasNext();) {
-            String punctbo1 = punctbo((Parse) pi1.next(),c1.index);
+            String punctbo1 = punctbo((Parse) pi1.next(),c1.index <= 0 ? c1.index -1 : c1.index);
             if (trigram) features.add(c0.cons   + "," + punctbo1+","+c1.cons   + "," + punctbo2+","+c2.cons);
             
             if (bigram2) features.add(c0.consbo + "," + punctbo1+","+c1.cons   + "," + punctbo2+","+c2.cons);
@@ -194,12 +232,12 @@ public abstract class AbstractContextGenerator implements ContextGenerator {
       else { //punct1s == null
         //cons(0),cons(1),punctbo(2),cons(2)
         for (Iterator pi2=punct2s.iterator();pi2.hasNext();) {
-          String punctbo2 = punctbo((Parse) pi2.next(),2);
+          String punctbo2 = punctbo((Parse) pi2.next(),c2.index <= 0 ? c2.index -1 : c2.index);
           if (trigram) features.add(c0.cons   + "," + c1.cons   + "," + punctbo2+","+c2.cons);
           
-          if (bigram2) features.add(c0.consbo + "," + c1.cons   +","  + punctbo2+ "," + c2.cons);
-          if (c0.unigram && c1.unigram) features.add(c0.cons   + "," + c1.consbo + "," + punctbo2+","+c2.cons);
-          if (bigram1) features.add(c0.cons   + "," + c1.cons   + "," + punctbo2+","+c2.consbo);
+          if (bigram2) features.add(c0.consbo + "," + c1.cons   + ","  + punctbo2+ "," + c2.cons);
+          if (c0.unigram && c2.unigram) features.add(c0.cons    + "," + c1.consbo + "," + punctbo2+","+c2.cons);
+          if (bigram1) features.add(c0.cons   + "," + c1.cons   + "," +  punctbo2+","+c2.consbo);
           
           if (c2.unigram) features.add(c0.consbo + "," + c1.consbo + "," + punctbo2+","+c2.cons);
           if (c1.unigram) features.add(c0.consbo + "," + c1.cons   + "," + punctbo2+","+c2.consbo);
@@ -220,7 +258,7 @@ public abstract class AbstractContextGenerator implements ContextGenerator {
       if (punct1s != null) {
         //cons(0),punctbo(1),cons(1),cons(2)
         for (Iterator pi1=punct1s.iterator();pi1.hasNext();) {
-          String punctbo1 = punctbo((Parse) pi1.next(),1);
+          String punctbo1 = punctbo((Parse) pi1.next(),c1.index <= 0 ? c1.index -1 : c1.index);
           if (trigram) features.add(c0.cons     + "," + punctbo1   +","+ c1.cons   +","+c2.cons);
           
           if (bigram2) features.add(c0.consbo    + "," + punctbo1   +","+ c1.cons   +","+c2.cons);
@@ -228,7 +266,7 @@ public abstract class AbstractContextGenerator implements ContextGenerator {
           if (bigram1) features.add(c0.cons      + "," + punctbo1   +","+ c1.cons   +","+c2.consbo);
           
           if (c2.unigram) features.add(c0.consbo  + "," + punctbo1   +","+ c1.consbo +","+c2.cons);
-          if (c1.unigram) features.add(c0.cons    + "," + punctbo1     +","+ c1.cons     +","+c2.consbo);
+          if (c1.unigram) features.add(c0.consbo  + "," + punctbo1   +","+ c1.cons   +","+c2.consbo);
           if (c0.unigram) features.add(c0.cons    + "," + punctbo1   +","+ c1.consbo +","+c2.consbo);   
           
           features.add(c0.consbo + "," + punctbo1   +","+ c1.consbo +","+c2.consbo);
