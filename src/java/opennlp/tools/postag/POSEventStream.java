@@ -29,7 +29,7 @@ import opennlp.tools.dictionary.Dictionary;
 import opennlp.tools.util.InvalidFormatException;
 
 /**
- * An implementation of EventStream which assumes the data stream gives a
+ * An implementation of EventStream whcih assumes the data stream gives a
  * sentence at a time with tokens as word_tag pairs.
  */
 
@@ -116,7 +116,13 @@ public class POSEventStream implements EventStream {
   }
 
   public static void main(String[] args) throws java.io.IOException, InvalidFormatException {
-    EventStream es = new POSEventStream(new opennlp.maxent.PlainTextByLineDataStream(new java.io.InputStreamReader(System.in)),new Dictionary(new FileInputStream(args[0])));
+    EventStream es;
+    if (args.length == 0) {
+      es = new POSEventStream(new opennlp.maxent.PlainTextByLineDataStream(new java.io.InputStreamReader(System.in)));
+    }
+    else {
+      es = new POSEventStream(new opennlp.maxent.PlainTextByLineDataStream(new java.io.InputStreamReader(System.in)),new Dictionary(new FileInputStream(args[0])));
+    }
     while (es.hasNext()) {
       System.out.println(es.nextEvent());
     }
