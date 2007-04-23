@@ -54,7 +54,7 @@ public class ParserEventStream extends AbstractParserEventStream {
   
   protected void init() {
     if (etype == ParserEventTypeEnum.BUILD) {
-      this.bcg = new BuildContextGenerator();
+      this.bcg = new BuildContextGenerator(dict);
     }
     else if (etype == ParserEventTypeEnum.CHECK) {
       this.kcg = new CheckContextGenerator();
@@ -197,7 +197,7 @@ public class ParserEventStream extends AbstractParserEventStream {
     HeadRules rules = new opennlp.tools.lang.english.HeadRules(args[ai++]);
     Dictionary dict = null;
     if (ai < args.length) {
-      dict = new Dictionary(new FileInputStream(args[ai++]));
+      dict = new Dictionary(new FileInputStream(args[ai++]),true);
     }
     if (fun) {
       Parse.useFunctionTags(true);
