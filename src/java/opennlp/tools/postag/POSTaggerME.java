@@ -55,7 +55,7 @@ import opennlp.tools.util.Sequence;
  * surrounding context.
  *
  * @author      Gann Bierner
- * @version $Revision: 1.26 $, $Date: 2007/04/11 17:11:59 $
+ * @version $Revision: 1.27 $, $Date: 2007/04/23 03:17:28 $
  */
 public class POSTaggerME implements Evalable, POSTagger {
 
@@ -432,7 +432,7 @@ public class POSTaggerME implements Evalable, POSTagger {
         System.out.println("Saving the dictionary");
         
         ngramModel.cutoff(cutoff, Integer.MAX_VALUE);
-        Dictionary dictionary = ngramModel.toDictionary();
+        Dictionary dictionary = ngramModel.toDictionary(true);
         
         dictionary.serialize(new FileOutputStream(dict));
       }
