@@ -19,7 +19,7 @@ else
   PS=":"
 fi
 
-LOCALCLASSPATH=$JAVA_HOME/lib/tools.jar
+LOCALCLASSPATH="$JAVA_HOME"/lib/tools.jar
 # add in the dependency .jar files
 DIRLIBS=lib/*.jar
 for i in ${DIRLIBS}
@@ -41,4 +41,4 @@ echo
 # One person found a seg fault with jdk 1.3.0 on Linux where adding -classic
 # to the following line fixed the issue
 
-$JAVA_HOME/bin/java -Dant.home=$ANT_HOME -classpath $LOCALCLASSPATH${PS}$ADDITIONALCLASSPATH org.apache.tools.ant.Main $*
+"$JAVA_HOME"/bin/java -Dant.home="$ANT_HOME" -classpath "$LOCALCLASSPATH${PS}$ADDITIONALCLASSPATH" org.apache.tools.ant.Main $*
