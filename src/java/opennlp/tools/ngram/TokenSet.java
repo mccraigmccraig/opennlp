@@ -35,7 +35,7 @@ import java.util.logging.Logger;
  * + weak vs. strong referneces ???
  * 
  * @author <a href="mailto:kottmann@gmail.com">Joern Kottmann</a>
- * @version $Revision: 1.4 $, $Date: 2007/03/30 06:38:04 $
+ * @version $Revision: 1.5 $, $Date: 2007/04/23 13:06:10 $
  */
 public final class TokenSet {
   
@@ -58,7 +58,7 @@ public final class TokenSet {
           // log only if it was changed
           int currentSize = mTokenTable.size();
           if (lastSize != currentSize) {
-            sLogger.info("Size: " + currentSize);
+            sLogger.finest("Size: " + currentSize);
             lastSize = currentSize;
           }
         }
@@ -73,7 +73,7 @@ public final class TokenSet {
   private Map mTokenTable = new WeakHashMap();
   
   private TokenSet() {
-    if (sLogger.isLoggable(Level.INFO)) {
+    if (sLogger.isLoggable(Level.FINEST)) {
       Thread statisticLogger = 
           new Thread(new StatisticLogger(), "TokenSet Statistics Logger");
 
