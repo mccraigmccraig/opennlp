@@ -42,7 +42,7 @@ public interface NameFinder {
    */
   public String[] find(Object[] toks, Map prevTags);
 
-  /** Generates name tags for the given sentence returng the result as an list 
+  /** Generates name tags for the given sentence returning the result as an list 
    * of spans.
    * @param sentence - the sentence
    * @param toks - a list of token spans
@@ -51,7 +51,7 @@ public interface NameFinder {
    */
   public List find(String sentence, List toks, Map prevMap);
   
-  /** Generates name tags for the given sentence returng the result as an array 
+  /** Generates name tags for the given sentence returning the result as an array 
    * of spans.
    * @param sentence - the sentence
    * @param toks - an array of token spans
