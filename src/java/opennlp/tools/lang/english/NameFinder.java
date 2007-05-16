@@ -27,6 +27,7 @@ import java.util.List;
 import java.util.Map;
 
 import opennlp.maxent.MaxentModel;
+import opennlp.maxent.io.PooledGISModelReader;
 import opennlp.maxent.io.SuffixSensitiveGISModelReader;
 import opennlp.tools.namefind.NameContextGenerator;
 import opennlp.tools.namefind.NameFinderME;
@@ -298,7 +299,7 @@ public class NameFinder extends NameFinderME {
     String[] names = new String[args.length-ai];
     for (int fi=0; ai < args.length; ai++,fi++) {
       String modelName = args[ai];
-      finders[fi] = new NameFinder(new SuffixSensitiveGISModelReader(new File(modelName)).getModel());
+      finders[fi] = new NameFinder(new PooledGISModelReader(new File(modelName)).getModel());
       int nameStart = modelName.lastIndexOf(System.getProperty("file.separator")) + 1;
       int nameEnd = modelName.indexOf('.', nameStart);
       if (nameEnd == -1) {
