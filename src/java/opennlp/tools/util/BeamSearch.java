@@ -76,8 +76,8 @@ public class BeamSearch {
     }
     for (int i = 0; i < n; i++) {
       int sz = Math.min(size, prev.size());
-      int sc = 0;
-      for (; prev.size() > 0 && sc < sz; sc++) {
+      
+      for (int sc = 0; prev.size() > 0 && sc < sz; sc++) {
         Sequence top = (Sequence) prev.extract();
         List tmpOutcomes = top.getOutcomes();
         String[] outcomes = (String[]) tmpOutcomes.toArray(new String[tmpOutcomes.size()]);
@@ -130,8 +130,8 @@ public class BeamSearch {
     }
     int numSeq = Math.min(numSequences, prev.size());
     Sequence[] topSequences = new Sequence[numSeq];
-    int seqIndex = 0;
-    for (; seqIndex < numSeq; seqIndex++) {
+    
+    for (int seqIndex = 0; seqIndex < numSeq; seqIndex++) {
       topSequences[seqIndex] = (Sequence) prev.extract();
     }
     return topSequences;
