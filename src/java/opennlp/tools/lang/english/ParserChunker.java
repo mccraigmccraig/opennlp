@@ -84,28 +84,4 @@ public class ParserChunker extends ChunkerME implements opennlp.tools.parser.Par
     }
     return (true);
   }
-  
-  protected boolean validOutcome(String outcome, Sequence sequence) {
-    if (continueStartMap.containsKey(outcome)) {
-      List tagList = sequence.getOutcomes();
-      int lti = tagList.size() - 1;
-      if (lti == -1) {
-        return (false);
-      }
-      else {
-        String lastTag = (String) tagList.get(lti);
-        if (lastTag.equals(outcome)) {
-           return true;
-        }
-        if (lastTag.equals(continueStartMap.get(outcome))) {
-          return true;
-        }
-        if (lastTag.equals(Parser.OTHER)) {
-          return (false);
-        }
-        return false;
-      }
-    }
-    return (true);
-  }
 }

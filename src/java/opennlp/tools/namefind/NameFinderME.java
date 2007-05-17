@@ -17,7 +17,6 @@
 //////////////////////////////////////////////////////////////////////////////
 package opennlp.tools.namefind;
 
-import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -33,10 +32,7 @@ import opennlp.maxent.EventStream;
 import opennlp.maxent.GIS;
 import opennlp.maxent.GISModel;
 import opennlp.maxent.MaxentModel;
-import opennlp.maxent.PlainTextByLineDataStream;
 import opennlp.maxent.TwoPassDataIndexer;
-import opennlp.maxent.io.SuffixSensitiveGISModelWriter;
-import opennlp.tools.chunker.ChunkerEventStream;
 import opennlp.tools.util.BeamSearch;
 import opennlp.tools.util.Sequence;
 import opennlp.tools.util.Span;
@@ -177,14 +173,13 @@ public class NameFinderME implements NameFinder {
    * @param sequence The precceding sequence of outcomes assignments. 
    * @return true is the outcome is valid for the sequence, false otherwise.
    */
-  protected boolean validOutcome(String outcome, Sequence sequence) {
+  protected boolean validOutcome(String outcome,  String[] outcomes) {
     if (outcome.equals(CONTINUE)) {
-      List tags = sequence.getOutcomes();
-      int li = tags.size() - 1;
+      int li = outcomes.length - 1;
       if (li == -1) {
         return false;
       }
-      else if (((String) tags.get(li)).equals(OTHER)) {
+      else if (outcomes[li].equals(OTHER)) {
         return false;
       }
     }
@@ -208,11 +203,12 @@ public class NameFinderME implements NameFinder {
       super(size, cg, model, beamSize);
     }
 
-    protected boolean validSequence(int i, List sequence, Sequence s, String outcome) {
-      return validOutcome(outcome, s);
+    protected boolean validSequence(int size, Object[] inputSequence, String[] outcomesSequence, String outcome) {
+      return validOutcome(outcome, outcomesSequence);
     }
   }
-
+  
+  
   /**
      * Populates the specified array with the probabilities of the last decoded sequence.  The
      * sequence was determined based on the previous call to <code>chunk</code>.  The 

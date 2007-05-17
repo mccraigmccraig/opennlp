@@ -55,7 +55,7 @@ import opennlp.tools.util.Sequence;
  * surrounding context.
  *
  * @author      Gann Bierner
- * @version $Revision: 1.27 $, $Date: 2007/04/23 03:17:28 $
+ * @version $Revision: 1.28 $, $Date: 2007/05/17 13:27:34 $
  */
 public class POSTaggerME implements Evalable, POSTagger {
 
@@ -280,21 +280,6 @@ public class POSTaggerME implements Evalable, POSTagger {
       }
       else {
         String[] tags = tagDictionary.getTags(inputSequence[i].toString());
-        if (tags == null) {
-          return true;
-        }
-        else {
-          return Arrays.asList(tags).contains(outcome);
-        }
-      }
-    }
-    
-    protected boolean validSequence(int i, List inputSequence, Sequence outcomesSequence, String outcome) {
-      if (tagDictionary == null) {
-        return true;
-      }
-      else {
-        String[] tags = tagDictionary.getTags(inputSequence.get(i).toString());
         if (tags == null) {
           return true;
         }

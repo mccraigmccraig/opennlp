@@ -156,19 +156,6 @@ public class BeamSearch {
   }
 
   /** Determines wheter a particular continuation of a sequence is valid.  
-   * This is used to restrict invalid sequences such as thoses used in start/continure tag-based chunking 
-   * or could be used to implement tag dictionary restrictions.
-   * @param i The index in the input sequence for which the new outcome is being proposed.
-   * @param inputSequence The input sequnce.
-   * @param outcomesSequence The outcomes so far in this sequence.
-   * @param outcome The next proposed outcome for the outcomes sequence.
-   * @return true is the sequence would still be valid with the new outcome, false otherwise.
-   */
-  protected boolean validSequence(int i, List inputSequence, Sequence outcomesSequence, String outcome) {
-    return true;
-  }
-
-  /** Determines wheter a particular continuation of a sequence is valid.  
      * This is used to restrict invalid sequences such as thoses used in start/continure tag-based chunking 
      * or could be used to implement tag dictionary restrictions.
      * @param i The index in the input sequence for which the new outcome is being proposed.

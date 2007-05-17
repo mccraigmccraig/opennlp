@@ -96,7 +96,7 @@ public class TreebankChunker extends ChunkerME {
   }
 
 
-  /* inherieted java doc */
+  /* inherieted java doc 
   protected boolean validOutcome(String outcome, Sequence sequence) {
     String prevOutcome = null;
     List tagList = sequence.getOutcomes();
@@ -106,7 +106,8 @@ public class TreebankChunker extends ChunkerME {
     }
     return validOutcome(outcome,prevOutcome);
   }
-
+  */
+  
   /**
    * Chunks tokenized input from stdin. <br>
    * Usage: java opennlp.tools.chunker.EnglishTreebankChunker model < tokenized_sentences <br>

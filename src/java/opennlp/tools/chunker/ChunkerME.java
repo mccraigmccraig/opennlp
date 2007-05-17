@@ -87,18 +87,7 @@ public class ChunkerME implements Chunker {
     List c = bestSequence.getOutcomes();
     return (String[]) c.toArray(new String[c.size()]);
   }
-
-  /** 
-   * This method determines wheter the outcome is valid for the preceeding sequence.  
-   * This can be used to implement constraints on what sequences are valid.  
-   * @param outcome The outcome.
-   * @param sequence The precceding sequence of outcome assignments. 
-   * @return true is the outcome is valid for the sequence, false otherwise.
-   */
-  protected boolean validOutcome(String outcome, Sequence sequence) {
-    return true;
-  }
-  
+ 
   /** 
     * This method determines wheter the outcome is valid for the preceeding sequence.  
     * This can be used to implement constraints on what sequences are valid.  
@@ -119,11 +108,6 @@ public class ChunkerME implements Chunker {
     
     ChunkBeamSearch(int size, ChunkerContextGenerator cg, MaxentModel model) {
       super(size, cg, model);
-    }
-    
-    /* inherieted java doc */
-    protected boolean validSequence(int i, List sequence, Sequence s, String outcome) {
-      return validOutcome(outcome, s);
     }
     
     protected boolean validSequence(int i, Object[] sequence, String[] s, String outcome) {
