@@ -134,7 +134,8 @@ public class NameFinderME implements NameFinder {
           endSpan = null;
         }
       } 
-      else {
+      
+      if (!insideName) {
         if (result.get(i).equals(NameFinderME.START)) {
           startSpan = annotation;
           insideName = true;
