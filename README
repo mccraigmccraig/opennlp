@@ -164,7 +164,7 @@ java -Xmx350m opennlp.tools.lang.english.TreebankParser -d \
 English Name Finding:
 java opennlp.tools.lang.english.SentenceDetector \
   opennlp.models/english/sentdetect/EnglishSD.bin.gz < text |
-java -Xmx350m opennlp.tools.lang.english.NameFinder  \
+java -Xmx200m opennlp.tools.lang.english.NameFinder  \
   opennlp.models/english/namefind/*.bin.gz
   
 English Coreference:
