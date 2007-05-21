@@ -70,7 +70,7 @@ public class NameFinderEventStream implements EventStream {
     String outcome = NameFinderME.OTHER;
     List toks = new ArrayList();
     List outcomes = new ArrayList();
-    for (int pi = 0, pl = parts.length; pi < pl; pi++) {
+    for (int pi = 0; pi < parts.length; pi++) {
       if (parts[pi].equals("<START>")) {
         outcome = NameFinderME.START;
       }
@@ -86,10 +86,10 @@ public class NameFinderEventStream implements EventStream {
       }
     }
     events = new Event[toks.size()];
-    for (int ti = 0, tl = toks.size(); ti < tl; ti++) {
+    for (int ti = 0; ti < toks.size(); ti++) {
       events[ti] = new Event((String) outcomes.get(ti), cg.getContext(ti, toks, outcomes, prevTags));
     }
-    for (int ti=0,tl=toks.size();ti<tl;ti++) {
+    for (int ti = 0; ti < toks.size(); ti++) {
       prevTags.put(toks.get(ti),outcomes.get(ti));
     }
   }
