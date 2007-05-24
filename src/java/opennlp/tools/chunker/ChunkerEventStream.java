@@ -78,7 +78,7 @@ public class ChunkerEventStream implements EventStream {
     List toks = new ArrayList();
     List tags = new ArrayList();
     List preds = new ArrayList();
-    for (String line = (String) data.nextToken(); !line.equals(""); line = (String) data.nextToken()) {
+    for (String line = (String) data.nextToken(); line !=null && !line.equals(""); line = (String) data.nextToken()) {
       String[] parts = line.split(" ");
       if (parts.length != 3) {
         System.err.println("Skipping corrupt line: "+line);
