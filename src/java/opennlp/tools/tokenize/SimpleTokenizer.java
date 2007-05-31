@@ -38,7 +38,7 @@ public class SimpleTokenizer implements Tokenizer {
    * @param s
    * @return the strings
    */
-  public String[] spansToStrings(Span[] spans, String s) {
+  public static String[] spansToStrings(Span[] spans, String s) {
     String[] tokens = new String[spans.length];
     
     for (int si = 0, sl = spans.length; si < sl; si++) {
@@ -49,7 +49,7 @@ public class SimpleTokenizer implements Tokenizer {
   }
   
   public String[] tokenize(String s) {
-    return spansToStrings(this.tokenizePos(s), s);
+    return spansToStrings(tokenizePos(s), s);
   }
 
   public Span[] tokenizePos(String s) {
