@@ -50,7 +50,11 @@ public class NameFinderME implements NameFinder {
   public static final String START = "start";
   public static final String CONTINUE = "cont";
   public static final String OTHER = "other";
-
+  
+  
+  private AdditionalContextFeatureGenerator additionalContextFeatureGenerator =
+      new AdditionalContextFeatureGenerator();
+  
   /**
    * Creates a new name finder with the specified model.
    * @param mod The model to be used to find names.
@@ -77,6 +81,9 @@ public class NameFinderME implements NameFinder {
   public NameFinderME(MaxentModel mod, NameContextGenerator cg, int beamSize) {
     _npModel = mod;
     _contextGen = cg;
+    
+    _contextGen.addFeatureGenerator(additionalContextFeatureGenerator);
+    
     beam = new NameBeamSearch(beamSize, cg, mod, beamSize);
   }
   
@@ -94,8 +101,10 @@ public class NameFinderME implements NameFinder {
   }
 
   /* inherieted javadoc */
-  public List find(String sentence, List toks, Map prevMap) {
-
+  public List find(String sentence, List toks, Map prevMap, String[][] additonalContext) {
+      
+    additionalContextFeatureGenerator.setCurrentContext(additonalContext);
+    
     List tokenStrings = new LinkedList();
     Iterator tokenIterator = toks.iterator();
 
@@ -155,6 +164,10 @@ public class NameFinderME implements NameFinder {
     return detectedNames;
   }
   
+  public List find(String sentence, List toks, Map prevMap) {
+      return find(sentence, toks, prevMap, null);
+  }
+  
   /* inherieted javadoc */
   public Span[] find(String sentence, Span[] toks, Map prevMap) {
     
@@ -167,6 +180,7 @@ public class NameFinderME implements NameFinder {
     
     return result;
   }
+  
   /** 
    * This method determines wheter the outcome is valid for the preceeding sequence.  
    * This can be used to implement constraints on what sequences are valid.  
@@ -414,10 +428,10 @@ public class NameFinderME implements NameFinder {
     GISModel mod;
     opennlp.maxent.EventStream es;
     if (encoding != null) {
-       es = new NameFinderEventStream(new opennlp.maxent.PlainTextByLineDataStream(new InputStreamReader(new FileInputStream(inFile),encoding)));
+       es = new NameFinderEventStream(new NameSampleDataStream(new opennlp.maxent.PlainTextByLineDataStream(new InputStreamReader(new FileInputStream(inFile),encoding)), "default"));
     }
     else {
-      es = new NameFinderEventStream(new opennlp.maxent.PlainTextByLineDataStream(new java.io.FileReader(inFile)));
+      es = new NameFinderEventStream(new NameSampleDataStream(new opennlp.maxent.PlainTextByLineDataStream(new java.io.FileReader(inFile)), "default"));
     }
     mod = train(es, iterations, cutoff);
     System.out.println("Saving the model as: " + args[1]);
