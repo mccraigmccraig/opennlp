@@ -25,7 +25,7 @@ import opennlp.tools.dictionary.Dictionary;
 /**
  * 
  * @author <a href="mailto:kottmann@gmail.com">Joern Kottmann</a>
- * @version $Revision: 1.2 $, $Date: 2007/03/30 06:42:23 $
+ * @version $Revision: 1.3 $, $Date: 2007/05/31 13:00:16 $
  */
 public class DictionaryFeatureGenerator implements FeatureGenerator {
   
@@ -53,7 +53,8 @@ public class DictionaryFeatureGenerator implements FeatureGenerator {
     
     if (mCurrentNames[index].equals(NameFinderME.START) || 
         mCurrentNames[index].equals(NameFinderME.CONTINUE)) {
-      features.add("w=dic");
+	features.add("w=dic");
+	features.add("w=dic=" + tokens[index]);
     }
   }
 }
