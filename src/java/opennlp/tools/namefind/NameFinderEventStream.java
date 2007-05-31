@@ -1,138 +1,126 @@
-///////////////////////////////////////////////////////////////////////////////
-//Copyright (C) 2003 Thomas Morton
-// 
-//This library is free software; you can redistribute it and/or
-//modify it under the terms of the GNU Lesser General Public
-//License as published by the Free Software Foundation; either
-//version 2.1 of the License, or (at your option) any later version.
-// 
-//This library is distributed in the hope that it will be useful,
-//but WITHOUT ANY WARRANTY; without even the implied warranty of
-//MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-//GNU Lesser General Public License for more details.
-// 
-//You should have received a copy of the GNU Lesser General Public
-//License along with this program; if not, write to the Free Software
-//Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
-//////////////////////////////////////////////////////////////////////////////
 package opennlp.tools.namefind;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.NoSuchElementException;
 
 import opennlp.maxent.DataStream;
 import opennlp.maxent.Event;
 import opennlp.maxent.EventStream;
+import opennlp.tools.namefind.Name;
+import opennlp.tools.namefind.NameContextGenerator;
+import opennlp.tools.namefind.NameFinderEventStream;
+import opennlp.tools.namefind.NameFinderME;
+import opennlp.tools.namefind.NameSample;
 
 /**
  * Class for creating an event stream out of data files for training an name finder. 
  */
 public class NameFinderEventStream implements EventStream {
+    
+    private DataStream dataStream;
+    
+    private Iterator events = Collections.EMPTY_LIST.iterator();
+    
+    private NameContextGenerator contextGenerator;
+    
+    private Map prevTags = new HashMap();
+    
+    private AdditionalContextFeatureGenerator additionalContextFeatureGenerator = 
+	new AdditionalContextFeatureGenerator();
+    
+    public NameFinderEventStream(DataStream dataStream, NameContextGenerator contextGenerator) {
+	this.dataStream = dataStream;
+	this.contextGenerator = contextGenerator;
+	
+	this.contextGenerator.addFeatureGenerator(additionalContextFeatureGenerator);
+    }
+    
+    public NameFinderEventStream(DataStream dataStream) {
+	this(dataStream, new NameContextGenerator());
+    }
+    
+    private void createNewEvents() {
+	if (dataStream.hasNext()) {
+	    NameSample sample = (NameSample) dataStream.nextToken();
+	    
+	    String outcomes[] = new String[sample.sentence().length];
+	    
+	    // set each slot of outcomes array to other
+	    for (int i = 0; i < outcomes.length; i++) {
+		outcomes[i] = NameFinderME.OTHER;
+	    }
+	    
+	    // set start and cont outcomes 
+	    for (int nameIndex = 0; nameIndex < sample.names().length; nameIndex++) {
+		Name name = sample.names()[nameIndex];
+		
+		outcomes[name.getBegin()] = NameFinderME.START;
+		
+		// now iterate from begin + 1 till end
+		for (int i = name.getBegin() + 1; i < name.getEnd(); i++) {
+		    outcomes[i] = NameFinderME.CONTINUE;
+		}
+	    }
+	    
+	    additionalContextFeatureGenerator.setCurrentContext(sample.additionalContext());
+	    
+	    List events = new ArrayList(outcomes.length);
+	    
+	    for (int i = 0; i < outcomes.length; i++) {
+		events.add(new Event((String) outcomes[i], 
+			contextGenerator.getContext(i, sample.sentence(), outcomes, 
+			prevTags)));
+	    }
+	    
+	    for (int i = 0; i < sample.sentence().length; i++) {
+		prevTags.put(sample.sentence()[i], outcomes[i]);
+	    }
+	    
+	    this.events = events.iterator();
+	}
+    }
+    
+    public boolean hasNext() {
+	
+	// check if iterator has next event
+	if (events.hasNext()) {
+	    return true;
+	}
+	else {
+	    createNewEvents();
+	    
+	    return events.hasNext();
+	}
+    }
 
-  private DataStream data;
-  private Event[] events;
-  private NameContextGenerator cg;
-  /** A mapping between tokens and the name tag assigned to them previously. */
-  private Map prevTags;
-  /** The index into the array of events. */
-  private int eventIndex;
-  /** The last line read in from the data file. */
-  private String line;
-  
-  /**
-   * Creates a new event stream based on the specified data stream.
-   * @param d The data stream for this event stream.
-   */
-  public NameFinderEventStream(DataStream d) {
-    this(d, new NameContextGenerator());
-  }
+    public Event nextEvent() {
+	// call to hasNext() is necessary for reloading elements
+	// if the events iterator was already consumed
+	if (!events.hasNext()) {
+	    throw new NoSuchElementException();
+	}
+	
+	return (Event) events.next();
+    }
 
-  /**
-   * Creates a new event stream based on the specified data stream using the specified context generator.
-   * @param d The data stream for this event stream.
-   * @param cg The context generator which should be used in the creation of events for this event stream.
-   */
-  public NameFinderEventStream(DataStream d, NameContextGenerator cg) {
-    this.data = d;
-    this.cg = cg;
-    eventIndex = 0;
-    prevTags = new HashMap();
-    events = new Event[0];
-  }
-
-  /** Adds name events for the specified sentence.
-   * @param sentence The sentence for which name events should be added.
-   */
-  private void addEvents(String sentence) {
-    String[] parts = sentence.split(" ");
-    String outcome = NameFinderME.OTHER;
-    List toks = new ArrayList();
-    List outcomes = new ArrayList();
-    for (int pi = 0; pi < parts.length; pi++) {
-      if (parts[pi].equals("<START>")) {
-        outcome = NameFinderME.START;
-      }
-      else if (parts[pi].equals("<END>")) {
-        outcome = NameFinderME.OTHER;
-      }
-      else { //regular token
-        toks.add(parts[pi]);
-        outcomes.add(outcome);
-        if (outcome.equals(NameFinderME.START)) {
-          outcome = NameFinderME.CONTINUE;
-        }
-      }
+    // TODO: fix and test it
+    public static final void main(String[] args) throws java.io.IOException {
+	if (args.length == 0) {
+	    System.err.println("Usage: NameFinderEventStream trainfiles");
+	    System.exit(1);
+	}
+	for (int ai = 0; ai < args.length; ai++) {
+	    EventStream es = new NameFinderEventStream(new NameSampleDataStream(
+		    new opennlp.maxent.PlainTextByLineDataStream(
+			    new java.io.FileReader(args[ai])), "default"));
+	    while (es.hasNext()) {
+		System.out.println(es.nextEvent());
+	    }
+	}
     }
-    events = new Event[toks.size()];
-    for (int ti = 0; ti < toks.size(); ti++) {
-      events[ti] = new Event((String) outcomes.get(ti), cg.getContext(ti, toks, outcomes, prevTags));
-    }
-    for (int ti = 0; ti < toks.size(); ti++) {
-      prevTags.put(toks.get(ti),outcomes.get(ti));
-    }
-  }
-
-  public Event nextEvent() {
-    if (eventIndex == events.length) {
-      addEvents(line);
-      eventIndex = 0;
-      line = null;
-    }
-    return events[eventIndex++];
-  }
-
-  public boolean hasNext() {
-    if (eventIndex < events.length) {
-      return true;
-    }
-    else if (line != null) { // previous result has not been consumed
-      return true;
-    }
-    //find next non-blank line
-    while (data.hasNext()) {
-      line = (String) data.nextToken();
-      if (line.equals("")) {
-        prevTags.clear();
-      }
-      else {
-        return true;
-      }
-    }
-    return false;
-  }
-  
-  public static final void main(String[] args) throws java.io.IOException {
-    if (args.length == 0) {
-      System.err.println("Usage: NameFinderEventStream trainfiles");
-      System.exit(1);
-    }
-    for (int ai=0,al=args.length;ai<al;ai++) {
-      EventStream es = new NameFinderEventStream(new opennlp.maxent.PlainTextByLineDataStream(new java.io.FileReader(args[ai])));
-      while(es.hasNext()) {
-        System.out.println(es.nextEvent());
-      }
-    }
-  }
 }
