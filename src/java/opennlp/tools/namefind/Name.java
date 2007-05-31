@@ -42,7 +42,8 @@ public class Name {
     }
     
     if (begin > end) {
-	throw new IllegalArgumentException("begin index must be before end index");
+	throw new IllegalArgumentException(
+		"begin index must be before the end index");
     }
     
     this.begin = begin;

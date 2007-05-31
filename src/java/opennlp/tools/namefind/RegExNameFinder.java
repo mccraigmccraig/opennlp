@@ -28,7 +28,7 @@ import java.util.regex.Pattern;
 /**
  * 
  * @author <a href="mailto:kottmann@gmail.com">Joern Kottmann</a>
- * @version $Revision: 1.1 $, $Date: 2006/12/09 16:45:14 $
+ * @version $Revision: 1.2 $, $Date: 2007/05/31 13:01:55 $
  */
 public class RegExNameFinder {
 
@@ -46,7 +46,7 @@ public class RegExNameFinder {
    * @param sentence
    * @return
    */
-  public Annotation[] find(String sentence[]) {
+  public Name[] find(String sentence[]) {
     
     Map sentencePosTokenMap = new HashMap();
     
@@ -81,7 +81,7 @@ public class RegExNameFinder {
             (Integer) sentencePosTokenMap.get(new Integer(matcher.end()));
         
         if (tokenStartIndex != null && tokenEndIndex != null) {
-          Annotation annotation = new Annotation(tokenStartIndex.intValue(), 
+          Name annotation = new Name("default", tokenStartIndex.intValue(), 
               tokenEndIndex.intValue());
           
           annotations.add(annotation);
@@ -89,7 +89,7 @@ public class RegExNameFinder {
       }
     }
     
-    return (Annotation[]) annotations.toArray(
-        new Annotation[annotations.size()]);
+    return (Name[]) annotations.toArray(
+        new Name[annotations.size()]);
   }
 }

@@ -18,6 +18,7 @@
 
 package opennlp.tools.namefind;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.LinkedList;
@@ -35,7 +36,7 @@ import opennlp.tools.util.Span;
  * for names inside a dictionary.
  * 
  * @author <a href="mailto:kottmann@gmail.com">Joern Kottmann</a>
- * @version $Revision: 1.4 $, $Date: 2007/03/30 06:42:23 $
+ * @version $Revision: 1.5 $, $Date: 2007/05/31 13:00:43 $
  */
 public class DictionaryNameFinder implements NameFinder {
 
@@ -80,11 +81,30 @@ public class DictionaryNameFinder implements NameFinder {
     
     Span names[] = find(sentence.toString(), tokenSpans, null);
     
-    List tokens = new LinkedList();
-    
-    for (int i = 0; i < names.length; i++) {
-      tokens.add(names[i].getCoveredText(sentence.toString()));
+    List tokens = new ArrayList(toks.size());
+
+    for (int i = 0; i < tokenSpans.length; i++) {
+	
+	String outcome = NameFinderME.OTHER;
+	
+	for (int j = 0; j < names.length; j++) {
+	    // is name a start ?
+	    // yes if tokenSpans[i] is the start of one span
+	    if (names[j].startsWith(tokenSpans[i])) {
+		// tokenSpans[i] is start 
+		outcome = NameFinderME.START;
+		break;
+	    }
+	    
+	    if (names[j].contains(tokenSpans[i])) {
+		outcome = NameFinderME.CONTINUE;
+		break;
+	    }
+	}
+	
+      tokens.add(outcome);
     }
+    
     
     return Collections.unmodifiableList(tokens);
   }

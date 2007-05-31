@@ -21,18 +21,27 @@ package opennlp.tools.namefind;
 import java.util.List;
 import java.util.regex.Pattern;
 
+import opennlp.tools.tokenize.SimpleTokenizer;
 import opennlp.tools.tokenize.Tokenizer;
 
 /**
  * 
  * @author <a href="mailto:kottmann@gmail.com">Joern Kottmann</a>
- * @version $Revision: 1.1 $, $Date: 2006/09/26 08:19:02 $
+ * @version $Revision: 1.2 $, $Date: 2007/05/31 13:02:34 $
  */
 public class TokenPatternFeatureGenerator implements FeatureGenerator {
     
     private Pattern noLetters = Pattern.compile("[^a-zA-Z]");
     private Tokenizer tokenizer;
 
+    /**
+     * Initializes a new instance. 
+     * For tokinization the {@link SimpleTokenizer} is used.
+     */
+    public TokenPatternFeatureGenerator() {
+        this(new SimpleTokenizer());
+    }
+    
     /**
      * Initializes a new instance.
      * 
