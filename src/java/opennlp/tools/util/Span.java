@@ -28,6 +28,7 @@ public class Span implements Comparable {
 
   /** 
    * Initializes a new Span Object.
+   * 
    * @param s start of span.
    * @param e end of span.
    */
@@ -38,6 +39,7 @@ public class Span implements Comparable {
   
   /** 
    * Return the start of a span.
+   * 
    * @return the start of a span.
    **/
   public int getStart() {
@@ -46,6 +48,7 @@ public class Span implements Comparable {
   
   /** 
    * Return the end of a span.
+   * 
    * @return the end of a span.
    **/
   public int getEnd() {
@@ -54,6 +57,7 @@ public class Span implements Comparable {
 
   /** 
    * Returns the length of this span.
+   * 
    * @return the length of the span.
    */
   public int length() {
@@ -63,7 +67,9 @@ public class Span implements Comparable {
   /**
    * Returns true if the specified span is contained by this span.  
    * Identical spans are considered to contain each other. 
+   * 
    * @param s The span to compare with this span.
+   * 
    * @return true is the specified span is contained by this span; 
    * false otherwise.
    */
@@ -71,10 +77,16 @@ public class Span implements Comparable {
     return start <= s.getStart() && s.getEnd() <= end;
   }
   
+  public boolean contains(int index) {
+    return start <= index && index <= end;
+  }
+  
   /**
    * Returns true if the specified span is the begin of this span and the
    * specified span is contained in this span.
+   * 
    * @param s The span to compare with this span.
+   * 
    * @return true if the specified span starts with this span and is
    * contained in this span; false otherwise
    */
@@ -84,7 +96,9 @@ public class Span implements Comparable {
   
   /**
    * Returns true if the specified span intersects with this span.
+   * 
    * @param s The span to compare with this span. 
+   * 
    * @return true is the spans overlap; false otherwise. 
    */
   public boolean intersects(Span s) {
@@ -97,7 +111,9 @@ public class Span implements Comparable {
   
   /**
    * Returns true is the specified span crosses this span.
+   * 
    * @param s The span to compare with this span.
+   * 
    * @return true is the specified span overlaps this span and contains a 
    * non-overlapping section; false otherwise.
    */
@@ -110,8 +126,10 @@ public class Span implements Comparable {
   }
   
   /**
-   * Retrives the string covered by the current span of the specified text.
+   * Retrieves the string covered by the current span of the specified text.
+   * 
    * @param text
+   * 
    * @return the substring covered by the current span
    */
   public String getCoveredText(String text) {
@@ -186,5 +204,22 @@ public class Span implements Comparable {
     toStringBuffer.append(getEnd());
     
     return toStringBuffer.toString();
+  }
+  
+  /**
+   * Converts an array of {@link Span}s to an array of {@link String}s. 
+   * 
+   * @param spans
+   * @param s
+   * @return the strings
+   */
+  public static String[] spansToStrings(Span[] spans, String s) {
+    String[] tokens = new String[spans.length];
+    
+    for (int si = 0, sl = spans.length; si < sl; si++) {
+      tokens[si] = spans[si].getCoveredText(s);
+    }
+    
+    return tokens;
   }
 }
