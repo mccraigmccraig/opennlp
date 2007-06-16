@@ -70,7 +70,7 @@ public class TokSpanEventStream implements EventStream {
       int start = tokens[0].getStart();
       int end = tokens[tokens.length - 1].getEnd();
       String sent = text.substring(start, end);
-      Span[] candTokens = TokenizerME.split(sent);
+      Span[] candTokens = WhitespaceTokenizer.INSTANCE.tokenizePos(sent);
       int firstTrainingToken = -1;
       int lastTrainingToken = -1;
       for (int ci = 0; ci < candTokens.length; ci++) {

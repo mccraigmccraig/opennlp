@@ -41,10 +41,10 @@ import opennlp.tools.util.Span;
  * homepage: <http://www.cis.upenn.edu/~jcreynar>.
  *
  * @author      Tom Morton
- * @version $Revision: 1.19 $, $Date: 2007/04/11 17:11:59 $
+ * @version $Revision: 1.20 $, $Date: 2007/06/16 22:13:02 $
  */
 
-public class TokenizerME implements Tokenizer {
+public class TokenizerME extends AbstractTokenizer {
 
   /**
    * The maximum entropy model to use to evaluate contexts.
@@ -108,7 +108,7 @@ public class TokenizerME implements Tokenizer {
    *           
    */
   public Span[] tokenizePos(String d) {
-    Span[] tokens = split(d);
+    Span[] tokens = WhitespaceTokenizer.INSTANCE.tokenizePos(d);
     newTokens.clear();
     tokProbs.clear();
     for (int i = 0, il = tokens.length; i < il; i++) {
@@ -151,55 +151,39 @@ public class TokenizerME implements Tokenizer {
     return spans;
   }
 
-  /**
-   * Tokenize a String.
-   *
-   * @param s  The string to be tokenized.
-   * @return   A string array containing individual tokens as elements.
-   *           
-   */
-  public String[] tokenize(String s) {
-    Span[] spans = tokenizePos(s);
-    String[] toks = new String[spans.length];
-    for (int ti = 0, tl = toks.length; ti < tl; ti++) {
-      toks[ti] = s.substring(spans[ti].getStart(), spans[ti].getEnd());
-    }
-    return toks;
-  }
-
-  /** Constructs a list of Span objects, one for each whitespace
-   * delimited token. Token strings can be constructed form these
-   * spans as follows: d.substring(span.getStart(),span.getEnd());
-   * @param d string to tokenize.
-   * @return List is spans.
-   **/
-  public static Span[] split(String d) {
-    int tokStart = -1;
-    List tokens = new ArrayList();
-    boolean inTok = false;
-
-    //gather up potential tokens
-    int end = d.length();
-    for (int i = 0; i < end; i++) {
-      if (Character.isWhitespace(d.charAt(i))) {
-        if (inTok) {
-          tokens.add(new Span(tokStart, i));
-          inTok = false;
-          tokStart = -1;
-        }
-      }
-      else {
-        if (!inTok) {
-          tokStart = i;
-          inTok = true;
-        }
-      }
-    }
-    if (inTok) {
-      tokens.add(new Span(tokStart, end));
-    }
-    return (Span[]) tokens.toArray(new Span[tokens.size()]);
-  }
+//  /** Constructs a list of Span objects, one for each whitespace
+//   * delimited token. Token strings can be constructed form these
+//   * spans as follows: d.substring(span.getStart(),span.getEnd());
+//   * @param d string to tokenize.
+//   * @return List is spans.
+//   **/
+//  public static Span[] split(String d) {
+//    int tokStart = -1;
+//    List tokens = new ArrayList();
+//    boolean inTok = false;
+//
+//    //gather up potential tokens
+//    int end = d.length();
+//    for (int i = 0; i < end; i++) {
+//      if (Character.isWhitespace(d.charAt(i))) {
+//        if (inTok) {
+//          tokens.add(new Span(tokStart, i));
+//          inTok = false;
+//          tokStart = -1;
+//        }
+//      }
+//      else {
+//        if (!inTok) {
+//          tokStart = i;
+//          inTok = true;
+//        }
+//      }
+//    }
+//    if (inTok) {
+//      tokens.add(new Span(tokStart, end));
+//    }
+//    return (Span[]) tokens.toArray(new Span[tokens.size()]);
+//  }
 
   /**
    * Trains the {@link TokenizerME}, use this to create a new model.

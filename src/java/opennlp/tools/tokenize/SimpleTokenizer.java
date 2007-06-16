@@ -29,28 +29,7 @@ import opennlp.tools.util.Span;
  * @author tsmorton
  *
  */
-public class SimpleTokenizer implements Tokenizer {
-
-  /**
-   * Converts an array of {@link Span}s to an array of {@link String}s. 
-   * 
-   * @param spans
-   * @param s
-   * @return the strings
-   */
-  public static String[] spansToStrings(Span[] spans, String s) {
-    String[] tokens = new String[spans.length];
-    
-    for (int si = 0, sl = spans.length; si < sl; si++) {
-      tokens[si] = spans[si].getCoveredText(s);
-    }
-    
-    return tokens;
-  }
-  
-  public String[] tokenize(String s) {
-    return spansToStrings(tokenizePos(s), s);
-  }
+public class SimpleTokenizer extends AbstractTokenizer {
 
   public Span[] tokenizePos(String s) {
     CharacterEnum charType = CharacterEnum.WHITESPACE;
