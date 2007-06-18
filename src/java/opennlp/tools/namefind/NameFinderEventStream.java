@@ -11,11 +11,11 @@ import java.util.NoSuchElementException;
 import opennlp.maxent.DataStream;
 import opennlp.maxent.Event;
 import opennlp.maxent.EventStream;
-import opennlp.tools.namefind.Name;
 import opennlp.tools.namefind.NameContextGenerator;
 import opennlp.tools.namefind.NameFinderEventStream;
 import opennlp.tools.namefind.NameFinderME;
 import opennlp.tools.namefind.NameSample;
+import opennlp.tools.util.Span;
 
 /**
  * Class for creating an event stream out of data files for training an name
@@ -59,12 +59,12 @@ public class NameFinderEventStream implements EventStream {
 
       // set start and cont outcomes
       for (int nameIndex = 0; nameIndex < sample.names().length; nameIndex++) {
-        Name name = sample.names()[nameIndex];
+        Span name = sample.names()[nameIndex];
 
-        outcomes[name.getBegin()] = NameFinderME.START;
+        outcomes[name.getStart()] = NameFinderME.START;
 
         // now iterate from begin + 1 till end
-        for (int i = name.getBegin() + 1; i < name.getEnd(); i++) {
+        for (int i = name.getStart() + 1; i < name.getEnd(); i++) {
           outcomes[i] = NameFinderME.CONTINUE;
         }
       }
@@ -119,7 +119,7 @@ public class NameFinderEventStream implements EventStream {
     for (int ai = 0; ai < args.length; ai++) {
       EventStream es = new NameFinderEventStream(new NameSampleDataStream(
           new opennlp.maxent.PlainTextByLineDataStream(new java.io.FileReader(
-              args[ai])), "default"));
+              args[ai]))));
       while (es.hasNext()) {
         System.out.println(es.nextEvent());
       }
