@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////////
-//Copyright (C) 2006 Calcucare GmbH
+//Copyright (C) 2007 OpenNlp
 // 
 //This library is free software; you can redistribute it and/or
 //modify it under the terms of the GNU Lesser General Public
@@ -25,14 +25,11 @@ import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-/**
- * 
- * @author <a href="mailto:kottmann@gmail.com">Joern Kottmann</a>
- * @version $Revision: 1.2 $, $Date: 2007/05/31 13:01:55 $
- */
-public class RegExNameFinder {
+import opennlp.tools.util.Span;
 
-  private Pattern mPatterns[];
+public final class RegExNameFinder implements NameFinder {
+
+  private final Pattern mPatterns[];
   
   public RegExNameFinder(Pattern patterns[]) {
     if (patterns == null || patterns.length == 0) {
@@ -42,29 +39,25 @@ public class RegExNameFinder {
     mPatterns = patterns;
   }
   
-  /**
-   * @param sentence
-   * @return
-   */
-  public Name[] find(String sentence[]) {
+  public Span[] find(String tokens[]) {
     
     Map sentencePosTokenMap = new HashMap();
     
-    StringBuffer sentenceString = new StringBuffer(sentence.length *  10);
+    StringBuffer sentenceString = new StringBuffer(tokens.length *  10);
     
-    for (int i = 0; i < sentence.length; i++) {
+    for (int i = 0; i < tokens.length; i++) {
       
       int startIndex = sentenceString.length();
       sentencePosTokenMap.put(new Integer(startIndex), 
           new Integer(i));
 
-      sentenceString.append(sentence[i]);
+      sentenceString.append(tokens[i]);
       
       int endIndex = sentenceString.length();
       sentencePosTokenMap.put(new Integer(endIndex), 
           new Integer(i));
       
-      if (i < sentence.length - 1) {
+      if (i < tokens.length - 1) {
         sentenceString.append(' ');
       }
     }
@@ -81,7 +74,7 @@ public class RegExNameFinder {
             (Integer) sentencePosTokenMap.get(new Integer(matcher.end()));
         
         if (tokenStartIndex != null && tokenEndIndex != null) {
-          Name annotation = new Name("default", tokenStartIndex.intValue(), 
+          Span annotation = new Span(tokenStartIndex.intValue(), 
               tokenEndIndex.intValue());
           
           annotations.add(annotation);
@@ -89,7 +82,7 @@ public class RegExNameFinder {
       }
     }
     
-    return (Name[]) annotations.toArray(
-        new Name[annotations.size()]);
+    return (Span[]) annotations.toArray(
+        new Span[annotations.size()]);
   }
 }

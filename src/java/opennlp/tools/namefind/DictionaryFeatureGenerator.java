@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////////
-//Copyright (C) 2006 Calcucare GmbH
+//Copyright (C) 2007 OpenNlp
 // 
 //This library is free software; you can redistribute it and/or
 //modify it under the terms of the GNU Lesser General Public
@@ -20,41 +20,44 @@ package opennlp.tools.namefind;
 
 import java.util.List;
 
-import opennlp.tools.dictionary.Dictionary;
+import opennlp.tools.util.Span;
 
 /**
  * 
- * @author <a href="mailto:kottmann@gmail.com">Joern Kottmann</a>
- * @version $Revision: 1.3 $, $Date: 2007/05/31 13:00:16 $
  */
 public class DictionaryFeatureGenerator implements FeatureGenerator {
-  
-  private DictionaryNameFinder mDictionary;
-  
+
+  private NameFinder mFinder;
+
   private String mCurrentSentence[];
-  
-  private String mCurrentNames[];
-  
+
+  private Span mCurrentNames[];
+
   /**
    * Initilizes the current instance.
    * 
    * @param dictionary
    */
-  public DictionaryFeatureGenerator(Dictionary dictionary) {
-    mDictionary = new DictionaryNameFinder(dictionary);
+  public DictionaryFeatureGenerator(NameFinder finder) {
+    mFinder = finder;
   }
-  
+
   public void createFeatures(List features, String[] tokens, int index) {
     // cache results sentence
     if (mCurrentSentence != tokens) {
       mCurrentSentence = tokens;
-      mCurrentNames = mDictionary.find(tokens, null);
+      mCurrentNames = mFinder.find(tokens);
     }
-    
-    if (mCurrentNames[index].equals(NameFinderME.START) || 
-        mCurrentNames[index].equals(NameFinderME.CONTINUE)) {
-	features.add("w=dic");
-	features.add("w=dic=" + tokens[index]);
+
+    // iterate over names and check if a span is contained
+    for (int i = 0; i < mCurrentNames.length; i++) {
+      if (mCurrentNames[i].contains(index)) {
+        // found a span for the current token
+        features.add("w=dic");
+        features.add("w=dic=" + tokens[index]);
+//        features.add("w=dic=" + mCurrentNames[i]); add start or cont
+        break;
+      }
     }
   }
 }

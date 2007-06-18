@@ -36,7 +36,7 @@ import opennlp.tools.util.Span;
  * for names inside a dictionary.
  * 
  * @author <a href="mailto:kottmann@gmail.com">Joern Kottmann</a>
- * @version $Revision: 1.5 $, $Date: 2007/05/31 13:00:43 $
+ * @version $Revision: 1.6 $, $Date: 2007/06/18 17:13:15 $
  */
 public class DictionaryNameFinder implements NameFinder {
 
@@ -53,107 +53,21 @@ public class DictionaryNameFinder implements NameFinder {
     mDictionary = dictionary;
     mMetaDictionary = new Index(dictionary.iterator());
   }
-  
-  public List find(List toks, Map prevTags) {
-    
-    Span tokenSpans[] = new Span[toks.size()];
-    
-    StringBuffer sentence = new StringBuffer();
-    
-    int index = 0;
-    for (Iterator it = toks.iterator(); it.hasNext();) {
-      String token = (String) it.next();
-      
-      int startIndex = sentence.length();
-      
-      sentence.append(token);
-      
-      int endIndex = sentence.length();
-      
-      tokenSpans[index] = new Span(startIndex, endIndex);
-      
-      if (index < toks.size() - 1) {
-        sentence.append(' ');
-      }
-      
-      index++;
-    }
-    
-    Span names[] = find(sentence.toString(), tokenSpans, null);
-    
-    List tokens = new ArrayList(toks.size());
-
-    for (int i = 0; i < tokenSpans.length; i++) {
-	
-	String outcome = NameFinderME.OTHER;
-	
-	for (int j = 0; j < names.length; j++) {
-	    // is name a start ?
-	    // yes if tokenSpans[i] is the start of one span
-	    if (names[j].startsWith(tokenSpans[i])) {
-		// tokenSpans[i] is start 
-		outcome = NameFinderME.START;
-		break;
-	    }
-	    
-	    if (names[j].contains(tokenSpans[i])) {
-		outcome = NameFinderME.CONTINUE;
-		break;
-	    }
-	}
-	
-      tokens.add(outcome);
-    }
-    
-    
-    return Collections.unmodifiableList(tokens);
-  }
-
-  public String[] find(Object[] toks, Map prevTags) {
-    
-    List tokenList = new LinkedList();
-    
-    for (int i = 0; i < toks.length; i++) {
-      tokenList.add(toks[i]);
-    }
-    
-    List nameList = find(tokenList, prevTags);
-    
-    return (String[]) nameList.toArray(new String[nameList.size()]);
-  }
-
-  public List find(String sentence, List toks, Map prevMap) {
-    
-    Span tokenSpan[] = (Span[]) toks.toArray(new Span[toks.size()]);
-    
-    Span names[] = find(sentence, tokenSpan, prevMap);
-    
-    List nameList = new LinkedList();
-    
-    for (int i = 0; i < names.length; i++) {
-      nameList.add(names[i]);
-    }
-    
-    return Collections.unmodifiableList(nameList);
-  }
-
-  public Span[] find(String sentence, Span[] toks, Map prevMap) {
-    
+   
+  public Span[] find(String[] tokenStrings) {
     List foundNames = new LinkedList();
     
-    for (int startToken = 0; startToken < toks.length; startToken++) {
+    for (int startToken = 0; startToken < tokenStrings.length; startToken++) {
       
       Span foundName = null;
       
       Token  tokens[] = new Token[]{};
       
-      for (int endToken = startToken; endToken < toks.length; endToken++) {
+      for (int endToken = startToken; endToken < tokenStrings.length; endToken++) {
         
-        Token token = Token.create(
-            sentence.substring(toks[endToken].getStart(), 
-            toks[endToken].getEnd()));
+        Token token = Token.create(tokenStrings[endToken]);
         
-        // TODO: improve performence here
+        // TODO: improve performance here
         Token newTokens[] = new Token[tokens.length + 1];
         System.arraycopy(tokens, 0, newTokens, 0, tokens.length);
         newTokens[newTokens.length - 1] = token;
@@ -164,8 +78,7 @@ public class DictionaryNameFinder implements NameFinder {
           TokenList tokenList = new TokenList(tokens);
           
           if (mDictionary.contains(tokenList)) {
-            foundName = new Span(toks[startToken].getStart(), 
-                toks[endToken].getEnd());
+            foundName = new Span(startToken, endToken + 1);
           }
         }
         else {
@@ -180,4 +93,5 @@ public class DictionaryNameFinder implements NameFinder {
     
     return (Span[]) foundNames.toArray(new Span[foundNames.size()]);
   }
+  
 }

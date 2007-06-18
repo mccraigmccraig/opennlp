@@ -28,35 +28,37 @@ import opennlp.tools.util.Span;
  */
 public interface NameFinder {
   
-  /** Generates name tags for the given sequence returning the result in a list.
-   * @param toks a list of the tokens or words of the sequence.
-   * @param prevTags a mapping between tokens and outcomes from previous sentences. 
-   * @return a list of chunk tags for each token in the sequence.
-   */
-  public List find(List toks, Map prevTags);
-  
-  /** Generates name tags for the given sequence returning the result in an array.
-   * @param toks an array of the tokens or words of the sequence.
-   * @param prevTags a mapping between tokens and outcomes from previous sentences. 
-   * @return an array of chunk tags for each token in the sequence.
-   */
-  public String[] find(Object[] toks, Map prevTags);
-
-  /** Generates name tags for the given sentence returning the result as an list 
-   * of spans.
-   * @param sentence - the sentence
-   * @param toks - a list of token spans
-   * @param prevMap 
-   * @return a list of the detected name spans
-   */
-  public List find(String sentence, List toks, Map prevMap);
-  
-  /** Generates name tags for the given sentence returning the result as an array 
-   * of spans.
-   * @param sentence - the sentence
-   * @param toks - an array of token spans
-   * @param prevMap 
-   * @return an array of the detected name spans
-   */
-  public Span[] find(String sentence, Span[] toks, Map prevMap);
+//  /** Generates name tags for the given sequence returning the result in a list.
+//   * @param toks a list of the tokens or words of the sequence.
+//   * @param prevTags a mapping between tokens and outcomes from previous sentences. 
+//   * @return a list of chunk tags for each token in the sequence.
+//   */
+//  public List find(List toks, Map prevTags);
+//  
+//  /** Generates name tags for the given sequence returning the result in an array.
+//   * @param toks an array of the tokens or words of the sequence.
+//   * @param prevTags a mapping between tokens and outcomes from previous sentences. 
+//   * @return an array of chunk tags for each token in the sequence.
+//   */
+//  public String[] find(Object[] toks, Map prevTags);
+//
+//  /** Generates name tags for the given sentence returning the result as an list 
+//   * of spans.
+//   * @param sentence - the sentence
+//   * @param toks - a list of token spans
+//   * @param prevMap 
+//   * @return a list of the detected name spans
+//   */
+//  public List find(String sentence, List toks, Map prevMap);
+//  
+//  /** Generates name tags for the given sentence returning the result as an array 
+//   * of spans.
+//   * @param sentence - the sentence
+//   * @param toks - an array of token spans
+//   * @param prevMap 
+//   * @return an array of the detected name spans
+//   */
+//  public Span[] find(String sentence, Span[] toks, Map prevMap);
+    
+    Span[] find(String tokens[]);
 }
