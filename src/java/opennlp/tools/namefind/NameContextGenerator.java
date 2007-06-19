@@ -30,7 +30,7 @@ import opennlp.tools.util.Sequence;
  * Class for determining contextual features for a tag/chunk style 
  * named-entity recognizer.
  * 
- * @version $Revision: 1.7 $, $Date: 2007/05/31 13:04:14 $
+ * @version $Revision: 1.8 $, $Date: 2007/06/19 21:46:01 $
  */
 public class NameContextGenerator implements BeamSearchContextGenerator {
   
@@ -63,7 +63,10 @@ public class NameContextGenerator implements BeamSearchContextGenerator {
     }
     else {
       mFeatureGenerators =  new FeatureGenerator[] 
-        {new TokenContextFeatureGenerator()};
+        {
+          new WindowFeatureGenerator(new TokenFeatureGenerator(), 2, 2),
+          new WindowFeatureGenerator(new TokenClassFeatureGenerator(), 2, 2)
+        };
     }
     
     if (cacheSize > 0) {
