@@ -36,7 +36,7 @@ import opennlp.tools.util.Span;
  * for names inside a dictionary.
  * 
  * @author <a href="mailto:kottmann@gmail.com">Joern Kottmann</a>
- * @version $Revision: 1.6 $, $Date: 2007/06/18 17:13:15 $
+ * @version $Revision: 1.7 $, $Date: 2007/06/26 13:03:00 $
  */
 public class DictionaryNameFinder implements NameFinder {
 
@@ -53,8 +53,12 @@ public class DictionaryNameFinder implements NameFinder {
     mDictionary = dictionary;
     mMetaDictionary = new Index(dictionary.iterator());
   }
-   
+  
   public Span[] find(String[] tokenStrings) {
+    return find(tokenStrings,null);
+  }
+   
+  public Span[] find(String[] tokenStrings, String[][] additionalContext) {
     List foundNames = new LinkedList();
     
     for (int startToken = 0; startToken < tokenStrings.length; startToken++) {

@@ -40,6 +40,10 @@ public final class RegExNameFinder implements NameFinder {
   }
   
   public Span[] find(String tokens[]) {
+    return find(tokens,null);
+  }
+  
+  public Span[] find(String tokens[], String[][] additionalContext) {
     
     Map sentencePosTokenMap = new HashMap();
     
