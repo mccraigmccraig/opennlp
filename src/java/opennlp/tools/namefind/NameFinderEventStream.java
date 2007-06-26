@@ -45,43 +45,42 @@ public class NameFinderEventStream implements EventStream {
   public NameFinderEventStream(DataStream dataStream) {
     this(dataStream, new NameContextGenerator());
   }
+  
+  public static String[] generateOutcomes(Span[] names, int length) {
+    String[] outcomes = new String[length];
+    for (int i = 0; i < outcomes.length; i++) {
+      outcomes[i] = NameFinderME.OTHER;
+    }
+    for (int nameIndex = 0; nameIndex < names.length; nameIndex++) {
+      Span name = names[nameIndex];
+      outcomes[name.getStart()] = NameFinderME.START;
+      // now iterate from begin + 1 till end
+      for (int i = name.getStart() + 1; i < name.getEnd(); i++) {
+        outcomes[i] = NameFinderME.CONTINUE;
+      }
+    }
+    return outcomes;
+  }
+  
+  
     
-    private void createNewEvents() {
+  private void createNewEvents() {
     if (dataStream.hasNext()) {
       NameSample sample = (NameSample) dataStream.nextToken();
 
-      String outcomes[] = new String[sample.sentence().length];
-
-      // set each slot of outcomes array to other
-      for (int i = 0; i < outcomes.length; i++) {
-        outcomes[i] = NameFinderME.OTHER;
-      }
-
-      // set start and cont outcomes
-      for (int nameIndex = 0; nameIndex < sample.names().length; nameIndex++) {
-        Span name = sample.names()[nameIndex];
-
-        outcomes[name.getStart()] = NameFinderME.START;
-
-        // now iterate from begin + 1 till end
-        for (int i = name.getStart() + 1; i < name.getEnd(); i++) {
-          outcomes[i] = NameFinderME.CONTINUE;
-        }
-      }
-
-      additionalContextFeatureGenerator.setCurrentContext(sample
-          .additionalContext());
-
+      String outcomes[] = generateOutcomes(sample.names(),sample.sentence().length);
+      additionalContextFeatureGenerator.setCurrentContext(sample.additionalContext());
+      String[] tokens = new String[sample.sentence().length]; 
       // TODO: move before or after context generation ???
       for (int i = 0; i < sample.sentence().length; i++) {
-        prevTags.put(sample.sentence()[i].getToken(), outcomes[i]);
+        tokens[i] = sample.sentence()[i].getToken();
       }
-
+      NameFinderEventStream.updatePrevMap(tokens, sample.names(), prevTags);
+      
       List events = new ArrayList(outcomes.length);
-
+      String[][] ac = additionalContext(tokens,prevTags);
       for (int i = 0; i < outcomes.length; i++) {
-        events.add(new Event((String) outcomes[i], contextGenerator.getContext(
-            i, sample.sentence(), outcomes, prevTags)));
+        events.add(new Event((String) outcomes[i], contextGenerator.getContext(i, sample.sentence(), outcomes,ac)));
       }
 
       this.events = events.iterator();
@@ -110,7 +109,43 @@ public class NameFinderEventStream implements EventStream {
     return (Event) events.next();
   }
 
-    // TODO: fix and test it
+    /**
+     * Updates the specified mapping of previous name tags with the assignment for the specified sentence tokens and
+     * their coresponding outcomes.
+     * @param tokens - the previous tokens as List of String or null
+     * @param outcomes - the previous outcome as List of Strings or null
+     * @param prevMap - Mapping between tokens and the previous name tags assigned to them.
+     * @return - the specified previous map with updates made.
+     */
+    public static Map updatePrevMap(String[] tokens, Span[] names, Map prevMap) {
+      String[] outcomes = generateOutcomes(names,tokens.length);
+      if (tokens != null | outcomes != null) {
+        if (tokens.length != outcomes.length) {
+          throw new IllegalArgumentException(
+              "The sent and outcome arrays MUST have the same size!");
+        }
+        for (int i = 0; i < tokens.length; i++) {
+          prevMap.put(tokens[i], outcomes[i]);
+        }
+      } 
+      else {
+        prevMap = Collections.EMPTY_MAP;
+      }
+    
+      return prevMap;
+    }
+
+    public static String[][] additionalContext(String[] tokens, Map prevMap) {
+      String[][] ac = new String[tokens.length][1];
+      for (int ti=0;ti<tokens.length;ti++) {
+        String pt = (String) prevMap.get(tokens[ti]);
+        ac[ti][0]="pd="+pt;
+      }
+      return ac;
+    
+    }
+
+  // TODO: fix and test it
   public static final void main(String[] args) throws java.io.IOException {
     if (args.length == 0) {
       System.err.println("Usage: NameFinderEventStream trainfiles");

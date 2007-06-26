@@ -30,7 +30,7 @@ import opennlp.tools.util.Sequence;
  * Class for determining contextual features for a tag/chunk style 
  * named-entity recognizer.
  * 
- * @version $Revision: 1.8 $, $Date: 2007/06/19 21:46:01 $
+ * @version $Revision: 1.9 $, $Date: 2007/06/26 13:03:54 $
  */
 public class NameContextGenerator implements BeamSearchContextGenerator {
   
@@ -86,19 +86,19 @@ public class NameContextGenerator implements BeamSearchContextGenerator {
   
   public String[] getContext(Object o) {
     Object[] data = (Object[]) o;
-    return getContext(((Integer) data[0]).intValue(), (List) data[1], (List) data[2], (Map) data[3]);
+    return getContext(((Integer) data[0]).intValue(), (List) data[1], (List) data[2], (String[][]) data[3]);
   }
   
   public String[] getContext(int index, List sequence, Sequence s, Object[] additionalContext) {
-    return getContext(index,sequence,s.getOutcomes(),(Map) additionalContext[0]);
+    return getContext(index,sequence,s.getOutcomes(),(String[][]) additionalContext);
   }
 
-  public String[] getContext(int i, List toks, List preds, Map prevTags) {
-    return getContext(i, toks.toArray(), (String[]) preds.toArray(new String[preds.size()]),prevTags);
+  public String[] getContext(int i, List toks, List preds, String[][] additionalContext) {
+    return getContext(i, toks.toArray(), (String[]) preds.toArray(new String[preds.size()]),additionalContext);
   }
   
   public String[] getContext(int index, Object[] sequence, String[] priorDecisions, Object[] additionalContext) {
-    return getContext(index,sequence,priorDecisions,(Map) additionalContext[0]);
+    return getContext(index,sequence,priorDecisions,(String[][]) additionalContext);
   }
 
   /**
@@ -109,7 +109,7 @@ public class NameContextGenerator implements BeamSearchContextGenerator {
    * @param prevTags  A mapping between tokens and the previous outcome for these tokens. 
    * @return the context for finding names at the specified index.
    */
-  public String[] getContext(int i, Object[] toks, String[] preds, Map prevTags) {
+  public String[] getContext(int i, Object[] toks, String[] preds, String[][] additionalContext) {
     String po=NameFinderME.OTHER;
     String ppo=NameFinderME.OTHER;
     if (i > 1){
@@ -137,13 +137,14 @@ public class NameContextGenerator implements BeamSearchContextGenerator {
     }
     else {
       features = getStaticFeatures(toks,i);
-      
-      String pt = (String) prevTags.get(toks[i].toString());
-      features.add("pd="+pt);
+      if (additionalContext != null) {
+        for (int aci=0;aci<additionalContext[i].length;aci++) {
+          features.add(additionalContext[i][aci]);
+        }
+      }
       if (i == 0) {
         features.add("df=it");
       }
-      
       pi=i;
       prevStaticFeatures=features;
     }

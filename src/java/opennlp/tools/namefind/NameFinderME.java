@@ -20,7 +20,7 @@ package opennlp.tools.namefind;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.util.Collections;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedList;
@@ -128,75 +128,66 @@ public class NameFinderME implements NameFinder {
     model = mod;
     contextGenerator = cg;
     
-    contextGenerator.addFeatureGenerator(new WindowFeatureGenerator(additionalContextFeatureGenerator, 
-       8, 8));
-    
+    contextGenerator.addFeatureGenerator(new WindowFeatureGenerator(additionalContextFeatureGenerator, 8, 8));
     beam = new NameBeamSearch(beamSize, cg, mod, beamSize);
   }
-
-  private String[] find(String[] toks, Map prevTags) {
-    bestSequence = beam.bestSequence(toks, new Object[] { prevTags });
-    List c = bestSequence.getOutcomes();
-    return (String[]) c.toArray(new String[c.size()]);
-  }
-
-  public Span[] find(String tokenStrings[], Map prevMap,
-      String[][] additonalContext) {
-
-    additionalContextFeatureGenerator.setCurrentContext(additonalContext);
-
-    String result[] = find(tokenStrings, prevMap);
-
-    List detectedNames = new LinkedList();
-
-    int startIndex = 0;
-    int endIndex = -1;
-
-    boolean insideName = false;
-
-    int length = tokenStrings.length;
-
-    for (int i = 0; i < length; i++) {
-
-      if (insideName) {
-
-        // check if insideName ends here
-        if (!result[i].equals(NameFinderME.CONTINUE)) {
-
-          detectedNames.add(new Span(startIndex, endIndex));
-
-          startIndex = -1;
-          insideName = false;
-          endIndex = -1;
-        }
-      }
-
-      if (!insideName) {
-        if (result[i].equals(NameFinderME.START)) {
-          startIndex = i;
-          insideName = true;
-        }
-      }
-
-      if (insideName) {
-        endIndex = i + 1;
-      }
+  
+  /**
+   * Returns tokens span for the specified document of sentences and their tokens.  
+   * Span start and end indices are relitive to the sentence they are in.
+   * For example, a span identifying a name consisting of the first and second word of the second sentence would
+   * be 0..2 and be referenced as spans[1][0].
+   * @param document An array of tokens for each sentence of a document.
+   * @return The token spans for each sentence of the specified document.  
+   */
+  public Span[][] find(String[][] document) {
+    Map prevMap = new HashMap();
+    Span[][] spans = new Span[document.length][];
+    for (int si=0;si<document.length;si++) {
+      Span[] names = find(document[si],NameFinderEventStream.additionalContext(document[si],prevMap));
+      spans[si] = names;
     }
-
-    // is last start in sent
-    if (insideName) {
-      detectedNames.add(new Span(startIndex, endIndex)); // TODO: correct ?
-    }
-
-    return (Span[]) detectedNames.toArray(new Span[detectedNames.size()]);
+    return spans;
   }
-
+  
   public Span[] find(String tokens[]) {
-    return null;
+    return find(tokens,null);
   }
   
+  public Span[] find(String[] tokens, String[][] additionalContext) {
+    additionalContextFeatureGenerator.setCurrentContext(additionalContext);
+    bestSequence = beam.bestSequence(tokens, additionalContext);
+    List c = bestSequence.getOutcomes();
+    
+    int start = -1;
+    int end = -1;
+    List spans = new ArrayList(tokens.length);
+    for (int li=0;li<c.size();li++) {
+      String chunkTag = (String) c.get(li);
+      if (chunkTag.equals(NameFinderME.START)) {
+        if (start != -1) {
+          spans.add(new Span(start,end));
+          start = li;
+          end = li+1;
+        }
+      }
+      else if (chunkTag.equals(NameFinderME.CONTINUE)) {
+        end = li+1;
+      }
+      else if (chunkTag.equals(NameFinderME.OTHER)) {
+        if (start != -1) {
+          spans.add(new Span(start,end));
+          start = -1;
+          end = -1;
+        }
+      }
+    }
+    if (start != -1) {
+      spans.add(new Span(start,end));
+    }
+    return (Span[]) c.toArray(new Span[spans.size()]);
+  }
   
-  // TODO: ask Tom how to return probs for each Span object
   
   /**
    * Populates the specified array with the probabilities of the last decoded
@@ -208,9 +199,9 @@ public class NameFinderME implements NameFinder {
    *          An array used to hold the probabilities of the last decoded
    *          sequence.
    */
-//  public void probs(double[] probs) {
-//    bestSequence.getProbs(probs);
-//  }
+   public void probs(double[] probs) {
+     bestSequence.getProbs(probs);
+   }
   
   /**
     * Returns an array with the probabilities of the last decoded sequence.  The
@@ -218,144 +209,9 @@ public class NameFinderME implements NameFinder {
     * @return An array with the same number of probabilities as tokens were sent to <code>chunk</code>
     * when it was last called.   
     */
-//  public double[] probs() {
-//    return bestSequence.getProbs();
-//  }
-  
-  /**
-   * Creates the map with the previous result.
-   * 
-   * @param tokens - the previous tokens as array of String or 
-   * null (if first time)
-   * @param outcomes - the previous outcome as array of String or null 
-   * (if first time)
-   * @return - the previous map
-   */
-  public static Map createPrevMap(String[] tokens, String[] outcomes) {
-    Map prevMap = new HashMap();
-
-    if (tokens != null | outcomes != null) {
-
-      if (tokens.length != outcomes.length) {
-        throw new IllegalArgumentException(
-            "The sent and outcome arrays MUST have the same size!");
-      }
-
-      for (int i = 0; i < tokens.length; i++) {
-        prevMap.put(tokens[i], outcomes[i]);
-      }
-    } 
-    else {
-      prevMap = Collections.EMPTY_MAP;
-    }
-
-    return prevMap;
-  }
-  
-  /**
-   * Creates the prevMap with the previous result.
-   * 
-   * @param tokens - the previous tokens as List of String or null
-   * @param outcomes - the previous outcome as List of Strings or null
-   * @return - the previous map or an empty map if token or outcome is null
-   */
-  public static Map createPrevMap(List tokens, List outcomes) {
-
-    Map prevMap = new HashMap();
-
-    if (tokens != null | outcomes != null) {
-
-      if (tokens.size() != outcomes.size()) {
-        throw new IllegalArgumentException(
-            "The sent and outcome arrays MUST have the same size!");
-      }
-
-      Iterator tokenIterator = tokens.iterator();
-      Iterator outcomeIterator = outcomes.iterator();
-
-      while (tokenIterator.hasNext() && outcomeIterator.hasNext()) {
-        prevMap.put(tokenIterator.next(), outcomeIterator.next());
-      }
-    } 
-    else {
-      prevMap = Collections.EMPTY_MAP;
-    }
-
-    return prevMap;
-  }
-
-  /**
-   * Creates the prevMap with the previous result.
-   * 
-   * @param sentence
-   * @param tokens - the previous tokens as list of Span or 
-   * null (if first time)
-   * @param outcomes - the previous outcome as list of Span or null 
-   * (if first time)
-   * @return - the previous map
-   */
-  public static Map createPrevMap(String sentence, List tokens, List outcomes) {
-    Map prevMap;
-    
-    if (sentence != null && tokens != null && 
-        outcomes != null && tokens.size() > 0) {
-      
-      if (tokens.size() < outcomes.size()) {
-        throw new IllegalArgumentException("The number of tokens must be " +
-            "less or equal compared to the number of outcomes");
-      }
-      
-      Iterator outcomeIterator = outcomes.iterator();
-           
-      Span outcomeSpan;
-      
-      if (outcomeIterator.hasNext()) {
-        outcomeSpan = (Span) outcomeIterator.next();
-      }
-      else {
-        outcomeSpan = new Span(0, 0);
-      }
- 
-      boolean isInsideSpan = false;
-      
-      prevMap = new HashMap();
-      
-      for (Iterator i = tokens.iterator(); i.hasNext();) {
-        
-        Span token = (Span) i.next();
-        
-        if (!outcomeSpan.contains(token)) {
-          
-          if (!prevMap.containsKey(token.getCoveredText(sentence))) {
-            prevMap.put(token.getCoveredText(sentence), 
-                NameFinderME.OTHER);
-          }
-          
-          if (isInsideSpan) {
-            if (outcomeIterator.hasNext()) {
-              outcomeSpan = (Span) outcomeIterator.next();
-            }
-            isInsideSpan = false;
-          }
-        } 
-        else if (outcomeSpan.startsWith(token)) {
-          prevMap.put(token.getCoveredText(sentence), 
-              NameFinderME.START);
-          
-          isInsideSpan = true;
-        }
-        // isContained
-        else {
-          prevMap.put(token.getCoveredText(sentence), 
-              NameFinderME.CONTINUE);
-        }
-      }
-    }
-    else {
-      prevMap = Collections.EMPTY_MAP;
-    }
-    return prevMap;
-  }
+   public double[] probs() {
+     return bestSequence.getProbs();
+   }
   
   public static GISModel train(EventStream es, int iterations, int cut) throws IOException {
     return GIS.trainModel(iterations, new TwoPassDataIndexer(es, cut));
