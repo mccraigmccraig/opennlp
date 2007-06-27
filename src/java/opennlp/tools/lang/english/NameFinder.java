@@ -28,8 +28,8 @@ import java.util.Map;
 
 import opennlp.maxent.MaxentModel;
 import opennlp.maxent.io.PooledGISModelReader;
-import opennlp.maxent.io.SuffixSensitiveGISModelReader;
 import opennlp.tools.namefind.NameContextGenerator;
+import opennlp.tools.namefind.NameFinderEventStream;
 import opennlp.tools.namefind.NameFinderME;
 import opennlp.tools.parser.Parse;
 import opennlp.tools.tokenize.SimpleTokenizer;
@@ -117,9 +117,9 @@ public class NameFinder extends NameFinderME {
     return tokens;
   }
   
-  private static void addNames(String tag, List names, Parse[] tokens) {
-    for (int ni=0,nn=names.size();ni<nn;ni++) {
-      Span nameTokenSpan = (Span) names.get(ni);
+  private static void addNames(String tag, Span[] names, Parse[] tokens) {
+    for (int ni=0,nn=names.length;ni<nn;ni++) {
+      Span nameTokenSpan = names[ni];
       Parse startToken = tokens[nameTokenSpan.getStart()];
       Parse endToken = tokens[nameTokenSpan.getEnd()];
       Parse commonParent = startToken.getCommonParent(endToken);
@@ -167,18 +167,15 @@ public class NameFinder extends NameFinderME {
     }
   }
   
-  private static void updatePrevTokenMaps(Map[] prevTokenMaps, Object[] tokens, String[][] finderTags) {
+  private static void updatePrevTokenMaps(Map[] prevTokenMaps, String[] tokens, Span[][] nameSpans) {
     for (int mi = 0, ml = prevTokenMaps.length; mi < ml; mi++) {
-      for (int ti=0,tn=tokens.length;ti<tn;ti++) {
-        //System.err.println("updatePrevTokenMaps:"+tokens[ti]+" -> "+finderTags[mi][ti]);
-        prevTokenMaps[mi].put(tokens[ti],finderTags[mi][ti]);
-      }
+      NameFinderEventStream.updatePrevMap(tokens, nameSpans[mi], prevTokenMaps[mi]);
     }
   }
 
 
   private static void processParse(NameFinder[] finders, String[] tags, BufferedReader input) throws IOException {
-    String[][] finderTags = new String[finders.length][];
+    Span[][] nameSpans = new Span[finders.length][];
     Map[] prevTokenMaps = createPrevTokenMaps(finders);
     for (String line = input.readLine(); null != line; line = input.readLine()) {
       if (line.equals("")) {
@@ -187,31 +184,19 @@ public class NameFinder extends NameFinderME {
         continue;
       }
       Parse p = Parse.parseParse(line);
-      Parse[] tokens = p.getTagNodes();
+      Parse[] tagNodes = p.getTagNodes();
+      String[] tokens = new String[tagNodes.length];
+      for (int ti=0;ti<tagNodes.length;ti++){
+        tokens[ti] = tagNodes.toString();
+      }
       //System.err.println(java.util.Arrays.asList(tokens));
       for (int fi = 0, fl = finders.length; fi < fl; fi++) {
-        finderTags[fi] = finders[fi].find(tokens, prevTokenMaps[fi]);
+        nameSpans[fi] = finders[fi].find(tokens, NameFinderEventStream.additionalContext(tokens,prevTokenMaps[fi]));
         //System.err.println("EnglishNameFinder.processParse: "+tags[fi] + " " + java.util.Arrays.asList(finderTags[fi]));
       }
-      updatePrevTokenMaps(prevTokenMaps,tokens,finderTags);
+      updatePrevTokenMaps(prevTokenMaps,tokens,nameSpans);
       for (int fi = 0, fl = finders.length; fi < fl; fi++) {
-        int start = -1;
-        List names = new ArrayList(5);
-        for (int ti = 0, tl = tokens.length; ti < tl; ti++) {
-          if ((finderTags[fi][ti].equals(NameFinderME.START) || finderTags[fi][ti].equals(NameFinderME.OTHER))) {
-            if (start != -1) {
-              names.add(new Span(start,ti-1));
-            }
-            start = -1;
-          }
-          if (finderTags[fi][ti].equals(NameFinderME.START)) {
-            start = ti;
-          }
-        }
-        if (start != -1) {
-          names.add(new Span(start,tokens.length-1));
-        }
-        addNames(tags[fi],names,tokens);
+        addNames(tags[fi],nameSpans[fi],tagNodes);
       }
       p.show();
     }
@@ -225,7 +210,8 @@ public class NameFinder extends NameFinderME {
    * @throws IOException
    */
   private static void processText(NameFinder[] finders, String[] tags, BufferedReader input) throws IOException {
-    String[][] finderTags = new String[finders.length][];
+    Span[][] nameSpans = new Span[finders.length][];
+    String[][] nameOutcomes = new String[finders.length][];
     Map[] prevTokenMaps = createPrevTokenMaps(finders);
     opennlp.tools.tokenize.Tokenizer tokenizer = new SimpleTokenizer();
     for (String line = input.readLine(); null != line; line = input.readLine()) {
@@ -237,15 +223,17 @@ public class NameFinder extends NameFinderME {
       Span[] spans = tokenizer.tokenizePos(line);
       String[] tokens = spansToStrings(spans,line);
       for (int fi = 0, fl = finders.length; fi < fl; fi++) {
-        finderTags[fi] = finders[fi].find(tokens, prevTokenMaps[fi]);
+        nameSpans[fi] = finders[fi].find(tokens,NameFinderEventStream.additionalContext(tokens,prevTokenMaps[fi]));
         //System.err.println("EnglighNameFinder.processText: "+tags[fi] + " " + java.util.Arrays.asList(finderTags[fi]));
+        nameOutcomes[fi] = NameFinderEventStream.generateOutcomes(nameSpans[fi], tokens.length);
       }
-      updatePrevTokenMaps(prevTokenMaps,tokens,finderTags);
+      updatePrevTokenMaps(prevTokenMaps,tokens,nameSpans);
       for (int ti = 0, tl = tokens.length; ti < tl; ti++) {
         for (int fi = 0, fl = finders.length; fi < fl; fi++) {
           //check for end tags
           if (ti != 0) {
-            if ((finderTags[fi][ti].equals(NameFinderME.START) || finderTags[fi][ti].equals(NameFinderME.OTHER)) && (finderTags[fi][ti - 1].equals(NameFinderME.START) || finderTags[fi][ti - 1].equals(NameFinderME.CONTINUE))) {
+            if ((nameOutcomes[fi][ti].equals(NameFinderME.START) || nameOutcomes[fi][ti].equals(NameFinderME.OTHER)) && 
+                (nameOutcomes[fi][ti - 1].equals(NameFinderME.START) || nameOutcomes[fi][ti - 1].equals(NameFinderME.CONTINUE))) {
               System.out.print("</" + tags[fi] + ">");
             }
           }
@@ -255,7 +243,7 @@ public class NameFinder extends NameFinderME {
         }
         //check for start tags
         for (int fi = 0, fl = finders.length; fi < fl; fi++) {
-          if (finderTags[fi][ti].equals(NameFinderME.START)) {
+          if (nameOutcomes[fi][ti].equals(NameFinderME.START)) {
             System.out.print("<" + tags[fi] + ">");
           }
         }
@@ -264,7 +252,7 @@ public class NameFinder extends NameFinderME {
       //final end tags
       if (tokens.length != 0) {
         for (int fi = 0, fl = finders.length; fi < fl; fi++) {
-          if (finderTags[fi][tokens.length - 1].equals(NameFinderME.START) || finderTags[fi][tokens.length - 1].equals(NameFinderME.CONTINUE)) {
+          if (nameOutcomes[fi][tokens.length - 1].equals(NameFinderME.START) || nameOutcomes[fi][tokens.length - 1].equals(NameFinderME.CONTINUE)) {
             System.out.print("</" + tags[fi] + ">");
           }
         }

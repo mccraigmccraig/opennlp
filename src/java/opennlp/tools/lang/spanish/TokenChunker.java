@@ -3,12 +3,13 @@ package opennlp.tools.lang.spanish;
 import java.io.File;
 import java.io.IOException;
 import java.io.PrintStream;
-import java.util.Collections;
 
 import opennlp.maxent.MaxentModel;
 import opennlp.maxent.io.SuffixSensitiveGISModelReader;
 import opennlp.tools.namefind.NameContextGenerator;
+import opennlp.tools.namefind.NameFinderEventStream;
 import opennlp.tools.namefind.NameFinderME;
+import opennlp.tools.util.Span;
 
 public class TokenChunker extends NameFinderME {
 
@@ -58,13 +59,14 @@ public class TokenChunker extends NameFinderME {
       }
       else {
         String[] tokens = line.split(" ");
-        String[] chunks = chunker.find(tokens,Collections.EMPTY_MAP);
+        Span[] spans = chunker.find(tokens);
+        String[] outcomes = NameFinderEventStream.generateOutcomes(spans, tokens.length);
         //System.err.println(java.util.Arrays.asList(chunks));
-        for (int ci=0,cn=chunks.length;ci<cn;ci++) {
+        for (int ci=0,cn=outcomes.length;ci<cn;ci++) {
           if (ci == 0) {
             out.print(tokens[ci]);
           }
-          else if (chunks[ci].equals(NameFinderME.CONTINUE)) {
+          else if (outcomes[ci].equals(NameFinderME.CONTINUE)) {
             out.print("_"+tokens[ci]);
           }
           else {
