@@ -46,6 +46,13 @@ public class NameFinderEventStream implements EventStream {
     this(dataStream, new NameContextGenerator());
   }
   
+  /**
+   * Generates the name tag outcomes (start, continue, other) for each token in a sentence
+   * with the specified length using the specified name spans.
+   * @param names Token spans for each of the names.
+   * @param length The length of the sentence.
+   * @return An array of start, continue, other outcomes based on the specified names and sentence length.
+   */
   public static String[] generateOutcomes(Span[] names, int length) {
     String[] outcomes = new String[length];
     for (int i = 0; i < outcomes.length; i++) {
@@ -135,6 +142,12 @@ public class NameFinderEventStream implements EventStream {
       return prevMap;
     }
 
+    /**
+     * Generated previous decision features for each token based on contents of the specifed map.
+     * @param tokens The token for which the context is generated.
+     * @param prevMap A mapping of tokens to their previous decisions.
+     * @return An additional context arrary with features for each token.
+     */
     public static String[][] additionalContext(String[] tokens, Map prevMap) {
       String[][] ac = new String[tokens.length][1];
       for (int ti=0;ti<tokens.length;ti++) {
