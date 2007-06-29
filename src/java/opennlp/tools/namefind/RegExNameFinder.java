@@ -27,7 +27,7 @@ import java.util.regex.Pattern;
 
 import opennlp.tools.util.Span;
 
-public final class RegExNameFinder implements NameFinder {
+public final class RegExNameFinder implements TokenNameFinder {
 
   private final Pattern mPatterns[];
   
@@ -40,11 +40,6 @@ public final class RegExNameFinder implements NameFinder {
   }
   
   public Span[] find(String tokens[]) {
-    return find(tokens,null);
-  }
-  
-  public Span[] find(String tokens[], String[][] additionalContext) {
-    
     Map sentencePosTokenMap = new HashMap();
     
     StringBuffer sentenceString = new StringBuffer(tokens.length *  10);

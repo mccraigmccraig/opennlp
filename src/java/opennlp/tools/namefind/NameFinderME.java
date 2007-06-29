@@ -22,8 +22,6 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Iterator;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
@@ -39,8 +37,9 @@ import opennlp.tools.util.Span;
 /**
  * Class for creating a maximum-entropy-based name finder.  
  */
-public class NameFinderME implements NameFinder {
+public class NameFinderME implements DocumentNameFinder, TokenNameFinder {
 
+  private static String[][] EMPTY = new String[0][0];
   /**
    * Implementation of the abstract beam search to allow the name finder to use
    * the common beam search code.
@@ -132,13 +131,8 @@ public class NameFinderME implements NameFinder {
     beam = new NameBeamSearch(beamSize, cg, mod, beamSize);
   }
   
-  /**
-   * Returns tokens span for the specified document of sentences and their tokens.  
-   * Span start and end indices are relitive to the sentence they are in.
-   * For example, a span identifying a name consisting of the first and second word of the second sentence would
-   * be 0..2 and be referenced as spans[1][0].
-   * @param document An array of tokens for each sentence of a document.
-   * @return The token spans for each sentence of the specified document.  
+  /* (non-Javadoc)
+   * @see opennlp.tools.namefind.DocumentNameFinder#find(java.lang.String[][])
    */
   public Span[][] find(String[][] document) {
     Map prevMap = new HashMap();
@@ -149,11 +143,16 @@ public class NameFinderME implements NameFinder {
     }
     return spans;
   }
-  
-  public Span[] find(String tokens[]) {
-    return find(tokens,null);
+    
+  public Span[] find(String[] tokens) {
+    return find(tokens,EMPTY);
   }
   
+  /** Generates name tags for the given sequence, typically a sentence, returning token spans for any identified names.
+   * @param toks an array of the tokens or words of the sequence, typically a sentence.
+   * @param assitionalContext features which are based on context outside of the sentence but which should also be used.
+   * @return an array of spans for each of the names identified.
+   */
   public Span[] find(String[] tokens, String[][] additionalContext) {
     additionalContextFeatureGenerator.setCurrentContext(additionalContext);
     bestSequence = beam.bestSequence(tokens, additionalContext);
@@ -222,7 +221,11 @@ public class NameFinderME implements NameFinder {
     System.exit(1);
   }
 
-  
+  /**
+   * Trains a new named entity model on the specified training file using the specified encoding to read it in. 
+   * @param args [-encoding encoding] training_file 
+   * @throws java.io.IOException
+   */
   public static void main(String[] args) throws java.io.IOException {
     if (args.length == 0) {
       usage();

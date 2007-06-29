@@ -18,12 +18,8 @@
 
 package opennlp.tools.namefind;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
 
 import opennlp.tools.dictionary.Dictionary;
 import opennlp.tools.dictionary.Index;
@@ -36,9 +32,9 @@ import opennlp.tools.util.Span;
  * for names inside a dictionary.
  * 
  * @author <a href="mailto:kottmann@gmail.com">Joern Kottmann</a>
- * @version $Revision: 1.7 $, $Date: 2007/06/26 13:03:00 $
+ * @version $Revision: 1.8 $, $Date: 2007/06/29 12:11:55 $
  */
-public class DictionaryNameFinder implements NameFinder {
+public class DictionaryNameFinder implements TokenNameFinder {
 
   private Dictionary mDictionary;
   
@@ -55,10 +51,6 @@ public class DictionaryNameFinder implements NameFinder {
   }
   
   public Span[] find(String[] tokenStrings) {
-    return find(tokenStrings,null);
-  }
-   
-  public Span[] find(String[] tokenStrings, String[][] additionalContext) {
     List foundNames = new LinkedList();
     
     for (int startToken = 0; startToken < tokenStrings.length; startToken++) {

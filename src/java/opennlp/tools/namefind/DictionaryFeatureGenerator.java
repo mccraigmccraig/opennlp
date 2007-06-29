@@ -27,7 +27,7 @@ import opennlp.tools.util.Span;
  */
 public class DictionaryFeatureGenerator implements FeatureGenerator {
 
-  private NameFinder mFinder;
+  private TokenNameFinder mFinder;
 
   private String mCurrentSentence[];
 
@@ -38,7 +38,7 @@ public class DictionaryFeatureGenerator implements FeatureGenerator {
    * 
    * @param dictionary
    */
-  public DictionaryFeatureGenerator(NameFinder finder) {
+  public DictionaryFeatureGenerator(TokenNameFinder finder) {
     mFinder = finder;
   }
 
