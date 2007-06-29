@@ -21,14 +21,11 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 import opennlp.maxent.MaxentModel;
 import opennlp.maxent.io.PooledGISModelReader;
-import opennlp.tools.namefind.NameContextGenerator;
 import opennlp.tools.namefind.NameFinderEventStream;
 import opennlp.tools.namefind.NameFinderME;
 import opennlp.tools.parser.Parse;
@@ -38,85 +35,19 @@ import opennlp.tools.util.Span;
 /**
  * Class is used to create a name finder for English.
  */
-public class NameFinder extends NameFinderME {
+public class NameFinder {
   
   public static String[] NAME_TYPES = {"person", "organization", "location", "date", "time", "percentage", "money"};
 
+  private NameFinderME nameFinder;
+  
   /** Creates an English name finder using the specified model.
    * @param mod The model used for finding names.
    */
   public NameFinder(MaxentModel mod) {
-    super(mod);
+    nameFinder = new NameFinderME(mod);
   }
 
-  /** Creates an English name finder using the specified model and context generator.
-   * @param mod The model used for finding names.
-   * @param cg The context generator used with the specified model.
-   */
-  public NameFinder(MaxentModel mod, NameContextGenerator cg) {
-    super(mod, cg);
-  }
-
-  /** Creates an English name finder using the specified model and context generator 
-   * which will be decoded using the specified beamSize. 
-   * @param mod The model used for finding names.
-   * @param cg The context generator used with the specified model.
-   * @param beamSize The size of the beam used for decoding.
-   */
-  public NameFinder(MaxentModel mod, NameContextGenerator cg, int beamSize) {
-    super(mod, cg, beamSize);
-  }
-
-  public static Span[] tokenizeToSpans(String s) {
-    CharacterEnum charType = CharacterEnum.WHITESPACE;
-    CharacterEnum state = charType;
-
-    List tokens = new ArrayList();
-    int sl = s.length();
-    int start = -1;
-    char pc = 0;
-    for (int ci = 0; ci < sl; ci++) {
-      char c = s.charAt(ci);
-      if (Character.isWhitespace(c)) {
-        charType = CharacterEnum.WHITESPACE;
-      }
-      else if (Character.isLetter(c)) {
-        charType = CharacterEnum.ALPHABETIC;
-      }
-      else if (Character.isDigit(c)) {
-        charType = CharacterEnum.NUMERIC;
-      }
-      else {
-        charType = CharacterEnum.OTHER;
-      }
-      if (state == CharacterEnum.WHITESPACE) {
-        if (charType != CharacterEnum.WHITESPACE) {
-          start = ci;
-        }
-      }
-      else {
-        if (charType != state || (charType == CharacterEnum.OTHER && c != pc)) {
-          tokens.add(new Span(start, ci));
-          start = ci;
-        }
-      }
-      state = charType;
-      pc = c;
-    }
-    if (charType != CharacterEnum.WHITESPACE) {
-      tokens.add(new Span(start, sl));
-    }
-    return ((Span[]) tokens.toArray(new Span[tokens.size()]));
-  }
-
-  public static String[] spansToStrings(Span[] spans, String s) {
-    String[] tokens = new String[spans.length];
-    for (int si = 0, sl = spans.length; si < sl; si++) {
-      tokens[si] = s.substring(spans[si].getStart(), spans[si].getEnd());
-    }
-    return tokens;
-  }
-  
   private static void addNames(String tag, Span[] names, Parse[] tokens) {
     for (int ni=0,nn=names.length;ni<nn;ni++) {
       Span nameTokenSpan = names[ni];
@@ -191,7 +122,7 @@ public class NameFinder extends NameFinderME {
       }
       //System.err.println(java.util.Arrays.asList(tokens));
       for (int fi = 0, fl = finders.length; fi < fl; fi++) {
-        nameSpans[fi] = finders[fi].find(tokens, NameFinderEventStream.additionalContext(tokens,prevTokenMaps[fi]));
+        nameSpans[fi] = finders[fi].nameFinder.find(tokens, NameFinderEventStream.additionalContext(tokens,prevTokenMaps[fi]));
         //System.err.println("EnglishNameFinder.processParse: "+tags[fi] + " " + java.util.Arrays.asList(finderTags[fi]));
       }
       updatePrevTokenMaps(prevTokenMaps,tokens,nameSpans);
@@ -221,9 +152,9 @@ public class NameFinder extends NameFinderME {
         continue;
       }
       Span[] spans = tokenizer.tokenizePos(line);
-      String[] tokens = spansToStrings(spans,line);
+      String[] tokens = Span.spansToStrings(spans,line);
       for (int fi = 0, fl = finders.length; fi < fl; fi++) {
-        nameSpans[fi] = finders[fi].find(tokens,NameFinderEventStream.additionalContext(tokens,prevTokenMaps[fi]));
+        nameSpans[fi] = finders[fi].nameFinder.find(tokens,NameFinderEventStream.additionalContext(tokens,prevTokenMaps[fi]));
         //System.err.println("EnglighNameFinder.processText: "+tags[fi] + " " + java.util.Arrays.asList(finderTags[fi]));
         nameOutcomes[fi] = NameFinderEventStream.generateOutcomes(nameSpans[fi], tokens.length);
       }
@@ -302,22 +233,5 @@ public class NameFinder extends NameFinderME {
     else {
       processText(finders,names,in);
     }
-  }
-}
-
-class CharacterEnum {
-  public static final CharacterEnum WHITESPACE = new CharacterEnum("whitespace");
-  public static final CharacterEnum ALPHABETIC = new CharacterEnum("alphabetic");
-  public static final CharacterEnum NUMERIC = new CharacterEnum("numeric");
-  public static final CharacterEnum OTHER = new CharacterEnum("other");
-
-  private String name;
-
-  private CharacterEnum(String name) {
-    this.name = name;
-  }
-
-  public String toString() {
-    return name;
   }
 }
