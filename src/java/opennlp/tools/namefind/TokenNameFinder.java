@@ -23,19 +23,11 @@ import opennlp.tools.util.Span;
  * The interface for name finders which provide name tags for a sequence of tokens.
  * @author      Thomas Morton
  */
-public interface NameFinder {
+public interface TokenNameFinder {
   
   /** Generates name tags for the given sequence, typically a sentence, returning token spans for any identified names.
    * @param toks an array of the tokens or words of the sequence, typically a sentence.
    * @return an array of spans for each of the names identified.
    */
-  
-  public Span[] find(String tokens[]);
-  
-  /** Generates name tags for the given sequence, typically a sentence, returning token spans for any identified names.
-   * @param toks an array of the tokens or words of the sequence, typically a sentence.
-   * @param assitionalContext features which are based on context outside of the sentence but which should also be used.
-   * @return an array of spans for each of the names identified.
-   */
-  public Span[] find(String tokens[], String[][] additionalContext);
+  public Span[] find(String tokens[]);  
 }
