@@ -51,7 +51,7 @@ public class ListHeap implements Heap {
   }
 
   /**
-   * Createa a new heap of the specified size.
+   * Creates a new heap of the specified size.
    * @param sz The size of the new heap.
    */
   public ListHeap(int sz) {
@@ -195,7 +195,7 @@ public class ListHeap implements Heap {
   public static void main(String[] args) {
    Heap heap = new ListHeap(5);
    for (int ai=0;ai<args.length;ai++){
-     heap.add(new Integer(Integer.parseInt(args[ai])));
+     heap.add(Integer.valueOf(Integer.parseInt(args[ai])));
    }
    while (!heap.isEmpty()) {
      System.out.print(heap.extract()+" ");

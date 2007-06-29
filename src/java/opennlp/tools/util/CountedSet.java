@@ -60,7 +60,7 @@ public class CountedSet implements Set {
       return true;
     } 
     else { 
-      cset.put(o, new Integer(count.intValue()+1));
+      cset.put(o, Integer.valueOf(count.intValue()+1));
       return false;
     }
   }
@@ -78,7 +78,7 @@ public class CountedSet implements Set {
         cset.remove(o);
       }
       else {
-        cset.put(o, new Integer(c)); 
+        cset.put(o, Integer.valueOf(c)); 
       }
     }
   }
@@ -89,7 +89,7 @@ public class CountedSet implements Set {
    * @param c The count of the specified object.
    */
   public void setCount(Object o,int c) {
-    cset.put(o,new Integer(c));
+    cset.put(o, Integer.valueOf(c));
   }
 
   /**
@@ -203,7 +203,4 @@ public class CountedSet implements Set {
   public Object[] toArray(Object[] arg0) {
     return cset.keySet().toArray(arg0);
   }
-  
-  
-
 }

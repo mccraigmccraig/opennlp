@@ -45,7 +45,7 @@ public class NumberedSet implements Set {
   }
   
   public void setIndex(Object key, int index) {
-    nset.put(key,new Integer(index));
+    nset.put(key, Integer.valueOf(index));
   }
 
   public int size() {
@@ -74,7 +74,7 @@ public class NumberedSet implements Set {
 
   public boolean add(Object arg0) {
     if (!nset.containsKey(arg0)) {
-      nset.put(arg0,new Integer(max++));
+      nset.put(arg0, Integer.valueOf(max++));
       return true;
     }
     return false;
