@@ -36,7 +36,7 @@ import java.util.Set;
 public class CountedSet implements Set {
 
   private Map cset;
-  private static Integer ONE = new Integer(1);
+  private static Integer ONE = Integer.valueOf(1);
   
   /**
    * Creates a new counted set.
