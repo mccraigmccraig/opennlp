@@ -22,7 +22,7 @@ import java.util.List;
 
 import opennlp.maxent.MaxentModel;
 
-/** Performs k-best search over sequence.  This is besed on the description in
+/** Performs k-best search over sequence.  This is based on the description in
   * Ratnaparkhi (1998), PhD diss, Univ. of Pennsylvania. 
  */
 public class BeamSearch {
@@ -155,11 +155,11 @@ public class BeamSearch {
     return bestSequences(1, sequence, additionalContext,zeroLog)[0];
   }
 
-  /** Determines wheter a particular continuation of a sequence is valid.  
-     * This is used to restrict invalid sequences such as thoses used in start/continure tag-based chunking 
+  /** Determines whether a particular continuation of a sequence is valid.  
+     * This is used to restrict invalid sequences such as thoses used in start/continue tag-based chunking 
      * or could be used to implement tag dictionary restrictions.
      * @param i The index in the input sequence for which the new outcome is being proposed.
-     * @param inputSequence The input sequnce.
+     * @param inputSequence The input sequence.
      * @param outcomesSequence The outcomes so far in this sequence.
      * @param outcome The next proposed outcome for the outcomes sequence.
      * @return true is the sequence would still be valid with the new outcome, false otherwise.
