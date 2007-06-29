@@ -4,45 +4,18 @@ import java.io.File;
 import java.io.IOException;
 import java.io.PrintStream;
 
-import opennlp.maxent.MaxentModel;
 import opennlp.maxent.io.SuffixSensitiveGISModelReader;
-import opennlp.tools.namefind.NameContextGenerator;
 import opennlp.tools.namefind.NameFinderEventStream;
 import opennlp.tools.namefind.NameFinderME;
 import opennlp.tools.util.Span;
 
-public class TokenChunker extends NameFinderME {
+public class TokenChunker {
 
+  private NameFinderME nameFinder;
   
   public TokenChunker(String modelName) throws IOException {
-    this(new SuffixSensitiveGISModelReader(new File(modelName)).getModel());
-  }
-  /**
-   * Creates a new token chunker using the specified model.
-   * @param model The model to make the chunk decisions.
-   */
-  public TokenChunker(MaxentModel model) {
-    super(model);
-  }
-
-  /**
-   * Creates a new token chunker using the specified model and context generator.
-   * @param model The model to make the chunk decisions.
-   * @param cg The context generator to be used with this model.
-   */
-  public TokenChunker(MaxentModel model, NameContextGenerator cg) {
-    super(model, cg);
-  }
-
-  /**
-   * Creates a new token chunker using the specified model, context generator, 
-   * and searches for a chunk sequence using the specified beam size.
-   * @param model The model to make the chunk decisions.
-   * @param cg The context generator to be used with this model.
-   * @param beamSize The size of the beam used for searching for a chunk sequence.
-   */
-  public TokenChunker(MaxentModel model, NameContextGenerator cg, int beamSize) {
-    super(model, cg, beamSize);
+  nameFinder = new NameFinderME(new SuffixSensitiveGISModelReader(
+      new File(modelName)).getModel());
   }
   
   public static void main(String[] args) throws IOException {
@@ -59,7 +32,7 @@ public class TokenChunker extends NameFinderME {
       }
       else {
         String[] tokens = line.split(" ");
-        Span[] spans = chunker.find(tokens);
+        Span[] spans = chunker.nameFinder.find(tokens);
         String[] outcomes = NameFinderEventStream.generateOutcomes(spans, tokens.length);
         //System.err.println(java.util.Arrays.asList(chunks));
         for (int ci=0,cn=outcomes.length;ci<cn;ci++) {
