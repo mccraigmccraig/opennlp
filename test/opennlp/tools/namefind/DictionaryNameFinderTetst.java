@@ -31,7 +31,7 @@ import junit.framework.TestCase;
 public class DictionaryNameFinderTetst extends TestCase {
   
   private Dictionary mDictionary = new Dictionary();
-  private NameFinder mNameFinder;
+  private TokenNameFinder mNameFinder;
   
   public DictionaryNameFinderTetst() {
     
