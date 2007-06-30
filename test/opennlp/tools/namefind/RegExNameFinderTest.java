@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////////
-//Copyright (C) 2006 Calcucare GmbH
+//Copyright (C) 2007 OpenNlp
 // 
 //This library is free software; you can redistribute it and/or
 //modify it under the terms of the GNU Lesser General Public
@@ -20,12 +20,12 @@ package opennlp.tools.namefind;
 
 import java.util.regex.Pattern;
 
+import opennlp.tools.util.Span;
+
 import junit.framework.TestCase;
 
 /**
- * 
- * @author <a href="mailto:kottmann@gmail.com">Joern Kottmann</a>
- * @version $Revision: 1.1 $, $Date: 2007/01/22 06:52:44 $
+ * Tests for the {@link RegExNameFinder} class.
  */
 public class RegExNameFinderTest extends TestCase {
   
@@ -37,11 +37,11 @@ public class RegExNameFinderTest extends TestCase {
     RegExNameFinder finder = 
       new RegExNameFinder(new Pattern[]{testPattern});
     
-    Annotation[] result = finder.find(sentence);
+    Span[] result = finder.find(sentence);
     
     assertTrue(result.length == 1);
     
-    assertTrue(result[0].getBegin() == 1);
+    assertTrue(result[0].getStart() == 1);
     assertTrue(result[0].getEnd() == 1);
   }
   
@@ -53,11 +53,11 @@ public class RegExNameFinderTest extends TestCase {
     RegExNameFinder finder = 
       new RegExNameFinder(new Pattern[]{testPattern});
     
-    Annotation[] result = finder.find(sentence);
+    Span[] result = finder.find(sentence);
     
     assertTrue(result.length == 1);
     
-    assertTrue(result[0].getBegin() == 1);
+    assertTrue(result[0].getStart() == 1);
     assertTrue(result[0].getEnd() == 2);
   }
   
@@ -69,7 +69,7 @@ public class RegExNameFinderTest extends TestCase {
     RegExNameFinder finder = 
       new RegExNameFinder(new Pattern[]{testPattern});
     
-    Annotation[] result = finder.find(sentence);
+    Span[] result = finder.find(sentence);
     
     assertTrue(result.length == 0);
   }

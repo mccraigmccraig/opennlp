@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////////
-//Copyright (C) 2006 Calcucare GmbH
+//Copyright (C) 2007 OpenNlp
 // 
 //This library is free software; you can redistribute it and/or
 //modify it under the terms of the GNU Lesser General Public
@@ -26,9 +26,7 @@ import opennlp.tools.util.Span;
 import junit.framework.TestCase;
 
 /**
-  * 
-  * @author <a href="mailto:kottmann@gmail.com">Joern Kottmann</a>
-  * @version $Revision: 1.3 $, $Date: 2007/01/22 06:52:44 $
+  *Tests for the {@link DictionaryNameFinder} class. 
   */
 public class DictionaryNameFinderTetst extends TestCase {
   
@@ -60,10 +58,10 @@ public class DictionaryNameFinderTetst extends TestCase {
     SimpleTokenizer tokenizer = new SimpleTokenizer();
     String tokens[] = tokenizer.tokenize(sentence);
     
-    String names[] = mNameFinder.find(tokens, null);
+    Span names[] = mNameFinder.find(tokens);
     
     assertTrue(names.length == 1);    
-    assertTrue("Max".equals(names[0]));
+    assertTrue(names[0].getStart() == 0 && names[0].getEnd() == 1);
   }
 
   public void testSingleTokeNameInsideSentence() {
@@ -72,11 +70,10 @@ public class DictionaryNameFinderTetst extends TestCase {
     SimpleTokenizer tokenizer = new SimpleTokenizer();
     String tokens[] = tokenizer.tokenize(sentence);
     
-    String names[] = mNameFinder.find(tokens, null);
+    Span names[] = mNameFinder.find(tokens);
     
     assertTrue(names.length == 1);    
-    assertTrue("Max".equals(names[0]));
-
+    assertTrue(names[0].getStart() == 2 && names[0].getEnd() == 3);
   }
 
   public void testSingleTokeNameAtSentenceEnd() {
@@ -85,33 +82,27 @@ public class DictionaryNameFinderTetst extends TestCase {
     SimpleTokenizer tokenizer = new SimpleTokenizer();
     String tokens[] = tokenizer.tokenize(sentence);
     
-    String names[] = mNameFinder.find(tokens, null);
+    Span names[] = mNameFinder.find(tokens);
     
     assertTrue(names.length == 1);    
-    assertTrue("Max".equals(names[0]));
+    assertTrue(names[0].getStart() == 3 && names[0].getEnd() == 4);
   }
   
   public void testLastMatchingTokenNameIsChoosen() {
-    String sentence = "a b c Vanessa";
+    String sentence[] = {"a", "b", "c", "Vanessa"};
     
-    SimpleTokenizer tokenizer = new SimpleTokenizer();
-    Span tokens[] = tokenizer.tokenizePos(sentence);
-    
-    Span names[] = mNameFinder.find(sentence, tokens, null);
+    Span names[] = mNameFinder.find(sentence);
     
     assertTrue(names.length == 1);    
-    assertTrue("Vanessa".equals(names[0].getCoveredText(sentence)));
+    assertTrue(names[0].getStart() == 3 && names[0].getEnd() == 4);
   }
   
   public void testLongerTokenNameIsPreferred() {
-    String sentence = "a b c Vanessa Williams";
+    String sentence[] = {"a", "b", "c", "Vanessa", "Williams"};
     
-    SimpleTokenizer tokenizer = new SimpleTokenizer();
-    Span tokens[] = tokenizer.tokenizePos(sentence);
-    
-    Span names[] = mNameFinder.find(sentence, tokens, null);
+    Span names[] = mNameFinder.find(sentence);
     
     assertTrue(names.length == 1);    
-    assertTrue("Vanessa Williams".equals(names[0].getCoveredText(sentence)));
+    assertTrue(names[0].getStart() == 3 && names[0].getEnd() == 5);
   }
 }

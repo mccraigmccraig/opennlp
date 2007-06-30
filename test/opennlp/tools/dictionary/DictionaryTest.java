@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////////
-//Copyright (C) 2006 Calcucare GmbH
+//Copyright (C) 2007 OpenNlp
 // 
 //This library is free software; you can redistribute it and/or
 //modify it under the terms of the GNU Lesser General Public
@@ -26,14 +26,12 @@ import java.io.StringReader;
 import opennlp.tools.dictionary.Dictionary;
 import opennlp.tools.ngram.Token;
 import opennlp.tools.ngram.TokenList;
+import opennlp.tools.util.InvalidFormatException;
 
 import junit.framework.TestCase;
 
 /**
   * Tests for the {@link Dictionary} class.
-  * 
-  * @author <a href="mailto:kottmann@gmail.com">Joern Kottmann</a>
-  * @version $Revision: 1.3 $, $Date: 2007/03/30 09:30:49 $
   */
 public class DictionaryTest extends TestCase  {
   
@@ -57,8 +55,9 @@ public class DictionaryTest extends TestCase  {
    * Tests serialization and deserailization of the {@link Dictionary}.
    * 
    * @throws IOException
+   * @throws InvalidFormatException 
    */
-  public void testSerialization() throws IOException {
+  public void testSerialization() throws IOException, InvalidFormatException {
     Dictionary reference = new Dictionary();
     
     Token a1 = Token.create("a1");
