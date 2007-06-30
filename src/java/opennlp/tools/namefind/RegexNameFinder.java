@@ -27,11 +27,11 @@ import java.util.regex.Pattern;
 
 import opennlp.tools.util.Span;
 
-public final class RegExNameFinder implements TokenNameFinder {
+public final class RegexNameFinder implements TokenNameFinder {
 
   private final Pattern mPatterns[];
   
-  public RegExNameFinder(Pattern patterns[]) {
+  public RegexNameFinder(Pattern patterns[]) {
     if (patterns == null || patterns.length == 0) {
       throw new IllegalArgumentException("patterns must not be null or emtpy!");
     }

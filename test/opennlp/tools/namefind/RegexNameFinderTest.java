@@ -25,17 +25,17 @@ import opennlp.tools.util.Span;
 import junit.framework.TestCase;
 
 /**
- * Tests for the {@link RegExNameFinder} class.
+ * Tests for the {@link RegexNameFinder} class.
  */
-public class RegExNameFinderTest extends TestCase {
+public class RegexNameFinderTest extends TestCase {
   
   public void testFindSingleTokenPattern() {
     Pattern testPattern = Pattern.compile("test");
     
     String sentence[] = new String[]{"a", "test", "b", "c"};
     
-    RegExNameFinder finder = 
-      new RegExNameFinder(new Pattern[]{testPattern});
+    RegexNameFinder finder = 
+      new RegexNameFinder(new Pattern[]{testPattern});
     
     Span[] result = finder.find(sentence);
     
@@ -50,8 +50,8 @@ public class RegExNameFinderTest extends TestCase {
     
     String sentence[] = new String[]{"a", "80", "year", "b", "c"};
     
-    RegExNameFinder finder = 
-      new RegExNameFinder(new Pattern[]{testPattern});
+    RegexNameFinder finder = 
+      new RegexNameFinder(new Pattern[]{testPattern});
     
     Span[] result = finder.find(sentence);
     
@@ -66,8 +66,8 @@ public class RegExNameFinderTest extends TestCase {
     
     String sentence[] = new String[]{"a", "80", "year", "c"};
     
-    RegExNameFinder finder = 
-      new RegExNameFinder(new Pattern[]{testPattern});
+    RegexNameFinder finder = 
+      new RegexNameFinder(new Pattern[]{testPattern});
     
     Span[] result = finder.find(sentence);
     
