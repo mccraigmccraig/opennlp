@@ -161,30 +161,34 @@ public class NameFinderME implements DocumentNameFinder, TokenNameFinder {
     int start = -1;
     int end = -1;
     List spans = new ArrayList(tokens.length);
-    for (int li=0;li<c.size();li++) {
+    for (int li = 0;li<c.size();li++) {
       String chunkTag = (String) c.get(li);
       if (chunkTag.equals(NameFinderME.START)) {
         if (start != -1) {
-          spans.add(new Span(start,end));
-          start = li;
-          end = li+1;
+          spans.add(new Span(start, end));
         }
+        
+        start = li;
+        end = li + 1;
+        
       }
       else if (chunkTag.equals(NameFinderME.CONTINUE)) {
-        end = li+1;
+        end = li + 1;
       }
       else if (chunkTag.equals(NameFinderME.OTHER)) {
         if (start != -1) {
-          spans.add(new Span(start,end));
+          spans.add(new Span(start, end));
           start = -1;
           end = -1;
         }
       }
     }
+    
     if (start != -1) {
       spans.add(new Span(start,end));
     }
-    return (Span[]) c.toArray(new Span[spans.size()]);
+    
+    return (Span[]) spans.toArray(new Span[spans.size()]);
   }
   
   
