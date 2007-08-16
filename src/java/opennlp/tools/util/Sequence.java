@@ -81,7 +81,7 @@ public class Sequence implements Comparable {
    * @return a list of outcomes.
    */
   public List getOutcomes() {
-    return (outcomes);
+    return outcomes;
   }
 
   /** Returns an array of probabilities associated with the outcomes of this sequence.
@@ -90,7 +90,7 @@ public class Sequence implements Comparable {
   public double[] getProbs() {
     double[] ps = new double[probs.size()];
     getProbs(ps);
-    return (ps);
+    return ps;
   }
   
   /**

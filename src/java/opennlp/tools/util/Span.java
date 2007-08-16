@@ -105,8 +105,8 @@ public class Span implements Comparable {
     int sstart = s.getStart();
     //either s's start is in this or this' start is in s
     return this.contains(s) || s.contains(this) || 
-	   (getStart() <= sstart && sstart < getEnd() ||
-	   sstart <= getStart() && getStart() < s.getEnd());
+	   getStart() <= sstart && sstart < getEnd() ||
+	   sstart <= getStart() && getStart() < s.getEnd();
   }
   
   /**
@@ -169,7 +169,7 @@ public class Span implements Comparable {
    * Generates a hash code of the current span.
    */
   public int hashCode() {
-    return (this.start << 16) | (0x0000FFFF | this.end);
+    return this.start << 16 | 0x0000FFFF | this.end;
   }
   
   /**

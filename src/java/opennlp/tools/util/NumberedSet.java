@@ -81,7 +81,7 @@ public class NumberedSet implements Set {
   }
 
   public boolean remove(Object o) {
-    return (nset.remove(o) != null);
+    return nset.remove(o) != null;
   }
 
   public boolean containsAll(Collection c) {
@@ -111,7 +111,7 @@ public class NumberedSet implements Set {
   public boolean removeAll(Collection c) {
     boolean changed =false;
     for (Iterator ki = nset.keySet().iterator();ki.hasNext();) {
-      changed = changed || (nset.remove(ki.next()) != null);
+      changed = changed || nset.remove(ki.next()) != null;
     }
     return changed;
   }

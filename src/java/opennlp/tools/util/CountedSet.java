@@ -100,10 +100,10 @@ public class CountedSet implements Set {
   public int getCount(Object o) {
     Integer count = (Integer) cset.get(o);   
     if ( count == null ) {
-      return(0);
+      return 0;
     }
     else {
-      return(count.intValue());
+      return count.intValue();
     }
   }
 
@@ -169,13 +169,13 @@ public class CountedSet implements Set {
   }
 
   public boolean remove(Object o) {
-    return (cset.remove(o) != null);
+    return cset.remove(o) != null;
   }
 
   public boolean removeAll(Collection c) {
     boolean changed =false;
     for (Iterator ki = cset.keySet().iterator();ki.hasNext();) {
-      changed = changed || (cset.remove(ki.next()) != null);
+      changed = changed || cset.remove(ki.next()) != null;
     }
     return changed;
   }

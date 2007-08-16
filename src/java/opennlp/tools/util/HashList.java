@@ -78,14 +78,14 @@ public class HashList extends HashMap {
   public boolean remove(Object key, Object value) {
     List l = (List) get(key);
     if (l == null) {
-      return(false);
+      return false;
     }
     else {
       boolean r = l.remove(value);
       if (l.size() == 0) {
 	remove(key);
       }
-      return(r);
+      return r;
     }
   }
 }

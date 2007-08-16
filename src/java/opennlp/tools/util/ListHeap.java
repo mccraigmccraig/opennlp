@@ -84,19 +84,19 @@ public class ListHeap implements Heap {
 
   private boolean lt(Object o1, Object o2) {
     if (comp != null) {
-      return (comp.compare(o1, o2) < 0);
+      return comp.compare(o1, o2) < 0;
     }
     else {
-      return (((Comparable) o1).compareTo(o2) < 0);
+      return ((Comparable) o1).compareTo(o2) < 0;
     }
   }
 
   private boolean gt(Object o1, Object o2) {
     if (comp != null) {
-      return (comp.compare(o1, o2) > 0);
+      return comp.compare(o1, o2) > 0;
     }
     else {
-      return (((Comparable) o1).compareTo(o2) > 0);
+      return ((Comparable) o1).compareTo(o2) > 0;
     }
   }
 
@@ -144,14 +144,14 @@ public class ListHeap implements Heap {
     if (list.size() == 0) {
       throw new RuntimeException("Heap Underflow");
     }
-    return (list.get(0));
+    return list.get(0);
   }
   
   public Object last() {
     if (list.size() == 0) {
       throw new RuntimeException("Heap Underflow");
     }
-    return (max);
+    return max;
   }
 
   public void add(Object o) {
@@ -185,7 +185,7 @@ public class ListHeap implements Heap {
   }
 
   public Iterator iterator() {
-    return (list.iterator());
+    return list.iterator();
   }
   
   public boolean isEmpty() {

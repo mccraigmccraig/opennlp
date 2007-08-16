@@ -34,15 +34,15 @@ public class ReverseListIterator implements Iterator {
   }
 
   public Object next() {
-    return(list.get(index--));
+    return list.get(index--);
   }
 
   public boolean hasNext() {
-    return(index >=0);
+    return index >=0;
   }
 
   public void remove() {
-    throw(new UnsupportedOperationException());
+    throw new UnsupportedOperationException();
   }
 
 }
