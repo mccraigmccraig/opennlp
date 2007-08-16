@@ -36,7 +36,7 @@ import opennlp.tools.util.InvalidFormatException;
  * The {@link NGramModel} can be used to crate ngrams and character ngrams.
  * 
  * @author <a href="mailto:kottmann@gmail.com">Joern Kottmann</a>
- * @version $Revision: 1.7 $, $Date: 2007/04/23 03:07:43 $
+ * @version $Revision: 1.8 $, $Date: 2007/08/16 00:28:19 $
  */
 public class NGramModel {
   
@@ -133,7 +133,7 @@ public class NGramModel {
   }
 
   /**
-   * Adds NGrams up to the specifed length to the current instance.
+   * Adds NGrams up to the specified length to the current instance.
    * 
    * @param ngram the tokens to build the uni-grams, bi-grams, tri-grams, ..
    *     from.
