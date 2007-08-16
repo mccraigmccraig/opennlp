@@ -118,7 +118,7 @@ public class NameFinderEventStream implements EventStream {
 
     /**
      * Updates the specified mapping of previous name tags with the assignment for the specified sentence tokens and
-     * their coresponding outcomes.
+     * their corresponding outcomes.
      * @param tokens - the previous tokens as List of String or null
      * @param outcomes - the previous outcome as List of Strings or null
      * @param prevMap - Mapping between tokens and the previous name tags assigned to them.
