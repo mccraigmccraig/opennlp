@@ -40,6 +40,7 @@ import opennlp.tools.util.Span;
 public class NameFinderME implements DocumentNameFinder, TokenNameFinder {
 
   private static String[][] EMPTY = new String[0][0];
+  
   /**
    * Implementation of the abstract beam search to allow the name finder to use
    * the common beam search code.
@@ -47,7 +48,7 @@ public class NameFinderME implements DocumentNameFinder, TokenNameFinder {
   private class NameBeamSearch extends BeamSearch {
 
     /**
-     * Creams a beam seach of the specified size sing the specified model with
+     * Creams a beam search of the specified size sing the specified model with
      * the specified context generator.
      * 
      * @param size
@@ -64,14 +65,14 @@ public class NameFinderME implements DocumentNameFinder, TokenNameFinder {
     }
 
     /**
-     * This method determines wheter the outcome is valid for the preceeding
+     * This method determines whether the outcome is valid for the preceding
      * sequence. This can be used to implement constraints on what sequences are
      * valid.
      * 
      * @param outcome
      *          The outcome.
      * @param sequence
-     *          The precceding sequence of outcomes assignments.
+     *          The preceding sequence of outcomes assignments.
      * @return true is the outcome is valid for the sequence, false otherwise.
      */
     protected boolean validSequence(int size, Object[] inputSequence,
@@ -150,7 +151,7 @@ public class NameFinderME implements DocumentNameFinder, TokenNameFinder {
   
   /** Generates name tags for the given sequence, typically a sentence, returning token spans for any identified names.
    * @param toks an array of the tokens or words of the sequence, typically a sentence.
-   * @param assitionalContext features which are based on context outside of the sentence but which should also be used.
+   * @param additionalContext features which are based on context outside of the sentence but which should also be used.
    * @return an array of spans for each of the names identified.
    */
   public Span[] find(String[] tokens, String[][] additionalContext) {
@@ -196,7 +197,7 @@ public class NameFinderME implements DocumentNameFinder, TokenNameFinder {
    * Populates the specified array with the probabilities of the last decoded
    * sequence. The sequence was determined based on the previous call to
    * <code>chunk</code>. The specified array should be at least as large as
-   * the numbe of tokens in the previous call to <code>chunk</code>.
+   * the number of tokens in the previous call to <code>chunk</code>.
    * 
    * @param probs
    *          An array used to hold the probabilities of the last decoded
