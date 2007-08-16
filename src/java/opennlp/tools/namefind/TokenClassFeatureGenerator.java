@@ -4,7 +4,7 @@ import java.util.List;
 
 
 /**
- * T
+ * Generates features for different for the class of the token.
  */
 public class TokenClassFeatureGenerator implements FeatureGenerator {
 

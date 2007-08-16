@@ -22,6 +22,10 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
+/**
+ * Generates previous and next features for a given {@link FeatureGenerator}.
+ * The window size can be specified.
+ */
 public class WindowFeatureGenerator implements FeatureGenerator {
   
   private final FeatureGenerator generator;
@@ -70,7 +74,6 @@ public class WindowFeatureGenerator implements FeatureGenerator {
         for (Iterator it = nextFeatures.iterator(); it.hasNext();) {
           features.add("n" + i + it.next().toString());
         }
-
       }
     }
   }

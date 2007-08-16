@@ -24,6 +24,11 @@ import opennlp.tools.namefind.FeatureGenerator;
 import opennlp.tools.ngram.NGramModel;
 import opennlp.tools.ngram.TokenList;
 
+/**
+ * The {@link CharacterNgramFeatureGenerator} uses character ngrams to 
+ * generate features about each token. 
+ * The minimum and maximum length can be specified.
+ */
 public class CharacterNgramFeatureGenerator implements FeatureGenerator {
 
   private final int minLength;
@@ -34,6 +39,9 @@ public class CharacterNgramFeatureGenerator implements FeatureGenerator {
     this.maxLength = maxLength;
   }
   
+  /**
+   * Initializes the current instance with min 2 length and max 5 length of ngrams.
+   */
   public CharacterNgramFeatureGenerator() {
     this(2, 5);
   }

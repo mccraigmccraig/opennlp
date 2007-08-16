@@ -20,6 +20,9 @@ package opennlp.tools.namefind;
 
 import java.util.List;
 
+/**
+ * Generates a feature which contains the token itself.
+ */
 public class TokenFeatureGenerator implements FeatureGenerator {
 
   private static final String WORD_PREFIX = "w";
