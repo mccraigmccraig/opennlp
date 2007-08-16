@@ -23,7 +23,7 @@ import java.util.List;
 import opennlp.tools.util.Span;
 
 /**
- * 
+ * Generates features if the tokens are contained in the dictionary. 
  */
 public class DictionaryFeatureGenerator implements FeatureGenerator {
 
@@ -34,7 +34,8 @@ public class DictionaryFeatureGenerator implements FeatureGenerator {
   private Span mCurrentNames[];
 
   /**
-   * Initilizes the current instance.
+   * Initializes the current instance. Pass in an instance of 
+   * the {@link DictionaryNameFinder}.
    * 
    * @param dictionary
    */
@@ -55,7 +56,9 @@ public class DictionaryFeatureGenerator implements FeatureGenerator {
         // found a span for the current token
         features.add("w=dic");
         features.add("w=dic=" + tokens[index]);
-//        features.add("w=dic=" + mCurrentNames[i]); add start or cont
+        
+        // TODO: consider generation start and continuation features
+        
         break;
       }
     }
