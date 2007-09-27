@@ -68,13 +68,15 @@ public class NameFinderEventStream implements EventStream {
     }
     return outcomes;
   }
-  
-  
     
   private void createNewEvents() {
     if (dataStream.hasNext()) {
       NameSample sample = (NameSample) dataStream.nextToken();
-
+      
+      if (sample.isClearAdaptiveDataSet()) {
+        contextGenerator.clearAdaptiveData();
+      }
+      
       String outcomes[] = generateOutcomes(sample.names(),sample.sentence().length);
       additionalContextFeatureGenerator.setCurrentContext(sample.additionalContext());
       String[] tokens = new String[sample.sentence().length]; 
@@ -82,7 +84,8 @@ public class NameFinderEventStream implements EventStream {
       for (int i = 0; i < sample.sentence().length; i++) {
         tokens[i] = sample.sentence()[i].getToken();
       }
-      NameFinderEventStream.updatePrevMap(tokens, sample.names(), prevTags);
+      
+      contextGenerator.updateAdaptiveData(tokens, outcomes);
       
       List events = new ArrayList(outcomes.length);
       String[][] ac = additionalContext(tokens,prevTags);
@@ -115,33 +118,8 @@ public class NameFinderEventStream implements EventStream {
 
     return (Event) events.next();
   }
-
-    /**
-     * Updates the specified mapping of previous name tags with the assignment for the specified sentence tokens and
-     * their corresponding outcomes.
-     * @param tokens - the previous tokens as List of String or null
-     * @param outcomes - the previous outcome as List of Strings or null
-     * @param prevMap - Mapping between tokens and the previous name tags assigned to them.
-     * @return - the specified previous map with updates made.
-     */
-    public static Map updatePrevMap(String[] tokens, Span[] names, Map prevMap) {
-      String[] outcomes = generateOutcomes(names,tokens.length);
-      if (tokens != null | outcomes != null) {
-        if (tokens.length != outcomes.length) {
-          throw new IllegalArgumentException(
-              "The sent and outcome arrays MUST have the same size!");
-        }
-        for (int i = 0; i < tokens.length; i++) {
-          prevMap.put(tokens[i], outcomes[i]);
-        }
-      } 
-      else {
-        prevMap = Collections.EMPTY_MAP;
-      }
     
-      return prevMap;
-    }
-
+    
     /**
      * Generated previous decision features for each token based on contents of the specifed map.
      * @param tokens The token for which the context is generated.

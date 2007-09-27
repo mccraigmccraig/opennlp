@@ -23,31 +23,31 @@ import java.util.Iterator;
 import java.util.List;
 
 /**
- * Generates previous and next features for a given {@link FeatureGenerator}.
+ * Generates previous and next features for a given {@link AdaptiveFeatureGenerator}.
  * The window size can be specified.
  */
-public class WindowFeatureGenerator implements FeatureGenerator {
+public class WindowFeatureGenerator implements AdaptiveFeatureGenerator {
   
-  private final FeatureGenerator generator;
+  private final AdaptiveFeatureGenerator generator;
   
   private final int prevWindowSize;
   private final int nextWindowSize;
 
-  public WindowFeatureGenerator(FeatureGenerator generator, int prevWindowSize, 
+  public WindowFeatureGenerator(AdaptiveFeatureGenerator generator, int prevWindowSize, 
       int nextWindowSize) {
         this.generator = generator;
         this.prevWindowSize = prevWindowSize;
         this.nextWindowSize = nextWindowSize;
   }
   
-  public WindowFeatureGenerator(FeatureGenerator generator) {
+  public WindowFeatureGenerator(AdaptiveFeatureGenerator generator) {
     this(generator, 5, 5);
   }
   
-  public void createFeatures(List features, String[] tokens, int index) {
+  public void createFeatures(List features, String[] tokens, String[] preds, int index) {
 
     // current features
-    generator.createFeatures(features, tokens, index);
+    generator.createFeatures(features, tokens, preds, index);
     
     // previous features
     for (int i = 1; i < prevWindowSize + 1; i++) {
@@ -55,7 +55,7 @@ public class WindowFeatureGenerator implements FeatureGenerator {
 
         List prevFeatures = new ArrayList();
           
-          generator.createFeatures(prevFeatures, tokens, index - i);
+          generator.createFeatures(prevFeatures, tokens, preds, index - i);
 
         for (Iterator it = prevFeatures.iterator(); it.hasNext();) {
           features.add("p" + i + it.next().toString());
@@ -69,12 +69,20 @@ public class WindowFeatureGenerator implements FeatureGenerator {
 
         List nextFeatures = new ArrayList();
 
-        generator.createFeatures(nextFeatures, tokens, index + i);
+        generator.createFeatures(nextFeatures, tokens, preds, index + i);
         
         for (Iterator it = nextFeatures.iterator(); it.hasNext();) {
           features.add("n" + i + it.next().toString());
         }
       }
     }
+  }
+  
+  public void updateAdaptiveData(String[] tokens, String[] outcomes) {
+    generator.updateAdaptiveData(tokens, outcomes);
+  }
+  
+  public void clearAdaptiveData() {
+      generator.clearAdaptiveData();
   }
 }

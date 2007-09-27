@@ -15,21 +15,14 @@
 //License along with this program; if not, write to the Free Software
 //Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 //////////////////////////////////////////////////////////////////////////////
-
 package opennlp.tools.namefind;
 
-import java.util.List;
+public abstract class FeatureGenerator implements AdaptiveFeatureGenerator {
 
-/**
- * 
- */
-public interface FeatureGenerator {
- 
-  /**
-   * 
-   * @param features
-   * @param tokens
-   * @param index
-   */
-  void createFeatures(List features, String[] tokens, int index);
+  public void updateAdaptiveData(String[] tokens, String[] outcomes) {
+  }
+  
+  public void clearAdaptiveData() {
+  }
+  
 }

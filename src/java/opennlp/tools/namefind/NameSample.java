@@ -18,8 +18,18 @@ public class NameSample {
 
   private final String additionalContext[][];
 
+  private final boolean isClearAdaptiveData;
+
+  /**
+   * Initializes the current instance. 
+   * 
+   * @param sentence training sentence
+   * @param names 
+   * @param additionalContext
+   * @param clearAdaptiveData if true the adaptive data of the feature generators is cleared
+   */
   public NameSample(Token sentence[], Span names[],
-      String additionalContext[][]) {
+      String additionalContext[][], boolean clearAdaptiveData) {
 
     if (sentence == null) {
       throw new IllegalArgumentException();
@@ -32,13 +42,27 @@ public class NameSample {
     this.sentence = sentence;
     this.names = names;
     this.additionalContext = additionalContext;
+    isClearAdaptiveData = clearAdaptiveData;
   }
 
-  public NameSample(Token sentence[], Span[] names) {
-    this(sentence, names, null);
+  /**
+   * Initializes the current instance.
+   * 
+   * @param sentence
+   * @param names
+   * @param clearAdaptiveData
+   */
+  public NameSample(Token sentence[], Span[] names, boolean clearAdaptiveData) {
+    this(sentence, names, null, clearAdaptiveData);
   }
 
-  public NameSample(String taggedTokens) {
+  /**
+   * Initializes the current instance.
+   * 
+   * @param taggedTokens
+   * @param clearAdaptiveData
+   */
+  public NameSample(String taggedTokens, boolean clearAdaptiveData) {
 
     String[] parts = taggedTokens.split(" ");
 
@@ -63,6 +87,8 @@ public class NameSample {
     names = (Span[]) nameList.toArray(new Span[nameList.size()]);
 
     this.additionalContext = null;
+    
+    isClearAdaptiveData = false;
   }
 
   public Token[] sentence() {
@@ -75,6 +101,10 @@ public class NameSample {
 
   public String[][] additionalContext() {
     return additionalContext;
+  }
+  
+  public boolean isClearAdaptiveDataSet() {
+    return isClearAdaptiveData;
   }
 
   public String toString() {

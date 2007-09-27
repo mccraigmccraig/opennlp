@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////////
-//Copyright (C) 2003 Thomas Morton
+//Copyright (C) 2007 OpenNlp
 // 
 //This library is free software; you can redistribute it and/or
 //modify it under the terms of the GNU Lesser General Public
@@ -21,13 +21,27 @@ package opennlp.tools.namefind;
 import java.util.List;
 
 /**
- * Generates a feature which contains the token itself.
+ * 
  */
-public class TokenFeatureGenerator extends FeatureGenerator {
-
-  private static final String WORD_PREFIX = "w";
-
-  public void createFeatures(List features, String[] tokens, String[] preds, int index) {
-    features.add(WORD_PREFIX + "=" + tokens[index].toLowerCase());
-  }
+public interface AdaptiveFeatureGenerator {
+ 
+  /**
+   * 
+   * @param features
+   * @param tokens
+   * @param index
+   */
+  void createFeatures(List features, String[] tokens, String[] preds, int index);
+  
+  /**
+   * 
+   * @param tokens
+   * @param outcomes
+   */
+  void updateAdaptiveData(String[] tokens, String[] outcomes);
+  
+  /**
+   * 
+   */
+  void clearAdaptiveData();
 }

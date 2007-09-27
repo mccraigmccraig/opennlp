@@ -20,7 +20,7 @@ package opennlp.tools.namefind;
 import java.util.Iterator;
 import java.util.List;
 
-import opennlp.tools.namefind.FeatureGenerator;
+import opennlp.tools.namefind.AdaptiveFeatureGenerator;
 import opennlp.tools.ngram.NGramModel;
 import opennlp.tools.ngram.TokenList;
 
@@ -29,7 +29,7 @@ import opennlp.tools.ngram.TokenList;
  * generate features about each token. 
  * The minimum and maximum length can be specified.
  */
-public class CharacterNgramFeatureGenerator implements FeatureGenerator {
+public class CharacterNgramFeatureGenerator extends FeatureGenerator {
 
   private final int minLength;
   private final int maxLength;
@@ -46,7 +46,7 @@ public class CharacterNgramFeatureGenerator implements FeatureGenerator {
     this(2, 5);
   }
   
-  public void createFeatures(List features, String[] tokens, int index) {
+  public void createFeatures(List features, String[] tokens, String[] preds, int index) {
 
     NGramModel model = new NGramModel();
     model.add(tokens[index], minLength, maxLength);

@@ -25,7 +25,7 @@ import opennlp.tools.util.Span;
 /**
  * Generates features if the tokens are contained in the dictionary. 
  */
-public class DictionaryFeatureGenerator implements FeatureGenerator {
+public class DictionaryFeatureGenerator extends FeatureGenerator {
 
   private TokenNameFinder mFinder;
 
@@ -43,7 +43,7 @@ public class DictionaryFeatureGenerator implements FeatureGenerator {
     mFinder = finder;
   }
 
-  public void createFeatures(List features, String[] tokens, int index) {
+  public void createFeatures(List features, String[] tokens, String[] preds, int index) {
     // cache results sentence
     if (mCurrentSentence != tokens) {
       mCurrentSentence = tokens;

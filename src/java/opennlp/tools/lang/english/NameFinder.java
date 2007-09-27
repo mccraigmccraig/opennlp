@@ -25,7 +25,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import opennlp.maxent.MaxentModel;
-import opennlp.maxent.io.PooledGISModelReader;
+import opennlp.maxent.io.BinaryGISModelReader;
 import opennlp.tools.namefind.NameFinderEventStream;
 import opennlp.tools.namefind.NameFinderME;
 import opennlp.tools.parser.Parse;
@@ -84,34 +84,19 @@ public class NameFinder {
     }
   }
   
-  private static Map[] createPrevTokenMaps(NameFinder[] finders){
-    Map[] prevTokenMaps = new HashMap[finders.length];
-    for (int fi = 0, fl = finders.length; fi < fl; fi++) {
-      prevTokenMaps[fi]=new HashMap();
-    }
-    return prevTokenMaps;
-  }
-  
-  private static void clearPrevTokenMaps(Map[] prevTokenMaps) {
-    for (int mi = 0, ml = prevTokenMaps.length; mi < ml; mi++) {
-      prevTokenMaps[mi].clear();
+  private static void clearPrevTokenMaps(NameFinder[] finders) {
+    for (int mi = 0; mi < finders.length; mi++) {
+      finders[mi].nameFinder.clearAdaptiveData();
     }
   }
-  
-  private static void updatePrevTokenMaps(Map[] prevTokenMaps, String[] tokens, Span[][] nameSpans) {
-    for (int mi = 0, ml = prevTokenMaps.length; mi < ml; mi++) {
-      NameFinderEventStream.updatePrevMap(tokens, nameSpans[mi], prevTokenMaps[mi]);
-    }
-  }
-
 
   private static void processParse(NameFinder[] finders, String[] tags, BufferedReader input) throws IOException {
     Span[][] nameSpans = new Span[finders.length][];
-    Map[] prevTokenMaps = createPrevTokenMaps(finders);
+    
     for (String line = input.readLine(); null != line; line = input.readLine()) {
       if (line.equals("")) {
         System.out.println();
-        clearPrevTokenMaps(prevTokenMaps);
+        clearPrevTokenMaps(finders);
         continue;
       }
       Parse p = Parse.parseParse(line);
@@ -122,10 +107,10 @@ public class NameFinder {
       }
       //System.err.println(java.util.Arrays.asList(tokens));
       for (int fi = 0, fl = finders.length; fi < fl; fi++) {
-        nameSpans[fi] = finders[fi].nameFinder.find(tokens, NameFinderEventStream.additionalContext(tokens,prevTokenMaps[fi]));
+        nameSpans[fi] = finders[fi].nameFinder.find(tokens);
         //System.err.println("EnglishNameFinder.processParse: "+tags[fi] + " " + java.util.Arrays.asList(finderTags[fi]));
       }
-      updatePrevTokenMaps(prevTokenMaps,tokens,nameSpans);
+      
       for (int fi = 0, fl = finders.length; fi < fl; fi++) {
         addNames(tags[fi],nameSpans[fi],tagNodes);
       }
@@ -136,29 +121,28 @@ public class NameFinder {
   /**
    * Adds sgml style name tags to the specified input buffer and outputs this information to stdout. 
    * @param finders The name finders to be used.
-   * @param tags The tag names for the coresponding name finder.
+   * @param tags The tag names for the corresponding name finder.
    * @param input The input reader.
    * @throws IOException
    */
   private static void processText(NameFinder[] finders, String[] tags, BufferedReader input) throws IOException {
     Span[][] nameSpans = new Span[finders.length][];
     String[][] nameOutcomes = new String[finders.length][];
-    Map[] prevTokenMaps = createPrevTokenMaps(finders);
     opennlp.tools.tokenize.Tokenizer tokenizer = new SimpleTokenizer();
     for (String line = input.readLine(); null != line; line = input.readLine()) {
       if (line.equals("")) {
-        clearPrevTokenMaps(prevTokenMaps);
+        clearPrevTokenMaps(finders);
         System.out.println();
         continue;
       }
       Span[] spans = tokenizer.tokenizePos(line);
       String[] tokens = Span.spansToStrings(spans,line);
       for (int fi = 0, fl = finders.length; fi < fl; fi++) {
-        nameSpans[fi] = finders[fi].nameFinder.find(tokens,NameFinderEventStream.additionalContext(tokens,prevTokenMaps[fi]));
+        nameSpans[fi] = finders[fi].nameFinder.find(tokens);
         //System.err.println("EnglighNameFinder.processText: "+tags[fi] + " " + java.util.Arrays.asList(finderTags[fi]));
         nameOutcomes[fi] = NameFinderEventStream.generateOutcomes(nameSpans[fi], tokens.length);
       }
-      updatePrevTokenMaps(prevTokenMaps,tokens,nameSpans);
+      
       for (int ti = 0, tl = tokens.length; ti < tl; ti++) {
         for (int fi = 0, fl = finders.length; fi < fl; fi++) {
           //check for end tags
@@ -218,7 +202,7 @@ public class NameFinder {
     String[] names = new String[args.length-ai];
     for (int fi=0; ai < args.length; ai++,fi++) {
       String modelName = args[ai];
-      finders[fi] = new NameFinder(new PooledGISModelReader(new File(modelName)).getModel());
+      finders[fi] = new NameFinder(new BinaryGISModelReader(new File(modelName)).getModel());
       int nameStart = modelName.lastIndexOf(System.getProperty("file.separator")) + 1;
       int nameEnd = modelName.indexOf('.', nameStart);
       if (nameEnd == -1) {

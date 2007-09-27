@@ -16,6 +16,10 @@ public class NameSampleDataStream implements DataStream {
   }
 
   public Object nextToken() {
-    return new NameSample((String) in.nextToken());
+    
+    String token = (String) in.nextToken();
+    
+    // clear adaptive data for every empty line
+    return new NameSample(token, token.length() == 0);
   }
 }

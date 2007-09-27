@@ -37,7 +37,7 @@ import opennlp.tools.util.Span;
 /**
  * Class for creating a maximum-entropy-based name finder.  
  */
-public class NameFinderME implements DocumentNameFinder, TokenNameFinder {
+public class NameFinderME implements TokenNameFinder {
 
   private static String[][] EMPTY = new String[0][0];
   
@@ -131,22 +131,9 @@ public class NameFinderME implements DocumentNameFinder, TokenNameFinder {
     contextGenerator.addFeatureGenerator(new WindowFeatureGenerator(additionalContextFeatureGenerator, 8, 8));
     beam = new NameBeamSearch(beamSize, cg, mod, beamSize);
   }
-  
-  /* (non-Javadoc)
-   * @see opennlp.tools.namefind.DocumentNameFinder#find(java.lang.String[][])
-   */
-  public Span[][] find(String[][] document) {
-    Map prevMap = new HashMap();
-    Span[][] spans = new Span[document.length][];
-    for (int si=0;si<document.length;si++) {
-      Span[] names = find(document[si],NameFinderEventStream.additionalContext(document[si],prevMap));
-      spans[si] = names;
-    }
-    return spans;
-  }
-    
+
   public Span[] find(String[] tokens) {
-    return find(tokens,EMPTY);
+    return find(tokens, EMPTY);
   }
   
   /** Generates name tags for the given sequence, typically a sentence, returning token spans for any identified names.
@@ -159,10 +146,12 @@ public class NameFinderME implements DocumentNameFinder, TokenNameFinder {
     bestSequence = beam.bestSequence(tokens, additionalContext);
     List c = bestSequence.getOutcomes();
     
+    contextGenerator.updateAdaptiveData(tokens, (String[]) c.toArray(new String[c.size()]));
+    
     int start = -1;
     int end = -1;
     List spans = new ArrayList(tokens.length);
-    for (int li = 0;li<c.size();li++) {
+    for (int li = 0; li < c.size(); li++) {
       String chunkTag = (String) c.get(li);
       if (chunkTag.equals(NameFinderME.START)) {
         if (start != -1) {
@@ -192,6 +181,15 @@ public class NameFinderME implements DocumentNameFinder, TokenNameFinder {
     return (Span[]) spans.toArray(new Span[spans.size()]);
   }
   
+  /**
+   * Forgets all adaptive data which was collected during previous
+   * calls to one of the find methods.
+   * 
+   * This method is typical called at the end of a document.
+   */
+  public void clearAdaptiveData() {
+   contextGenerator.clearAdaptiveData();
+  }
   
   /**
    * Populates the specified array with the probabilities of the last decoded

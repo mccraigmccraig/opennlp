@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////////
-//Copyright (C) 2003 Thomas Morton
+//Copyright (C) 2007 OpenNlp
 // 
 //This library is free software; you can redistribute it and/or
 //modify it under the terms of the GNU Lesser General Public
@@ -15,19 +15,37 @@
 //License along with this program; if not, write to the Free Software
 //Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 //////////////////////////////////////////////////////////////////////////////
-
 package opennlp.tools.namefind;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
- * Generates a feature which contains the token itself.
+ * This {@link FeatureGenerator} generates previous decision features.
  */
-public class TokenFeatureGenerator extends FeatureGenerator {
+public class PreviousMapFeatureGenerator implements AdaptiveFeatureGenerator {
 
-  private static final String WORD_PREFIX = "w";
-
+  private Map previousMap = new HashMap();
+  
   public void createFeatures(List features, String[] tokens, String[] preds, int index) {
-    features.add(WORD_PREFIX + "=" + tokens[index].toLowerCase());
+    tokens[index] = "pd=" + (String) previousMap.get(tokens[index]);
+  }
+  
+  /**
+   * Generates previous decision features for the token based on contents of the previous map.
+   */
+  public void updateAdaptiveData(String[] tokens, String[] outcomes) {
+    
+    for (int i = 0; i < tokens.length; i++) {
+      previousMap.put(tokens[i], outcomes[i]);
+    }
+  }
+  
+  /**
+   * Clears the previous map.
+   */
+  public void clearAdaptiveData() {
+    previousMap.clear();
   }
 }
