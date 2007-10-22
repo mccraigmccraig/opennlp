@@ -33,13 +33,15 @@ public class NameFinderEventStream implements EventStream {
 
   private AdditionalContextFeatureGenerator additionalContextFeatureGenerator = new AdditionalContextFeatureGenerator();
 
-  public NameFinderEventStream(DataStream dataStream,
-      NameContextGenerator contextGenerator) {
+  /** 
+   * Creates a new name finder event stream using the specified data stream and context generator.
+   * @param dataStream The data stream of events.
+   * @param contextGenerator The context generator used to generate features for the event stream.
+   */
+  public NameFinderEventStream(DataStream dataStream, NameContextGenerator contextGenerator) {
     this.dataStream = dataStream;
     this.contextGenerator = contextGenerator;
-
-    this.contextGenerator.addFeatureGenerator(new WindowFeatureGenerator(
-        additionalContextFeatureGenerator, 8, 8));
+    this.contextGenerator.addFeatureGenerator(new WindowFeatureGenerator(additionalContextFeatureGenerator, 8, 8));
   }
 
   public NameFinderEventStream(DataStream dataStream) {
@@ -75,8 +77,8 @@ public class NameFinderEventStream implements EventStream {
       
       if (sample.isClearAdaptiveDataSet()) {
         contextGenerator.clearAdaptiveData();
+        sample = (NameSample) dataStream.nextToken();
       }
-      
       String outcomes[] = generateOutcomes(sample.names(),sample.sentence().length);
       additionalContextFeatureGenerator.setCurrentContext(sample.additionalContext());
       String[] tokens = new String[sample.sentence().length]; 
@@ -84,9 +86,9 @@ public class NameFinderEventStream implements EventStream {
       for (int i = 0; i < sample.sentence().length; i++) {
         tokens[i] = sample.sentence()[i].getToken();
       }
-      
+
       contextGenerator.updateAdaptiveData(tokens, outcomes);
-      
+
       List events = new ArrayList(outcomes.length);
       String[][] ac = additionalContext(tokens,prevTags);
       for (int i = 0; i < outcomes.length; i++) {
@@ -97,7 +99,7 @@ public class NameFinderEventStream implements EventStream {
     }
   }
     
-    public boolean hasNext() {
+  public boolean hasNext() {
 
     // check if iterator has next event
     if (events.hasNext()) {
@@ -109,7 +111,7 @@ public class NameFinderEventStream implements EventStream {
     }
   }
 
-    public Event nextEvent() {
+  public Event nextEvent() {
     // call to hasNext() is necessary for reloading elements
     // if the events iterator was already consumed
     if (!events.hasNext()) {
@@ -120,21 +122,21 @@ public class NameFinderEventStream implements EventStream {
   }
     
     
-    /**
-     * Generated previous decision features for each token based on contents of the specifed map.
-     * @param tokens The token for which the context is generated.
-     * @param prevMap A mapping of tokens to their previous decisions.
-     * @return An additional context arrary with features for each token.
-     */
-    public static String[][] additionalContext(String[] tokens, Map prevMap) {
-      String[][] ac = new String[tokens.length][1];
-      for (int ti=0;ti<tokens.length;ti++) {
-        String pt = (String) prevMap.get(tokens[ti]);
-        ac[ti][0]="pd="+pt;
-      }
-      return ac;
-    
+  /**
+   * Generated previous decision features for each token based on contents of the specifed map.
+   * @param tokens The token for which the context is generated.
+   * @param prevMap A mapping of tokens to their previous decisions.
+   * @return An additional context arrary with features for each token.
+   */
+  public static String[][] additionalContext(String[] tokens, Map prevMap) {
+    String[][] ac = new String[tokens.length][1];
+    for (int ti=0;ti<tokens.length;ti++) {
+      String pt = (String) prevMap.get(tokens[ti]);
+      ac[ti][0]="pd="+pt;
     }
+    return ac;
+
+  }
 
   // TODO: fix and test it
   public static final void main(String[] args) throws java.io.IOException {
