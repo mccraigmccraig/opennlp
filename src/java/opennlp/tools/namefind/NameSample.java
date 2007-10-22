@@ -63,32 +63,40 @@ public class NameSample {
    * @param clearAdaptiveData
    */
   public NameSample(String taggedTokens, boolean clearAdaptiveData) {
-
-    String[] parts = taggedTokens.split(" ");
-
-    List tokenList = new ArrayList(parts.length);
-    List nameList = new ArrayList();
-
-    int startIndex = -1;
-
-    for (int pi = 0; pi < parts.length; pi++) {
-      if (parts[pi].equals(START_TAG)) {
-        startIndex = pi;
-      } else if (parts[pi].equals(END_TAG)) {
-        // create name
-        nameList.add(new Span(startIndex, pi));
-      } else {
-        tokenList.add(Token.create(parts[pi]));
-      }
-    }
-
-    sentence = (Token[]) tokenList.toArray(new Token[tokenList.size()]);
-
-    names = (Span[]) nameList.toArray(new Span[nameList.size()]);
-
+    this.isClearAdaptiveData = clearAdaptiveData;
     this.additionalContext = null;
-    
-    isClearAdaptiveData = false;
+
+    if (!clearAdaptiveData) {
+      String[] parts = taggedTokens.split(" ");
+
+      List tokenList = new ArrayList(parts.length);
+      List nameList = new ArrayList();
+
+      int startIndex = -1;
+      int wordIndex = 0;
+      for (int pi = 0; pi < parts.length; pi++) {
+        if (parts[pi].equals(START_TAG)) {
+          startIndex = wordIndex;
+        } 
+        else if (parts[pi].equals(END_TAG)) {
+          // create name
+          nameList.add(new Span(startIndex, wordIndex));
+        } 
+        else {
+          tokenList.add(Token.create(parts[pi]));
+          wordIndex++;
+        }
+      }
+
+      sentence = (Token[]) tokenList.toArray(new Token[tokenList.size()]);
+
+      names = (Span[]) nameList.toArray(new Span[nameList.size()]);
+
+    }
+    else {
+      this.sentence = null;
+      this.names = null;
+    }
   }
 
   public Token[] sentence() {
