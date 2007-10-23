@@ -74,11 +74,11 @@ public class NameFinderEventStream implements EventStream {
   private void createNewEvents() {
     if (dataStream.hasNext()) {
       NameSample sample = (NameSample) dataStream.nextToken();
-      
-      if (sample.isClearAdaptiveDataSet()) {
+      while (sample.isClearAdaptiveDataSet()) {
         contextGenerator.clearAdaptiveData();
         sample = (NameSample) dataStream.nextToken();
       }
+      //System.err.println(sample);
       String outcomes[] = generateOutcomes(sample.names(),sample.sentence().length);
       additionalContextFeatureGenerator.setCurrentContext(sample.additionalContext());
       String[] tokens = new String[sample.sentence().length]; 
