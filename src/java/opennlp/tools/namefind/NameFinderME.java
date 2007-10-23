@@ -226,7 +226,7 @@ public class NameFinderME implements TokenNameFinder {
 
   /**
    * Trains a new named entity model on the specified training file using the specified encoding to read it in. 
-   * @param args [-encoding encoding] training_file 
+   * @param args [-encoding encoding] training_file model_file
    * @throws java.io.IOException
    */
   public static void main(String[] args) throws java.io.IOException {
