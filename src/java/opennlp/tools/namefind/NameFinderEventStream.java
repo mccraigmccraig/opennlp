@@ -11,10 +11,6 @@ import java.util.NoSuchElementException;
 import opennlp.maxent.DataStream;
 import opennlp.maxent.Event;
 import opennlp.maxent.EventStream;
-import opennlp.tools.namefind.NameContextGenerator;
-import opennlp.tools.namefind.NameFinderEventStream;
-import opennlp.tools.namefind.NameFinderME;
-import opennlp.tools.namefind.NameSample;
 import opennlp.tools.util.Span;
 
 /**
@@ -41,7 +37,7 @@ public class NameFinderEventStream implements EventStream {
   public NameFinderEventStream(DataStream dataStream, NameContextGenerator contextGenerator) {
     this.dataStream = dataStream;
     this.contextGenerator = contextGenerator;
-    this.contextGenerator.addFeatureGenerator(new WindowFeatureGenerator(additionalContextFeatureGenerator, 8, 8));
+    this.contextGenerator.addFeatureGenerator(new WindowFeatureGenerator(additionalContextFeatureGenerator, 8, 8,true));
   }
 
   public NameFinderEventStream(DataStream dataStream) {
@@ -76,26 +72,26 @@ public class NameFinderEventStream implements EventStream {
       NameSample sample = (NameSample) dataStream.nextToken();
       while (sample.isClearAdaptiveDataSet()) {
         contextGenerator.clearAdaptiveData();
-        sample = (NameSample) dataStream.nextToken();
+        if (dataStream.hasNext()) {
+          sample = (NameSample) dataStream.nextToken();
+        }
+        else {
+          return;
+        }
       }
       //System.err.println(sample);
       String outcomes[] = generateOutcomes(sample.names(),sample.sentence().length);
       additionalContextFeatureGenerator.setCurrentContext(sample.additionalContext());
       String[] tokens = new String[sample.sentence().length]; 
-      // TODO: move before or after context generation ???
+      List events = new ArrayList(outcomes.length);
       for (int i = 0; i < sample.sentence().length; i++) {
         tokens[i] = sample.sentence()[i].getToken();
       }
-
-      contextGenerator.updateAdaptiveData(tokens, outcomes);
-
-      List events = new ArrayList(outcomes.length);
-      String[][] ac = additionalContext(tokens,prevTags);
       for (int i = 0; i < outcomes.length; i++) {
-        events.add(new Event((String) outcomes[i], contextGenerator.getContext(i, sample.sentence(), outcomes,ac)));
+        events.add(new Event((String) outcomes[i], contextGenerator.getContext(i, sample.sentence(), outcomes,null)));
       }
-
       this.events = events.iterator();
+      contextGenerator.updateAdaptiveData(tokens, outcomes);
     }
   }
     
@@ -138,19 +134,14 @@ public class NameFinderEventStream implements EventStream {
 
   }
 
-  // TODO: fix and test it
   public static final void main(String[] args) throws java.io.IOException {
-    if (args.length == 0) {
-      System.err.println("Usage: NameFinderEventStream trainfiles");
+    if (args.length != 0) {
+      System.err.println("Usage: NameFinderEventStream < training files");
       System.exit(1);
     }
-    for (int ai = 0; ai < args.length; ai++) {
-      EventStream es = new NameFinderEventStream(new NameSampleDataStream(
-          new opennlp.maxent.PlainTextByLineDataStream(new java.io.FileReader(
-              args[ai]))));
-      while (es.hasNext()) {
-        System.out.println(es.nextEvent());
-      }
+    EventStream es = new NameFinderEventStream(new NameSampleDataStream(new opennlp.maxent.PlainTextByLineDataStream(new java.io.InputStreamReader(System.in))));
+    while (es.hasNext()) {
+      System.out.println(es.nextEvent());
     }
   }
 }
