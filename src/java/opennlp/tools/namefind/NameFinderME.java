@@ -21,9 +21,7 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import opennlp.maxent.EventStream;
 import opennlp.maxent.GIS;
@@ -69,10 +67,8 @@ public class NameFinderME implements TokenNameFinder {
      * sequence. This can be used to implement constraints on what sequences are
      * valid.
      * 
-     * @param outcome
-     *          The outcome.
-     * @param sequence
-     *          The preceding sequence of outcomes assignments.
+     * @param outcome The outcome.
+     * @param sequence The preceding sequence of outcomes assignments.
      * @return true is the outcome is valid for the sequence, false otherwise.
      */
     protected boolean validSequence(int size, Object[] inputSequence,
@@ -106,7 +102,7 @@ public class NameFinderME implements TokenNameFinder {
    * @param mod The model to be used to find names.
    */
   public NameFinderME(MaxentModel mod) {
-    this(mod, new NameContextGenerator(10), 10);
+    this(mod, new NameContextGenerator(), 10);
   }
 
   /**
@@ -128,7 +124,7 @@ public class NameFinderME implements TokenNameFinder {
     model = mod;
     contextGenerator = cg;
     
-    contextGenerator.addFeatureGenerator(new WindowFeatureGenerator(additionalContextFeatureGenerator, 8, 8));
+    contextGenerator.addFeatureGenerator(new WindowFeatureGenerator(additionalContextFeatureGenerator, 8, 8,true));
     beam = new NameBeamSearch(beamSize, cg, mod, beamSize);
   }
 
@@ -277,7 +273,7 @@ public class NameFinderME implements TokenNameFinder {
       es = new NameFinderEventStream(new NameSampleDataStream(new opennlp.maxent.PlainTextByLineDataStream(new java.io.FileReader(inFile))));
     }
     mod = train(es, iterations, cutoff);
-    System.out.println("Saving the model as: " + args[1]);
+    System.out.println("Saving the model as: " + outFile.toString());
     new opennlp.maxent.io.SuffixSensitiveGISModelWriter(mod, outFile).persist();
   }
 }
