@@ -32,7 +32,7 @@ class AdditionalContextFeatureGenerator extends FeatureGenerator {
 
   public void createFeatures(List features, String[] tokens, String[] preds, int index) {
 
-    if (additionalContext != null) {
+    if (additionalContext != null && additionalContext.length != 0) {
 
       String[] context = additionalContext[index];
 
