@@ -29,14 +29,9 @@ import opennlp.tools.util.Sequence;
  * Class for determining contextual features for a tag/chunk style 
  * named-entity recognizer.
  * 
- * @version $Revision: 1.10 $, $Date: 2007/09/27 06:19:15 $
+ * @version $Revision: 1.11 $, $Date: 2007/11/05 13:10:03 $
  */
 public class NameContextGenerator implements BeamSearchContextGenerator {
-  
-  private Cache contextsCache;
-  private Object wordsKey;
-  private int pi = -1;
-  private List prevStaticFeatures;
   
   private AdaptiveFeatureGenerator featureGenerators[];
   
@@ -44,18 +39,13 @@ public class NameContextGenerator implements BeamSearchContextGenerator {
    * Creates a name context generator.
    */
   public NameContextGenerator() {
-    this(0, null);
-  }
-
-  public NameContextGenerator(int cacheSize) {
-    this(cacheSize, null);
+    this(null);
   }
   
   /**
    * Creates a name context generator with the specified cache size.
    */
-  public NameContextGenerator(int cacheSize, 
-      AdaptiveFeatureGenerator featureGenerators[]) {
+  public NameContextGenerator(AdaptiveFeatureGenerator featureGenerators[]) {
     
     if (featureGenerators != null) {
       this.featureGenerators = featureGenerators;
@@ -63,14 +53,11 @@ public class NameContextGenerator implements BeamSearchContextGenerator {
     else {
       this.featureGenerators =  new AdaptiveFeatureGenerator[] 
         {
-          new WindowFeatureGenerator(new TokenFeatureGenerator(), 2, 2),
-          new WindowFeatureGenerator(new TokenClassFeatureGenerator(), 2, 2)
+          new WindowFeatureGenerator(new TokenFeatureGenerator(), 2, 2,true),
+          new WindowFeatureGenerator(new TokenClassFeatureGenerator(), 2, 2,true),
+          new PreviousMapFeatureGenerator()
         };
-    }
-    
-    if (cacheSize > 0) {
-      contextsCache = new Cache(cacheSize);
-    }
+    }    
   }
   
   void addFeatureGenerator(AdaptiveFeatureGenerator generator) {
@@ -120,65 +107,47 @@ public class NameContextGenerator implements BeamSearchContextGenerator {
 
   /**
    * Return the context for finding names at the specified index.
-   * @param i The index of the token in the specified toks array for which the context should be constructed. 
+   * @param index The index of the token in the specified toks array for which the context should be constructed. 
    * @param toks The tokens of the sentence.  The <code>toString</code> methods of these objects should return the token text.
    * @param preds The previous decisions made in the tagging of this sequence.  Only indices less than i will be examined.
-   * @param prevTags  A mapping between tokens and the previous outcome for these tokens. 
+   * @param additionalContext Addition features which may be based on a context outside of the sentence. 
    * @return the context for finding names at the specified index.
    */
-  public String[] getContext(int i, Object[] toks, String[] preds, String[][] additionalContext) {
+  public String[] getContext(int index, Object[] toks, String[] preds, String[][] additionalContext) {
     String po=NameFinderME.OTHER;
     String ppo=NameFinderME.OTHER;
-    
-    if (i > 1){
-      ppo = preds[i-2];
-    }
-    
-    if (i > 0) {
-      po = preds[i-1];
-    }
-    
-    String cacheKey = i + po + ppo;
-    if (contextsCache != null) {
-      if (wordsKey == toks) {
-        String[] cachedContexts = (String[]) contextsCache.get(cacheKey);
-        if (cachedContexts != null) {
-          return cachedContexts;
-        }
-      } else {
-        contextsCache.clear();
-        wordsKey = toks;
-      }
-    }
-    List features;
-    if (wordsKey == toks && i == pi) {
-      features = prevStaticFeatures;
-    } else {
-      features = getStaticFeatures(toks, preds, i);
-      if (additionalContext != null) {
-        for (int aci = 0; aci < additionalContext[i].length; aci++) {
-          features.add(additionalContext[i][aci]);
-        }
-      }
-      if (i == 0) {
-        features.add("df=it");
-      }
-      pi = i;
-      prevStaticFeatures = features;
+
+    if (index > 1){
+      ppo = preds[index-2];
     }
 
+    if (index > 0) {
+      po = preds[index-1];
+    }
+
+    List features = new ArrayList();
+    String tokens[] = new String[toks.length];  
+    for (int i = 0; i < toks.length; i++) {
+      tokens[i] = toks[i].toString();
+    }
+    for (int i = 0; i < featureGenerators.length; i++) {
+      featureGenerators[i].createFeatures(features, tokens, preds, index);
+    }    
+    if (additionalContext != null && additionalContext.length != 0) {
+      for (int aci = 0; aci < additionalContext[index].length; aci++) {
+        features.add(additionalContext[index][aci]);
+      }
+    }
+    if (index == 0) {
+      features.add("df=it");
+    }
     String[] contexts = (String[]) features.toArray(new String[features.size() + 4]);
 
-    contexts[features.size()] = "po= " + po;
-    contexts[features.size() + 1] = "pow=" + po + toks[i];
+    contexts[features.size()] = "po=" + po;
+    contexts[features.size() + 1] = "pow=" + po + toks[index];
     contexts[features.size() + 2] = "powf=" + po + 
-        FeatureGeneratorUtil.tokenFeature(toks[i].toString());
+    FeatureGeneratorUtil.tokenFeature(toks[index].toString());
     contexts[features.size() + 3] = "ppo=" + ppo;
-    
-    if (contextsCache != null) {
-      contextsCache.put(cacheKey,contexts);
-    }
-    
     return contexts;
   }
 
@@ -189,7 +158,7 @@ public class NameContextGenerator implements BeamSearchContextGenerator {
     * features.  This method is called by <code>search</code>.
     *
     * @param toks The list of tokens being processed.
-    * @param i The index of the token whose features should be returned.
+    * @param index The index of the token whose features should be returned.
     * @return a list of the features for <code>toks[i]</code> that can
     * be safely cached.
     */
@@ -207,5 +176,5 @@ public class NameContextGenerator implements BeamSearchContextGenerator {
     }
     
     return feats;
-  }
+  }  
 }
