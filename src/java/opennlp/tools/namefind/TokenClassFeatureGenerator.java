@@ -9,10 +9,23 @@ import java.util.List;
 public class TokenClassFeatureGenerator extends FeatureGenerator {
 
   private static final String TOKEN_CLASS_PREFIX = "wc";
+  private static final String TOKEN_AND_CLASS_PREFIX = "w&c";
 
+  private boolean generateWordAndClassFeature;
+  
+  public TokenClassFeatureGenerator() {
+    this(false);
+  }
+  
+  public TokenClassFeatureGenerator(boolean genearteWordAndClassFeature) {
+    this.generateWordAndClassFeature = genearteWordAndClassFeature;
+  }
+  
   public void createFeatures(List features, String[] tokens, String[] preds, int index) {
     String wordClass = FeatureGeneratorUtil.tokenFeature(tokens[index]);
-
     features.add(TOKEN_CLASS_PREFIX + "=" + wordClass);
+    if (generateWordAndClassFeature) {
+      features.add(TOKEN_AND_CLASS_PREFIX + "=" + tokens[index]+","+wordClass);
+    }
   }
 }

@@ -29,7 +29,7 @@ import opennlp.tools.util.Sequence;
  * Class for determining contextual features for a tag/chunk style 
  * named-entity recognizer.
  * 
- * @version $Revision: 1.11 $, $Date: 2007/11/05 13:10:03 $
+ * @version $Revision: 1.12 $, $Date: 2008/01/22 05:13:24 $
  */
 public class NameContextGenerator implements BeamSearchContextGenerator {
   
@@ -54,7 +54,7 @@ public class NameContextGenerator implements BeamSearchContextGenerator {
       this.featureGenerators =  new AdaptiveFeatureGenerator[] 
         {
           new WindowFeatureGenerator(new TokenFeatureGenerator(), 2, 2,true),
-          new WindowFeatureGenerator(new TokenClassFeatureGenerator(), 2, 2,true),
+          new WindowFeatureGenerator(new TokenClassFeatureGenerator(true), 2, 2,true),
           new PreviousMapFeatureGenerator()
         };
     }    
@@ -126,6 +126,7 @@ public class NameContextGenerator implements BeamSearchContextGenerator {
     }
 
     List features = new ArrayList();
+    features.add("def");
     String tokens[] = new String[toks.length];  
     for (int i = 0; i < toks.length; i++) {
       tokens[i] = toks[i].toString();
@@ -139,14 +140,13 @@ public class NameContextGenerator implements BeamSearchContextGenerator {
       }
     }
     if (index == 0) {
-      features.add("df=it");
+      features.add("fwis"); //first word in sentence
     }
     String[] contexts = (String[]) features.toArray(new String[features.size() + 4]);
 
     contexts[features.size()] = "po=" + po;
-    contexts[features.size() + 1] = "pow=" + po + toks[index];
-    contexts[features.size() + 2] = "powf=" + po + 
-    FeatureGeneratorUtil.tokenFeature(toks[index].toString());
+    contexts[features.size() + 1] = "pow=" + po + "," + toks[index];
+    contexts[features.size() + 2] = "powf=" + po + "," + FeatureGeneratorUtil.tokenFeature(toks[index].toString());
     contexts[features.size() + 3] = "ppo=" + ppo;
     return contexts;
   }
