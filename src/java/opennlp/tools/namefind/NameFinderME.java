@@ -210,6 +210,25 @@ public class NameFinderME implements TokenNameFinder {
    public double[] probs() {
      return bestSequence.getProbs();
    }
+   
+   /**
+    * Returns an array of probabilities for each of the specified spans which is the product 
+    * the probabilities for each of the outcomes which make up the span. 
+    * @param spans The spans of the names for which probabilities are desired.
+    * @return an array of probabilities for each of the specified spans.
+    */
+   public double[] probs(Span[] spans) {
+     double[] sprobs = new double[spans.length];
+     double[] probs = bestSequence.getProbs();
+     for (int si=0;si<spans.length;si++) {
+       double p = 1;
+       for (int oi=spans[si].getStart();oi<spans[si].getEnd();oi++) {
+         p*=probs[oi];
+       }
+       sprobs[si] = p;
+     }
+     return sprobs;
+   }
   
   public static GISModel train(EventStream es, int iterations, int cut) throws IOException {
     return GIS.trainModel(iterations, new TwoPassDataIndexer(es, cut));

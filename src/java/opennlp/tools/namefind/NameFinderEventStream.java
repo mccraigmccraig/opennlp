@@ -2,13 +2,11 @@ package opennlp.tools.namefind;
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.NoSuchElementException;
 
-import opennlp.maxent.DataStream;
 import opennlp.maxent.Event;
 import opennlp.maxent.EventStream;
 import opennlp.tools.util.Span;
@@ -19,13 +17,11 @@ import opennlp.tools.util.Span;
  */
 public class NameFinderEventStream implements EventStream {
 
-  private DataStream dataStream;
+  private NameSampleStream nameSampleStream;
 
   private Iterator events = Collections.EMPTY_LIST.iterator();
 
   private NameContextGenerator contextGenerator;
-
-  private Map prevTags = new HashMap();
 
   private AdditionalContextFeatureGenerator additionalContextFeatureGenerator = new AdditionalContextFeatureGenerator();
 
@@ -34,13 +30,13 @@ public class NameFinderEventStream implements EventStream {
    * @param dataStream The data stream of events.
    * @param contextGenerator The context generator used to generate features for the event stream.
    */
-  public NameFinderEventStream(DataStream dataStream, NameContextGenerator contextGenerator) {
-    this.dataStream = dataStream;
+  public NameFinderEventStream(NameSampleStream dataStream, NameContextGenerator contextGenerator) {
+    this.nameSampleStream = dataStream;
     this.contextGenerator = contextGenerator;
     this.contextGenerator.addFeatureGenerator(new WindowFeatureGenerator(additionalContextFeatureGenerator, 8, 8,true));
   }
 
-  public NameFinderEventStream(DataStream dataStream) {
+  public NameFinderEventStream(NameSampleStream dataStream) {
     this(dataStream, new NameContextGenerator());
   }
   
@@ -68,12 +64,12 @@ public class NameFinderEventStream implements EventStream {
   }
     
   private void createNewEvents() {
-    if (dataStream.hasNext()) {
-      NameSample sample = (NameSample) dataStream.nextToken();
+    if (nameSampleStream.hasNext()) {
+      NameSample sample = nameSampleStream.nextNameSample();
       while (sample.isClearAdaptiveDataSet()) {
         contextGenerator.clearAdaptiveData();
-        if (dataStream.hasNext()) {
-          sample = (NameSample) dataStream.nextToken();
+        if (nameSampleStream.hasNext()) {
+          sample = (NameSample) nameSampleStream.nextNameSample();
         }
         else {
           return;
