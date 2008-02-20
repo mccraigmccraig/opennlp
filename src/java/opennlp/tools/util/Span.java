@@ -222,4 +222,17 @@ public class Span implements Comparable {
     
     return tokens;
   }
+  
+  public static String[] spansToStrings(Span[] spans, String[] tokens) {
+    String[] chunks = new String[spans.length];
+    StringBuffer cb = new StringBuffer();
+    for (int si = 0, sl = spans.length; si < sl; si++) {
+      cb.setLength(0);
+      for (int ti=spans[si].getStart();ti<spans[si].getEnd();ti++) {
+        cb.append(tokens[ti]).append(" ");
+      }
+      chunks[si]=cb.substring(0, cb.length()-1);
+    }
+    return chunks;
+  }
 }
