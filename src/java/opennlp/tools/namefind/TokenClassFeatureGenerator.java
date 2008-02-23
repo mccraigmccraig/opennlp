@@ -25,7 +25,7 @@ public class TokenClassFeatureGenerator extends FeatureGenerator {
     String wordClass = FeatureGeneratorUtil.tokenFeature(tokens[index]);
     features.add(TOKEN_CLASS_PREFIX + "=" + wordClass);
     if (generateWordAndClassFeature) {
-      features.add(TOKEN_AND_CLASS_PREFIX + "=" + tokens[index]+","+wordClass);
+      features.add(TOKEN_AND_CLASS_PREFIX + "=" + tokens[index].toLowerCase()+","+wordClass);
     }
   }
 }
