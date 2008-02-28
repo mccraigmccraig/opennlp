@@ -33,7 +33,7 @@ public class NameFinderEventStream implements EventStream {
   public NameFinderEventStream(NameSampleStream dataStream, NameContextGenerator contextGenerator) {
     this.nameSampleStream = dataStream;
     this.contextGenerator = contextGenerator;
-    this.contextGenerator.addFeatureGenerator(new WindowFeatureGenerator(additionalContextFeatureGenerator, 8, 8,true));
+    this.contextGenerator.addFeatureGenerator(new WindowFeatureGenerator(additionalContextFeatureGenerator, 8, 8));
   }
 
   public NameFinderEventStream(NameSampleStream dataStream) {

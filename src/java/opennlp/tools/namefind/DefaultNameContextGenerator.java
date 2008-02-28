@@ -22,7 +22,6 @@ import java.util.List;
 
 import opennlp.tools.util.Sequence;
 
-
 /** 
  * Class for determining contextual features for a tag/chunk style 
  * named-entity recognizer.
@@ -35,10 +34,6 @@ public class DefaultNameContextGenerator implements NameContextGenerator {
   
   private static Object[] prevTokens;
   private static String[] prevStrings;
-  
-  /* Static feature generator which have no state and thus can be shared to improve caching. */
-  private static AdaptiveFeatureGenerator defaultTokenFeatureGenerator = new WindowFeatureGenerator(new TokenFeatureGenerator(), 2, 2,true);
-  private static AdaptiveFeatureGenerator defaultTokenClassGenerator = new WindowFeatureGenerator(new TokenClassFeatureGenerator(true), 2, 2,true);
   
   /**
    * Creates a name context generator.
@@ -56,12 +51,14 @@ public class DefaultNameContextGenerator implements NameContextGenerator {
       this.featureGenerators = featureGenerators;
     }
     else {
-      this.featureGenerators =  new AdaptiveFeatureGenerator[] 
-        {
-          defaultTokenFeatureGenerator,
-          defaultTokenClassGenerator,
-          new PreviousMapFeatureGenerator()
-        };
+      // use defaults
+      
+      this.featureGenerators =  new AdaptiveFeatureGenerator[1];
+      
+      this.featureGenerators[0] = new CachedFeatureGenerator(new AdaptiveFeatureGenerator[]{
+          new WindowFeatureGenerator(new TokenFeatureGenerator(), 2, 2), 
+          new WindowFeatureGenerator(new TokenClassFeatureGenerator(true), 2, 2), 
+          new PreviousMapFeatureGenerator()});
     }    
   }
   
@@ -162,32 +159,5 @@ public class DefaultNameContextGenerator implements NameContextGenerator {
     contexts[features.size() + 2] = "powf=" + po + "," + FeatureGeneratorUtil.tokenFeature(toks[index].toString());
     contexts[features.size() + 3] = "ppo=" + ppo;
     return contexts;
-  }
-
-  /**
-    * Returns a list of the features for <code>toks[i]</code> that can
-    * be safely cached.  In other words, return a list of all
-    * features that do not depend on previous outcome or decision
-    * features.  This method is called by <code>search</code>.
-    *
-    * @param toks The list of tokens being processed.
-    * @param index The index of the token whose features should be returned.
-    * @return a list of the features for <code>toks[i]</code> that can
-    * be safely cached.
-    */
-  private List getStaticFeatures(Object[] toks, String[] preds, int index) {
-    List feats = new ArrayList();
-    
-    String tokens[] = new String[toks.length];	
-    
-    for (int i = 0; i < toks.length; i++) {
-      tokens[i] = toks[i].toString();
-    }
-    
-    for (int i = 0; i < featureGenerators.length; i++) {
-      featureGenerators[i].createFeatures(feats, tokens, index, preds);
-    }
-    
-    return feats;
-  }  
+  } 
 }

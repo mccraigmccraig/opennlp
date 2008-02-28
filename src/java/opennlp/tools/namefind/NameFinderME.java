@@ -124,7 +124,7 @@ public class NameFinderME implements TokenNameFinder {
     model = mod;
     contextGenerator = cg;
     
-    contextGenerator.addFeatureGenerator(new WindowFeatureGenerator(additionalContextFeatureGenerator, 8, 8,true));
+    contextGenerator.addFeatureGenerator(new WindowFeatureGenerator(additionalContextFeatureGenerator, 8, 8));
     beam = new NameBeamSearch(beamSize, cg, mod, beamSize);
   }
 

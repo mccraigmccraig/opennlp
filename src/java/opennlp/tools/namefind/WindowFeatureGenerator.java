@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////////
-//Copyright (C) 2007 OpenNlp
+//Copyright (C) 2008 OpenNlp
 // 
 //This library is free software; you can redistribute it and/or
 //modify it under the terms of the GNU Lesser General Public
@@ -22,8 +22,6 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
-import opennlp.tools.util.Cache;
-
 /**
  * Generates previous and next features for a given {@link AdaptiveFeatureGenerator}.
  * The window size can be specified.
@@ -35,43 +33,33 @@ public class WindowFeatureGenerator implements AdaptiveFeatureGenerator {
   private final int prevWindowSize;
   private final int nextWindowSize;
   
-  private String[] prevTokens;
-  private boolean caching;
-  private Cache contextsCache;  
-
-  public WindowFeatureGenerator(AdaptiveFeatureGenerator generator, int prevWindowSize,  int nextWindowSize, boolean caching) {
+  /**
+   * Initializes the current instance with the given parameters.
+   * 
+   * @param generator
+   * @param prevWindowSize
+   * @param nextWindowSize
+   * @param caching
+   */
+  public WindowFeatureGenerator(AdaptiveFeatureGenerator generator, int prevWindowSize,  int nextWindowSize) {
     this.generator = generator;
     this.prevWindowSize = prevWindowSize;
     this.nextWindowSize = nextWindowSize;
-    this.caching = caching;
-    contextsCache = new Cache(100);
   }
   
+  /**
+   * Initializes the current instance. The previous and next window size is 5.
+   * 
+   * @param generator
+   */
   public WindowFeatureGenerator(AdaptiveFeatureGenerator generator) {
-    this(generator, 5, 5,true);
+    this(generator, 5, 5);
   }
   
   public void createFeatures(List features, String[] tokens, int index, String[] preds) {
     List cacheFeatures;
-    if (caching) {
-      if (tokens == prevTokens) {
-        cacheFeatures = (List) contextsCache.get(new Integer(index));
-        if (cacheFeatures != null) {
-          features.addAll(cacheFeatures);
-          return;
-        }
-      }
-      else {
-        contextsCache.clear();
-        prevTokens = tokens;
-      }
-    }
-    if (caching) {
-      cacheFeatures = new ArrayList();
-    }   
-    else {
       cacheFeatures = features;
-    }
+      
     // current features
     generator.createFeatures(cacheFeatures, tokens, index, preds);
 
@@ -102,10 +90,6 @@ public class WindowFeatureGenerator implements AdaptiveFeatureGenerator {
         }
       }
     }
-    if (caching) {
-      contextsCache.put(new Integer(index),cacheFeatures);
-      features.addAll(cacheFeatures);
-    }
   }
   
   public void updateAdaptiveData(String[] tokens, String[] outcomes) {
@@ -114,5 +98,10 @@ public class WindowFeatureGenerator implements AdaptiveFeatureGenerator {
   
   public void clearAdaptiveData() {
       generator.clearAdaptiveData();
+  }
+  
+  public String toString() {
+    return "Prev windwow size: " + prevWindowSize + 
+        ", Next window size: " + nextWindowSize;
   }
 }
