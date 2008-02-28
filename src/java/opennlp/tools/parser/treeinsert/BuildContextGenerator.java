@@ -46,6 +46,13 @@ public class BuildContextGenerator extends AbstractContextGenerator {
     return getContext((Parse[]) parts[0],((Integer)parts[1]).intValue());
   }
     
+  /**
+   * Returns the contexts/features for the decision to build a new constituent for the specified parse 
+   * at the specified index.
+   * @param constituents The constituents of the parse so far.
+   * @param index The index of the constituent where a build decision is being made.
+   * @return the contexts/features for the decision to build a new constituent.
+   */
   public String[] getContext(Parse[] constituents, int index) {
     Parse p_2 = null;
     Parse p_1 = null;
