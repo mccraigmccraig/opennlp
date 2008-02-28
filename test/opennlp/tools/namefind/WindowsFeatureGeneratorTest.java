@@ -28,14 +28,6 @@ import junit.framework.TestCase;
  */
 public class WindowsFeatureGeneratorTest extends TestCase {
 
-  private class IdentityFeatureGenerator extends FeatureGeneratorAdapter {
-
-    public void createFeatures(List features, String[] tokens, int index,
-        String[] previousOutcomes) {
-      features.add(tokens[index]);
-    }
-  }
-  
   private String[] testSentence = new String[] {"a", "b", "c", "d", 
       "e", "f", "g", "h"};
   
