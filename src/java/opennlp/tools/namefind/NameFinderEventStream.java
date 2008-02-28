@@ -65,11 +65,11 @@ public class NameFinderEventStream implements EventStream {
     
   private void createNewEvents() {
     if (nameSampleStream.hasNext()) {
-      NameSample sample = nameSampleStream.nextNameSample();
+      NameSample sample = nameSampleStream.next();
       while (sample.isClearAdaptiveDataSet()) {
         contextGenerator.clearAdaptiveData();
         if (nameSampleStream.hasNext()) {
-          sample = (NameSample) nameSampleStream.nextNameSample();
+          sample = (NameSample) nameSampleStream.next();
         }
         else {
           return;

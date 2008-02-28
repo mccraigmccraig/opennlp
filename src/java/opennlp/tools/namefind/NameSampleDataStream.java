@@ -21,7 +21,7 @@ public class NameSampleDataStream implements NameSampleStream {
   /* (non-Javadoc)
    * @see opennlp.tools.namefind.NameSampleStream#nextNameSample()
    */
-  public NameSample nextNameSample() {
+  public NameSample next() {
     String token = (String) in.nextToken();
     // clear adaptive data for every empty line
     return new NameSample(token, token.length() == 0);

@@ -21,6 +21,6 @@ public interface NameSampleStream {
 
   public abstract boolean hasNext();
 
-  public abstract NameSample nextNameSample();
+  public abstract NameSample next();
 
 }
