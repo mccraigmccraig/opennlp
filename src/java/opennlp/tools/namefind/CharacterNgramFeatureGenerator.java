@@ -28,7 +28,7 @@ import opennlp.tools.ngram.TokenList;
  * generate features about each token. 
  * The minimum and maximum length can be specified.
  */
-public class CharacterNgramFeatureGenerator extends FeatureGeneratorAdaptor {
+public class CharacterNgramFeatureGenerator extends FeatureGeneratorAdapter {
 
   private final int minLength;
   private final int maxLength;

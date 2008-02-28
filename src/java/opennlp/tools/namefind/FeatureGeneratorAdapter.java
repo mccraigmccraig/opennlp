@@ -22,7 +22,7 @@ package opennlp.tools.namefind;
  * {@link AdditionalContextFeatureGenerator} to make implementing feature generators
  * easier.
  */
-public abstract class FeatureGeneratorAdaptor implements AdaptiveFeatureGenerator {
+public abstract class FeatureGeneratorAdapter implements AdaptiveFeatureGenerator {
 
   public void updateAdaptiveData(String[] tokens, String[] outcomes) {
   }

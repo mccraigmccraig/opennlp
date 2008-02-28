@@ -25,7 +25,7 @@ import opennlp.tools.util.Span;
 /**
  * Generates features if the tokens are contained in the dictionary. 
  */
-public class DictionaryFeatureGenerator extends FeatureGeneratorAdaptor {
+public class DictionaryFeatureGenerator extends FeatureGeneratorAdapter {
 
   private TokenNameFinder mFinder;
 

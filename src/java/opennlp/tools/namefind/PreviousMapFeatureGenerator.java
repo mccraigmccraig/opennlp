@@ -22,7 +22,7 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * This {@link FeatureGeneratorAdaptor} generates features indicating the outcome associated with a previously occuring word.
+ * This {@link FeatureGeneratorAdapter} generates features indicating the outcome associated with a previously occuring word.
  */
 public class PreviousMapFeatureGenerator implements AdaptiveFeatureGenerator {
 

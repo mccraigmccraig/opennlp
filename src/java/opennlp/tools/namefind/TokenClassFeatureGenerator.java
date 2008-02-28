@@ -6,7 +6,7 @@ import java.util.List;
 /**
  * Generates features for different for the class of the token.
  */
-public class TokenClassFeatureGenerator extends FeatureGeneratorAdaptor {
+public class TokenClassFeatureGenerator extends FeatureGeneratorAdapter {
 
   private static final String TOKEN_CLASS_PREFIX = "wc";
   private static final String TOKEN_AND_CLASS_PREFIX = "w&c";

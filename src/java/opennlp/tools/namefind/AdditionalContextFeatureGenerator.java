@@ -23,7 +23,7 @@ import java.util.List;
  * The {@link AdditionalContextFeatureGenerator} generates the context from the passed
  * in additional context.
  */
-class AdditionalContextFeatureGenerator extends FeatureGeneratorAdaptor {
+class AdditionalContextFeatureGenerator extends FeatureGeneratorAdapter {
 
   private String[][] additionalContext;
 
