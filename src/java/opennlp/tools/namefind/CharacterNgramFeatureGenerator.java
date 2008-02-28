@@ -20,7 +20,6 @@ package opennlp.tools.namefind;
 import java.util.Iterator;
 import java.util.List;
 
-import opennlp.tools.namefind.AdaptiveFeatureGenerator;
 import opennlp.tools.ngram.NGramModel;
 import opennlp.tools.ngram.TokenList;
 
