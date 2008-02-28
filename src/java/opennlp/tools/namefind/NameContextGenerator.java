@@ -27,7 +27,7 @@ public interface NameContextGenerator extends BeamSearchContextGenerator {
   
   /**
    * Adds a feature generator to this set of feature generators.
-   * @param generator The feature genertor to add. 
+   * @param generator The feature generator to add. 
    */
   public void addFeatureGenerator(AdaptiveFeatureGenerator generator);
   
