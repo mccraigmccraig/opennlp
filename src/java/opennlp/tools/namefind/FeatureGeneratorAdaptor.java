@@ -17,7 +17,12 @@
 //////////////////////////////////////////////////////////////////////////////
 package opennlp.tools.namefind;
 
-public abstract class FeatureGenerator implements AdaptiveFeatureGenerator {
+/**
+ * This call provides empty implementations of some of the optional methods in 
+ * {@link AdditionalContextFeatureGenerator} to make implementing feature generators
+ * easier.
+ */
+public abstract class FeatureGeneratorAdaptor implements AdaptiveFeatureGenerator {
 
   public void updateAdaptiveData(String[] tokens, String[] outcomes) {
   }

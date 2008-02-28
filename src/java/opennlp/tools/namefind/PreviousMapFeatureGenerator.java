@@ -22,13 +22,13 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * This {@link FeatureGenerator} generates previous decision features.
+ * This {@link FeatureGeneratorAdaptor} generates features indicating the outcome associated with a previously occuring word.
  */
 public class PreviousMapFeatureGenerator implements AdaptiveFeatureGenerator {
 
   private Map previousMap = new HashMap();
   
-  public void createFeatures(List features, String[] tokens, String[] preds, int index) {
+  public void createFeatures(List features, String[] tokens, int index, String[] preds) {
     features.add("pd=" + (String) previousMap.get(tokens[index]));
   }
   

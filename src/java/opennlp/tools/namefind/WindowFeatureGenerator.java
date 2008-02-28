@@ -37,7 +37,7 @@ public class WindowFeatureGenerator implements AdaptiveFeatureGenerator {
   
   private String[] prevTokens;
   private boolean caching;
-  private Cache contextsCache;
+  private Cache contextsCache;  
 
   public WindowFeatureGenerator(AdaptiveFeatureGenerator generator, int prevWindowSize,  int nextWindowSize, boolean caching) {
     this.generator = generator;
@@ -51,15 +51,13 @@ public class WindowFeatureGenerator implements AdaptiveFeatureGenerator {
     this(generator, 5, 5,true);
   }
   
-  public void createFeatures(List features, String[] tokens, String[] preds, int index) {
+  public void createFeatures(List features, String[] tokens, int index, String[] preds) {
     List cacheFeatures;
     if (caching) {
       if (tokens == prevTokens) {
         cacheFeatures = (List) contextsCache.get(new Integer(index));
         if (cacheFeatures != null) {
-          for (Iterator it = cacheFeatures.iterator(); it.hasNext();) {
-            features.add(it.next().toString());
-          }
+          features.addAll(cacheFeatures);
           return;
         }
       }
@@ -75,7 +73,7 @@ public class WindowFeatureGenerator implements AdaptiveFeatureGenerator {
       cacheFeatures = features;
     }
     // current features
-    generator.createFeatures(cacheFeatures, tokens, preds, index);
+    generator.createFeatures(cacheFeatures, tokens, index, preds);
 
     // previous features
     for (int i = 1; i < prevWindowSize + 1; i++) {
@@ -83,7 +81,7 @@ public class WindowFeatureGenerator implements AdaptiveFeatureGenerator {
 
         List prevFeatures = new ArrayList();
 
-        generator.createFeatures(prevFeatures, tokens, preds, index - i);
+        generator.createFeatures(prevFeatures, tokens, index - i, preds);
 
         for (Iterator it = prevFeatures.iterator(); it.hasNext();) {
           cacheFeatures.add("p" + i + it.next().toString());
@@ -97,7 +95,7 @@ public class WindowFeatureGenerator implements AdaptiveFeatureGenerator {
 
         List nextFeatures = new ArrayList();
 
-        generator.createFeatures(nextFeatures, tokens, preds, index + i);
+        generator.createFeatures(nextFeatures, tokens, index + i, preds);
 
         for (Iterator it = nextFeatures.iterator(); it.hasNext();) {
           cacheFeatures.add("n" + i + it.next().toString());
@@ -106,9 +104,7 @@ public class WindowFeatureGenerator implements AdaptiveFeatureGenerator {
     }
     if (caching) {
       contextsCache.put(new Integer(index),cacheFeatures);
-      for (Iterator it = cacheFeatures.iterator(); it.hasNext();) {
-        features.add(it.next().toString());
-      }
+      features.addAll(cacheFeatures);
     }
   }
   

@@ -37,7 +37,7 @@ public class NameFinderEventStream implements EventStream {
   }
 
   public NameFinderEventStream(NameSampleStream dataStream) {
-    this(dataStream, new NameContextGenerator());
+    this(dataStream, new DefaultNameContextGenerator());
   }
   
   /**

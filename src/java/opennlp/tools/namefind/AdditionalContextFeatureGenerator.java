@@ -23,14 +23,14 @@ import java.util.List;
  * The {@link AdditionalContextFeatureGenerator} generates the context from the passed
  * in additional context.
  */
-class AdditionalContextFeatureGenerator extends FeatureGenerator {
+class AdditionalContextFeatureGenerator extends FeatureGeneratorAdaptor {
 
   private String[][] additionalContext;
 
   AdditionalContextFeatureGenerator() {
   }
 
-  public void createFeatures(List features, String[] tokens, String[] preds, int index) {
+  public void createFeatures(List features, String[] tokens, int index, String[] preds) {
 
     if (additionalContext != null && additionalContext.length != 0) {
 
@@ -44,9 +44,5 @@ class AdditionalContextFeatureGenerator extends FeatureGenerator {
 
   void setCurrentContext(String[][] context) {
     additionalContext = context;
-  }
-  
-  public void clearAdaptiveData() {
-    // has no adaptive data
   }
 }

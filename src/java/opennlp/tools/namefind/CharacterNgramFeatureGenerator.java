@@ -29,7 +29,7 @@ import opennlp.tools.ngram.TokenList;
  * generate features about each token. 
  * The minimum and maximum length can be specified.
  */
-public class CharacterNgramFeatureGenerator extends FeatureGenerator {
+public class CharacterNgramFeatureGenerator extends FeatureGeneratorAdaptor {
 
   private final int minLength;
   private final int maxLength;
@@ -46,7 +46,7 @@ public class CharacterNgramFeatureGenerator extends FeatureGenerator {
     this(2, 5);
   }
   
-  public void createFeatures(List features, String[] tokens, String[] preds, int index) {
+  public void createFeatures(List features, String[] tokens, int index, String[] preds) {
 
     NGramModel model = new NGramModel();
     model.add(tokens[index], minLength, maxLength);

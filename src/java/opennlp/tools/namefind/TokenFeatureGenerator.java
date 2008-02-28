@@ -23,7 +23,7 @@ import java.util.List;
 /**
  * Generates a feature which contains the token itself.
  */
-public class TokenFeatureGenerator extends FeatureGenerator {
+public class TokenFeatureGenerator extends FeatureGeneratorAdaptor {
 
   private static final String WORD_PREFIX = "w";
   private boolean lowercase;
@@ -36,7 +36,7 @@ public class TokenFeatureGenerator extends FeatureGenerator {
     this(true);
   }
   
-  public void createFeatures(List features, String[] tokens, String[] preds, int index) {
+  public void createFeatures(List features, String[] tokens, int index, String[] preds) {
     if (lowercase) {
       features.add(WORD_PREFIX + "=" + tokens[index].toLowerCase());
     }

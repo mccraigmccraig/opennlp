@@ -102,7 +102,7 @@ public class NameFinderME implements TokenNameFinder {
    * @param mod The model to be used to find names.
    */
   public NameFinderME(MaxentModel mod) {
-    this(mod, new NameContextGenerator(), 10);
+    this(mod, new DefaultNameContextGenerator(), 3);
   }
 
   /**
@@ -111,7 +111,7 @@ public class NameFinderME implements TokenNameFinder {
    * @param cg The context generator to be used with this name finder.
    */
   public NameFinderME(MaxentModel mod, NameContextGenerator cg) {
-    this(mod, cg, 10);
+    this(mod, cg, 3);
   }
 
   /**

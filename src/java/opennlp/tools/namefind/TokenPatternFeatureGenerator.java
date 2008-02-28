@@ -25,9 +25,10 @@ import opennlp.tools.tokenize.SimpleTokenizer;
 import opennlp.tools.tokenize.Tokenizer;
 
 /**
- * 
+ * Partitions tokens into sub-tokens based on character classes and generates 
+ * class features for each of the sub-tokens and combinations of those sub-tokens. 
  */
-public class TokenPatternFeatureGenerator extends FeatureGenerator {
+public class TokenPatternFeatureGenerator extends FeatureGeneratorAdaptor {
     
     private Pattern noLetters = Pattern.compile("[^a-zA-Z]");
     private Tokenizer tokenizer;
@@ -49,7 +50,7 @@ public class TokenPatternFeatureGenerator extends FeatureGenerator {
         tokenizer = supportTokenizer;
     }
 
-    public void createFeatures(List feats, String[] toks, String[] preds, int index) {
+    public void createFeatures(List feats, String[] toks, int index, String[] preds) {
       
       String[] tokenized = tokenizer.tokenize(toks[index]);
       
