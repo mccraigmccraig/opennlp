@@ -25,8 +25,16 @@ import java.util.List;
 /**
  * Generates previous and next features for a given {@link AdaptiveFeatureGenerator}.
  * The window size can be specified.
+ * 
+ * Features:
+ * Current token is always included unchanged
+ * Previous tokens are prefixed with p distance
+ * Next tokens are prefix with n distance
  */
 public class WindowFeatureGenerator implements AdaptiveFeatureGenerator {
+  
+  public static final String PREV_PREFIX = "p";
+  public static final String NEXT_PREFIX = "n";
   
   private final AdaptiveFeatureGenerator generator;
   
@@ -72,7 +80,7 @@ public class WindowFeatureGenerator implements AdaptiveFeatureGenerator {
         generator.createFeatures(prevFeatures, tokens, index - i, preds);
 
         for (Iterator it = prevFeatures.iterator(); it.hasNext();) {
-          cacheFeatures.add("p" + i + it.next().toString());
+          cacheFeatures.add(PREV_PREFIX + i + it.next().toString());
         }
       }
     }
@@ -86,7 +94,7 @@ public class WindowFeatureGenerator implements AdaptiveFeatureGenerator {
         generator.createFeatures(nextFeatures, tokens, index + i, preds);
 
         for (Iterator it = nextFeatures.iterator(); it.hasNext();) {
-          cacheFeatures.add("n" + i + it.next().toString());
+          cacheFeatures.add(NEXT_PREFIX + i + it.next().toString());
         }
       }
     }
