@@ -31,7 +31,7 @@ import opennlp.tools.util.Cache;
  *
  * @author      Gann Bierner
  * @author      Tom Morton
- * @version     $Revision: 1.15 $, $Date: 2007/03/30 06:36:56 $
+ * @version     $Revision: 1.16 $, $Date: 2008/02/28 13:33:47 $
  */
 
 public class DefaultPOSContextGenerator implements POSContextGenerator {
@@ -79,7 +79,7 @@ public class DefaultPOSContextGenerator implements POSContextGenerator {
   }
 
   protected static String[] getPrefixes(String lex) {
-    String[] prefs = new String[4];
+    String[] prefs = new String[PREFIX_LENGTH];
     for (int li = 0, ll = PREFIX_LENGTH; li < ll; li++) {
       prefs[li] = lex.substring(0, Math.min(li + 1, lex.length()));
     }
@@ -87,7 +87,7 @@ public class DefaultPOSContextGenerator implements POSContextGenerator {
   }
 
   protected static String[] getSuffixes(String lex) {
-    String[] suffs = new String[4];
+    String[] suffs = new String[SUFFIX_LENGTH];
     for (int li = 0, ll = SUFFIX_LENGTH; li < ll; li++) {
       suffs[li] = lex.substring(Math.max(lex.length() - li - 1, 0));
     }
