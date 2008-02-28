@@ -23,7 +23,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 
 import opennlp.maxent.MaxentModel;
-import opennlp.maxent.io.BinaryGISModelReader;
+import opennlp.maxent.io.PooledGISModelReader;
 import opennlp.tools.namefind.NameFinderEventStream;
 import opennlp.tools.namefind.NameFinderME;
 import opennlp.tools.parser.Parse;
@@ -127,12 +127,14 @@ public class NameFinder {
     Span[][] nameSpans = new Span[finders.length][];
     String[][] nameOutcomes = new String[finders.length][];
     opennlp.tools.tokenize.Tokenizer tokenizer = new SimpleTokenizer();
+    StringBuffer output = new StringBuffer();
     for (String line = input.readLine(); null != line; line = input.readLine()) {
       if (line.equals("")) {
         clearPrevTokenMaps(finders);
         System.out.println();
         continue;
       }
+      output.setLength(0);
       Span[] spans = tokenizer.tokenizePos(line);
       String[] tokens = Span.spansToStrings(spans,line);
       for (int fi = 0, fl = finders.length; fi < fl; fi++) {
@@ -147,35 +149,35 @@ public class NameFinder {
           if (ti != 0) {
             if ((nameOutcomes[fi][ti].equals(NameFinderME.START) || nameOutcomes[fi][ti].equals(NameFinderME.OTHER)) && 
                 (nameOutcomes[fi][ti - 1].equals(NameFinderME.START) || nameOutcomes[fi][ti - 1].equals(NameFinderME.CONTINUE))) {
-              System.out.print("</" + tags[fi] + ">");
+              output.append("</").append(tags[fi]).append(">");
             }
           }
         }
         if (ti > 0 && spans[ti - 1].getEnd() < spans[ti].getStart()) {
-          System.out.print(line.substring(spans[ti - 1].getEnd(), spans[ti].getStart()));
+          output.append(line.substring(spans[ti - 1].getEnd(), spans[ti].getStart()));
         }
         //check for start tags
         for (int fi = 0, fl = finders.length; fi < fl; fi++) {
           if (nameOutcomes[fi][ti].equals(NameFinderME.START)) {
-            System.out.print("<" + tags[fi] + ">");
+            output.append("<").append(tags[fi]).append(">");
           }
         }
-        System.out.print(tokens[ti]);
+        output.append(tokens[ti]);
       }
       //final end tags
       if (tokens.length != 0) {
         for (int fi = 0, fl = finders.length; fi < fl; fi++) {
           if (nameOutcomes[fi][tokens.length - 1].equals(NameFinderME.START) || nameOutcomes[fi][tokens.length - 1].equals(NameFinderME.CONTINUE)) {
-            System.out.print("</" + tags[fi] + ">");
+            output.append("</").append(tags[fi]).append(">");
           }
         }
       }
       if (tokens.length != 0) {
         if (spans[tokens.length - 1].getEnd() < line.length()) {
-          System.out.print(line.substring(spans[tokens.length - 1].getEnd()));
+          output.append(line.substring(spans[tokens.length - 1].getEnd()));
         }
       }
-      System.out.println();
+      System.out.println(output);
     }
   }
 
@@ -200,7 +202,7 @@ public class NameFinder {
     String[] names = new String[args.length-ai];
     for (int fi=0; ai < args.length; ai++,fi++) {
       String modelName = args[ai];
-      finders[fi] = new NameFinder(new BinaryGISModelReader(new File(modelName)).getModel());
+      finders[fi] = new NameFinder(new PooledGISModelReader(new File(modelName)).getModel());
       int nameStart = modelName.lastIndexOf(System.getProperty("file.separator")) + 1;
       int nameEnd = modelName.indexOf('.', nameStart);
       if (nameEnd == -1) {
@@ -208,6 +210,7 @@ public class NameFinder {
       }
       names[fi] = modelName.substring(nameStart, nameEnd);
     }
+    //long t1 = System.currentTimeMillis();
     BufferedReader in = new BufferedReader(new InputStreamReader(System.in));
     if (parsedInput) {
       processParse(finders,names,in);
@@ -215,5 +218,7 @@ public class NameFinder {
     else {
       processText(finders,names,in);
     }
+    //long t2 = System.currentTimeMillis();
+    //System.err.println("Time "+(t2-t1));
   }
 }
