@@ -26,7 +26,7 @@ import java.util.List;
 public interface AdaptiveFeatureGenerator {
  
   /**
-   * Adds the appropiate features for the token at the specified index with the 
+   * Adds the appropriate features for the token at the specified index with the 
    * specified array of previous outcomes to the specified list of features.
    * @param features The list of features to be added to.
    * @param tokens The tokens of the sentence or other text unit being processed.
