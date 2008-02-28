@@ -81,7 +81,7 @@ public class SimpleTokenizer extends AbstractTokenizer {
    * @throws IOException 
    */
   public static void main(String[] args) throws IOException {
-    if (args.length == 0) {
+    if (args.length != 0) {
       System.err.println("Usage:  java opennlp.tools.tokenize.SimpleTokenizer < sentences");
       System.exit(1);
     }
