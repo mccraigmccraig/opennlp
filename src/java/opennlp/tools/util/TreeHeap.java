@@ -5,7 +5,7 @@ import java.util.SortedSet;
 import java.util.TreeSet;
 
 /** 
- * An implmention of the Heap interface based on {@link java.util.SortedSet}.
+ * An implementation of the Heap interface based on {@link java.util.SortedSet}.
  * This implementation will not allow multiple objects which are equal to be added to the heap.
  * Only use this implementation when object in the heap can be totally ordered (no duplicates). 
  */

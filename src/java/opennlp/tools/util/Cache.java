@@ -33,7 +33,7 @@ public class Cache implements Map {
   private DoubleLinkedListElement last;
   /** Temporary holder of the key of the least-recently-used element. */
   private Object lastKey;
-  /** Temperary value used in swap. */ 
+  /** Temporary value used in swap. */ 
   private ObjectWrapper temp;
   /** Holds the object wrappers which the keys are mapped to. */
   private ObjectWrapper[] wrappers;

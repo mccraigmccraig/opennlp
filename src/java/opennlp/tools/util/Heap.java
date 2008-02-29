@@ -19,7 +19,7 @@ package opennlp.tools.util;
 
 import java.util.Iterator;
 
-/** Inteface for interacting with a Heap data structure.  
+/** Interface for interacting with a Heap data structure.  
  * This implementation extract objects from smallest to largest based on either
  * their natural ordering or the comparator provided to an implementation.
  * While this is a typical of a heap it allows this objects natural ordering to
@@ -65,7 +65,7 @@ public interface Heap  {
 
   /**
    * Returns an iterator over the elements of the heap.  No specific ordering of these 
-   * elements is gaurenteed. 
+   * elements is guaranteed. 
    * @return An iterator over the elements of the heap.
    */
   public Iterator iterator();
