@@ -23,7 +23,7 @@ import java.util.List;
 import opennlp.tools.util.Span;
 
 /**
- * This tokenizer uses white spaces to tokenizes the input text.
+ * This tokenizer uses white spaces to tokenize the input text.
  */
 public class WhitespaceTokenizer extends AbstractTokenizer {
   
