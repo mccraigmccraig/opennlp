@@ -32,7 +32,7 @@ import opennlp.maxent.DataStream;
  * @param <E> 
  * 
  * @author <a href="mailto:kottmann@gmail.com">Joern Kottmann</a>
- * @version $Revision: 1.1 $, $Date: 2007/05/31 16:09:19 $
+ * @version $Revision: 1.2 $, $Date: 2008/03/04 09:52:00 $
  */
 public final class DataStreamBuilder implements DataStream {
 
@@ -43,7 +43,7 @@ public final class DataStreamBuilder implements DataStream {
   private boolean mIsIterating;
   
   /**
-   * Initalizes a new instance.
+   * Initializes a new instance.
    */
   public DataStreamBuilder() {
     mData = new LinkedList();
