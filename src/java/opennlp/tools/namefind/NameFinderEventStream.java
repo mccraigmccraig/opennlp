@@ -47,17 +47,27 @@ public class NameFinderEventStream implements EventStream {
    * @param length The length of the sentence.
    * @return An array of start, continue, other outcomes based on the specified names and sentence length.
    */
-  public static String[] generateOutcomes(Span[] names, int length) {
+  public static String[] generateOutcomes(Span[] names, String[] nameTypes, int length) {
     String[] outcomes = new String[length];
     for (int i = 0; i < outcomes.length; i++) {
       outcomes[i] = NameFinderME.OTHER;
     }
     for (int nameIndex = 0; nameIndex < names.length; nameIndex++) {
       Span name = names[nameIndex];
-      outcomes[name.getStart()] = NameFinderME.START;
+      if (nameTypes == null) {
+        outcomes[name.getStart()] = NameFinderME.START;
+      }
+      else {
+        outcomes[name.getStart()] = nameTypes[nameIndex]+"-"+NameFinderME.START;
+      }
       // now iterate from begin + 1 till end
       for (int i = name.getStart() + 1; i < name.getEnd(); i++) {
-        outcomes[i] = NameFinderME.CONTINUE;
+        if (nameTypes == null) {
+          outcomes[i] = NameFinderME.CONTINUE;
+        }
+        else {
+          outcomes[name.getStart()] = nameTypes[nameIndex]+"-"+NameFinderME.CONTINUE;
+        }
       }
     }
     return outcomes;
@@ -76,15 +86,15 @@ public class NameFinderEventStream implements EventStream {
         }
       }
       //System.err.println(sample);
-      String outcomes[] = generateOutcomes(sample.names(),sample.sentence().length);
-      additionalContextFeatureGenerator.setCurrentContext(sample.additionalContext());
-      String[] tokens = new String[sample.sentence().length]; 
+      String outcomes[] = generateOutcomes(sample.getNames(),sample.getNameTypes(),sample.getSentence().length);
+      additionalContextFeatureGenerator.setCurrentContext(sample.getAdditionalContext());
+      String[] tokens = new String[sample.getSentence().length]; 
       List events = new ArrayList(outcomes.length);
-      for (int i = 0; i < sample.sentence().length; i++) {
-        tokens[i] = sample.sentence()[i].getToken();
+      for (int i = 0; i < sample.getSentence().length; i++) {
+        tokens[i] = sample.getSentence()[i].getToken();
       }
       for (int i = 0; i < outcomes.length; i++) {
-        events.add(new Event((String) outcomes[i], contextGenerator.getContext(i, sample.sentence(), outcomes,null)));
+        events.add(new Event((String) outcomes[i], contextGenerator.getContext(i, sample.getSentence(), outcomes,null)));
       }
       this.events = events.iterator();
       contextGenerator.updateAdaptiveData(tokens, outcomes);

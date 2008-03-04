@@ -1,23 +1,14 @@
 package opennlp.tools.namefind;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import opennlp.tools.ngram.Token;
 import opennlp.tools.util.Span;
 
 public class NameSample {
 
-  public static final String START_TAG = "<START>";
-
-  public static final String END_TAG = "<END>";
-
-  private final Token sentence[];
-
-  private final Span names[];
-
-  private final String additionalContext[][];
-
+  private final Token[] sentence;
+  private final Span[] names;
+  private final String[] nameTypes;
+  private final String[][] additionalContext;
   private final boolean isClearAdaptiveData;
 
   /**
@@ -28,8 +19,8 @@ public class NameSample {
    * @param additionalContext
    * @param clearAdaptiveData if true the adaptive data of the feature generators is cleared
    */
-  public NameSample(Token sentence[], Span names[],
-      String additionalContext[][], boolean clearAdaptiveData) {
+  public NameSample(Token[] sentence, Span[] names, String[] types,
+      String[][] additionalContext, boolean clearAdaptiveData) {
 
     if (sentence == null) {
       throw new IllegalArgumentException();
@@ -43,6 +34,7 @@ public class NameSample {
     this.names = names;
     this.additionalContext = additionalContext;
     isClearAdaptiveData = clearAdaptiveData;
+    this.nameTypes = types;
   }
 
   /**
@@ -53,61 +45,26 @@ public class NameSample {
    * @param clearAdaptiveData
    */
   public NameSample(Token sentence[], Span[] names, boolean clearAdaptiveData) {
-    this(sentence, names, null, clearAdaptiveData);
+    this(sentence, names, null, null, clearAdaptiveData);
+  }
+  
+  public NameSample(Token sentence[], Span[] names, String[] nameTypes, boolean clearAdaptiveData) {
+    this(sentence, names, nameTypes, null, clearAdaptiveData);
   }
 
-  /**
-   * Initializes the current instance.
-   * 
-   * @param taggedTokens
-   * @param clearAdaptiveData
-   */
-  public NameSample(String taggedTokens, boolean clearAdaptiveData) {
-    this.isClearAdaptiveData = clearAdaptiveData;
-    this.additionalContext = null;
-
-    if (!clearAdaptiveData) {
-      String[] parts = taggedTokens.split(" ");
-
-      List tokenList = new ArrayList(parts.length);
-      List nameList = new ArrayList();
-
-      int startIndex = -1;
-      int wordIndex = 0;
-      for (int pi = 0; pi < parts.length; pi++) {
-        if (parts[pi].equals(START_TAG)) {
-          startIndex = wordIndex;
-        } 
-        else if (parts[pi].equals(END_TAG)) {
-          // create name
-          nameList.add(new Span(startIndex, wordIndex));
-        } 
-        else {
-          tokenList.add(Token.create(parts[pi]));
-          wordIndex++;
-        }
-      }
-
-      sentence = (Token[]) tokenList.toArray(new Token[tokenList.size()]);
-
-      names = (Span[]) nameList.toArray(new Span[nameList.size()]);
-
-    }
-    else {
-      this.sentence = null;
-      this.names = null;
-    }
-  }
-
-  public Token[] sentence() {
+  public Token[] getSentence() {
     return sentence;
   }
 
-  public Span[] names() {
+  public Span[] getNames() {
     return names;
   }
+  
+  public String[] getNameTypes() {
+    return nameTypes;
+  }
 
-  public String[][] additionalContext() {
+  public String[][] getAdditionalContext() {
     return additionalContext;
   }
   
@@ -116,9 +73,6 @@ public class NameSample {
   }
 
   public String toString() {
-
-    Token sentence[] = sentence();
-
     StringBuilder result = new StringBuilder();
 
     for (int tokenIndex = 0; tokenIndex < sentence.length; tokenIndex++) {
@@ -126,11 +80,21 @@ public class NameSample {
 
       for (int nameIndex = 0; nameIndex < names.length; nameIndex++) {
         if (names[nameIndex].getStart() == tokenIndex) {
-          result.append(START_TAG + ' ');
+          if (nameTypes == null) {
+            result.append(NameSampleDataStream.START_TAG).append(' ');
+          }
+          else {
+            result.append("<").append(names[nameIndex]).append("> ");
+          }
         }
 
         if (names[nameIndex].getEnd() == tokenIndex) {
-          result.append(END_TAG + ' ');
+          if (nameTypes == null) {
+            result.append(NameSampleDataStream.END_TAG).append(' ');
+          }
+          else {
+            result.append("</").append(names[nameIndex]).append("> ");
+          }
         }
       }
 
@@ -139,7 +103,12 @@ public class NameSample {
 
     for (int nameIndex = 0; nameIndex < names.length; nameIndex++) {
       if (names[nameIndex].getEnd() == sentence.length) {
-        result.append(END_TAG + ' ');
+        if (nameTypes == null) {
+          result.append(NameSampleDataStream.END_TAG + ' ');
+        }
+        else {
+          result.append("</").append(names[nameIndex]).append("> ");
+        }
       }
     }
 
