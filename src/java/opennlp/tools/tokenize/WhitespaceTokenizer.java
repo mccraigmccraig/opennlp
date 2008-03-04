@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////////
-//Copyright (C) 2007 OpenNlp
+//Copyright (C) 2008 OpenNlp
 // 
 //This library is free software; you can redistribute it and/or
 //modify it under the terms of the GNU Lesser General Public
@@ -22,10 +22,20 @@ import java.util.List;
 
 import opennlp.tools.util.Span;
 
+/**
+ * This tokenizer uses white spaces to tokenizes the input text.
+ */
 public class WhitespaceTokenizer extends AbstractTokenizer {
   
+  /**
+   * Use this static reference to retrieve an instance of the 
+   * {@link WhitespaceTokenizer}.
+   */
   public static final WhitespaceTokenizer INSTANCE = new WhitespaceTokenizer();
   
+  /**
+   * Use the {@link WhitespaceTokenizer#INSTANCE} field to retrieve an instance.
+   */
   private WhitespaceTokenizer() {
   }
   
