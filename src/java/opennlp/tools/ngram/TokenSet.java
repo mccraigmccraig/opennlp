@@ -29,13 +29,6 @@ import java.util.logging.Logger;
  * 
  * It uses weak references to allow garbage collection of tokens which are 
  * not used anymore.
- * 
- * TODO: 
- * + maybe give the client control over cache strategy weak 
- * + weak vs. strong referneces ???
- * 
- * @author <a href="mailto:kottmann@gmail.com">Joern Kottmann</a>
- * @version $Revision: 1.5 $, $Date: 2007/04/23 13:06:10 $
  */
 public final class TokenSet {
   
@@ -102,7 +95,7 @@ public final class TokenSet {
   }
   
   /**
-   * Retrives the one and only instance of the {@link TokenSet}.
+   * Retrieves the one and only instance of the {@link TokenSet}.
    * 
    * Note: Instance is created on the first call to this method.
    * 
