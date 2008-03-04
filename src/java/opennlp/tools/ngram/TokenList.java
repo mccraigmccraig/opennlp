@@ -25,9 +25,6 @@ import java.util.NoSuchElementException;
 
 /**
  * TODO: add a method for a subtoken list
- * 
- * @author <a href="mailto:kottmann@gmail.com">Joern Kottmann</a>
- * @version $Revision: 1.7 $, $Date: 2007/04/23 03:06:22 $
  */
 public class TokenList {
   
@@ -60,7 +57,7 @@ public class TokenList {
   }
   
   /**
-   * Retrives a token from the given index.
+   * Retrieves a token from the given index.
    * 
    * @param index
    * 
@@ -71,7 +68,7 @@ public class TokenList {
   }
   
   /**
-   * Retrives the number of tokens inside this list.
+   * Retrieves the number of tokens inside this list.
    *  
    * @return number of tokens
    */
@@ -80,7 +77,7 @@ public class TokenList {
   }
   
   /**
-   * Retrives an {@link Iterator} over all {@link Token}s.
+   * Retrieves an {@link Iterator} over all {@link Token}s.
    * 
    * @return iterator over tokens
    */
@@ -117,7 +114,7 @@ public class TokenList {
    * 
    * @param tokens
    * 
-   * @return true if identicaly with ignore the case otherwise false
+   * @return true if identically with ignore the case otherwise false
    */
   public boolean compareToIgnoreCase(TokenList tokens) {
     
@@ -178,7 +175,7 @@ public class TokenList {
       }
       word = getToken(wi).hashCode() & mask; // mask off top bits
       word <<= 32 - leftMostBit - numBits; // move to correct position
-      leftMostBit += numBits; // set for next interation
+      leftMostBit += numBits; // set for next iteration
       code |= word;
     }
     
