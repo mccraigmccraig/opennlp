@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////////
-//Copyright (C) 2005 Calcucare GmbH
+//Copyright (C) 2008 OpenNlp
 //
 //This library is free software; you can redistribute it and/or
 //modify it under the terms of the GNU Lesser General Public
@@ -28,11 +28,6 @@ import opennlp.maxent.DataStream;
 
 /**
  * This is a DataStream of elements contained in a collection.
- *
- * @param <E> 
- * 
- * @author <a href="mailto:kottmann@gmail.com">Joern Kottmann</a>
- * @version $Revision: 1.2 $, $Date: 2008/03/04 09:52:00 $
  */
 public final class DataStreamBuilder implements DataStream {
 
@@ -43,7 +38,7 @@ public final class DataStreamBuilder implements DataStream {
   private boolean mIsIterating;
   
   /**
-   * Initializes a new instance.
+   * Initializes the current instance.
    */
   public DataStreamBuilder() {
     mData = new LinkedList();
@@ -52,7 +47,8 @@ public final class DataStreamBuilder implements DataStream {
   }
   
   /**
-   * Initalizes a new instance.
+   * Initializes the current instance.
+   * 
    * @param object 
    */
   public DataStreamBuilder(Object object) {
@@ -62,7 +58,8 @@ public final class DataStreamBuilder implements DataStream {
   }
 
   /**
-   * Initalizes a new instance.
+   *Initializes the current instance.
+   *
    * @param array 
    */
   public DataStreamBuilder(Object[] array) {
@@ -72,7 +69,8 @@ public final class DataStreamBuilder implements DataStream {
   }
   
   /**
-   * Initalizes a new instance.
+   * Initializes the current instance.
+   * 
    * @param data 
    */
   public DataStreamBuilder(Collection data) {
