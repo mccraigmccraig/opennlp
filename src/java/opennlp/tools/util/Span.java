@@ -179,8 +179,8 @@ public class Span implements Comparable {
 
     boolean result;
     
-    if (o == null) {
-      result = false;
+    if (o == this) {
+      result = true;
     }
     else if (o instanceof Span) {
       Span s = (Span) o;
