@@ -29,7 +29,7 @@ import opennlp.maxent.EventStream;
  */
 public class CollectionEventStream implements EventStream {
   
-  Iterator ci;
+  private Iterator ci;
   
   public CollectionEventStream(Collection c) {
     ci = c.iterator();
