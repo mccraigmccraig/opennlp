@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////////
-//Copyright (C) 2004 Thomas Morton
+//Copyright (C) 2008 OpenNlp
 // 
 //This library is free software; you can redistribute it and/or
 //modify it under the terms of the GNU Lesser General Public
@@ -15,19 +15,21 @@
 //License along with this program; if not, write to the Free Software
 //Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 //////////////////////////////////////////////////////////////////////////////
-package opennlp.tools.util;
+package opennlp.tools.tokenize;
 
 /**
- * Interface for context generators used with a sequence beam search. 
+ * Interface for {@link TokenizerME} context generators.
  */
-public interface BeamSearchContextGenerator {
-    
-  /** Returns the context for the specified position in the specified sequence (list).  
-     * @param index The index of the sequence.
-     * @param sequence  The sequence of items over which the beam search is performed.
-     * @param priorDecisions The sequence of decisions made prior to the context for which this decision is being made.
-     * @param additionalContext Any addition context specific to a class implementing this interface.
-     * @return the context for the specified position in the specified sequence.
-     */
-  public String[] getContext(int index, Object[] sequence, String[] priorDecisions, Object[] additionalContext);
+public interface TokenContextGenerator {
+
+  /**
+   * Returns an array of features for the specified sentence string at the specified index.
+   * 
+   * @param sentence The string for a sentence.
+   * @param index The index to consider splitting as a token.
+   * 
+   * @return an array of features for the specified sentence string at the 
+   *   specified index.
+   */
+  public abstract String[] getContext(String sentence, int index);
 }

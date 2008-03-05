@@ -20,8 +20,6 @@ package opennlp.tools.namefind;
 import java.util.ArrayList;
 import java.util.List;
 
-import opennlp.tools.util.Sequence;
-
 /** 
  * Class for determining contextual features for a tag/chunk style 
  * named-entity recognizer.
@@ -88,19 +86,6 @@ public class DefaultNameContextGenerator implements NameContextGenerator {
     for (int i = 0; i < featureGenerators.length; i++) {
       featureGenerators[i].clearAdaptiveData();
     }
-  }
-  
-  public String[] getContext(Object o) {
-    Object[] data = (Object[]) o;
-    return getContext(((Integer) data[0]).intValue(), (List) data[1], (List) data[2], (String[][]) data[3]);
-  }
-  
-  public String[] getContext(int index, List sequence, Sequence s, Object[] additionalContext) {
-    return getContext(index,sequence,s.getOutcomes(),(String[][]) additionalContext);
-  }
-
-  public String[] getContext(int i, List toks, List preds, String[][] additionalContext) {
-    return getContext(i, toks.toArray(), (String[]) preds.toArray(new String[preds.size()]),additionalContext);
   }
   
   public String[] getContext(int index, Object[] sequence, String[] priorDecisions, Object[] additionalContext) {

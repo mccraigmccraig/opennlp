@@ -22,21 +22,19 @@ import java.io.BufferedReader;
 import java.io.Reader;
 import java.util.ArrayList;
 
-import opennlp.maxent.ContextGenerator;
 import opennlp.maxent.Event;
 import opennlp.maxent.EventCollector;
-import opennlp.tools.util.ObjectIntPair;
 
 /**
  * Generate event contexts for maxent decisions for tokenization detection.
  * This procedure isn't currrently used for tokenization event creation.
  *
  * @author      Jason Baldridge
- * @version     $Revision: 1.6 $, $Date: 2006/11/17 12:20:38 $
+ * @version     $Revision: 1.7 $, $Date: 2008/03/05 16:45:13 $
  */
 
 public class TokEventCollector implements EventCollector {
-    private static final ContextGenerator cg = new TokContextGenerator();
+    private static final TokenContextGenerator cg = new DefaultTokenContextGenerator();
     private BufferedReader br;
     
     /** 
@@ -65,7 +63,7 @@ public class TokEventCollector implements EventCollector {
           if (TokenizerME.alphaNumeric.matcher(spaceToks[tok]).matches()) {
             int lastIndex = sb.length() - 1;
             for (int id = 0; id < sb.length(); id++) {
-              String[] context = cg.getContext(new ObjectIntPair(sb, id));
+              String[] context = cg.getContext(sb.toString(), id);
               if (id == lastIndex) {
                 elist.add(new Event("T", context));
               }

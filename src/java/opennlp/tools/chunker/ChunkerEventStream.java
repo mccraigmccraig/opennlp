@@ -25,8 +25,7 @@ import opennlp.maxent.Event;
 import opennlp.maxent.EventStream;
 
 /**
- * Class for creating an event stream out of data files for training a chunker. 
- *
+ * Class for creating an event stream out of data files for training a chunker.
  */
 public class ChunkerEventStream implements EventStream {
 

@@ -21,10 +21,8 @@ package opennlp.tools.tokenize;
 import java.util.ArrayList;
 import java.util.List;
 
-import opennlp.maxent.ContextGenerator;
 import opennlp.maxent.Event;
 import opennlp.maxent.EventStream;
-import opennlp.tools.util.ObjectIntPair;
 import opennlp.tools.util.Span;
 
 
@@ -33,7 +31,7 @@ import opennlp.tools.util.Span;
  */
 public class TokSpanEventStream implements EventStream {
 
-  private ContextGenerator cg;
+  private TokenContextGenerator cg;
   private List events;
   private int eventIndex;
   private boolean skipAlphaNumerics;
@@ -44,7 +42,7 @@ public class TokSpanEventStream implements EventStream {
    * @param skipAlphaNumerics
    * @param cg
    */
-  public TokSpanEventStream(boolean skipAlphaNumerics, ContextGenerator cg) {
+  public TokSpanEventStream(boolean skipAlphaNumerics, TokenContextGenerator cg) {
     this.skipAlphaNumerics = skipAlphaNumerics;
     events = new ArrayList(50);
     eventIndex = 0;
@@ -57,7 +55,7 @@ public class TokSpanEventStream implements EventStream {
    * @param skipAlphaNumerics
    */
   public TokSpanEventStream(boolean skipAlphaNumerics) {
-    this(skipAlphaNumerics, new TokContextGenerator());
+    this(skipAlphaNumerics, new DefaultTokenContextGenerator());
   }
 
   /**
@@ -110,12 +108,12 @@ public class TokSpanEventStream implements EventStream {
               Span tSpan = tokens[ti];
               int cStart = cSpan.getStart();
               for (int i = tSpan.getStart() + 1; i < tSpan.getEnd(); i++) {
-                String[] context = cg.getContext(new ObjectIntPair(ctok, i - cStart));
-                events.add(new Event(TokContextGenerator.NO_SPLIT, context));
+                String[] context = cg.getContext(ctok, i - cStart);
+                events.add(new Event(DefaultTokenContextGenerator.NO_SPLIT, context));
               }
               if (tSpan.getEnd() != cSpan.getEnd()) {
-                String[] context = cg.getContext(new ObjectIntPair(ctok, tSpan.getEnd() - cStart));
-                events.add(new Event(TokContextGenerator.SPLIT, context));
+                String[] context = cg.getContext(ctok, tSpan.getEnd() - cStart);
+                events.add(new Event(DefaultTokenContextGenerator.SPLIT, context));
               }
             }
           }

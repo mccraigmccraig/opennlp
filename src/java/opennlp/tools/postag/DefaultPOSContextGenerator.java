@@ -31,7 +31,7 @@ import opennlp.tools.util.Cache;
  *
  * @author      Gann Bierner
  * @author      Tom Morton
- * @version     $Revision: 1.16 $, $Date: 2008/02/28 13:33:47 $
+ * @version     $Revision: 1.17 $, $Date: 2008/03/05 16:45:13 $
  */
 
 public class DefaultPOSContextGenerator implements POSContextGenerator {
@@ -72,12 +72,6 @@ public class DefaultPOSContextGenerator implements POSContextGenerator {
       contextsCache = new Cache(cacheSize);
     }
   }
-
-  public String[] getContext(Object o) {
-    Object[] data = (Object[]) o;
-    return getContext(((Integer) data[0]).intValue(), (Object[]) data[1], (String[]) data[2], null);
-  }
-
   protected static String[] getPrefixes(String lex) {
     String[] prefs = new String[PREFIX_LENGTH];
     for (int li = 0, ll = PREFIX_LENGTH; li < ll; li++) {

@@ -32,7 +32,6 @@ import opennlp.maxent.TwoPassDataIndexer;
 import opennlp.tools.dictionary.Dictionary;
 import opennlp.tools.ngram.NGramModel;
 import opennlp.tools.ngram.Token;
-import opennlp.tools.ngram.TokenList;
 import opennlp.tools.parser.AbstractBottomUpParser;
 import opennlp.tools.parser.HeadRules;
 import opennlp.tools.parser.Parse;

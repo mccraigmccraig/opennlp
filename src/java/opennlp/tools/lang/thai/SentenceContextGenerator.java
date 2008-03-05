@@ -18,9 +18,9 @@
 
 package opennlp.tools.lang.thai;
 
-import opennlp.tools.sentdetect.SDContextGenerator;
+import opennlp.tools.sentdetect.DefaultSDContextGenerator;
 
-public class SentenceContextGenerator extends SDContextGenerator {
+public class SentenceContextGenerator extends DefaultSDContextGenerator {
 
   public SentenceContextGenerator() {
     super(EndOfSentenceScanner.eosCharacters);

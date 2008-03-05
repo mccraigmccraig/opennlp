@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////////
-//Copyright (C) 2004 Thomas Morton
+//Copyright (C) 2007 OpenNlp
 // 
 //This library is free software; you can redistribute it and/or
 //modify it under the terms of the GNU Lesser General Public
@@ -17,17 +17,47 @@
 //////////////////////////////////////////////////////////////////////////////
 package opennlp.tools.util;
 
-/**
- * Interface for context generators used with a sequence beam search. 
- */
-public interface BeamSearchContextGenerator {
+import java.util.Map;
+import java.util.WeakHashMap;
+
+public class NewCache {
+
+  private class KeyWrapper {
+    private final Object key;
     
-  /** Returns the context for the specified position in the specified sequence (list).  
-     * @param index The index of the sequence.
-     * @param sequence  The sequence of items over which the beam search is performed.
-     * @param priorDecisions The sequence of decisions made prior to the context for which this decision is being made.
-     * @param additionalContext Any addition context specific to a class implementing this interface.
-     * @return the context for the specified position in the specified sequence.
-     */
-  public String[] getContext(int index, Object[] sequence, String[] priorDecisions, Object[] additionalContext);
+    KeyWrapper(Object key) {
+      if (key == null)
+        throw new IllegalArgumentException();
+      
+      this.key = key;
+    }
+    
+    public boolean equals(Object obj) {
+      
+      if (obj == null) 
+        return false;
+      
+      KeyWrapper wrapper = (KeyWrapper) obj;
+      
+      return key.equals(wrapper.key);
+    }
+    
+    public int hashCode() {
+      return key.hashCode();
+    }
+  }
+  
+  private Map map = new WeakHashMap();
+  
+  public Object get(Object key) {
+    return map.get(new KeyWrapper(key));
+  }
+  
+  public void put(Object key, Object value) {
+    map.put(new KeyWrapper(key), value);
+  }
+  
+  public void clear() {
+    map.clear();
+  }
 }

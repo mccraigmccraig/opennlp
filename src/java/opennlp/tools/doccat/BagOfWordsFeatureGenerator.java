@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////////
-//Copyright (C) 2006 Calcucare GmbH
+//Copyright (C) 2008 OpenNlp
 // 
 //This library is free software; you can redistribute it and/or
 //modify it under the terms of the GNU Lesser General Public
@@ -22,10 +22,8 @@ import java.util.ArrayList;
 import java.util.Collection;
 
 /**
-*
-* @author <a href="mailto:kottmann@gmail.com">Joern Kottmann</a>
-* @version $Revision: 1.2 $, $Date: 2007/04/10 12:57:55 $
-*/
+ * 
+ */
 public class BagOfWordsFeatureGenerator implements FeatureGenerator {
 
   public Collection extractFeatures(String[] text) {

@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////////
-//Copyright (C) 2006 Calcucare GmbH
+//Copyright (C) 2008 OpenNlp
 // 
 //This library is free software; you can redistribute it and/or
 //modify it under the terms of the GNU Lesser General Public
@@ -18,7 +18,6 @@
 
 package opennlp.tools.doccat;
 
-import opennlp.maxent.ContextGenerator;
 import opennlp.maxent.DataStream;
 import opennlp.maxent.Event;
 import opennlp.maxent.EventStream;
@@ -26,11 +25,11 @@ import opennlp.maxent.EventStream;
 /**
 *
 * @author <a href="mailto:kottmann@gmail.com">Joern Kottmann</a>
-* @version $Revision: 1.3 $, $Date: 2007/04/10 12:23:42 $
+* @version $Revision: 1.4 $, $Date: 2008/03/05 16:45:12 $
 */
 public class DocumentCategorizerEventStream implements EventStream {
   
-  private ContextGenerator mContextGenerator;
+  private DocumentCategorizerContextGenerator mContextGenerator;
   
   private DataStream data;
   

@@ -18,10 +18,6 @@
 
 package opennlp.tools.chunker;
 
-import java.util.List;
-
-import opennlp.tools.util.Sequence;
-
 /** Features based on chunking model described in Fei Sha and Fernando Pereira. Shallow 
  *  parsing with conditional random fields. In Proceedings of HLT-NAACL 2003. Association 
  *  for Computational Linguistics, 2003.
@@ -33,14 +29,6 @@ public class DefaultChunkerContextGenerator implements ChunkerContextGenerator {
    * Creates the default context generator a chunker.
    */
   public DefaultChunkerContextGenerator() {
-    super();
-  }
-  
-  /* inherieted java doc */
-  public String[] getContext(Object o) {
-    Object[] data = (Object[]) o;
-    List outcomes = ((Sequence) data[2]).getOutcomes();
-    return getContext(((Integer) data[0]).intValue(), (Object[]) data[1], (String[]) data[3], outcomes.toArray(new String[outcomes.size()]));
   }
   
   public String[] getContext(int index, Object[] sequence, String[] priorDecisions, Object[] additionalContext) {
@@ -155,5 +143,4 @@ public class DefaultChunkerContextGenerator implements ChunkerContextGenerator {
     
     return features;
   }
-
 }

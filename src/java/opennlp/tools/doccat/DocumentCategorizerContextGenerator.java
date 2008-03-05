@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////////
-//Copyright (C) 2006 Calcucare GmbH
+//Copyright (C) 2008 OpenNlp
 // 
 //This library is free software; you can redistribute it and/or
 //modify it under the terms of the GNU Lesser General Public
@@ -21,14 +21,10 @@ package opennlp.tools.doccat;
 import java.util.Collection;
 import java.util.LinkedList;
 
-import opennlp.maxent.ContextGenerator;
-
 /**
-*
-* @author <a href="mailto:kottmann@gmail.com">Joern Kottmann</a>
-* @version $Revision: 1.1 $, $Date: 2006/11/08 18:43:25 $
-*/
-class DocumentCategorizerContextGenerator implements ContextGenerator{
+ * 
+ */
+class DocumentCategorizerContextGenerator {
   
   private FeatureGenerator[] mFeatureGenerators;
   

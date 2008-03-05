@@ -28,7 +28,6 @@ import java.io.Reader;
 import java.util.ArrayList;
 import java.util.List;
 
-import opennlp.maxent.ContextGenerator;
 import opennlp.maxent.DataStream;
 import opennlp.maxent.EventStream;
 import opennlp.maxent.GIS;
@@ -38,7 +37,6 @@ import opennlp.maxent.MaxentModel;
 import opennlp.maxent.PlainTextByLineDataStream;
 import opennlp.maxent.io.SuffixSensitiveGISModelWriter;
 import opennlp.tools.lang.thai.SentenceContextGenerator;
-import opennlp.tools.util.Pair;
 
 /**
  * A sentence detector for splitting up raw text into sentences.  A maximum
@@ -46,7 +44,7 @@ import opennlp.tools.util.Pair;
  * string to determine if they signify the end of a sentence.
  *
  * @author      Jason Baldridge and Tom Morton
- * @version     $Revision: 1.16 $, $Date: 2006/11/17 12:24:58 $
+ * @version     $Revision: 1.17 $, $Date: 2008/03/05 16:45:13 $
  */
 
 public class SentenceDetectorME implements SentenceDetector {
@@ -55,7 +53,7 @@ public class SentenceDetectorME implements SentenceDetector {
   private MaxentModel model;
 
   /** The feature context generator. */
-  private final ContextGenerator cgen;
+  private final SDContextGenerator cgen;
 
   /** The EndOfSentenceScanner to use when scanning for end of sentence offsets. */
   private final EndOfSentenceScanner scanner;
@@ -77,7 +75,7 @@ public class SentenceDetectorME implements SentenceDetector {
    *          evaluate end-of-sentence decisions.
    */
   public SentenceDetectorME(MaxentModel m) {
-    this(m, new SDContextGenerator(opennlp.tools.lang.english.EndOfSentenceScanner.eosCharacters), new opennlp.tools.lang.english.EndOfSentenceScanner());
+    this(m, new DefaultSDContextGenerator(opennlp.tools.lang.english.EndOfSentenceScanner.eosCharacters), new opennlp.tools.lang.english.EndOfSentenceScanner());
   }
 
   /**
@@ -90,7 +88,7 @@ public class SentenceDetectorME implements SentenceDetector {
    *           will use to turn Strings into contexts for the model to
    *           evaluate.
    */
-  public SentenceDetectorME(MaxentModel m, ContextGenerator cg) {
+  public SentenceDetectorME(MaxentModel m, SDContextGenerator cg) {
     this(m, cg, new opennlp.tools.lang.english.EndOfSentenceScanner());
   }
 
@@ -105,7 +103,7 @@ public class SentenceDetectorME implements SentenceDetector {
    * @param s the EndOfSentenceScanner which this SentenceDetectorME
    *          will use to locate end of sentence indexes.
    */
-  public SentenceDetectorME(MaxentModel m, ContextGenerator cg, EndOfSentenceScanner s) {
+  public SentenceDetectorME(MaxentModel m, SDContextGenerator cg, EndOfSentenceScanner s) {
     model = m;
     cgen = cg;
     scanner = s;
@@ -178,8 +176,7 @@ public class SentenceDetectorME implements SentenceDetector {
         continue;
       }
 
-      Pair pair = new Pair(sb, candidate);
-      double[] probs = model.eval(cgen.getContext(pair));
+      double[] probs = model.eval(cgen.getContext(sb, candidate.intValue()));
       String bestOutcome = model.getBestOutcome(probs);
       sentProb *= probs[model.getIndex(bestOutcome)];
       //System.err.println("sentPosDetect: cand="+cint+" index="+index+" "+bestOutcome+" "+probs[model.getIndex(bestOutcome)]+" "+s.substring(0,cint));
@@ -332,7 +329,7 @@ public class SentenceDetectorME implements SentenceDetector {
       SDContextGenerator cg = null;
       if (lang == null || lang.equals("english") || lang.equals("spanish")) {
         scanner = new opennlp.tools.lang.english.EndOfSentenceScanner();
-        cg = new SDContextGenerator(scanner.getEndOfSentenceCharacters());
+        cg = new DefaultSDContextGenerator(scanner.getEndOfSentenceCharacters());
       }
       else if (lang.equals("thai")) {
         scanner = new opennlp.tools.lang.thai.EndOfSentenceScanner();

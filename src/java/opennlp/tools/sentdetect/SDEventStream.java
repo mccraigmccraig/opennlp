@@ -37,7 +37,7 @@ import opennlp.maxent.PlainTextByLineDataStream;
  * @author      Jason Baldridge
  * @author      Eric D. Friedman
  * @author      Thomas Morton
- * @version     $Revision: 1.6 $, $Date: 2006/11/17 12:24:58 $
+ * @version     $Revision: 1.7 $, $Date: 2008/03/05 16:45:13 $
  */
 public class SDEventStream implements EventStream {
     private DataStream data;
@@ -54,7 +54,7 @@ public class SDEventStream implements EventStream {
      * @param d a <code>DataStream</code> value
      */
     public SDEventStream(DataStream d) {
-      this(d,new opennlp.tools.lang.english.EndOfSentenceScanner(), new SDContextGenerator(opennlp.tools.lang.english.EndOfSentenceScanner.eosCharacters));
+      this(d,new opennlp.tools.lang.english.EndOfSentenceScanner(), new DefaultSDContextGenerator(opennlp.tools.lang.english.EndOfSentenceScanner.eosCharacters));
     }
     
     /**
@@ -65,7 +65,7 @@ public class SDEventStream implements EventStream {
      * @param s 
      */
     public SDEventStream (DataStream d, EndOfSentenceScanner s) {
-      this(d,s,new SDContextGenerator(s.getEndOfSentenceCharacters()));
+      this(d,s,new DefaultSDContextGenerator(s.getEndOfSentenceCharacters()));
     }
 
     /**
@@ -195,7 +195,7 @@ public class SDEventStream implements EventStream {
       SDContextGenerator cg = null;
       if (lang == null || lang.equals("english") || lang.equals("spanish")) {
         scanner = new opennlp.tools.lang.english.EndOfSentenceScanner();
-        cg = new SDContextGenerator(scanner.getEndOfSentenceCharacters());
+        cg = new DefaultSDContextGenerator(scanner.getEndOfSentenceCharacters());
       }
       else if (lang.equals("thai")) {
         scanner = new opennlp.tools.lang.thai.EndOfSentenceScanner();

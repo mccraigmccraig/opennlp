@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////////
-//Copyright (C) 2006 Calcucare GmbH
+//Copyright (C) 2008 OpenNlp
 // 
 //This library is free software; you can redistribute it and/or
 //modify it under the terms of the GNU Lesser General Public
@@ -20,7 +20,6 @@ package opennlp.tools.doccat;
 
 import java.io.IOException;
 
-import opennlp.maxent.ContextGenerator;
 import opennlp.maxent.GIS;
 import opennlp.maxent.GISModel;
 import opennlp.maxent.MaxentModel;
@@ -29,14 +28,12 @@ import opennlp.tools.tokenize.SimpleTokenizer;
 import opennlp.tools.tokenize.Tokenizer;
 
 /**
-*
-* @author <a href="mailto:kottmann@gmail.com">Joern Kottmann</a>
-* @version $Revision: 1.4 $, $Date: 2007/04/11 17:11:59 $
-*/
+ *
+ */
 public class DocumentCategorizerME implements DocumentCategorizer {
   
   MaxentModel mModel;
-  private ContextGenerator mContextGenerator;
+  private DocumentCategorizerContextGenerator mContextGenerator;
   
   /**
    * Initializes the current instance with the given {@link MaxentModel}.

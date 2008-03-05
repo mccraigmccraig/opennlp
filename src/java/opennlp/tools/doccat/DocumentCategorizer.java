@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////////
-//Copyright (C) 2006 Calcucare GmbH
+//Copyright (C) 2008 OpenNlp
 // 
 //This library is free software; you can redistribute it and/or
 //modify it under the terms of the GNU Lesser General Public
@@ -19,10 +19,8 @@
 package opennlp.tools.doccat;
 
 /**
-*
-* @author <a href="mailto:kottmann@gmail.com">Joern Kottmann</a>
-* @version $Revision: 1.2 $, $Date: 2006/11/17 13:31:01 $
-*/
+ *
+ */
 public interface DocumentCategorizer {
 
   /**

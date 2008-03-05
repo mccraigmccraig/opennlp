@@ -24,13 +24,11 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Pattern;
 
-import opennlp.maxent.ContextGenerator;
 import opennlp.maxent.EventStream;
 import opennlp.maxent.GISModel;
 import opennlp.maxent.MaxentModel;
 import opennlp.maxent.TwoPassDataIndexer;
 import opennlp.maxent.io.SuffixSensitiveGISModelWriter;
-import opennlp.tools.util.ObjectIntPair;
 import opennlp.tools.util.Span;
 
 /**
@@ -41,7 +39,7 @@ import opennlp.tools.util.Span;
  * homepage: <http://www.cis.upenn.edu/~jcreynar>.
  *
  * @author      Tom Morton
- * @version $Revision: 1.20 $, $Date: 2007/06/16 22:13:02 $
+ * @version $Revision: 1.21 $, $Date: 2008/03/05 16:45:13 $
  */
 
 public class TokenizerME extends AbstractTokenizer {
@@ -54,7 +52,7 @@ public class TokenizerME extends AbstractTokenizer {
   /**
    * The context generator.
    */
-  private final ContextGenerator cg = new TokContextGenerator();
+  private final TokenContextGenerator cg = new DefaultTokenContextGenerator();
 
   private static final Double ONE = new Double(1.0);
   
@@ -130,11 +128,11 @@ public class TokenizerME extends AbstractTokenizer {
         double tokenProb = 1.0;
         for (int j = origStart + 1; j < end; j++) {
           double[] probs =
-            model.eval(cg.getContext(new ObjectIntPair(tok, j - origStart)));
+            model.eval(cg.getContext(tok, j - origStart));
           String best = model.getBestOutcome(probs);
           //System.err.println("TokenizerME: "+tok.substring(0,j-origStart)+"^"+tok.substring(j-origStart)+" "+best+" "+probs[model.getIndex(best)]);
           tokenProb *= probs[model.getIndex(best)];
-          if (best.equals(TokContextGenerator.SPLIT)) {
+          if (best.equals(DefaultTokenContextGenerator.SPLIT)) {
             newTokens.add(new Span(start, j));
             tokProbs.add(new Double(tokenProb));
             start = j;

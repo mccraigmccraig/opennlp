@@ -23,9 +23,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
-import opennlp.maxent.ContextGenerator;
-
-public abstract class AbstractContextGenerator implements ContextGenerator {
+public abstract class AbstractContextGenerator {
 
   protected static final String EOS = "eos";
 
@@ -35,7 +33,7 @@ public abstract class AbstractContextGenerator implements ContextGenerator {
   protected boolean useLabel;
   
   /**
-   * Creates punctuation feature for the specified punctuation at the specfied index based on the punctuation mark.
+   * Creates punctuation feature for the specified punctuation at the specified index based on the punctuation mark.
    * @param punct The punctuation which is in context.
    * @param i The index of the punctuation with relative to the parse.
    * @return Punctuation feature for the specified parse and the specified punctuation at the specfied index.

@@ -21,18 +21,14 @@ package opennlp.tools.tokenize;
 import java.util.ArrayList;
 import java.util.List;
 
-import opennlp.maxent.ContextGenerator;
-import opennlp.tools.util.ObjectIntPair;
-
-
 /**
  * Generate events for maxent decisions for tokenization.
  *
  * @author      Jason Baldridge
- * @version     $Revision: 1.5 $, $Date: 2006/11/17 12:20:38 $
+ * @version     $Revision: 1.1 $, $Date: 2008/03/05 16:45:13 $
  */
 
-public class TokContextGenerator implements ContextGenerator {
+public class DefaultTokenContextGenerator implements TokenContextGenerator {
 
   /**
    * Constant indicates a token split.
@@ -43,23 +39,9 @@ public class TokContextGenerator implements ContextGenerator {
    * Constant indicates no token split.
    */
   public static final String NO_SPLIT ="F";
-  
-  /**
-   * Builds up the list of features based on the information in the Object,
-   * which is a pair containing a String and and Integer which
-   * indicates the index of the position we are investigating.
-   */
-  public String[] getContext(Object o) {
-    String sb = (String)((ObjectIntPair)o).a;
-    int id = ((ObjectIntPair)o).b;
-    return getContext(sb,id);
-  }
 
-  /**
-   * Returns an array of features for the specified sentence string at the specified index.
-   * @param sentence The string for a sentence.
-   * @param index The index to consider spliting as a token.
-   * @return an array of features for the specified sentence string at the specified index.
+  /* (non-Javadoc)
+   * @see opennlp.tools.tokenize.TokenContextGenerator#getContext(java.lang.String, int)
    */
   public String[] getContext(String sentence, int index) {	
     List preds = new ArrayList();

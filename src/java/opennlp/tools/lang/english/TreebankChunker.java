@@ -19,13 +19,11 @@ package opennlp.tools.lang.english;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.List;
 
 import opennlp.maxent.MaxentModel;
 import opennlp.maxent.io.SuffixSensitiveGISModelReader;
 import opennlp.tools.chunker.ChunkerContextGenerator;
 import opennlp.tools.chunker.ChunkerME;
-import opennlp.tools.util.Sequence;
 
 /** This is a chunker based on the CONLL chunking task which uses Penn Treebank constituents as the basis for the chunks.
  *   See   http://cnts.uia.ac.be/conll2000/chunking/ for data and task definition.
