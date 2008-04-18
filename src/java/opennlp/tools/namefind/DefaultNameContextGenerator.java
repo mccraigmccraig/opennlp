@@ -32,6 +32,11 @@ public class DefaultNameContextGenerator implements NameContextGenerator {
   
   private static Object[] prevTokens;
   private static String[] prevStrings;
+  private static AdaptiveFeatureGenerator windowFeatures = new CachedFeatureGenerator(
+      new AdaptiveFeatureGenerator[]{
+      new WindowFeatureGenerator(new TokenFeatureGenerator(), 2, 2), 
+      new WindowFeatureGenerator(new TokenClassFeatureGenerator(true), 2, 2)
+      });
   
   /**
    * Creates a name context generator.
@@ -51,12 +56,9 @@ public class DefaultNameContextGenerator implements NameContextGenerator {
     else {
       // use defaults
       
-      this.featureGenerators =  new AdaptiveFeatureGenerator[1];
-      
-      this.featureGenerators[0] = new CachedFeatureGenerator(new AdaptiveFeatureGenerator[]{
-          new WindowFeatureGenerator(new TokenFeatureGenerator(), 2, 2), 
-          new WindowFeatureGenerator(new TokenClassFeatureGenerator(true), 2, 2), 
-          new PreviousMapFeatureGenerator()});
+      this.featureGenerators = new AdaptiveFeatureGenerator[]{
+          windowFeatures, 
+          new PreviousMapFeatureGenerator()};
     }    
   }
   
@@ -101,17 +103,6 @@ public class DefaultNameContextGenerator implements NameContextGenerator {
    * @return the context for finding names at the specified index.
    */
   public String[] getContext(int index, Object[] toks, String[] preds, String[][] additionalContext) {
-    String po=NameFinderME.OTHER;
-    String ppo=NameFinderME.OTHER;
-
-    if (index > 1){
-      ppo = preds[index-2];
-    }
-
-    if (index > 0) {
-      po = preds[index-1];
-    }
-
     List features = new ArrayList();
     features.add("def");
     String[] tokens;
@@ -137,12 +128,30 @@ public class DefaultNameContextGenerator implements NameContextGenerator {
     if (index == 0) {
       features.add("fwis"); //first word in sentence
     }
-    String[] contexts = (String[]) features.toArray(new String[features.size() + 4]);
+    
+    //previous outcome features
+    String po=NameFinderME.OTHER;
+    String ppo=NameFinderME.OTHER;
 
-    contexts[features.size()] = "po=" + po;
-    contexts[features.size() + 1] = "pow=" + po + "," + toks[index];
-    contexts[features.size() + 2] = "powf=" + po + "," + FeatureGeneratorUtil.tokenFeature(toks[index].toString());
-    contexts[features.size() + 3] = "ppo=" + ppo;
-    return contexts;
-  } 
+    if (index > 1){
+      ppo = preds[index-2];
+    }
+
+    if (index > 0) {
+      po = preds[index-1];
+    }
+    features.add("po=" + po);
+    features.add("pow=" + po + "," + toks[index]);
+    features.add("powf=" + po + "," + FeatureGeneratorUtil.tokenFeature(toks[index].toString()));
+    features.add("ppo=" + ppo);
+    
+    //callNum++;  if (callNum % 100000 == 0) { cacheReport(); }
+    return (String[]) features.toArray(new String[features.size()]);
+  }
+  
+  private static int callNum = 0;
+
+  private void cacheReport() {
+    System.err.println(windowFeatures.toString());
+  }
 }
