@@ -35,7 +35,6 @@ public class CachedFeatureGenerator implements AdaptiveFeatureGenerator {
   private Cache contextsCache;
 
   private long numberOfCacheHits;
-  
   private long numberOfCacheMisses;
   
   public CachedFeatureGenerator(AdaptiveFeatureGenerator generators[]) {
@@ -54,7 +53,6 @@ public class CachedFeatureGenerator implements AdaptiveFeatureGenerator {
       if (cacheFeatures != null) {
         numberOfCacheHits++;
         features.addAll(cacheFeatures);
-        
         return;
       }
       
@@ -103,7 +101,7 @@ public class CachedFeatureGenerator implements AdaptiveFeatureGenerator {
   }
   
   public String toString() {
-    return "Total cache Hits/Misses ratio: " + (getNumberOfCacheHits() > 0 ? 
-        numberOfCacheHits / getNumberOfCacheMisses() : 0);
+    return super.toString()+": hits=" + numberOfCacheHits+" misses="+ numberOfCacheMisses+" hit%"+ (numberOfCacheHits > 0 ? 
+        (double)numberOfCacheHits/(numberOfCacheMisses+numberOfCacheHits) : 0);
   }
 }
