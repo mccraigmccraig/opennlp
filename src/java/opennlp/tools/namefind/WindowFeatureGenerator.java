@@ -44,10 +44,9 @@ public class WindowFeatureGenerator implements AdaptiveFeatureGenerator {
   /**
    * Initializes the current instance with the given parameters.
    * 
-   * @param generator
-   * @param prevWindowSize
-   * @param nextWindowSize
-   * @param caching
+   * @param generator Feature generator to apply to the window.
+   * @param prevWindowSize Size of the window to the left of the current token.
+   * @param nextWindowSize Size of the window to the right of the current token.
    */
   public WindowFeatureGenerator(AdaptiveFeatureGenerator generator, int prevWindowSize,  int nextWindowSize) {
     this.generator = generator;
@@ -65,11 +64,8 @@ public class WindowFeatureGenerator implements AdaptiveFeatureGenerator {
   }
   
   public void createFeatures(List features, String[] tokens, int index, String[] preds) {
-    List cacheFeatures;
-      cacheFeatures = features;
-      
     // current features
-    generator.createFeatures(cacheFeatures, tokens, index, preds);
+    generator.createFeatures(features, tokens, index, preds);
 
     // previous features
     for (int i = 1; i < prevWindowSize + 1; i++) {
@@ -80,7 +76,7 @@ public class WindowFeatureGenerator implements AdaptiveFeatureGenerator {
         generator.createFeatures(prevFeatures, tokens, index - i, preds);
 
         for (Iterator it = prevFeatures.iterator(); it.hasNext();) {
-          cacheFeatures.add(PREV_PREFIX + i + it.next().toString());
+          features.add(PREV_PREFIX + i + it.next().toString());
         }
       }
     }
@@ -94,7 +90,7 @@ public class WindowFeatureGenerator implements AdaptiveFeatureGenerator {
         generator.createFeatures(nextFeatures, tokens, index + i, preds);
 
         for (Iterator it = nextFeatures.iterator(); it.hasNext();) {
-          cacheFeatures.add(NEXT_PREFIX + i + it.next().toString());
+          features.add(NEXT_PREFIX + i + it.next().toString());
         }
       }
     }
@@ -109,7 +105,6 @@ public class WindowFeatureGenerator implements AdaptiveFeatureGenerator {
   }
   
   public String toString() {
-    return "Prev windwow size: " + prevWindowSize + 
-        ", Next window size: " + nextWindowSize;
+    return super.toString()+": Prev windwow size: " + prevWindowSize +", Next window size: " + nextWindowSize;
   }
 }
