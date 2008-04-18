@@ -68,7 +68,7 @@ public class NameFinderME implements TokenNameFinder {
      * valid.
      * 
      * @param outcome The outcome.
-     * @param sequence The preceding sequence of outcomes assignments.
+     * @param inputSequence The preceding sequence of outcomes assignments.
      * @return true is the outcome is valid for the sequence, false otherwise.
      */
     protected boolean validSequence(int size, Object[] inputSequence,
@@ -133,7 +133,7 @@ public class NameFinderME implements TokenNameFinder {
   }
   
   /** Generates name tags for the given sequence, typically a sentence, returning token spans for any identified names.
-   * @param toks an array of the tokens or words of the sequence, typically a sentence.
+   * @param tokens an array of the tokens or words of the sequence, typically a sentence.
    * @param additionalContext features which are based on context outside of the sentence but which should also be used.
    * @return an array of spans for each of the names identified.
    */
