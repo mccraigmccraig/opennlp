@@ -15,13 +15,15 @@
 //License along with this program; if not, write to the Free Software
 //Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 //////////////////////////////////////////////////////////////////////////////
-package opennlp.tools.namefind;
+package opennlp.tools.util.featuregen;
 
 import java.util.List;
 
+import opennlp.tools.util.featuregen.FeatureGeneratorAdapter;
+
 class IdentityFeatureGenerator extends FeatureGeneratorAdapter {
 
-  public void createFeatures(List features, String[] tokens, int index,
+  public void createFeatures(List<String> features, String[] tokens, int index,
       String[] previousOutcomes) {
     features.add(tokens[index]);
   }

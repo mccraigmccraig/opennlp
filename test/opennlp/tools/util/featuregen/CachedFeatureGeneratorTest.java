@@ -15,10 +15,13 @@
 //License along with this program; if not, write to the Free Software
 //Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 //////////////////////////////////////////////////////////////////////////////
-package opennlp.tools.namefind;
+package opennlp.tools.util.featuregen;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import opennlp.tools.util.featuregen.AdaptiveFeatureGenerator;
+import opennlp.tools.util.featuregen.CachedFeatureGenerator;
 
 import junit.framework.Assert;
 import junit.framework.TestCase;
@@ -35,7 +38,7 @@ public class CachedFeatureGeneratorTest extends TestCase {
   
   private String testSentence2[];
   
-  private List features;
+  private List<String> features;
   
   protected void setUp() throws Exception {
     
@@ -43,7 +46,7 @@ public class CachedFeatureGeneratorTest extends TestCase {
     
     testSentence2 = new String[] {"a2", "b2", "c2", "d2"};
     
-    features = new ArrayList();
+    features = new ArrayList<String>();
   }
   
   /**

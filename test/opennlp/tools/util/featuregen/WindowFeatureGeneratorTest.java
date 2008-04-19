@@ -15,10 +15,13 @@
 //License along with this program; if not, write to the Free Software
 //Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 //////////////////////////////////////////////////////////////////////////////
-package opennlp.tools.namefind;
+package opennlp.tools.util.featuregen;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import opennlp.tools.util.featuregen.AdaptiveFeatureGenerator;
+import opennlp.tools.util.featuregen.WindowFeatureGenerator;
 
 import junit.framework.Assert;
 import junit.framework.TestCase;
@@ -26,15 +29,15 @@ import junit.framework.TestCase;
 /**
  * Test for the {@link WindowFeatureGenerator} class.
  */
-public class WindowsFeatureGeneratorTest extends TestCase {
+public class WindowFeatureGeneratorTest extends TestCase {
 
   private String[] testSentence = new String[] {"a", "b", "c", "d", 
       "e", "f", "g", "h"};
   
-  private List features;
+  private List<String> features;
   
   protected void setUp() throws Exception {
-    features = new ArrayList();
+    features = new ArrayList<String>();
   }
   
   /**
