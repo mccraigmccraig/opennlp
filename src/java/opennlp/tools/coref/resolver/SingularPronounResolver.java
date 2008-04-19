@@ -52,8 +52,8 @@ public class SingularPronounResolver extends MaxentResolver {
     return (tag != null && tag.startsWith("PRP") && Linker.singularThirdPersonPronounPattern.matcher(mention.getHeadTokenText()).matches());
   }
 
-  protected List getFeatures(MentionContext mention, DiscourseEntity entity) {
-    List features = new ArrayList();
+  protected List<String> getFeatures(MentionContext mention, DiscourseEntity entity) {
+    List<String> features = new ArrayList<String>();
     features.addAll(super.getFeatures(mention, entity));
     if (entity != null) { //generate pronoun w/ referent features
       MentionContext cec = entity.getLastExtent();
@@ -105,7 +105,7 @@ public class SingularPronounResolver extends MaxentResolver {
     }
     String mentionGender = null;
 
-    for (Iterator ei = entity.getMentions(); ei.hasNext();) {
+    for (Iterator<MentionContext> ei = entity.getMentions(); ei.hasNext();) {
       MentionContext entityMention = (MentionContext) ei.next();
       String tag = entityMention.getHeadTokenTag();
       if (tag != null && tag.startsWith("PRP") && Linker.singularThirdPersonPronounPattern.matcher(mention.getHeadTokenText()).matches()) {

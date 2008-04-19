@@ -41,7 +41,7 @@ import opennlp.tools.coref.mention.MentionContext;
 public class ProperNounResolver extends MaxentResolver {
 
   private static final Pattern initialCaps = Pattern.compile("^[A-Z]");
-  private static Map acroMap;
+  private static Map<String, Set<String>> acroMap;
   private static boolean acroMapLoaded = false;
 
   public ProperNounResolver(String projectName, ResolverMode m) throws IOException {
@@ -67,7 +67,7 @@ public class ProperNounResolver extends MaxentResolver {
   }
 
   private void initAcronyms(String name) {
-    acroMap = new HashMap(15000);
+    acroMap = new HashMap<String, Set<String>>(15000);
     try {
       BufferedReader str;
       if (MaxentResolver.loadAsResource()) {
@@ -82,15 +82,15 @@ public class ProperNounResolver extends MaxentResolver {
         StringTokenizer st = new StringTokenizer(line, "\t");
         String acro = st.nextToken();
         String full = st.nextToken();
-        Set exSet = (Set) acroMap.get(acro);
+        Set<String> exSet = acroMap.get(acro);
         if (exSet == null) {
-          exSet = new HashSet();
+          exSet = new HashSet<String>();
           acroMap.put(acro, exSet);
         }
         exSet.add(full);
-        exSet = (Set) acroMap.get(full);
+        exSet = acroMap.get(full);
         if (exSet == null) {
-          exSet = new HashSet();
+          exSet = new HashSet<String>();
           acroMap.put(full, exSet);
         }
         exSet.add(acro);
@@ -102,7 +102,7 @@ public class ProperNounResolver extends MaxentResolver {
   }
 
   private MentionContext getProperNounExtent(DiscourseEntity de) {
-    for (Iterator ei = de.getMentions(); ei.hasNext();) { //use first extent which is propername
+    for (Iterator<MentionContext> ei = de.getMentions(); ei.hasNext();) { //use first extent which is propername
       MentionContext xec = (MentionContext) ei.next();
       String xecHeadTag = xec.getHeadTokenTag();
       if (xecHeadTag.startsWith("NNP") || initialCaps.matcher(xec.getHeadTokenText()).find()) {
@@ -114,30 +114,30 @@ public class ProperNounResolver extends MaxentResolver {
 
 
   private boolean isAcronym(String ecStrip, String xecStrip) {
-    Set exSet = (Set) acroMap.get(ecStrip);
+    Set<String> exSet = acroMap.get(ecStrip);
     if (exSet != null && exSet.contains(xecStrip)) {
       return true;
     }
     return false;
   }
 
-  protected List getAcronymFeatures(MentionContext mention, DiscourseEntity entity) {
+  protected List<String> getAcronymFeatures(MentionContext mention, DiscourseEntity entity) {
     MentionContext xec = getProperNounExtent(entity);
     String ecStrip = stripNp(mention);
     String xecStrip = stripNp(xec);
     if (ecStrip != null && xecStrip != null) {
       if (isAcronym(ecStrip, xecStrip)) {
-        List features = new ArrayList(1);        
+        List<String> features = new ArrayList<String>(1);        
         features.add("knownAcronym");
         return features;
       }
     }
-    return Collections.EMPTY_LIST;
+    return Collections.emptyList();
   }
 
-  protected List getFeatures(MentionContext mention, DiscourseEntity entity) {
+  protected List<String> getFeatures(MentionContext mention, DiscourseEntity entity) {
     //System.err.println("ProperNounResolver.getFeatures: "+mention.toText()+" -> "+entity);
-    List features = new ArrayList();
+    List<String> features = new ArrayList<String>();
     features.addAll(super.getFeatures(mention, entity));
     if (entity != null) {
       features.addAll(getStringMatchFeatures(mention, entity));
@@ -148,15 +148,17 @@ public class ProperNounResolver extends MaxentResolver {
 
   public boolean excluded(MentionContext mention, DiscourseEntity entity) {
     if (super.excluded(mention, entity)) {
-      return (true);
+      return true;
     }
-    for (Iterator ei = entity.getMentions(); ei.hasNext();) {
-      MentionContext xec = (MentionContext) ei.next();
+    
+    for (Iterator<MentionContext> ei = entity.getMentions(); ei.hasNext();) {
+      MentionContext xec = ei.next();
       if (xec.getHeadTokenTag().startsWith("NNP")) { // || initialCaps.matcher(xec.headToken.toString()).find()) {
         //System.err.println("MaxentProperNounResolver.exclude: kept "+xec.toText()+" with "+xec.headTag);
-        return (false);
+        return false;
       }
     }
-    return (true);
+    
+    return true;
   }
 }

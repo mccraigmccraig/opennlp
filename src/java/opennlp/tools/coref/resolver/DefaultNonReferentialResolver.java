@@ -24,7 +24,7 @@ import opennlp.tools.util.CollectionEventStream;
 public class DefaultNonReferentialResolver implements NonReferentialResolver {
 
   private MaxentModel model;
-  private List events;
+  private List<Event> events;
   private boolean loadAsResource;
   private boolean debugOn = false;
   private ResolverMode mode;
@@ -36,7 +36,7 @@ public class DefaultNonReferentialResolver implements NonReferentialResolver {
     this.mode = mode;
     this.modelName = projectName+"/"+name+".nr";
     if (mode == ResolverMode.TRAIN) {
-      events = new ArrayList();
+      events = new ArrayList<Event>();
     }
     else if (mode == ResolverMode.TEST) {
       if (loadAsResource) {
@@ -53,24 +53,24 @@ public class DefaultNonReferentialResolver implements NonReferentialResolver {
   }
   
   public double getNonReferentialProbability(MentionContext mention) {
-    List features = getFeatures(mention);
+    List<String> features = getFeatures(mention);
     double r = model.eval((String[]) features.toArray(new String[features.size()]))[nonRefIndex];
     if (debugOn) System.err.println(this +" " + mention.toText() + " ->  null " + r + " " + features);
     return r;
   }
   
   public void addEvent(MentionContext ec) {
-    List features = getFeatures(ec);
+    List<String> features = getFeatures(ec);
     if (-1 == ec.getId()) {
-      events.add(new Event(MaxentResolver.SAME, (String[]) features.toArray(new String[features.size()])));
+      events.add(new Event(MaxentResolver.SAME, features.toArray(new String[features.size()])));
     }
     else {
-      events.add(new Event(MaxentResolver.DIFF, (String[]) features.toArray(new String[features.size()])));
+      events.add(new Event(MaxentResolver.DIFF, features.toArray(new String[features.size()])));
     } 
   }
   
-  protected List getFeatures(MentionContext mention) {
-    List features = new ArrayList();
+  protected List<String> getFeatures(MentionContext mention) {
+    List<String> features = new ArrayList<String>();
     features.add(MaxentResolver.DEFAULT);
     features.addAll(getNonReferentialFeatures(mention));
     return features;
@@ -81,13 +81,13 @@ public class DefaultNonReferentialResolver implements NonReferentialResolver {
    * @param mention The mention under considereation.
    * @return a list of featues used to predict whether the sepcified mention is non-referential.
    */
-  protected List getNonReferentialFeatures(MentionContext mention) {
-    List features = new ArrayList();
+  protected List<String> getNonReferentialFeatures(MentionContext mention) {
+    List<String> features = new ArrayList<String>();
     Parse[] mtokens = mention.getTokenParses();
     //System.err.println("getNonReferentialFeatures: mention has "+mtokens.length+" tokens");
     for (int ti = 0; ti <= mention.getHeadTokenIndex(); ti++) {
       Parse tok = mtokens[ti];
-      List wfs = MaxentResolver.getWordFeatures(tok);
+      List<String> wfs = MaxentResolver.getWordFeatures(tok);
       for (int wfi = 0; wfi < wfs.size(); wfi++) {
         features.add("nr" + (String) wfs.get(wfi));
       }
@@ -101,8 +101,8 @@ public class DefaultNonReferentialResolver implements NonReferentialResolver {
       System.err.println(this +" referential");
       if (debugOn) {
         FileWriter writer = new FileWriter(modelName+".events");
-        for (Iterator ei=events.iterator();ei.hasNext();) {
-          Event e = (Event) ei.next();
+        for (Iterator<Event> ei=events.iterator();ei.hasNext();) {
+          Event e = ei.next();
           writer.write(e.toString()+"\n");
         }
         writer.close();

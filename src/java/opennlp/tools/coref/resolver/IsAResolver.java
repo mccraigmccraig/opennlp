@@ -89,16 +89,16 @@ public class IsAResolver extends MaxentResolver {
     return (true);
   }
 
-  protected List getFeatures(MentionContext mention, DiscourseEntity entity) {
-    List features = new ArrayList();
+  protected List<String> getFeatures(MentionContext mention, DiscourseEntity entity) {
+    List<String> features = new ArrayList<String>();
     features.addAll(super.getFeatures(mention, entity));
     if (entity != null) {
       MentionContext ant = entity.getLastExtent();
-      List leftContexts = getContextFeatures(ant);
+      List<String> leftContexts = getContextFeatures(ant);
       for (int ci = 0, cn = leftContexts.size(); ci < cn; ci++) {
         features.add("l" + leftContexts.get(ci));
       }
-      List rightContexts = getContextFeatures(mention);
+      List<String> rightContexts = getContextFeatures(mention);
       for (int ci = 0, cn = rightContexts.size(); ci < cn; ci++) {
         features.add("r" + rightContexts.get(ci));
       }

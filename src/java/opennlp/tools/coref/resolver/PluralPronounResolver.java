@@ -40,8 +40,8 @@ public class PluralPronounResolver extends MaxentResolver {
     super(projectName, "tmodel", m, 30,nrr);
   }
 
-  protected List getFeatures(MentionContext mention, DiscourseEntity entity) {
-    List features = new ArrayList();
+  protected List<String> getFeatures(MentionContext mention, DiscourseEntity entity) {
+    List<String> features = new ArrayList<String>();
     features.addAll(super.getFeatures(mention,entity));
     //features.add("eid="+pc.id);
     if (entity != null) { //generate pronoun w/ referent features

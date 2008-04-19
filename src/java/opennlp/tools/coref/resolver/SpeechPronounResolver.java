@@ -44,12 +44,12 @@ public class SpeechPronounResolver extends MaxentResolver {
   }
 
 
-  protected List getFeatures(MentionContext mention, DiscourseEntity entity) {
-    List features = new ArrayList();
+  protected List<String> getFeatures(MentionContext mention, DiscourseEntity entity) {
+    List<String> features = new ArrayList<String>();
     features.addAll(super.getFeatures(mention, entity));
     if (entity != null) {
       features.addAll(getPronounMatchFeatures(mention,entity));
-      List contexts = getContextFeatures(mention);
+      List<String> contexts = getContextFeatures(mention);
       MentionContext cec = entity.getLastExtent();
       if (mention.getHeadTokenTag().startsWith("PRP") && cec.getHeadTokenTag().startsWith("PRP")) {
         features.add(mention.getHeadTokenText() + "," + cec.getHeadTokenText());
@@ -61,7 +61,7 @@ public class SpeechPronounResolver extends MaxentResolver {
         features.add(mention.getNameType() + "," + cec.getHeadTokenText());
       }
       else {
-        List ccontexts = getContextFeatures(cec);
+        List<String> ccontexts = getContextFeatures(cec);
         for (int ci = 0, cl = ccontexts.size(); ci < cl; ci++) {
           features.add(ccontexts.get(ci));
         }

@@ -82,7 +82,7 @@ public abstract class MaxentResolver extends AbstractResolver {
   private double[] candProbs;
   private int sameIndex;
   private ResolverMode mode;
-  private List events;
+  private List<Event> events;
 
   /** When true, this designates that the resolver should use the first referent encountered which it
    * more preferable than non-reference.  When false all non-excluded referents within this resolvers range
@@ -146,7 +146,7 @@ public abstract class MaxentResolver extends AbstractResolver {
       sameIndex = model.getIndex(SAME);
     }
     else if (ResolverMode.TRAIN == this.mode) {
-      events = new ArrayList();
+      events = new ArrayList<Event>();
     }
     else {
       System.err.println("Unknown mode: " + this.mode);
@@ -219,8 +219,8 @@ public abstract class MaxentResolver extends AbstractResolver {
       }
       else {
 
-        List lfeatures = getFeatures(ec, de);
-        String[] features = (String[]) lfeatures.toArray(new String[lfeatures.size()]);
+        List<String> lfeatures = getFeatures(ec, de);
+        String[] features = lfeatures.toArray(new String[lfeatures.size()]);
         try {
           candProbs[ei] = model.eval(features)[sameIndex];
         }
@@ -327,7 +327,7 @@ public abstract class MaxentResolver extends AbstractResolver {
           hasReferentialCandidate = true;
           boolean useAsDifferentExample = defaultReferent(cde);
           //if (!sampleSelection || (mention.getId() != -1 && entityMention.getId() == mention.getId()) || (!nonReferentFound && useAsDifferentExample)) {
-            List features = getFeatures(mention, cde);
+            List<String> features = getFeatures(mention, cde);
 
             //add Event to Model
             if (debugOn) {
@@ -376,13 +376,13 @@ public abstract class MaxentResolver extends AbstractResolver {
   
 
   /** 
-   * Returns a list of features for deciding whether the specificed mention refers to the specified discourse entity.
+   * Returns a list of features for deciding whether the specified mention refers to the specified discourse entity.
    * @param mention the mention being considers as possibly referential. 
    * @param entity The disource entity with which the mention is being considered referential.  
    * @return a list of features used to predict reference between the specified mention and entity.
    */
-  protected List getFeatures(MentionContext mention, DiscourseEntity entity) {
-    List features = new ArrayList();
+  protected List<String> getFeatures(MentionContext mention, DiscourseEntity entity) {
+    List<String> features = new ArrayList<String>();
     features.add(DEFAULT);
     features.addAll(getCompatibilityFeatures(mention, entity));
     return features;
@@ -393,7 +393,7 @@ public abstract class MaxentResolver extends AbstractResolver {
       if (debugOn) {
         System.err.println(this +" referential");
         FileWriter writer = new FileWriter(modelName+".events");
-        for (Iterator ei=events.iterator();ei.hasNext();) {
+        for (Iterator<Event> ei=events.iterator();ei.hasNext();) {
           Event e = (Event) ei.next();
           writer.write(e.toString()+"\n");
         }
@@ -411,7 +411,7 @@ public abstract class MaxentResolver extends AbstractResolver {
   private String getSemanticCompatibilityFeature(MentionContext ec, DiscourseEntity de) {
     if (simModel != null) {
       double best = 0;
-      for (Iterator xi = de.getMentions(); xi.hasNext();) {
+      for (Iterator<MentionContext> xi = de.getMentions(); xi.hasNext();) {
         MentionContext ec2 = (MentionContext) xi.next();
         double sim = simModel.compatible(ec, ec2);
         if (debugOn) {
@@ -470,8 +470,8 @@ public abstract class MaxentResolver extends AbstractResolver {
    * @param entity The entity.
    * @return list of features indicating whether the specified mention and the specified entity are compatible.
    */
-  private List getCompatibilityFeatures(MentionContext mention, DiscourseEntity entity) {
-    List compatFeatures = new ArrayList();
+  private List<String> getCompatibilityFeatures(MentionContext mention, DiscourseEntity entity) {
+    List<String> compatFeatures = new ArrayList<String>();
     String semCompatible = getSemanticCompatibilityFeature(mention, entity);
     compatFeatures.add(semCompatible);
     String genCompatible = getGenderCompatibilityFeature(mention, entity);
@@ -492,8 +492,8 @@ public abstract class MaxentResolver extends AbstractResolver {
    * @param mention he mention whose surround context the features model. 
    * @return a list of features based on the surrounding context of the specified mention
    */
-  public static List getContextFeatures(MentionContext mention) {
-    List features = new ArrayList();
+  public static List<String> getContextFeatures(MentionContext mention) {
+    List<String> features = new ArrayList<String>();
     if (mention.getPreviousToken() != null) {
       features.add("pt=" + mention.getPreviousToken().getSyntacticType());
       features.add("pw=" + mention.getPreviousToken().toString());
@@ -521,8 +521,8 @@ public abstract class MaxentResolver extends AbstractResolver {
     return (features);
   }
 
-  private Set constructModifierSet(Parse[] tokens, int headIndex) {
-    Set modSet = new HashSet();
+  private Set<String> constructModifierSet(Parse[] tokens, int headIndex) {
+    Set<String> modSet = new HashSet<String>();
     for (int ti = 0; ti < headIndex; ti++) {
       Parse tok = tokens[ti];
       modSet.add(tok.toString().toLowerCase());
@@ -588,8 +588,8 @@ public abstract class MaxentResolver extends AbstractResolver {
    * @param entity The entity.
    * @return list of distance features for the specified mention and entity.
    */
-  protected List getDistanceFeatures(MentionContext mention, DiscourseEntity entity) {
-    List features = new ArrayList();
+  protected List<String> getDistanceFeatures(MentionContext mention, DiscourseEntity entity) {
+    List<String> features = new ArrayList<String>();
     MentionContext cec = entity.getLastExtent();
     int entityDistance = mention.getNounPhraseDocumentIndex()- cec.getNounPhraseDocumentIndex();
     int sentenceDistance = mention.getSentenceNumber() - cec.getSentenceNumber();
@@ -611,8 +611,8 @@ public abstract class MaxentResolver extends AbstractResolver {
     return (features);
   }
   
-  private Map getPronounFeatureMap(String pronoun) {
-    Map pronounMap = new HashMap();
+  private Map<String, String> getPronounFeatureMap(String pronoun) {
+    Map<String, String> pronounMap = new HashMap<String, String>();
     if (Linker.malePronounPattern.matcher(pronoun).matches()) {
       pronounMap.put("gender","male");
     }
@@ -650,26 +650,26 @@ public abstract class MaxentResolver extends AbstractResolver {
    * @return list of features indicating whether the specified mention is compatible with the pronouns
    * of the specified entity.
    */
-  protected List getPronounMatchFeatures(MentionContext mention, DiscourseEntity entity) {
+  protected List<String> getPronounMatchFeatures(MentionContext mention, DiscourseEntity entity) {
     boolean foundCompatiblePronoun = false;
     boolean foundIncompatiblePronoun = false;
     if (mention.getHeadTokenTag().startsWith("PRP")) {
-      Map pronounMap = getPronounFeatureMap(mention.getHeadTokenText());
+      Map<String, String> pronounMap = getPronounFeatureMap(mention.getHeadTokenText());
       //System.err.println("getPronounMatchFeatures.pronounMap:"+pronounMap);
-      for (Iterator mi=entity.getMentions();mi.hasNext();) {
-        MentionContext candidateMention = (MentionContext) mi.next();
+      for (Iterator<MentionContext> mi=entity.getMentions();mi.hasNext();) {
+        MentionContext candidateMention = mi.next();
         if (candidateMention.getHeadTokenTag().startsWith("PRP")) {
           if (mention.getHeadTokenText().equalsIgnoreCase(candidateMention.getHeadTokenText())) {
             foundCompatiblePronoun = true;
             break;
           }
           else {
-            Map candidatePronounMap = getPronounFeatureMap(candidateMention.getHeadTokenText());
+            Map<String, String> candidatePronounMap = getPronounFeatureMap(candidateMention.getHeadTokenText());
             //System.err.println("getPronounMatchFeatures.candidatePronounMap:"+candidatePronounMap);
             boolean allKeysMatch = true;
-            for (Iterator ki = pronounMap.keySet().iterator(); ki.hasNext();) {
-              Object key = ki.next();
-              Object cfv = candidatePronounMap.get(key);
+            for (Iterator<String> ki = pronounMap.keySet().iterator(); ki.hasNext();) {
+              String key = ki.next();
+              String cfv = candidatePronounMap.get(key);
               if (cfv != null) {
                 if (!pronounMap.get(key).equals(cfv)) {
                   foundIncompatiblePronoun = true;
@@ -687,7 +687,7 @@ public abstract class MaxentResolver extends AbstractResolver {
         }
       }
     }
-    List pronounFeatures = new ArrayList();
+    List<String> pronounFeatures = new ArrayList<String>();
     if (foundCompatiblePronoun) {
       pronounFeatures.add("compatiblePronoun");
     }
@@ -703,17 +703,17 @@ public abstract class MaxentResolver extends AbstractResolver {
    * @param entity The entity.
    * @return list of string-match features for the the specified mention and entity.
    */
-  protected List getStringMatchFeatures(MentionContext mention, DiscourseEntity entity) {
+  protected List<String> getStringMatchFeatures(MentionContext mention, DiscourseEntity entity) {
     boolean sameHead = false;
     boolean modsMatch = false;
     boolean titleMatch = false;
     boolean nonTheModsMatch = false;
-    List features = new ArrayList();
+    List<String> features = new ArrayList<String>();
     Parse[] mtokens = mention.getTokenParses();
-    Set ecModSet = constructModifierSet(mtokens, mention.getHeadTokenIndex());
+    Set<String> ecModSet = constructModifierSet(mtokens, mention.getHeadTokenIndex());
     String mentionHeadString = mention.getHeadTokenText().toLowerCase();
-    Set featureSet = new HashSet();
-    for (Iterator ei = entity.getMentions(); ei.hasNext();) {
+    Set<String> featureSet = new HashSet<String>();
+    for (Iterator<MentionContext> ei = entity.getMentions(); ei.hasNext();) {
       MentionContext entityMention = (MentionContext) ei.next();
       String exactMatchFeature = getExactMatchFeature(entityMention, mention);
       if (exactMatchFeature != null) {
@@ -745,8 +745,8 @@ public abstract class MaxentResolver extends AbstractResolver {
         if (!modsMatch || !nonTheModsMatch) { //only check if we haven't already found one which is the same
           modsMatch = true;
           nonTheModsMatch = true;
-          Set entityMentionModifierSet = constructModifierSet(xtoks, headIndex);
-          for (Iterator mi = ecModSet.iterator(); mi.hasNext();) {
+          Set<String> entityMentionModifierSet = constructModifierSet(xtoks, headIndex);
+          for (Iterator<String> mi = ecModSet.iterator(); mi.hasNext();) {
             String mw = (String) mi.next();
             if (!entityMentionModifierSet.contains(mw)) {
               modsMatch = false;
@@ -758,7 +758,7 @@ public abstract class MaxentResolver extends AbstractResolver {
           }
         }
       }
-      Set descModSet = constructModifierSet(xtoks, entityMention.getNonDescriptorStart());
+      Set<String> descModSet = constructModifierSet(xtoks, entityMention.getNonDescriptorStart());
       if (descModSet.contains(mentionHeadString)) {
         titleMatch = true;
       }
@@ -871,8 +871,8 @@ public abstract class MaxentResolver extends AbstractResolver {
    * @param token The token for which fetures are to be computed.
    * @return a list of word features for the specified tokens.
    */
-  public static List getWordFeatures(Parse token) {
-    List wordFeatures = new ArrayList();
+  public static List<String> getWordFeatures(Parse token) {
+    List<String> wordFeatures = new ArrayList<String>();
     String word = token.toString().toLowerCase();
     String wf = "";
     if (ENDS_WITH_PERIOD.matcher(word).find()) {
@@ -881,6 +881,6 @@ public abstract class MaxentResolver extends AbstractResolver {
     String tokTag = token.getSyntacticType();
     wordFeatures.add("w=" + word + ",t=" + tokTag + wf);
     wordFeatures.add("t=" + tokTag + wf);
-    return (wordFeatures);
+    return wordFeatures;
   }
 }
