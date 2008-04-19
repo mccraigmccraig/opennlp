@@ -16,7 +16,7 @@
 //Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 //////////////////////////////////////////////////////////////////////////////
 
-package opennlp.tools.ngram;
+package opennlp.tools.util;
 
 import java.util.Arrays;
 import java.util.Iterator;
@@ -25,7 +25,7 @@ import java.util.NoSuchElementException;
 /**
  * TODO: add a method for a sub-token list
  */
-public class TokenList {
+public class StringList {
   
   private String tokens[];
   
@@ -34,7 +34,7 @@ public class TokenList {
    * 
    * @param singleToken one single token
    */
-  public TokenList(String singleToken) {
+  public StringList(String singleToken) {
     tokens = new String[] {
           singleToken.intern()
         };
@@ -45,7 +45,7 @@ public class TokenList {
    * 
    * @param tokens
    */
-  public TokenList(String tokens[]) {
+  public StringList(String tokens[]) {
     
     if (tokens == null || tokens.length == 0) {
       throw new IllegalArgumentException();
@@ -118,7 +118,7 @@ public class TokenList {
    * 
    * @return true if identically with ignore the case otherwise false
    */
-  public boolean compareToIgnoreCase(TokenList tokens) {
+  public boolean compareToIgnoreCase(StringList tokens) {
     
     if (size() == tokens.size()) {
       for (int i = 0; i < size(); i++) {
@@ -144,8 +144,8 @@ public class TokenList {
     if (this == obj) {
       result = true;
     }
-    else if (obj != null && obj instanceof TokenList) {
-      TokenList tokenList = (TokenList) obj;
+    else if (obj != null && obj instanceof StringList) {
+      StringList tokenList = (StringList) obj;
       
       result = Arrays.equals(tokens, tokenList.tokens);
     }

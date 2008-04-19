@@ -34,8 +34,8 @@ import javax.xml.transform.sax.SAXTransformerFactory;
 import javax.xml.transform.sax.TransformerHandler;
 import javax.xml.transform.stream.StreamResult;
 
-import opennlp.tools.ngram.TokenList;
 import opennlp.tools.util.InvalidFormatException;
+import opennlp.tools.util.StringList;
 
 import org.xml.sax.ContentHandler;
 import org.xml.sax.InputSource;
@@ -48,7 +48,7 @@ import org.xml.sax.helpers.XMLReaderFactory;
 /**
   * 
   * @author <a href="mailto:kottmann@gmail.com">Joern Kottmann</a>
-  * @version $Revision: 1.5 $, $Date: 2008/04/19 22:07:26 $
+  * @version $Revision: 1.6 $, $Date: 2008/04/19 22:24:30 $
   */
 public class DictionarySerializer {
   
@@ -115,7 +115,7 @@ public class DictionarySerializer {
          String[] tokens = mTokenList.toArray(
              new String[mTokenList.size()]);
          
-         Entry entry = new Entry(new TokenList(tokens), mAttributes);
+         Entry entry = new Entry(new StringList(tokens), mAttributes);
          
          try {
            mInserter.insert(entry);
@@ -269,7 +269,7 @@ public class DictionarySerializer {
     
     hd.startElement("", "", ENTRY_ELEMENT, entryAttributes); 
     
-    TokenList tokens = entry.getTokens();
+    StringList tokens = entry.getTokens();
     
     for (Iterator<String> it = tokens.iterator(); it.hasNext(); ) {
       

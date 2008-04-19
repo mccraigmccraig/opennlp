@@ -18,16 +18,16 @@
 
 package opennlp.tools.dictionary.serializer;
 
-import opennlp.tools.ngram.TokenList;
+import opennlp.tools.util.StringList;
 
 /**
  * 
  * @author <a href="mailto:kottmann@gmail.com">Joern Kottmann</a>
- * @version $Revision: 1.4 $, $Date: 2008/04/19 22:07:26 $
+ * @version $Revision: 1.5 $, $Date: 2008/04/19 22:24:30 $
  */
 public class Entry {
   
-  private TokenList mTokens;
+  private StringList mTokens;
   private Attributes mAttributes;
   
   /**
@@ -36,7 +36,7 @@ public class Entry {
    * @param tokens
    * @param attributes
    */
-  public Entry(TokenList tokens, Attributes attributes) {
+  public Entry(StringList tokens, Attributes attributes) {
     mTokens = tokens;
     mAttributes = attributes;
   }
@@ -46,7 +46,7 @@ public class Entry {
    * 
    * @return the {@link Token}s
    */
-  public TokenList getTokens() {
+  public StringList getTokens() {
     return mTokens;
   }
   

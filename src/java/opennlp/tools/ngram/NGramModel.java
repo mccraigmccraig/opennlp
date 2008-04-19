@@ -31,18 +31,19 @@ import opennlp.tools.dictionary.serializer.DictionarySerializer;
 import opennlp.tools.dictionary.serializer.Entry;
 import opennlp.tools.dictionary.serializer.EntryInserter;
 import opennlp.tools.util.InvalidFormatException;
+import opennlp.tools.util.StringList;
 
 /**
  * The {@link NGramModel} can be used to crate ngrams and character ngrams.
  * 
  * @author <a href="mailto:kottmann@gmail.com">Joern Kottmann</a>
- * @version $Revision: 1.10 $, $Date: 2008/04/19 22:07:26 $
+ * @version $Revision: 1.11 $, $Date: 2008/04/19 22:24:29 $
  */
 public class NGramModel {
   
   protected static final String COUNT = "count";
   
-  private Map<TokenList, Integer> mNGrams = new HashMap<TokenList, Integer>();
+  private Map<StringList, Integer> mNGrams = new HashMap<StringList, Integer>();
   
   /**
    * Initializes an empty instance.
@@ -91,7 +92,7 @@ public class NGramModel {
    * @return count of the ngram or 0 if it is not contained
    * 
    */
-  public int getCount(TokenList ngram) {
+  public int getCount(StringList ngram) {
     
     Integer count = (Integer) mNGrams.get(ngram);
     
@@ -108,7 +109,7 @@ public class NGramModel {
    * @param ngram
    * @param count
    */
-  public void setCount(TokenList ngram, int count) {
+  public void setCount(StringList ngram, int count) {
     
     Integer oldCount = (Integer) mNGrams.put(ngram, new Integer(count));
     
@@ -123,7 +124,7 @@ public class NGramModel {
    * 
    * @param ngram
    */
-  public void add(TokenList ngram) {
+  public void add(StringList ngram) {
     if (contains(ngram)) {
       setCount(ngram, getCount(ngram) + 1);
     }
@@ -140,7 +141,7 @@ public class NGramModel {
    * @param minLength - minimal length
    * @param maxLength - maximal length
    */
-  public void add(TokenList ngram, int minLength, int maxLength) {
+  public void add(StringList ngram, int minLength, int maxLength) {
     
     for (int lengthIndex = minLength; lengthIndex < maxLength + 1; 
     lengthIndex++) {
@@ -153,7 +154,7 @@ public class NGramModel {
           grams[i - textIndex] = ngram.getToken(i);
         }
         
-        add(new TokenList(grams));
+        add(new StringList(grams));
       }      
     }    
   }
@@ -175,7 +176,7 @@ public class NGramModel {
         String gram = 
             chars.substring(textIndex, textIndex + lengthIndex).toLowerCase();
         
-        add(new TokenList(new String[]{gram}));
+        add(new StringList(new String[]{gram}));
       }      
     }
   }
@@ -185,7 +186,7 @@ public class NGramModel {
    * 
    * @param tokens
    */
-  public void remove(TokenList tokens) {
+  public void remove(StringList tokens) {
     mNGrams.remove(tokens);
   }
   
@@ -196,12 +197,12 @@ public class NGramModel {
    * 
    * @return true if the ngram is contained
    */
-  public boolean contains(TokenList tokens) {
+  public boolean contains(StringList tokens) {
     return mNGrams.containsKey(tokens);
   }
   
   /**
-   * Retrieves the number of {@link TokenList} entries in the current instance.
+   * Retrieves the number of {@link StringList} entries in the current instance.
    * 
    * @return number of different grams
    */
@@ -210,11 +211,11 @@ public class NGramModel {
   }
   
   /**
-   * Retrieves an {@link Iterator} over all {@link TokenList} entries.
+   * Retrieves an {@link Iterator} over all {@link StringList} entries.
    * 
    * @return iterator over all grams
    */
-  public Iterator<TokenList> iterator() {
+  public Iterator<StringList> iterator() {
     return mNGrams.keySet().iterator();
   }
   
@@ -226,9 +227,9 @@ public class NGramModel {
   public int numberOfGrams() {
     int counter = 0;
     
-    for (Iterator<TokenList> it = iterator(); it.hasNext();) {
+    for (Iterator<StringList> it = iterator(); it.hasNext();) {
       
-      TokenList ngram = it.next();
+      StringList ngram = it.next();
       
       counter += getCount(ngram);
     }
@@ -247,9 +248,9 @@ public class NGramModel {
     
     if (cutoffUnder > 0 || cutoffOver < Integer.MAX_VALUE) {
       
-      for (Iterator<TokenList> it = iterator(); it.hasNext();) {
+      for (Iterator<StringList> it = iterator(); it.hasNext();) {
         
-        TokenList ngram = (TokenList) it.next();
+        StringList ngram = (StringList) it.next();
         
         int count = getCount(ngram);
         
@@ -288,7 +289,7 @@ public class NGramModel {
   }
   
   /**
-   * Creates a dictionary which contains all {@link TokenList}s which
+   * Creates a dictionary which contains all {@link StringList}s which
    * are in the current {@link NGramModel}.
    * @param caseSensitive Specifies whether case distinctions should be kept in the creation of the dictionary.
    * @return the new dictionary
@@ -297,8 +298,8 @@ public class NGramModel {
     
     Dictionary dict = new Dictionary(caseSensitive);
     
-    for (Iterator<TokenList> it = iterator(); it.hasNext();) {
-      dict.put((TokenList)it.next());
+    for (Iterator<StringList> it = iterator(); it.hasNext();) {
+      dict.put((StringList)it.next());
     }
     
     return dict;
@@ -313,7 +314,7 @@ public class NGramModel {
   public void serialize(OutputStream out) throws IOException {
 	    Iterator<Entry> entryIterator = new Iterator<Entry>() 
 	      {
-	        private Iterator<TokenList> mDictionaryIterator = NGramModel.this.iterator();
+	        private Iterator<StringList> mDictionaryIterator = NGramModel.this.iterator();
 	        
 	        public boolean hasNext() {
 	          return mDictionaryIterator.hasNext();
@@ -321,7 +322,7 @@ public class NGramModel {
 
 	        public Entry next() {
 	          
-	          TokenList tokens = (TokenList) mDictionaryIterator.next();
+	          StringList tokens = (StringList) mDictionaryIterator.next();
 	          
 	          Attributes attributes = new Attributes();
 	          

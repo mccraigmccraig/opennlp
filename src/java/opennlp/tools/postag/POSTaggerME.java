@@ -42,11 +42,11 @@ import opennlp.maxent.TwoPassDataIndexer;
 import opennlp.maxent.io.SuffixSensitiveGISModelWriter;
 import opennlp.tools.dictionary.Dictionary;
 import opennlp.tools.ngram.NGramModel;
-import opennlp.tools.ngram.TokenList;
 import opennlp.tools.util.BeamSearch;
 import opennlp.tools.util.InvalidFormatException;
 import opennlp.tools.util.Pair;
 import opennlp.tools.util.Sequence;
+import opennlp.tools.util.StringList;
 
 /**
  * A part-of-speech tagger that uses maximum entropy.  Trys to predict whether
@@ -54,7 +54,7 @@ import opennlp.tools.util.Sequence;
  * surrounding context.
  *
  * @author      Gann Bierner
- * @version $Revision: 1.31 $, $Date: 2008/04/19 22:07:26 $
+ * @version $Revision: 1.32 $, $Date: 2008/04/19 22:24:29 $
  */
 public class POSTaggerME implements Evalable, POSTagger {
 
@@ -410,7 +410,7 @@ public class POSTaggerME implements Evalable, POSTagger {
                 tt[wi].substring(0,tt[wi].lastIndexOf('_'));
           }
           
-          ngramModel.add(new TokenList(words), 1, 1);
+          ngramModel.add(new StringList(words), 1, 1);
         }
         
         System.out.println("Saving the dictionary");

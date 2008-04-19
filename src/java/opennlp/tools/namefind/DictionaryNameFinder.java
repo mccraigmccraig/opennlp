@@ -23,15 +23,15 @@ import java.util.List;
 
 import opennlp.tools.dictionary.Dictionary;
 import opennlp.tools.dictionary.Index;
-import opennlp.tools.ngram.TokenList;
 import opennlp.tools.util.Span;
+import opennlp.tools.util.StringList;
 
 /**
  * This is a dictionary based name finder, it scans text
  * for names inside a dictionary.
  * 
  * @author <a href="mailto:kottmann@gmail.com">Joern Kottmann</a>
- * @version $Revision: 1.10 $, $Date: 2008/04/19 22:07:26 $
+ * @version $Revision: 1.11 $, $Date: 2008/04/19 22:24:30 $
  */
 public class DictionaryNameFinder implements TokenNameFinder {
 
@@ -70,7 +70,7 @@ public class DictionaryNameFinder implements TokenNameFinder {
         
         if (mMetaDictionary.contains(token)) {
           
-          TokenList tokenList = new TokenList(tokens);
+          StringList tokenList = new StringList(tokens);
           
           if (mDictionary.contains(tokenList)) {
             foundName = new Span(startToken, endToken + 1);

@@ -32,27 +32,27 @@ import opennlp.tools.dictionary.serializer.Attributes;
 import opennlp.tools.dictionary.serializer.DictionarySerializer;
 import opennlp.tools.dictionary.serializer.Entry;
 import opennlp.tools.dictionary.serializer.EntryInserter;
-import opennlp.tools.ngram.TokenList;
 import opennlp.tools.util.InvalidFormatException;
+import opennlp.tools.util.StringList;
 
 /**
  * This class is a dictionary.
  * 
  * @author <a href="mailto:kottmann@gmail.com">Joern Kottmann</a>
- * @version $Revision: 1.8 $, $Date: 2008/04/19 22:07:26 $
+ * @version $Revision: 1.9 $, $Date: 2008/04/19 22:24:30 $
  */
 public class Dictionary {
   
   
   private static class IgnoreCaseTokenList {
     
-    private TokenList mTokenList;
+    private StringList mTokenList;
     
-    private IgnoreCaseTokenList(TokenList tokenList) {
+    private IgnoreCaseTokenList(StringList tokenList) {
       mTokenList = tokenList;
     }
     
-    private TokenList getTokenList() {
+    private StringList getTokenList() {
       return mTokenList;
     }
     
@@ -125,7 +125,7 @@ public class Dictionary {
    * 
    * @param tokens the new entry
    */
-  public void put(TokenList tokens) {
+  public void put(StringList tokens) {
     if (caseSensitive) {
       mEntrySet.add(tokens);
     }
@@ -141,7 +141,7 @@ public class Dictionary {
    * 
    * @return true if it contains the entry otherwise false
    */
-  public boolean contains(TokenList tokens) {
+  public boolean contains(StringList tokens) {
     if (caseSensitive) {
       return mEntrySet.contains(tokens);      
     }
@@ -155,7 +155,7 @@ public class Dictionary {
    * 
    * @param tokens
    */
-  public void remove(TokenList tokens) {
+  public void remove(StringList tokens) {
     if (caseSensitive) {
       mEntrySet.remove(tokens);
     }
@@ -218,7 +218,7 @@ public class Dictionary {
 
         public Object next() {
           
-          TokenList tokens = (TokenList)
+          StringList tokens = (StringList)
               mDictionaryIterator.next();
           
           return new Entry(tokens, new Attributes());
@@ -288,7 +288,7 @@ public class Dictionary {
           tokens[tokenIndex++] = whiteSpaceTokenizer.nextToken();
         }
         
-        dictionary.put(new TokenList(tokens));
+        dictionary.put(new StringList(tokens));
       }
     }
     

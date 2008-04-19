@@ -4,12 +4,12 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
 
-import opennlp.tools.ngram.TokenList;
+import opennlp.tools.util.StringList;
 
 /**
- * This classes indexes {@link TokenList}s. This makes it possible
+ * This classes indexes {@link StringList}s. This makes it possible
  * to check if a certain {@link Token} is contained in at least one of the 
- * {@link TokenList}s.
+ * {@link StringList}s.
  */
 public class Index {
   
@@ -17,15 +17,15 @@ public class Index {
   
   /**
    * Initializes the current instance with the given
-   * {@link TokenList} {@link Iterator}.
+   * {@link StringList} {@link Iterator}.
    * 
    * @param tokenLists
    */
-  public Index(Iterator<TokenList> tokenLists) {
+  public Index(Iterator<StringList> tokenLists) {
     
     while (tokenLists.hasNext()) {
     
-      TokenList tokens = (TokenList) tokenLists.next();
+      StringList tokens = (StringList) tokenLists.next();
       
       for (int i = 0; i < tokens.size(); i++) {
         this.tokens.add(tokens.getToken(i));
@@ -34,7 +34,7 @@ public class Index {
   }
   
   /**
-   * Checks if at leat one {@link TokenList} contains the 
+   * Checks if at leat one {@link StringList} contains the 
    * given {@link Token}.
    * 
    * @param token

@@ -31,7 +31,6 @@ import opennlp.maxent.MaxentModel;
 import opennlp.maxent.TwoPassDataIndexer;
 import opennlp.tools.dictionary.Dictionary;
 import opennlp.tools.ngram.NGramModel;
-import opennlp.tools.ngram.TokenList;
 import opennlp.tools.parser.AbstractBottomUpParser;
 import opennlp.tools.parser.HeadRules;
 import opennlp.tools.parser.Parse;
@@ -40,6 +39,7 @@ import opennlp.tools.parser.ParserEventTypeEnum;
 import opennlp.tools.parser.ParserTagger;
 import opennlp.tools.util.InvalidFormatException;
 import opennlp.tools.util.Span;
+import opennlp.tools.util.StringList;
 
 /**
  * Class for a shift reduce style parser based on Adwait Ratnaparkhi's 1998 thesis. 
@@ -278,14 +278,14 @@ public class Parser extends AbstractBottomUpParser {
         words[wi] = pwords[wi].toString();
       }
       
-      mdict.add(new TokenList(words), 1, 1);
+      mdict.add(new StringList(words), 1, 1);
       //add tri-grams and bi-grams for inital sequence
       Parse[] chunks = collapsePunctuation(ParserEventStream.getInitialChunks(p),rules.getPunctuationTags());
       String[] cwords = new String[chunks.length];
       for (int wi=0;wi<cwords.length;wi++) {
         cwords[wi] = chunks[wi].getHead().toString();
       }
-      mdict.add(new TokenList(cwords), 2, 3);
+      mdict.add(new StringList(cwords), 2, 3);
       
       //emulate reductions to produce additional n-grams 
       int ci = 0;
@@ -316,10 +316,10 @@ public class Parser extends AbstractBottomUpParser {
               window = subWindow;
             }
             if (window.length >=3) {
-              mdict.add(new TokenList(window), 2, 3);
+              mdict.add(new StringList(window), 2, 3);
             }
             else if (window.length == 2) {
-              mdict.add(new TokenList(window), 2, 2);
+              mdict.add(new StringList(window), 2, 2);
             }
           }
           ci=reduceStart-1; //ci will be incremented at end of loop
