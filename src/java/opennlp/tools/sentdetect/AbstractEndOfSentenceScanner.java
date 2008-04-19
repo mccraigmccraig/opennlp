@@ -24,22 +24,22 @@ import java.util.List;
 import opennlp.maxent.IntegerPool;
 
 /**
- * @version $Revision: 1.2 $, $Date: 2006/11/17 12:24:58 $ 
+ * @version $Revision: 1.3 $, $Date: 2008/04/19 15:13:06 $ 
  */
 public abstract class AbstractEndOfSentenceScanner implements EndOfSentenceScanner {
 
   protected static final IntegerPool INT_POOL = new IntegerPool(500);
   
-  public List getPositions(String s) {
+  public List<Integer> getPositions(String s) {
     return getPositions(s.toCharArray());
   }
 
-  public List getPositions(StringBuffer buf) {
+  public List<Integer> getPositions(StringBuffer buf) {
     return getPositions(buf.toString().toCharArray());
   }
 
-  public List getPositions(char[] cbuf) {
-    List l = new ArrayList();
+  public List<Integer> getPositions(char[] cbuf) {
+    List<Integer> l = new ArrayList<Integer>();
     char[] eosCharacters = getEndOfSentenceCharacters();
     for (int i = 0; i < cbuf.length; i++) {
       for (int ci=0;ci<eosCharacters.length;ci++) {
