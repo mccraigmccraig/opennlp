@@ -18,7 +18,7 @@
 package opennlp.tools.namefind;
 
 /**
- * This call provides empty implementations of some of the optional methods in 
+ * This class provides empty implementations of some of the optional methods in 
  * {@link AdditionalContextFeatureGenerator} to make implementing feature generators
  * easier.
  */
