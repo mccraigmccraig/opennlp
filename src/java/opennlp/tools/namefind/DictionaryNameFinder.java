@@ -32,7 +32,7 @@ import opennlp.tools.util.Span;
  * for names inside a dictionary.
  * 
  * @author <a href="mailto:kottmann@gmail.com">Joern Kottmann</a>
- * @version $Revision: 1.8 $, $Date: 2007/06/29 12:11:55 $
+ * @version $Revision: 1.9 $, $Date: 2008/04/19 15:40:31 $
  */
 public class DictionaryNameFinder implements TokenNameFinder {
 
@@ -51,7 +51,7 @@ public class DictionaryNameFinder implements TokenNameFinder {
   }
   
   public Span[] find(String[] tokenStrings) {
-    List foundNames = new LinkedList();
+    List<Span> foundNames = new LinkedList<Span>();
     
     for (int startToken = 0; startToken < tokenStrings.length; startToken++) {
       

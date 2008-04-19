@@ -40,7 +40,7 @@ public final class RegexNameFinder implements TokenNameFinder {
   }
   
   public Span[] find(String tokens[]) {
-    Map sentencePosTokenMap = new HashMap();
+    Map<Integer, Integer> sentencePosTokenMap = new HashMap<Integer, Integer>();
     
     StringBuffer sentenceString = new StringBuffer(tokens.length *  10);
     
@@ -61,7 +61,7 @@ public final class RegexNameFinder implements TokenNameFinder {
       }
     }
     
-    Collection annotations = new LinkedList();
+    Collection<Span> annotations = new LinkedList<Span>();
     
     for (int i = 0; i < mPatterns.length; i++) {
       Matcher matcher = mPatterns[i].matcher(sentenceString);

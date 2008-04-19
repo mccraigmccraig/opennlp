@@ -111,7 +111,7 @@ public class DefaultNameContextGenerator implements NameContextGenerator {
    * @return the context for finding names at the specified index.
    */
   public String[] getContext(int index, Object[] toks, String[] preds, String[][] additionalContext) {
-    List features = new ArrayList();
+    List<String> features = new ArrayList<String>();
     features.add("def");
     String[] tokens;
     if (prevTokens == toks) {

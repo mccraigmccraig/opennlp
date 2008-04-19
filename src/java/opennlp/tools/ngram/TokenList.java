@@ -24,7 +24,7 @@ import java.util.NoSuchElementException;
 
 
 /**
- * TODO: add a method for a subtoken list
+ * TODO: add a method for a sub-token list
  */
 public class TokenList {
   
@@ -81,8 +81,8 @@ public class TokenList {
    * 
    * @return iterator over tokens
    */
-  public Iterator iterator() {
-    return new Iterator() {
+  public Iterator<Token> iterator() {
+    return new Iterator<Token>() {
       
       private int mIndex;
       
@@ -90,7 +90,7 @@ public class TokenList {
         return mIndex < size();
       }
 
-      public Object next() {
+      public Token next() {
         
         if (hasNext()) {
           return getToken(mIndex++);

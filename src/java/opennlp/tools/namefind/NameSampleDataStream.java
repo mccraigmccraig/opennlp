@@ -39,8 +39,8 @@ public class NameSampleDataStream implements NameSampleStream {
   private NameSample createNameSample(String taggedTokens) {
     String[] parts = taggedTokens.split(" ");
 
-    List tokenList = new ArrayList(parts.length);
-    List nameList = new ArrayList();
+    List<Token> tokenList = new ArrayList<Token>(parts.length);
+    List<Span> nameList = new ArrayList<Span>();
 
     int startIndex = -1;
     int wordIndex = 0;

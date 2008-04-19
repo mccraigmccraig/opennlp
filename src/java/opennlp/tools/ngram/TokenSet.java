@@ -63,7 +63,8 @@ public final class TokenSet {
   
   private static TokenSet sInstance;
   
-  private Map mTokenTable = new WeakHashMap();
+  private Map<String, WeakReference<Token>> mTokenTable = 
+      new WeakHashMap<String, WeakReference<Token>>();
   
   private TokenSet() {
     if (sLogger.isLoggable(Level.FINEST)) {
@@ -77,8 +78,7 @@ public final class TokenSet {
   }
   
   synchronized Token insert(Token token) {
-    WeakReference weakCachedToken = 
-      (WeakReference) mTokenTable.get(token.getToken());
+    WeakReference<Token> weakCachedToken = mTokenTable.get(token.getToken());
     
     // Note: cachedToken == null is possible even if weakCachedToken != null,
     // then the referent was concurrently collected
@@ -89,7 +89,7 @@ public final class TokenSet {
       return cachedToken;
     }
     else {
-      mTokenTable.put(token.getToken(), new WeakReference(token));
+      mTokenTable.put(token.getToken(), new WeakReference<Token>(token));
       return token;
     }
   }

@@ -36,13 +36,13 @@ import opennlp.tools.util.InvalidFormatException;
  * The {@link NGramModel} can be used to crate ngrams and character ngrams.
  * 
  * @author <a href="mailto:kottmann@gmail.com">Joern Kottmann</a>
- * @version $Revision: 1.8 $, $Date: 2007/08/16 00:28:19 $
+ * @version $Revision: 1.9 $, $Date: 2008/04/19 15:36:20 $
  */
 public class NGramModel {
   
   protected static final String COUNT = "count";
   
-  private Map mNGrams = new HashMap();
+  private Map<TokenList, Integer> mNGrams = new HashMap<TokenList, Integer>();
   
   /**
    * Initializes an empty instance.
@@ -84,7 +84,7 @@ public class NGramModel {
   }
 
   /**
-   * Retrives the count of the given ngram.
+   * Retrieves the count of the given ngram.
    * 
    * @param ngram
    * 
@@ -201,7 +201,7 @@ public class NGramModel {
   }
   
   /**
-   * Retrives the number of {@link TokenList} entries in the current instance.
+   * Retrieves the number of {@link TokenList} entries in the current instance.
    * 
    * @return number of different grams
    */
@@ -210,25 +210,25 @@ public class NGramModel {
   }
   
   /**
-   * Retrives an {@link Iterator} over all {@link TokenList} entires.
+   * Retrieves an {@link Iterator} over all {@link TokenList} entries.
    * 
    * @return iterator over all grams
    */
-  public Iterator iterator() {
+  public Iterator<TokenList> iterator() {
     return mNGrams.keySet().iterator();
   }
   
   /**
-   * Retrives the total count of all Ngrams.
+   * Retrieves the total count of all Ngrams.
    * 
    * @return total count of all ngrams
    */
   public int numberOfGrams() {
     int counter = 0;
     
-    for (Iterator it = iterator(); it.hasNext();) {
+    for (Iterator<TokenList> it = iterator(); it.hasNext();) {
       
-      TokenList ngram = (TokenList) it.next();
+      TokenList ngram = it.next();
       
       counter += getCount(ngram);
     }
@@ -247,7 +247,7 @@ public class NGramModel {
     
     if (cutoffUnder > 0 || cutoffOver < Integer.MAX_VALUE) {
       
-      for (Iterator it = iterator(); it.hasNext();) {
+      for (Iterator<TokenList> it = iterator(); it.hasNext();) {
         
         TokenList ngram = (TokenList) it.next();
         
@@ -297,7 +297,7 @@ public class NGramModel {
     
     Dictionary dict = new Dictionary(caseSensitive);
     
-    for (Iterator it = iterator(); it.hasNext();) {
+    for (Iterator<TokenList> it = iterator(); it.hasNext();) {
       dict.put((TokenList)it.next());
     }
     
@@ -311,15 +311,15 @@ public class NGramModel {
    * @throws IOException if an I/O Error during writing occures
    */
   public void serialize(OutputStream out) throws IOException {
-	    Iterator entryIterator = new Iterator() 
+	    Iterator<Entry> entryIterator = new Iterator<Entry>() 
 	      {
-	        private Iterator mDictionaryIterator = NGramModel.this.iterator();
+	        private Iterator<TokenList> mDictionaryIterator = NGramModel.this.iterator();
 	        
 	        public boolean hasNext() {
 	          return mDictionaryIterator.hasNext();
 	        }
 
-	        public Object next() {
+	        public Entry next() {
 	          
 	          TokenList tokens = (TokenList) mDictionaryIterator.next();
 	          
