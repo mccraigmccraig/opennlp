@@ -28,7 +28,7 @@ import java.util.Set;
  *
  * @author      Jason Baldridge
  * @author      Eric D. Friedman
- * @version     $Revision: 1.1 $, $Date: 2008/03/05 16:45:13 $
+ * @version     $Revision: 1.2 $, $Date: 2008/04/19 15:26:06 $
  */
 
 public class DefaultSDContextGenerator implements SDContextGenerator {
@@ -36,8 +36,8 @@ public class DefaultSDContextGenerator implements SDContextGenerator {
   /** String buffer for generating features. */
   protected StringBuffer buf;
   /** List for holding features as they are generated. */
-  protected List collectFeats;
-  private Set inducedAbbreviations;
+  protected List<String> collectFeats;
+  private Set<String> inducedAbbreviations;
   private char[] eosCharacters;
 
   /**
@@ -60,11 +60,11 @@ public class DefaultSDContextGenerator implements SDContextGenerator {
    * 
    * @param eosCharacters 
    */
-  public DefaultSDContextGenerator(Set inducedAbbreviations, char[] eosCharacters) {
+  public DefaultSDContextGenerator(Set<String> inducedAbbreviations, char[] eosCharacters) {
     this.inducedAbbreviations = inducedAbbreviations;
     this.eosCharacters = eosCharacters;
     buf = new StringBuffer();
-    collectFeats = new ArrayList();
+    collectFeats = new ArrayList<String>();
   }
   
   /* (non-Javadoc)
