@@ -35,19 +35,19 @@ public interface Parse extends Comparable {
    * also implement the {@link Parse} interface.  
    * @return a list of all the noun phrases contained by this parse.
    */
-  public List getNounPhrases();
+  public List<Parse> getNounPhrases();
   
   /** Returns a list of all the named entities
    * contained by this parse.  The named entities in this list should
    * also implement the {@link Parse} interface.  
    * @return a list of all the named entities contained by this parse. */
-  public List getNamedEntities();
+  public List<Parse> getNamedEntities();
 
   /** Returns a list of the children to this object.  The
    * children should also implement the {@link Parse} interface.
    * @return a list of the children to this object.
    * */
-  public List getChildren();
+  public List<Parse> getChildren();
   
   /**
    * Returns a list of the children to this object which are constituents or tokens.  The
@@ -56,14 +56,14 @@ public interface Parse extends Comparable {
    * hide those nodes from the componets which only care about syntactic nodes. 
    * @return a list of the children to this object which are constituents or tokens.
    */
-  public List getSyntacticChildren();
+  public List<Parse> getSyntacticChildren();
 
   /** Returns a list of the tokens contained by this object.  The tokens in this list should also
    * implement the {@link Parse} inteface.  
    * 
    * @return the tokens
    */
-  public List getTokens();
+  public List<Parse> getTokens();
 
   /** Returns the syntactic type of this node. Typically this is the part-of-speech or 
    * constituent labeling.

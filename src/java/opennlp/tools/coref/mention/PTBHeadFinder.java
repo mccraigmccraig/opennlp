@@ -28,7 +28,7 @@ import java.util.Set;
 public final class PTBHeadFinder implements HeadFinder {
 
   private static PTBHeadFinder instance;
-  private static Set skipSet = new HashSet();
+  private static Set<String> skipSet = new HashSet<String>();
   static {
     skipSet.add("POS");
     skipSet.add(",");
@@ -57,12 +57,12 @@ public final class PTBHeadFinder implements HeadFinder {
       return null;
     }
     if (p.isNounPhrase()) {
-      List parts = p.getSyntacticChildren();
+      List<Parse> parts = p.getSyntacticChildren();
       //shallow parse POS
       if (parts.size() > 2) {
-        Parse child0 = (Parse) parts.get(0);
-        Parse child1 = (Parse) parts.get(1);
-        Parse child2 = (Parse) parts.get(2);
+        Parse child0 = parts.get(0);
+        Parse child1 = parts.get(1);
+        Parse child2 = parts.get(2);
         if (child1.isToken() && child1.getSyntacticType().equals("POS") && child0.isNounPhrase() && child2.isNounPhrase()) {
           return child2;
         }
@@ -71,7 +71,7 @@ public final class PTBHeadFinder implements HeadFinder {
       if (parts.size() > 1) {
         Parse child0 = (Parse) parts.get(0);
         if (child0.isNounPhrase()) {
-          List ctoks = child0.getTokens();
+          List<Parse> ctoks = child0.getTokens();
           if (ctoks.size() == 0) {
             System.err.println("PTBHeadFinder: NP "+child0+" with no tokens");
           }
@@ -106,12 +106,12 @@ public final class PTBHeadFinder implements HeadFinder {
   }
 
   public int getHeadIndex(Parse p) {
-    List sChildren = p.getSyntacticChildren();
+    List<Parse> sChildren = p.getSyntacticChildren();
     boolean countTokens = false;
     int tokenCount = 0;
     //check for NP -> NN S type structures and return last token before S as head.
     for (int sci=0,scn = sChildren.size();sci<scn;sci++) {
-      Parse sc = (Parse) sChildren.get(sci);
+      Parse sc = sChildren.get(sci);
       //System.err.println("PTBHeadFinder.getHeadIndex "+p+" "+p.getSyntacticType()+" sChild "+sci+" type = "+sc.getSyntacticType());
       if (sc.getSyntacticType().startsWith("S")) {
         if (sci != 0) {
@@ -125,7 +125,7 @@ public final class PTBHeadFinder implements HeadFinder {
         tokenCount+=sc.getTokens().size();
       }
     }
-    List toks = p.getTokens();
+    List<Parse> toks = p.getTokens();
     if (toks.size() == 0) {
       System.err.println("PTBHeadFinder.getHeadIndex(): empty tok list for parse "+p);
     }
@@ -156,8 +156,7 @@ public final class PTBHeadFinder implements HeadFinder {
   }
 
   public Parse getHeadToken(Parse p) {
-    List toks = p.getTokens();
-    return (Parse) toks.get(getHeadIndex(p));
+    List<Parse> toks = p.getTokens();
+    return toks.get(getHeadIndex(p));
   }
-
 }
