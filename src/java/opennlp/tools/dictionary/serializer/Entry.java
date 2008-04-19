@@ -18,13 +18,12 @@
 
 package opennlp.tools.dictionary.serializer;
 
-import opennlp.tools.ngram.Token;
 import opennlp.tools.ngram.TokenList;
 
 /**
  * 
  * @author <a href="mailto:kottmann@gmail.com">Joern Kottmann</a>
- * @version $Revision: 1.3 $, $Date: 2008/04/19 18:57:49 $
+ * @version $Revision: 1.4 $, $Date: 2008/04/19 22:07:26 $
  */
 public class Entry {
   

@@ -22,7 +22,7 @@ import java.util.Collection;
 import java.util.List;
 
 import opennlp.tools.dictionary.Dictionary;
-import opennlp.tools.ngram.Token;
+import opennlp.tools.ngram.TokenList;
 import opennlp.tools.parser.AbstractContextGenerator;
 import opennlp.tools.parser.Cons;
 import opennlp.tools.parser.Parse;
@@ -121,36 +121,36 @@ public class BuildContextGenerator extends AbstractContextGenerator {
       
       if (p_2 != null) {
         unigram[0] = p_2.getHead().toString();
-        u_2 = dict.contains(Token.create(unigram));
+        u_2 = dict.contains(new TokenList(unigram));
       }
       
       if (p2 != null) {
         unigram[0] = p2.getHead().toString();
-        u2 = dict.contains(Token.create(unigram));
+        u2 = dict.contains(new TokenList(unigram));
       }
 
       unigram[0] = p0.getHead().toString();
-      u0 = dict.contains(Token.create(unigram));
+      u0 = dict.contains(new TokenList(unigram));
       
       if (p_2 != null && p_1 != null) {
         bigram[0] = p_2.getHead().toString();
         bigram[1] = p_1.getHead().toString();
-        b_2_1 = dict.contains(Token.create(bigram));
+        b_2_1 = dict.contains(new TokenList(bigram));
         
         trigram[0] = p_2.getHead().toString();
         trigram[1] = p_1.getHead().toString();
         trigram[2] = p0.getHead().toString();
-        t_2_10 = dict.contains(Token.create(trigram));
+        t_2_10 = dict.contains(new TokenList(trigram));
       }
       if (p_1 != null && p1 != null) {
         trigram[0] = p_1.getHead().toString();
         trigram[1] = p0.getHead().toString();
         trigram[2] = p1.getHead().toString();
-        t_101 = dict.contains(Token.create(trigram));
+        t_101 = dict.contains(new TokenList(trigram));
       }
       if (p_1 != null) {
         unigram[0] = p_1.getHead().toString();
-        u_1 = dict.contains(Token.create(unigram));
+        u_1 = dict.contains(new TokenList(unigram));
         
         //extra check for 2==null case
         b_2_1 = b_2_1 && u_1; 
@@ -159,21 +159,21 @@ public class BuildContextGenerator extends AbstractContextGenerator {
         
         bigram[0] = p_1.getHead().toString();
         bigram[1] = p0.getHead().toString();
-        b_10 = dict.contains(Token.create(bigram));
+        b_10 = dict.contains(new TokenList(bigram));
       }
       if (p1 != null && p2 != null) {
         bigram[0] = p1.getHead().toString();
         bigram[1] = p2.getHead().toString();
-        b12 = dict.contains(Token.create(bigram));
+        b12 = dict.contains(new TokenList(bigram));
         
         trigram[0] = p0.getHead().toString();
         trigram[1] = p1.getHead().toString();
         trigram[2] = p2.getHead().toString();
-        t012 = dict.contains(Token.create(trigram));
+        t012 = dict.contains(new TokenList(trigram));
       }
       if (p1 != null) {
         unigram[0] = p1.getHead().toString();
-        u1 = dict.contains(Token.create(unigram));
+        u1 = dict.contains(new TokenList(unigram));
         
         //extra check fpr 2==null case
         b12 = b12 && u1;
@@ -182,7 +182,7 @@ public class BuildContextGenerator extends AbstractContextGenerator {
         
         bigram[0] = p0.getHead().toString();
         bigram[1] = p1.getHead().toString();
-        b01 = dict.contains(Token.create(bigram));
+        b01 = dict.contains(new TokenList(bigram));
       }
     }
 

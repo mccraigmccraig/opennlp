@@ -32,7 +32,6 @@ import opennlp.tools.dictionary.serializer.Attributes;
 import opennlp.tools.dictionary.serializer.DictionarySerializer;
 import opennlp.tools.dictionary.serializer.Entry;
 import opennlp.tools.dictionary.serializer.EntryInserter;
-import opennlp.tools.ngram.Token;
 import opennlp.tools.ngram.TokenList;
 import opennlp.tools.util.InvalidFormatException;
 
@@ -40,7 +39,7 @@ import opennlp.tools.util.InvalidFormatException;
  * This class is a dictionary.
  * 
  * @author <a href="mailto:kottmann@gmail.com">Joern Kottmann</a>
- * @version $Revision: 1.7 $, $Date: 2008/04/19 12:26:46 $
+ * @version $Revision: 1.8 $, $Date: 2008/04/19 22:07:26 $
  */
 public class Dictionary {
   
@@ -281,12 +280,12 @@ public class Dictionary {
     while ((line = lineReader.readLine()) != null) {
       StringTokenizer whiteSpaceTokenizer = new StringTokenizer(line, " ");
       
-      Token tokens[] = new Token[whiteSpaceTokenizer.countTokens()];
+      String tokens[] = new String[whiteSpaceTokenizer.countTokens()];
       
       if (tokens.length > 0) {
         int tokenIndex = 0;
         while (whiteSpaceTokenizer.hasMoreTokens()) {
-          tokens[tokenIndex++] = Token.create(whiteSpaceTokenizer.nextToken());
+          tokens[tokenIndex++] = whiteSpaceTokenizer.nextToken();
         }
         
         dictionary.put(new TokenList(tokens));

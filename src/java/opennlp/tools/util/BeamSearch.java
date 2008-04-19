@@ -142,7 +142,7 @@ public class BeamSearch {
    * @param additionalContext An Object[] of additional context.  This is passed to the context generator blindly with the assumption that the context are appropiate.
    * @return The top ranked sequence of outcomes.
    */
-  public Sequence bestSequence(List<Object> sequence, Object[] additionalContext) {
+  public Sequence bestSequence(List sequence, Object[] additionalContext) {
     return bestSequences(1, sequence.toArray(), additionalContext)[0];
   }
   

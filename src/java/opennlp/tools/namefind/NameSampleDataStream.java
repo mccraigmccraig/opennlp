@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import opennlp.maxent.DataStream;
-import opennlp.tools.ngram.Token;
 import opennlp.tools.util.Span;
 
 // gets tagged string as input and outputs a name sample
@@ -39,7 +38,7 @@ public class NameSampleDataStream implements NameSampleStream {
   private NameSample createNameSample(String taggedTokens) {
     String[] parts = taggedTokens.split(" ");
 
-    List<Token> tokenList = new ArrayList<Token>(parts.length);
+    List<String> tokenList = new ArrayList<String>(parts.length);
     List<Span> nameList = new ArrayList<Span>();
 
     int startIndex = -1;
@@ -53,11 +52,11 @@ public class NameSampleDataStream implements NameSampleStream {
         nameList.add(new Span(startIndex, wordIndex));
       } 
       else {
-        tokenList.add(Token.create(parts[pi]));
+        tokenList.add(parts[pi]);
         wordIndex++;
       }
     }
-    Token[] sentence = (Token[]) tokenList.toArray(new Token[tokenList.size()]);
+    String[] sentence = (String[]) tokenList.toArray(new String[tokenList.size()]);
     Span[] names = (Span[]) nameList.toArray(new Span[nameList.size()]);
     return new NameSample(sentence,names,sentence.length==0);
   }

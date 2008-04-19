@@ -42,7 +42,6 @@ import opennlp.maxent.TwoPassDataIndexer;
 import opennlp.maxent.io.SuffixSensitiveGISModelWriter;
 import opennlp.tools.dictionary.Dictionary;
 import opennlp.tools.ngram.NGramModel;
-import opennlp.tools.ngram.Token;
 import opennlp.tools.ngram.TokenList;
 import opennlp.tools.util.BeamSearch;
 import opennlp.tools.util.InvalidFormatException;
@@ -55,7 +54,7 @@ import opennlp.tools.util.Sequence;
  * surrounding context.
  *
  * @author      Gann Bierner
- * @version $Revision: 1.30 $, $Date: 2008/04/19 21:12:25 $
+ * @version $Revision: 1.31 $, $Date: 2008/04/19 22:07:26 $
  */
 public class POSTaggerME implements Evalable, POSTagger {
 
@@ -405,10 +404,10 @@ public class POSTaggerME implements Evalable, POSTagger {
         while(data.hasNext()) {
           String tagStr = (String) data.nextToken();
           String[] tt = tagStr.split(" ");
-          Token[] words = new Token[tt.length];
+          String[] words = new String[tt.length];
           for (int wi=0;wi<words.length;wi++) {
             words[wi] = 
-                Token.create(tt[wi].substring(0,tt[wi].lastIndexOf('_')));
+                tt[wi].substring(0,tt[wi].lastIndexOf('_'));
           }
           
           ngramModel.add(new TokenList(words), 1, 1);

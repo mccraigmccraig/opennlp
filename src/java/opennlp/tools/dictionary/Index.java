@@ -4,7 +4,6 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
 
-import opennlp.tools.ngram.Token;
 import opennlp.tools.ngram.TokenList;
 
 /**
@@ -14,7 +13,7 @@ import opennlp.tools.ngram.TokenList;
  */
 public class Index {
   
-  private Set<Token> tokens = new HashSet<Token>();
+  private Set<String> tokens = new HashSet<String>();
   
   /**
    * Initializes the current instance with the given
@@ -42,7 +41,7 @@ public class Index {
    * 
    * @return true if the {@link Token} is contained otherwise false.
    */
-  public boolean contains(Token token) {
+  public boolean contains(String token) {
     return tokens.contains(token);
   }
 }

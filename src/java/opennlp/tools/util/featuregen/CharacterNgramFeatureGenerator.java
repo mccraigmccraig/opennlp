@@ -55,7 +55,7 @@ public class CharacterNgramFeatureGenerator extends FeatureGeneratorAdapter {
       TokenList tokenList = (TokenList) it.next();
 
       if (tokenList.size() > 0) {
-        features.add("ng=" + tokenList.getToken(0).getToken().toLowerCase());
+        features.add("ng=" + tokenList.getToken(0).toLowerCase());
       }
     }
   }

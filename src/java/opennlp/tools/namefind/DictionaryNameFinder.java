@@ -23,7 +23,6 @@ import java.util.List;
 
 import opennlp.tools.dictionary.Dictionary;
 import opennlp.tools.dictionary.Index;
-import opennlp.tools.ngram.Token;
 import opennlp.tools.ngram.TokenList;
 import opennlp.tools.util.Span;
 
@@ -32,7 +31,7 @@ import opennlp.tools.util.Span;
  * for names inside a dictionary.
  * 
  * @author <a href="mailto:kottmann@gmail.com">Joern Kottmann</a>
- * @version $Revision: 1.9 $, $Date: 2008/04/19 15:40:31 $
+ * @version $Revision: 1.10 $, $Date: 2008/04/19 22:07:26 $
  */
 public class DictionaryNameFinder implements TokenNameFinder {
 
@@ -57,14 +56,14 @@ public class DictionaryNameFinder implements TokenNameFinder {
       
       Span foundName = null;
       
-      Token  tokens[] = new Token[]{};
+      String  tokens[] = new String[]{};
       
       for (int endToken = startToken; endToken < tokenStrings.length; endToken++) {
         
-        Token token = Token.create(tokenStrings[endToken]);
+        String token = tokenStrings[endToken];
         
         // TODO: improve performance here
-        Token newTokens[] = new Token[tokens.length + 1];
+        String newTokens[] = new String[tokens.length + 1];
         System.arraycopy(tokens, 0, newTokens, 0, tokens.length);
         newTokens[newTokens.length - 1] = token;
         tokens = newTokens;

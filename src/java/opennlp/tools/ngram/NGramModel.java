@@ -36,7 +36,7 @@ import opennlp.tools.util.InvalidFormatException;
  * The {@link NGramModel} can be used to crate ngrams and character ngrams.
  * 
  * @author <a href="mailto:kottmann@gmail.com">Joern Kottmann</a>
- * @version $Revision: 1.9 $, $Date: 2008/04/19 15:36:20 $
+ * @version $Revision: 1.10 $, $Date: 2008/04/19 22:07:26 $
  */
 public class NGramModel {
   
@@ -147,7 +147,7 @@ public class NGramModel {
       for (int textIndex = 0; 
           textIndex + lengthIndex - 1 < ngram.size(); textIndex++) {
         
-        Token[] grams = new Token[lengthIndex];
+        String[] grams = new String[lengthIndex];
         
         for (int i = textIndex; i < textIndex + lengthIndex; i++) {
           grams[i - textIndex] = ngram.getToken(i);
@@ -175,7 +175,7 @@ public class NGramModel {
         String gram = 
             chars.substring(textIndex, textIndex + lengthIndex).toLowerCase();
         
-        add(new TokenList(new Token[]{Token.create(gram)}));
+        add(new TokenList(new String[]{gram}));
       }      
     }
   }

@@ -93,7 +93,7 @@ public class NameFinderEventStream implements EventStream {
       String[] tokens = new String[sample.getSentence().length]; 
       List<Event> events = new ArrayList<Event>(outcomes.length);
       for (int i = 0; i < sample.getSentence().length; i++) {
-        tokens[i] = sample.getSentence()[i].getToken();
+        tokens[i] = sample.getSentence()[i];
       }
       for (int i = 0; i < outcomes.length; i++) {
         events.add(new Event((String) outcomes[i], contextGenerator.getContext(i, sample.getSentence(), outcomes,null)));

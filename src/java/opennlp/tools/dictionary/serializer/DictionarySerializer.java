@@ -34,7 +34,6 @@ import javax.xml.transform.sax.SAXTransformerFactory;
 import javax.xml.transform.sax.TransformerHandler;
 import javax.xml.transform.stream.StreamResult;
 
-import opennlp.tools.ngram.Token;
 import opennlp.tools.ngram.TokenList;
 import opennlp.tools.util.InvalidFormatException;
 
@@ -49,7 +48,7 @@ import org.xml.sax.helpers.XMLReaderFactory;
 /**
   * 
   * @author <a href="mailto:kottmann@gmail.com">Joern Kottmann</a>
-  * @version $Revision: 1.4 $, $Date: 2008/04/19 18:53:45 $
+  * @version $Revision: 1.5 $, $Date: 2008/04/19 22:07:26 $
   */
 public class DictionarySerializer {
   
@@ -62,7 +61,7 @@ public class DictionarySerializer {
 //    private boolean mIsInsideEntryElement;
     private boolean mIsInsideTokenElement;
     
-    private List<Token> mTokenList = new LinkedList<Token>();
+    private List<String> mTokenList = new LinkedList<String>();
 
     private Attributes mAttributes;
     
@@ -100,7 +99,7 @@ public class DictionarySerializer {
      public void characters(char[] ch, int start, int length) 
          throws SAXException {
        if (mIsInsideTokenElement) {
-         mTokenList.add(Token.create(new String(ch, start, length)));
+         mTokenList.add(new String(ch, start, length));
        }
      }
 
@@ -113,8 +112,8 @@ public class DictionarySerializer {
        
        if (ENTRY_ELEMENT.equals(localName)) {
          
-         Token[] tokens = (Token[]) mTokenList.toArray(
-             new Token[mTokenList.size()]);
+         String[] tokens = mTokenList.toArray(
+             new String[mTokenList.size()]);
          
          Entry entry = new Entry(new TokenList(tokens), mAttributes);
          
@@ -272,14 +271,14 @@ public class DictionarySerializer {
     
     TokenList tokens = entry.getTokens();
     
-    for (Iterator<Token> it = tokens.iterator(); it.hasNext(); ) {
+    for (Iterator<String> it = tokens.iterator(); it.hasNext(); ) {
       
       hd.startElement("", "", TOKEN_ELEMENT, new AttributesImpl()); 
 
-      Token token = (Token) it.next();
+      String token = it.next();
       
-      hd.characters(token.getToken().toCharArray(), 
-          0, token.getToken().length());
+      hd.characters(token.toCharArray(), 
+          0, token.length());
       
       hd.endElement("", "", TOKEN_ELEMENT);
     }

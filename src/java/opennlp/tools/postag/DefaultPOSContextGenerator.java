@@ -23,7 +23,7 @@ import java.util.List;
 import java.util.regex.Pattern;
 
 import opennlp.tools.dictionary.Dictionary;
-import opennlp.tools.ngram.Token;
+import opennlp.tools.ngram.TokenList;
 import opennlp.tools.util.Cache;
 
 /**
@@ -31,7 +31,7 @@ import opennlp.tools.util.Cache;
  *
  * @author      Gann Bierner
  * @author      Tom Morton
- * @version     $Revision: 1.18 $, $Date: 2008/04/19 21:12:25 $
+ * @version     $Revision: 1.19 $, $Date: 2008/04/19 22:07:26 $
  */
 
 public class DefaultPOSContextGenerator implements POSContextGenerator {
@@ -151,7 +151,7 @@ public class DefaultPOSContextGenerator implements POSContextGenerator {
     // add the word itself
     e.add("w=" + lex);
     dictGram[0] = lex;
-    if (dict == null || !dict.contains(Token.create(dictGram))) {
+    if (dict == null || !dict.contains(new TokenList(dictGram))) {
       // do some basic suffix analysis
       String[] suffs = getSuffixes(lex);
       for (int i = 0; i < suffs.length; i++) {

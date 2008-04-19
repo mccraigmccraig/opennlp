@@ -28,32 +28,33 @@ import java.util.NoSuchElementException;
  */
 public class TokenList {
   
-  private Token mTokens[];
+  private String mTokens[];
+  
+  /**
+   * Initializes the current instance.
+   * 
+   * @param singleToken one single token
+   */
+  public TokenList(String singleToken) {
+    mTokens = new String[] {
+          singleToken
+        };
+  }
   
   /**
    * Initializes the current instance.
    * 
    * @param tokens
    */
-  public TokenList(Token tokens[]) {
+  public TokenList(String tokens[]) {
     
     if (tokens == null || tokens.length == 0) {
       throw new IllegalArgumentException();
     }
     
-    mTokens = new Token[tokens.length];
+    mTokens = new String[tokens.length];
     
     System.arraycopy(tokens, 0, mTokens, 0, tokens.length);
-  }
-  
-  public TokenList(String[] tokens) {
-    if (tokens == null || tokens.length == 0) {
-      throw new IllegalArgumentException();
-    }
-    mTokens = new Token[tokens.length];
-    for (int ti=0;ti<tokens.length;ti++) {
-      mTokens[ti]=Token.create(tokens[ti]);
-    }
   }
   
   /**
@@ -63,7 +64,7 @@ public class TokenList {
    * 
    * @return token at the given index
    */
-  public Token getToken(int index) {
+  public String getToken(int index) {
     return mTokens[index];
   }
   
@@ -81,8 +82,8 @@ public class TokenList {
    * 
    * @return iterator over tokens
    */
-  public Iterator<Token> iterator() {
-    return new Iterator<Token>() {
+  public Iterator<String> iterator() {
+    return new Iterator<String>() {
       
       private int mIndex;
       
@@ -90,7 +91,7 @@ public class TokenList {
         return mIndex < size();
       }
 
-      public Token next() {
+      public String next() {
         
         if (hasNext()) {
           return getToken(mIndex++);
@@ -121,8 +122,8 @@ public class TokenList {
     if (size() == tokens.size()) {
       for (int i = 0; i < size(); i++) {
         
-        if (getToken(i).getToken().compareToIgnoreCase(
-            tokens.getToken(i).getToken()) != 0) {
+        if (getToken(i).compareToIgnoreCase(
+            tokens.getToken(i)) != 0) {
           return false;
         } 
       }
@@ -188,8 +189,7 @@ public class TokenList {
     string.append('[');
     
     for (int i = 0; i < size(); i++) {
-      Token token = getToken(i);
-      string.append(token.getToken());
+      string.append(getToken(i));
       
       if (i < size() - 1) {
         string.append(',');

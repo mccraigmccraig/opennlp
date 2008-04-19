@@ -1,11 +1,10 @@
 package opennlp.tools.namefind;
 
-import opennlp.tools.ngram.Token;
 import opennlp.tools.util.Span;
 
 public class NameSample {
 
-  private final Token[] sentence;
+  private final String[] sentence;
   private final Span[] names;
   private final String[] nameTypes;
   private final String[][] additionalContext;
@@ -19,7 +18,7 @@ public class NameSample {
    * @param additionalContext
    * @param clearAdaptiveData if true the adaptive data of the feature generators is cleared
    */
-  public NameSample(Token[] sentence, Span[] names, String[] types,
+  public NameSample(String[] sentence, Span[] names, String[] types,
       String[][] additionalContext, boolean clearAdaptiveData) {
 
     if (sentence == null) {
@@ -44,15 +43,15 @@ public class NameSample {
    * @param names
    * @param clearAdaptiveData
    */
-  public NameSample(Token sentence[], Span[] names, boolean clearAdaptiveData) {
+  public NameSample(String sentence[], Span[] names, boolean clearAdaptiveData) {
     this(sentence, names, null, null, clearAdaptiveData);
   }
   
-  public NameSample(Token sentence[], Span[] names, String[] nameTypes, boolean clearAdaptiveData) {
+  public NameSample(String sentence[], Span[] names, String[] nameTypes, boolean clearAdaptiveData) {
     this(sentence, names, nameTypes, null, clearAdaptiveData);
   }
 
-  public Token[] getSentence() {
+  public String[] getSentence() {
     return sentence;
   }
 
@@ -98,7 +97,7 @@ public class NameSample {
         }
       }
 
-      result.append(sentence[tokenIndex].getToken() + ' ');
+      result.append(sentence[tokenIndex] + ' ');
     }
 
     for (int nameIndex = 0; nameIndex < names.length; nameIndex++) {
