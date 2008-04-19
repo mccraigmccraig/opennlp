@@ -40,7 +40,7 @@ import opennlp.tools.util.CountedSet;
 public class POSDictionaryWriter {
 
   private Writer dictFile;
-  private Map dictionary;
+  private Map<String, Set<String>> dictionary;
   private CountedSet wordCounts;
   private String newline = System.getProperty("line.separator");
   
@@ -51,7 +51,7 @@ public class POSDictionaryWriter {
     else {
       dictFile = new FileWriter(file);
     }
-    dictionary = new HashMap();
+    dictionary = new HashMap<String, Set<String>>();
     wordCounts = new CountedSet();    
   }
   
@@ -60,9 +60,9 @@ public class POSDictionaryWriter {
   }
   
   public void addEntry(String word, String tag) {
-    Set tags = (Set) dictionary.get(word);
+    Set<String> tags = dictionary.get(word);
     if (tags == null) {
-      tags = new HashSet();
+      tags = new HashSet<String>();
       dictionary.put(word,tags);
     }
     tags.add(tag);
@@ -78,8 +78,8 @@ public class POSDictionaryWriter {
       String word = (String) wi.next();
       if (wordCounts.getCount(word) >= cutoff) {
         dictFile.write(word);
-        Set tags = (Set) dictionary.get(word);
-        for (Iterator ti=tags.iterator();ti.hasNext();) {
+        Set<String> tags = dictionary.get(word);
+        for (Iterator<String> ti=tags.iterator();ti.hasNext();) {
           dictFile.write(" ");
           dictFile.write((String) ti.next());
         }

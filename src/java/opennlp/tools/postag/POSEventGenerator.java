@@ -13,7 +13,7 @@ import opennlp.maxent.EventStream;
  */
 public class POSEventGenerator implements EventStream {
 
-  private List events;
+  private List<Event> events;
   private int eventIndex;
   private POSContextGenerator pcg;
   
@@ -23,7 +23,7 @@ public class POSEventGenerator implements EventStream {
    */
   public POSEventGenerator(POSContextGenerator pcg) {
     this.pcg = pcg;
-    events = new ArrayList(50);
+    events = new ArrayList<Event>(50);
     eventIndex = 0;
   }
   
