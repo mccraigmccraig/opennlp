@@ -31,7 +31,7 @@ import java.util.Map;
  */
 public class POSDictionary implements TagDictionary {
 
-  private Map dictionary;
+  private Map<String, String[]> dictionary;
   private boolean caseSensitive;
 
   /**
@@ -72,7 +72,7 @@ public class POSDictionary implements TagDictionary {
    * @throws IOException when the specified file can not be read.
    */
   public POSDictionary(BufferedReader reader, boolean caseSensitive) throws IOException {
-    dictionary = new HashMap();
+    dictionary = new HashMap<String, String[]>();
     this.caseSensitive = caseSensitive;
     for (String line = reader.readLine(); line != null; line = reader.readLine()) {
       String[] parts = line.split(" ");

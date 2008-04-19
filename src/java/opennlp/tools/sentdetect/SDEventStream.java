@@ -37,7 +37,7 @@ import opennlp.maxent.PlainTextByLineDataStream;
  * @author      Jason Baldridge
  * @author      Eric D. Friedman
  * @author      Thomas Morton
- * @version     $Revision: 1.7 $, $Date: 2008/03/05 16:45:13 $
+ * @version     $Revision: 1.8 $, $Date: 2008/04/19 15:27:34 $
  */
 public class SDEventStream implements EventStream {
     private DataStream data;
@@ -120,7 +120,7 @@ public class SDEventStream implements EventStream {
           }
         }
         //TODO: Should only send sentence string to scanner, and sentence + next word to context generator.
-        for (Iterator i = scanner.getPositions(sb).iterator();i.hasNext();) {
+        for (Iterator<Integer> i = scanner.getPositions(sb).iterator();i.hasNext();) {
             Integer candidate = (Integer)i.next();
             String type = i.hasNext() ? "F" : "T";
             SDEvent evt = new SDEvent(type,cg.getContext(sb,candidate.intValue()));

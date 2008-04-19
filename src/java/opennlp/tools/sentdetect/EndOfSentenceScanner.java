@@ -32,7 +32,7 @@ import java.util.List;
  * Created: Sat Oct 27 11:42:07 2001
  *
  * @author Eric D. Friedman
- * @version $Id: EndOfSentenceScanner.java,v 1.2 2006/01/16 17:51:49 tsmorton Exp $
+ * @version $Id: EndOfSentenceScanner.java,v 1.3 2008/04/19 15:26:52 joernkottmann Exp $
  */
 
 public interface EndOfSentenceScanner {
@@ -50,7 +50,7 @@ public interface EndOfSentenceScanner {
      * @param s a <code>String</code> value
      * @return a <code>List</code> of Integer objects.
      */
-    public List getPositions(String s);
+    public List<Integer> getPositions(String s);
 
     /**
      * The receiver scans `buf' for sentence ending characters and
@@ -59,7 +59,7 @@ public interface EndOfSentenceScanner {
      * @param buf a <code>StringBuffer</code> value
      * @return a <code>List</code> of Integer objects.
      */
-    public List getPositions(StringBuffer buf);
+    public List<Integer> getPositions(StringBuffer buf);
 
     /**
      * The receiver scans `cbuf' for sentence ending characters and
@@ -68,5 +68,5 @@ public interface EndOfSentenceScanner {
      * @param cbuf a <code>char[]</code> value
      * @return a <code>List</code> of Integer objects.
      */
-    public List getPositions(char[] cbuf);
-} // EndOfSentenceScanner
+    public List<Integer> getPositions(char[] cbuf);
+}

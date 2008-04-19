@@ -44,7 +44,7 @@ import opennlp.tools.lang.thai.SentenceContextGenerator;
  * string to determine if they signify the end of a sentence.
  *
  * @author      Jason Baldridge and Tom Morton
- * @version     $Revision: 1.17 $, $Date: 2008/03/05 16:45:13 $
+ * @version     $Revision: 1.18 $, $Date: 2008/04/19 15:28:59 $
  */
 
 public class SentenceDetectorME implements SentenceDetector {
@@ -62,7 +62,7 @@ public class SentenceDetectorME implements SentenceDetector {
   private static final IntegerPool INT_POOL = new IntegerPool(100);
   
   /** The list of probabilities associated with each decision. */
-  private List sentProbs;
+  private List<Double> sentProbs;
   
   protected boolean useTokenEnd;
 
@@ -107,7 +107,7 @@ public class SentenceDetectorME implements SentenceDetector {
     model = m;
     cgen = cg;
     scanner = s;
-    sentProbs = new ArrayList(50);
+    sentProbs = new ArrayList<Double>(50);
   }
 
   /**
@@ -164,8 +164,8 @@ public class SentenceDetectorME implements SentenceDetector {
     double sentProb = 1;
     sentProbs.clear();
     StringBuffer sb = new StringBuffer(s);
-    List enders = scanner.getPositions(s);
-    List positions = new ArrayList(enders.size());
+    List<Integer> enders = scanner.getPositions(s);
+    List<Integer> positions = new ArrayList<Integer>(enders.size());
 
     for (int i = 0, end = enders.size(), index = 0; i < end; i++) {
       Integer candidate = (Integer) enders.get(i);
