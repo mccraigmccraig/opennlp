@@ -40,7 +40,7 @@ import opennlp.tools.util.InvalidFormatException;
  * This class is a dictionary.
  * 
  * @author <a href="mailto:kottmann@gmail.com">Joern Kottmann</a>
- * @version $Revision: 1.6 $, $Date: 2007/04/23 03:05:48 $
+ * @version $Revision: 1.7 $, $Date: 2008/04/19 12:26:46 $
  */
 public class Dictionary {
   
@@ -90,7 +90,7 @@ public class Dictionary {
   private boolean caseSensitive;
   
   /**
-   * Iitalizes an empty {@link Dictionary}.
+   * Initializes an empty {@link Dictionary}.
    */
   public Dictionary() {
     this(false);
@@ -101,7 +101,7 @@ public class Dictionary {
   }
   
   /**
-   * Initalize the {@link Dictionary} from an existing dictionary resource.
+   * Initializes the {@link Dictionary} from an existing dictionary resource.
    * 
    * @param in
    * @throws IOException
@@ -122,7 +122,7 @@ public class Dictionary {
   }
   
   /**
-   * Adds the tokens to the dicitionary as one new entry. 
+   * Adds the tokens to the dictionary as one new entry. 
    * 
    * @param tokens the new entry
    */
@@ -166,7 +166,7 @@ public class Dictionary {
   }
   
   /**
-   * Retrives an Interator over all tokens.
+   * Retrieves an Iterator over all tokens.
    * 
    * @return token-{@link Iterator}
    */
@@ -193,7 +193,7 @@ public class Dictionary {
   }
   
   /**
-   * Retrives the number of tokens in the current instance.
+   * Retrieves the number of tokens in the current instance.
    * 
    * @return number of tokens
    */
