@@ -35,7 +35,7 @@ public class SimpleTokenizer extends AbstractTokenizer {
     CharacterEnum charType = CharacterEnum.WHITESPACE;
     CharacterEnum state = charType;
     
-    List tokens = new ArrayList();
+    List<Span> tokens = new ArrayList<Span>();
     int sl = s.length();
     int start = -1;
     char pc = 0;

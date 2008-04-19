@@ -32,7 +32,7 @@ import opennlp.tools.util.Span;
 public class TokSpanEventStream implements EventStream {
 
   private TokenContextGenerator cg;
-  private List events;
+  private List<Event> events;
   private int eventIndex;
   private boolean skipAlphaNumerics;
 
@@ -44,7 +44,7 @@ public class TokSpanEventStream implements EventStream {
    */
   public TokSpanEventStream(boolean skipAlphaNumerics, TokenContextGenerator cg) {
     this.skipAlphaNumerics = skipAlphaNumerics;
-    events = new ArrayList(50);
+    events = new ArrayList<Event>(50);
     eventIndex = 0;
     this.cg = cg;
   }

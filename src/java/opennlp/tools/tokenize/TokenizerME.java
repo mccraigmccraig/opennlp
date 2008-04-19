@@ -39,7 +39,7 @@ import opennlp.tools.util.Span;
  * homepage: <http://www.cis.upenn.edu/~jcreynar>.
  *
  * @author      Tom Morton
- * @version $Revision: 1.21 $, $Date: 2008/03/05 16:45:13 $
+ * @version $Revision: 1.22 $, $Date: 2008/04/19 15:06:12 $
  */
 
 public class TokenizerME extends AbstractTokenizer {
@@ -68,8 +68,8 @@ public class TokenizerME extends AbstractTokenizer {
 
   /** list of probabilities for each token returned from call to
    * tokenize() */
-  private List tokProbs;
-  private List newTokens;
+  private List<Double> tokProbs;
+  private List<Span> newTokens;
 
   /**
    * Class constructor which takes the string locations of the
@@ -80,8 +80,8 @@ public class TokenizerME extends AbstractTokenizer {
   public TokenizerME(MaxentModel mod) {
     setAlphaNumericOptimization(false);
     model = mod;
-    newTokens = new ArrayList();
-    tokProbs = new ArrayList(50);
+    newTokens = new ArrayList<Span>();
+    tokProbs = new ArrayList<Double>(50);
   }
 
   /** Returns the probabilities associated with the most recent

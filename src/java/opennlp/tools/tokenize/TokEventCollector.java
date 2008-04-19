@@ -30,7 +30,7 @@ import opennlp.maxent.EventCollector;
  * This procedure isn't currrently used for tokenization event creation.
  *
  * @author      Jason Baldridge
- * @version     $Revision: 1.7 $, $Date: 2008/03/05 16:45:13 $
+ * @version     $Revision: 1.8 $, $Date: 2008/04/19 15:06:46 $
  */
 
 public class TokEventCollector implements EventCollector {
@@ -52,7 +52,7 @@ public class TokEventCollector implements EventCollector {
      * should only be used to create training data.
      */
   public Event[] getEvents() {
-    ArrayList elist = new ArrayList();
+    ArrayList<Event> elist = new ArrayList<Event>();
 
     try {
       String s = br.readLine();

@@ -25,7 +25,7 @@ import java.util.List;
  * Generate events for maxent decisions for tokenization.
  *
  * @author      Jason Baldridge
- * @version     $Revision: 1.1 $, $Date: 2008/03/05 16:45:13 $
+ * @version     $Revision: 1.2 $, $Date: 2008/04/19 15:03:54 $
  */
 
 public class DefaultTokenContextGenerator implements TokenContextGenerator {
@@ -44,7 +44,7 @@ public class DefaultTokenContextGenerator implements TokenContextGenerator {
    * @see opennlp.tools.tokenize.TokenContextGenerator#getContext(java.lang.String, int)
    */
   public String[] getContext(String sentence, int index) {	
-    List preds = new ArrayList();
+    List<String> preds = new ArrayList<String>();
     preds.add("p="+sentence.substring(0,index));
     preds.add("s="+sentence.substring(index));
     if (index>0) {
@@ -82,7 +82,7 @@ public class DefaultTokenContextGenerator implements TokenContextGenerator {
   /**
    * Helper function for getContext.
    */
-  private void addCharPreds(String key, char c, List preds) {
+  private void addCharPreds(String key, char c, List<String> preds) {
     preds.add(key + "=" + c);
     if (Character.isLetter(c)) {
       preds.add(key+"_alpha");
@@ -112,4 +112,3 @@ public class DefaultTokenContextGenerator implements TokenContextGenerator {
     }
   }
 }
-
