@@ -55,7 +55,7 @@ import opennlp.tools.util.Sequence;
  * surrounding context.
  *
  * @author      Gann Bierner
- * @version $Revision: 1.29 $, $Date: 2008/04/19 19:50:14 $
+ * @version $Revision: 1.30 $, $Date: 2008/04/19 21:12:25 $
  */
 public class POSTaggerME implements Evalable, POSTagger {
 
@@ -235,7 +235,7 @@ public class POSTaggerME implements Evalable, POSTagger {
     try {
       while ((line = br.readLine()) != null) {
         sentences++;
-        Pair p = POSEventCollector.convertAnnotatedString(line);
+        Pair<List<String>, List<String>> p = POSEventCollector.convertAnnotatedString(line);
         List<String> words = (List<String>) p.a;
         List<String> outcomes = (List<String>) p.b;
         List<String> tags = beam.bestSequence(words, null).getOutcomes();

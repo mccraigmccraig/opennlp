@@ -22,14 +22,16 @@ package opennlp.tools.util;
  * Dinky class to package pairs of things
  *
  * @author      Gann Bierner
- * @version     $Revision: 1.1 $, $Date: 2004/01/26 14:11:57 $
+ * @version     $Revision: 1.2 $, $Date: 2008/04/19 21:12:39 $
  */
 
-public final class Pair {
-    public final Object a,b;
+public final class Pair<A, B> {
+    public final A a;
+    public final B b;
 
-    public Pair(Object _a, Object _b) {
-	a=_a; b=_b;
+    public Pair(A a, B b) {
+      this.a = a; 
+      this.b = b;
     }
 
     public String toString() { return "["+a+"/"+b+"]"; }

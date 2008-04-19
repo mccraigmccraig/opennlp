@@ -6,7 +6,7 @@ import java.util.List;
  * The interface for part of speech taggers.
  *
  * @author      Jason Baldridge
- * @version $Revision: 1.2 $, $Date: 2003/12/06 18:25:37 $ */
+ * @version $Revision: 1.3 $, $Date: 2008/04/19 21:12:25 $ */
 
 public interface POSTagger {
 
@@ -14,7 +14,7 @@ public interface POSTagger {
    * @param sentence The sentece of tokens to be tagged.
    * @return a list of pos tags for each token provided in sentence.
    */
-  public List tag(List sentence);
+  public List<String> tag(List<String> sentence);
 
   /** Assigns the sentence of tokens pos tags.
    * @param sentence The sentece of tokens to be tagged.
