@@ -22,13 +22,12 @@ import java.util.Arrays;
 import java.util.Iterator;
 import java.util.NoSuchElementException;
 
-
 /**
  * TODO: add a method for a sub-token list
  */
 public class TokenList {
   
-  private String mTokens[];
+  private String tokens[];
   
   /**
    * Initializes the current instance.
@@ -36,8 +35,8 @@ public class TokenList {
    * @param singleToken one single token
    */
   public TokenList(String singleToken) {
-    mTokens = new String[] {
-          singleToken
+    tokens = new String[] {
+          singleToken.intern()
         };
   }
   
@@ -52,9 +51,11 @@ public class TokenList {
       throw new IllegalArgumentException();
     }
     
-    mTokens = new String[tokens.length];
+    this.tokens = new String[tokens.length];
     
-    System.arraycopy(tokens, 0, mTokens, 0, tokens.length);
+    for (int i = 0; i < tokens.length; i++) {
+      this.tokens[i] = tokens[i].intern();
+    }
   }
   
   /**
@@ -65,7 +66,7 @@ public class TokenList {
    * @return token at the given index
    */
   public String getToken(int index) {
-    return mTokens[index];
+    return tokens[index];
   }
   
   /**
@@ -74,7 +75,7 @@ public class TokenList {
    * @return number of tokens
    */
   public int size() {
-    return mTokens.length;
+    return tokens.length;
   }
   
   /**
@@ -146,7 +147,7 @@ public class TokenList {
     else if (obj != null && obj instanceof TokenList) {
       TokenList tokenList = (TokenList) obj;
       
-      result = Arrays.equals(mTokens, tokenList.mTokens);
+      result = Arrays.equals(tokens, tokenList.tokens);
     }
     else {
       result = false;
