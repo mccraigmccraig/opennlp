@@ -142,13 +142,13 @@ public class NameFinderME implements TokenNameFinder {
   public Span[] find(String[] tokens, String[][] additionalContext) {
     additionalContextFeatureGenerator.setCurrentContext(additionalContext);
     bestSequence = beam.bestSequence(tokens, additionalContext);
-    List c = bestSequence.getOutcomes();
+    List<String> c = bestSequence.getOutcomes();
     
     contextGenerator.updateAdaptiveData(tokens, (String[]) c.toArray(new String[c.size()]));
     
     int start = -1;
     int end = -1;
-    List spans = new ArrayList(tokens.length);
+    List<Span> spans = new ArrayList<Span>(tokens.length);
     for (int li = 0; li < c.size(); li++) {
       String chunkTag = (String) c.get(li);
       if (chunkTag.equals(NameFinderME.START)) {
