@@ -10,6 +10,8 @@ import java.util.NoSuchElementException;
 import opennlp.maxent.Event;
 import opennlp.maxent.EventStream;
 import opennlp.tools.util.Span;
+import opennlp.tools.util.featuregen.AdditionalContextFeatureGenerator;
+import opennlp.tools.util.featuregen.WindowFeatureGenerator;
 
 /**
  * Class for creating an event stream out of data files for training an name

@@ -20,6 +20,14 @@ package opennlp.tools.namefind;
 import java.util.ArrayList;
 import java.util.List;
 
+import opennlp.tools.util.featuregen.AdaptiveFeatureGenerator;
+import opennlp.tools.util.featuregen.CachedFeatureGenerator;
+import opennlp.tools.util.featuregen.FeatureGeneratorUtil;
+import opennlp.tools.util.featuregen.PreviousMapFeatureGenerator;
+import opennlp.tools.util.featuregen.TokenClassFeatureGenerator;
+import opennlp.tools.util.featuregen.TokenFeatureGenerator;
+import opennlp.tools.util.featuregen.WindowFeatureGenerator;
+
 /** 
  * Class for determining contextual features for a tag/chunk style 
  * named-entity recognizer.

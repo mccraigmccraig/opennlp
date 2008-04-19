@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////////
-//Copyright (C) 2003 Thomas Morton
+//Copyright (C) 2007 OpenNlp
 // 
 //This library is free software; you can redistribute it and/or
 //modify it under the terms of the GNU Lesser General Public
@@ -15,33 +15,35 @@
 //License along with this program; if not, write to the Free Software
 //Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 //////////////////////////////////////////////////////////////////////////////
-
-package opennlp.tools.namefind;
+package opennlp.tools.util.featuregen;
 
 import java.util.List;
 
+
 /**
- * Generates a feature which contains the token itself.
+ * The {@link AdditionalContextFeatureGenerator} generates the context from the passed
+ * in additional context.
  */
-public class TokenFeatureGenerator extends FeatureGeneratorAdapter {
+public class AdditionalContextFeatureGenerator extends FeatureGeneratorAdapter {
 
-  private static final String WORD_PREFIX = "w";
-  private boolean lowercase;
+  private String[][] additionalContext;
 
-  public TokenFeatureGenerator(boolean lowercase) {
-    this.lowercase = lowercase;
+  public AdditionalContextFeatureGenerator() {
   }
-  
-  public TokenFeatureGenerator() {
-    this(true);
+
+  public void createFeatures(List<String> features, String[] tokens, int index, String[] preds) {
+
+    if (additionalContext != null && additionalContext.length != 0) {
+
+      String[] context = additionalContext[index];
+
+      for (int i = 0; i < context.length; i++) {
+        features.add("ne=" + context[i]);
+      }
+    }
   }
-  
-  public void createFeatures(List features, String[] tokens, int index, String[] preds) {
-    if (lowercase) {
-      features.add(WORD_PREFIX + "=" + tokens[index].toLowerCase());
-    }
-    else {
-      features.add(WORD_PREFIX + "=" + tokens[index]);
-    }
+
+  public void setCurrentContext(String[][] context) {
+    additionalContext = context;
   }
 }

@@ -16,7 +16,7 @@
 //Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 //////////////////////////////////////////////////////////////////////////////
 
-package opennlp.tools.namefind;
+package opennlp.tools.util.featuregen;
 
 import java.util.List;
 import java.util.regex.Pattern;
@@ -50,7 +50,7 @@ public class TokenPatternFeatureGenerator extends FeatureGeneratorAdapter {
         tokenizer = supportTokenizer;
     }
 
-    public void createFeatures(List feats, String[] toks, int index, String[] preds) {
+    public void createFeatures(List<String> feats, String[] toks, int index, String[] preds) {
       
       String[] tokenized = tokenizer.tokenize(toks[index]);
       

@@ -16,7 +16,7 @@
 //Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 //////////////////////////////////////////////////////////////////////////////
 
-package opennlp.tools.namefind;
+package opennlp.tools.util.featuregen;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -42,13 +42,13 @@ public class CachedFeatureGenerator implements AdaptiveFeatureGenerator {
     contextsCache = new Cache(100);
   }
 
-  public void createFeatures(List features, String[] tokens, int index,
+  public void createFeatures(List<String> features, String[] tokens, int index,
       String[] previousOutcomes) {
 
-    List cacheFeatures;
+    List<String> cacheFeatures;
 
     if (tokens == prevTokens) {
-      cacheFeatures = (List) contextsCache.get(new Integer(index));
+      cacheFeatures = (List<String>) contextsCache.get(new Integer(index));
       
       if (cacheFeatures != null) {
         numberOfCacheHits++;
@@ -61,7 +61,7 @@ public class CachedFeatureGenerator implements AdaptiveFeatureGenerator {
       prevTokens = tokens;
     }
 
-    cacheFeatures = new ArrayList();
+    cacheFeatures = new ArrayList<String>();
     
     numberOfCacheMisses++;
     

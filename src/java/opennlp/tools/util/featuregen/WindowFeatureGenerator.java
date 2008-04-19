@@ -16,7 +16,7 @@
 //Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 //////////////////////////////////////////////////////////////////////////////
 
-package opennlp.tools.namefind;
+package opennlp.tools.util.featuregen;
 
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -63,7 +63,7 @@ public class WindowFeatureGenerator implements AdaptiveFeatureGenerator {
     this(generator, 5, 5);
   }
   
-  public void createFeatures(List features, String[] tokens, int index, String[] preds) {
+  public void createFeatures(List<String> features, String[] tokens, int index, String[] preds) {
     // current features
     generator.createFeatures(features, tokens, index, preds);
 
@@ -71,12 +71,12 @@ public class WindowFeatureGenerator implements AdaptiveFeatureGenerator {
     for (int i = 1; i < prevWindowSize + 1; i++) {
       if (index - i >= 0) {
 
-        List prevFeatures = new ArrayList();
+        List<String> prevFeatures = new ArrayList<String>();
 
         generator.createFeatures(prevFeatures, tokens, index - i, preds);
 
-        for (Iterator it = prevFeatures.iterator(); it.hasNext();) {
-          features.add(PREV_PREFIX + i + it.next().toString());
+        for (Iterator<String> it = prevFeatures.iterator(); it.hasNext();) {
+          features.add(PREV_PREFIX + i + it.next());
         }
       }
     }
@@ -85,12 +85,12 @@ public class WindowFeatureGenerator implements AdaptiveFeatureGenerator {
     for (int i = 1; i < nextWindowSize + 1; i++) {
       if (i + index < tokens.length) {
 
-        List nextFeatures = new ArrayList();
+        List<String> nextFeatures = new ArrayList<String>();
 
         generator.createFeatures(nextFeatures, tokens, index + i, preds);
 
-        for (Iterator it = nextFeatures.iterator(); it.hasNext();) {
-          features.add(NEXT_PREFIX + i + it.next().toString());
+        for (Iterator<String> it = nextFeatures.iterator(); it.hasNext();) {
+          features.add(NEXT_PREFIX + i + it.next());
         }
       }
     }

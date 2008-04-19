@@ -16,7 +16,7 @@
 //Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 //////////////////////////////////////////////////////////////////////////////
 
-package opennlp.tools.namefind;
+package opennlp.tools.util.featuregen;
 
 import java.util.regex.Pattern;
 
@@ -73,7 +73,7 @@ public class FeatureGeneratorUtil {
    * @param token A token or word.
    * @return The class name that the specified token belongs in.
    */
-  protected static String tokenFeature(String token) {
+  public static String tokenFeature(String token) {
     
     String feat;
     if (lowercase.matcher(token).find()) {

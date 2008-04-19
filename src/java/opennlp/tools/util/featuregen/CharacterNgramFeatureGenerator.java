@@ -15,7 +15,7 @@
 //License along with this program; if not, write to the Free Software
 //Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 //////////////////////////////////////////////////////////////////////////////
-package opennlp.tools.namefind;
+package opennlp.tools.util.featuregen;
 
 import java.util.Iterator;
 import java.util.List;
@@ -45,7 +45,7 @@ public class CharacterNgramFeatureGenerator extends FeatureGeneratorAdapter {
     this(2, 5);
   }
   
-  public void createFeatures(List features, String[] tokens, int index, String[] preds) {
+  public void createFeatures(List<String> features, String[] tokens, int index, String[] preds) {
 
     NGramModel model = new NGramModel();
     model.add(tokens[index], minLength, maxLength);

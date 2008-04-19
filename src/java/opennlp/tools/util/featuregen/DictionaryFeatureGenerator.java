@@ -16,10 +16,12 @@
 //Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 //////////////////////////////////////////////////////////////////////////////
 
-package opennlp.tools.namefind;
+package opennlp.tools.util.featuregen;
 
 import java.util.List;
 
+import opennlp.tools.namefind.DictionaryNameFinder;
+import opennlp.tools.namefind.TokenNameFinder;
 import opennlp.tools.util.Span;
 
 /**
@@ -43,7 +45,7 @@ public class DictionaryFeatureGenerator extends FeatureGeneratorAdapter {
     mFinder = finder;
   }
 
-  public void createFeatures(List features, String[] tokens, int index, String[] preds) {
+  public void createFeatures(List<String> features, String[] tokens, int index, String[] preds) {
     // cache results sentence
     if (mCurrentSentence != tokens) {
       mCurrentSentence = tokens;

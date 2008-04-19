@@ -15,34 +15,25 @@
 //License along with this program; if not, write to the Free Software
 //Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 //////////////////////////////////////////////////////////////////////////////
-package opennlp.tools.namefind;
+package opennlp.tools.util.featuregen;
 
 import java.util.List;
 
 /**
- * The {@link AdditionalContextFeatureGenerator} generates the context from the passed
- * in additional context.
+ * This feature generator creates sentence begin and end features.
  */
-class AdditionalContextFeatureGenerator extends FeatureGeneratorAdapter {
+public class SentenceFeatureGenerator extends FeatureGeneratorAdapter {
 
-  private String[][] additionalContext;
-
-  AdditionalContextFeatureGenerator() {
-  }
-
-  public void createFeatures(List features, String[] tokens, int index, String[] preds) {
-
-    if (additionalContext != null && additionalContext.length != 0) {
-
-      String[] context = additionalContext[index];
-
-      for (int i = 0; i < context.length; i++) {
-        features.add("ne=" + context[i]);
-      }
+  public void createFeatures(List<String> features, String[] tokens, int index,
+      String[] previousOutcomes) {
+    
+    if (index == 0) {
+      features.add("S=begin");
+    }
+    
+    if (tokens.length == index + 1) {
+      features.add("S=end");
     }
   }
 
-  void setCurrentContext(String[][] context) {
-    additionalContext = context;
-  }
 }

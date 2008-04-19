@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////////
-//Copyright (C) 2007 OpenNlp
+//Copyright (C) 2003 Thomas Morton
 // 
 //This library is free software; you can redistribute it and/or
 //modify it under the terms of the GNU Lesser General Public
@@ -15,37 +15,33 @@
 //License along with this program; if not, write to the Free Software
 //Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 //////////////////////////////////////////////////////////////////////////////
-package opennlp.tools.namefind;
 
-import java.util.HashMap;
+package opennlp.tools.util.featuregen;
+
 import java.util.List;
-import java.util.Map;
 
 /**
- * This {@link FeatureGeneratorAdapter} generates features indicating the outcome associated with a previously occuring word.
+ * Generates a feature which contains the token itself.
  */
-public class PreviousMapFeatureGenerator implements AdaptiveFeatureGenerator {
+public class TokenFeatureGenerator extends FeatureGeneratorAdapter {
 
-  private Map previousMap = new HashMap();
-  
-  public void createFeatures(List features, String[] tokens, int index, String[] preds) {
-    features.add("pd=" + (String) previousMap.get(tokens[index]));
+  private static final String WORD_PREFIX = "w";
+  private boolean lowercase;
+
+  public TokenFeatureGenerator(boolean lowercase) {
+    this.lowercase = lowercase;
   }
   
-  /**
-   * Generates previous decision features for the token based on contents of the previous map.
-   */
-  public void updateAdaptiveData(String[] tokens, String[] outcomes) {
-    
-    for (int i = 0; i < tokens.length; i++) {
-      previousMap.put(tokens[i], outcomes[i]);
+  public TokenFeatureGenerator() {
+    this(true);
+  }
+  
+  public void createFeatures(List<String> features, String[] tokens, int index, String[] preds) {
+    if (lowercase) {
+      features.add(WORD_PREFIX + "=" + tokens[index].toLowerCase());
     }
-  }
-  
-  /**
-   * Clears the previous map.
-   */
-  public void clearAdaptiveData() {
-    previousMap.clear();
+    else {
+      features.add(WORD_PREFIX + "=" + tokens[index]);
+    }
   }
 }

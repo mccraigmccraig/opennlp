@@ -15,19 +15,37 @@
 //License along with this program; if not, write to the Free Software
 //Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 //////////////////////////////////////////////////////////////////////////////
-package opennlp.tools.namefind;
+package opennlp.tools.util.featuregen;
+
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
- * This class provides empty implementations of some of the optional methods in 
- * {@link AdditionalContextFeatureGenerator} to make implementing feature generators
- * easier.
+ * This {@link FeatureGeneratorAdapter} generates features indicating the outcome associated with a previously occuring word.
  */
-public abstract class FeatureGeneratorAdapter implements AdaptiveFeatureGenerator {
+public class PreviousMapFeatureGenerator implements AdaptiveFeatureGenerator {
 
+  private Map<String, String> previousMap = new HashMap<String, String>();
+  
+  public void createFeatures(List<String> features, String[] tokens, int index, String[] preds) {
+    features.add("pd=" + (String) previousMap.get(tokens[index]));
+  }
+  
+  /**
+   * Generates previous decision features for the token based on contents of the previous map.
+   */
   public void updateAdaptiveData(String[] tokens, String[] outcomes) {
+    
+    for (int i = 0; i < tokens.length; i++) {
+      previousMap.put(tokens[i], outcomes[i]);
+    }
   }
   
+  /**
+   * Clears the previous map.
+   */
   public void clearAdaptiveData() {
+    previousMap.clear();
   }
-  
 }

@@ -1,4 +1,4 @@
-package opennlp.tools.namefind;
+package opennlp.tools.util.featuregen;
 
 import java.util.List;
 
@@ -21,9 +21,10 @@ public class TokenClassFeatureGenerator extends FeatureGeneratorAdapter {
     this.generateWordAndClassFeature = genearteWordAndClassFeature;
   }
   
-  public void createFeatures(List features, String[] tokens, int index, String[] preds) {
+  public void createFeatures(List<String> features, String[] tokens, int index, String[] preds) {
     String wordClass = FeatureGeneratorUtil.tokenFeature(tokens[index]);
     features.add(TOKEN_CLASS_PREFIX + "=" + wordClass);
+    
     if (generateWordAndClassFeature) {
       features.add(TOKEN_AND_CLASS_PREFIX + "=" + tokens[index].toLowerCase()+","+wordClass);
     }

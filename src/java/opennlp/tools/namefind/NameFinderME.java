@@ -31,6 +31,8 @@ import opennlp.maxent.TwoPassDataIndexer;
 import opennlp.tools.util.BeamSearch;
 import opennlp.tools.util.Sequence;
 import opennlp.tools.util.Span;
+import opennlp.tools.util.featuregen.AdditionalContextFeatureGenerator;
+import opennlp.tools.util.featuregen.WindowFeatureGenerator;
 
 /**
  * Class for creating a maximum-entropy-based name finder.  

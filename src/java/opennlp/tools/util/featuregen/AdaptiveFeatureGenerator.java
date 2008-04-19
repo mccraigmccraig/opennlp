@@ -16,7 +16,7 @@
 //Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 //////////////////////////////////////////////////////////////////////////////
 
-package opennlp.tools.namefind;
+package opennlp.tools.util.featuregen;
 
 import java.util.List;
 
@@ -33,7 +33,7 @@ public interface AdaptiveFeatureGenerator {
    * @param index The index of the token which is currently being processed.
    * @param previousOutcomes The outcomes for the tokens prior to the specified index.
    */
-  void createFeatures(List features, String[] tokens, int index, String[] previousOutcomes);
+  void createFeatures(List<String> features, String[] tokens, int index, String[] previousOutcomes);
   
   /**
    * Informs the feature generator that the specified tokens have been classified with the coorisponds set of specified outcomes.
