@@ -49,7 +49,7 @@ import org.xml.sax.helpers.XMLReaderFactory;
 /**
   * 
   * @author <a href="mailto:kottmann@gmail.com">Joern Kottmann</a>
-  * @version $Revision: 1.3 $, $Date: 2007/03/30 09:46:33 $
+  * @version $Revision: 1.4 $, $Date: 2008/04/19 18:53:45 $
   */
 public class DictionarySerializer {
   
@@ -62,7 +62,7 @@ public class DictionarySerializer {
 //    private boolean mIsInsideEntryElement;
     private boolean mIsInsideTokenElement;
     
-    private List mTokenList = new LinkedList();
+    private List<Token> mTokenList = new LinkedList<Token>();
 
     private Attributes mAttributes;
     
@@ -70,14 +70,14 @@ public class DictionarySerializer {
       mInserter = inserter;
     }
     /**
-     * Not implemendted.
+     * Not implemented.
      */
      public void processingInstruction(String target, String data) 
        throws SAXException {
      }
 
      /**
-      * Not implemendted.
+      * Not implemented.
       */
      public void startDocument() throws SAXException {
      }
@@ -212,7 +212,7 @@ public class DictionarySerializer {
    * 
    * @throws IOException If an I/O error occurs
    */
-  public static void serialize(OutputStream out, Iterator entries) 
+  public static void serialize(OutputStream out, Iterator<Entry> entries) 
       throws IOException {
     GZIPOutputStream gzipOut = new GZIPOutputStream(out);
     StreamResult streamResult = new StreamResult(gzipOut);
@@ -240,7 +240,7 @@ public class DictionarySerializer {
       hd.startElement("", "", DICTIONARY_ELEMENT, new AttributesImpl());
     
       while (entries.hasNext()) {
-        Entry entry = (Entry) entries.next();
+        Entry entry = entries.next();
         
         serializeEntry(hd, entry);
       }
@@ -261,8 +261,8 @@ public class DictionarySerializer {
     
     AttributesImpl entryAttributes = new AttributesImpl();
     
-    for (Iterator it = entry.getAttributes().iterator(); it.hasNext();) {
-      String key = (String) it.next();
+    for (Iterator<String> it = entry.getAttributes().iterator(); it.hasNext();) {
+      String key = it.next();
       
       entryAttributes.addAttribute("", "", key,
               "", entry.getAttributes().getValue(key));
@@ -272,7 +272,7 @@ public class DictionarySerializer {
     
     TokenList tokens = entry.getTokens();
     
-    for (Iterator it = tokens.iterator(); it.hasNext(); ) {
+    for (Iterator<Token> it = tokens.iterator(); it.hasNext(); ) {
       
       hd.startElement("", "", TOKEN_ELEMENT, new AttributesImpl()); 
 

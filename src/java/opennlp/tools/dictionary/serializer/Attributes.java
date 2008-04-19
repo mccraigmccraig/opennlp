@@ -30,17 +30,17 @@ import java.util.Map;
  */
 public class Attributes {
   
-  private Map mNameValueMap = new HashMap();
+  private Map<String, String> mNameValueMap = new HashMap<String, String>();
   
   /**
-   * Retrives the value for the given key or null if attribute it not set.
+   * Retrieves the value for the given key or null if attribute it not set.
    * 
    * @param key
    * 
    * @return the value
    */
   public  String getValue(String key) {
-    return (String) mNameValueMap.get(key);
+    return mNameValueMap.get(key);
   }
   
   /**
@@ -63,7 +63,7 @@ public class Attributes {
    * 
    * @return key-{@link Iterator}
    */
-  public Iterator iterator() {
+  public Iterator<String> iterator() {
     return mNameValueMap.keySet().iterator();
   }
 }

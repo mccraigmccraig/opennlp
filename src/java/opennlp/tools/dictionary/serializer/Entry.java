@@ -24,7 +24,7 @@ import opennlp.tools.ngram.TokenList;
 /**
  * 
  * @author <a href="mailto:kottmann@gmail.com">Joern Kottmann</a>
- * @version $Revision: 1.2 $, $Date: 2006/11/17 13:10:19 $
+ * @version $Revision: 1.3 $, $Date: 2008/04/19 18:57:49 $
  */
 public class Entry {
   
@@ -43,7 +43,7 @@ public class Entry {
   }
   
   /**
-   * Retrives the {@link Token}s.
+   * Retrieves the {@link Token}s.
    * 
    * @return the {@link Token}s
    */
@@ -52,7 +52,7 @@ public class Entry {
   }
   
   /**
-   * Retrives the {@link Attributes}.
+   * Retrieves the {@link Attributes}.
    * 
    * @return the {@link Attributes}
    */

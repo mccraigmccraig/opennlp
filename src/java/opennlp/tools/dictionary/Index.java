@@ -14,7 +14,7 @@ import opennlp.tools.ngram.TokenList;
  */
 public class Index {
   
-  private Set tokens = new HashSet();
+  private Set<Token> tokens = new HashSet<Token>();
   
   /**
    * Initializes the current instance with the given
@@ -22,7 +22,7 @@ public class Index {
    * 
    * @param tokenLists
    */
-  public Index(Iterator tokenLists) {
+  public Index(Iterator<TokenList> tokenLists) {
     
     while (tokenLists.hasNext()) {
     
