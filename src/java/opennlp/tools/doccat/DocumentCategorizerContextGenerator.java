@@ -32,14 +32,12 @@ class DocumentCategorizerContextGenerator {
     mFeatureGenerators = featureGenerators;
   }
 
-  public String[] getContext(Object textObject) {
+  public String[] getContext(String text[]) {
     
-    String[] text = (String[]) textObject;
-    
-    Collection context = new LinkedList();
+    Collection<String> context = new LinkedList<String>();
     
     for (int i = 0; i < mFeatureGenerators.length; i++) {
-      Collection extractedFeatures = 
+      Collection<String> extractedFeatures = 
           mFeatureGenerators[i].extractFeatures(text);
       context.addAll(extractedFeatures);
     }

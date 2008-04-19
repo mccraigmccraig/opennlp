@@ -21,5 +21,5 @@ package opennlp.tools.doccat;
 import java.util.Collection;
 
 interface FeatureGenerator {
-  public Collection extractFeatures(String[] text);
+  public Collection<String> extractFeatures(String[] text);
 }

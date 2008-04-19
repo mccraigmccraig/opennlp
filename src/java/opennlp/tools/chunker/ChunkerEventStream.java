@@ -74,9 +74,9 @@ public class ChunkerEventStream implements EventStream {
   }
 
   private void addNewEvents() {
-    List toks = new ArrayList();
-    List tags = new ArrayList();
-    List preds = new ArrayList();
+    List<String> toks = new ArrayList<String>();
+    List<String> tags = new ArrayList<String>();
+    List<String> preds = new ArrayList<String>();
     for (String line = (String) data.nextToken(); line !=null && !line.equals(""); line = (String) data.nextToken()) {
       String[] parts = line.split(" ");
       if (parts.length != 3) {

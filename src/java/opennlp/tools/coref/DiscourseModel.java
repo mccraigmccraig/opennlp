@@ -28,7 +28,7 @@ import opennlp.tools.coref.mention.MentionContext;
  */
 public class DiscourseModel {
 
-  private List entities;
+  private List<DiscourseEntity> entities;
   
   int nextEntityId = 1;
 
@@ -37,7 +37,7 @@ public class DiscourseModel {
    *
    */
   public DiscourseModel() {
-    entities=new ArrayList();
+    entities = new ArrayList<DiscourseEntity>();
   }
 
   /**
@@ -87,7 +87,7 @@ public class DiscourseModel {
    * @param confidence The confidence.
    */
   public void mergeEntities(DiscourseEntity e1,DiscourseEntity e2,float confidence) {
-    for (Iterator ei=e2.getMentions();ei.hasNext();) {
+    for (Iterator<MentionContext> ei=e2.getMentions();ei.hasNext();) {
       e1.addMention((MentionContext) ei.next());
     }
     //System.err.println("DiscourseModel.mergeEntities: removing "+e2);
