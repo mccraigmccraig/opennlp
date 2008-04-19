@@ -67,9 +67,9 @@ public class BeamSearch {
    */
   public Sequence[] bestSequences(int numSequences, Object[] sequence, Object[] additionalContext, double minSequenceScore) {
     int n = sequence.length;
-    Heap prev = new ListHeap(size);
-    Heap next = new ListHeap(size);
-    Heap tmp;
+    Heap<Sequence> prev = new ListHeap<Sequence>(size);
+    Heap<Sequence> next = new ListHeap<Sequence>(size);
+    Heap<Sequence> tmp;
     prev.add(new Sequence());
     if (additionalContext == null) {
       additionalContext = EMPTY_ADDITIONAL_CONTEXT;
@@ -79,7 +79,7 @@ public class BeamSearch {
       
       for (int sc = 0; prev.size() > 0 && sc < sz; sc++) {
         Sequence top = (Sequence) prev.extract();
-        List tmpOutcomes = top.getOutcomes();
+        List<String> tmpOutcomes = top.getOutcomes();
         String[] outcomes = (String[]) tmpOutcomes.toArray(new String[tmpOutcomes.size()]);
         String[] contexts = cg.getContext(i, sequence, outcomes, additionalContext);
         double[] scores;
@@ -142,7 +142,7 @@ public class BeamSearch {
    * @param additionalContext An Object[] of additional context.  This is passed to the context generator blindly with the assumption that the context are appropiate.
    * @return The top ranked sequence of outcomes.
    */
-  public Sequence bestSequence(List sequence, Object[] additionalContext) {
+  public Sequence bestSequence(List<Object> sequence, Object[] additionalContext) {
     return bestSequences(1, sequence.toArray(), additionalContext)[0];
   }
   
