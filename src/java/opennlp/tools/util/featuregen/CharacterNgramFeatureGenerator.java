@@ -50,7 +50,7 @@ public class CharacterNgramFeatureGenerator extends FeatureGeneratorAdapter {
     NGramModel model = new NGramModel();
     model.add(tokens[index], minLength, maxLength);
 
-    for (Iterator it = model.iterator(); it.hasNext();) {
+    for (Iterator<TokenList> it = model.iterator(); it.hasNext();) {
 
       TokenList tokenList = (TokenList) it.next();
 

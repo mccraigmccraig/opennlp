@@ -91,7 +91,7 @@ public class NameFinderEventStream implements EventStream {
       String outcomes[] = generateOutcomes(sample.getNames(),sample.getNameTypes(),sample.getSentence().length);
       additionalContextFeatureGenerator.setCurrentContext(sample.getAdditionalContext());
       String[] tokens = new String[sample.getSentence().length]; 
-      List events = new ArrayList(outcomes.length);
+      List<Event> events = new ArrayList<Event>(outcomes.length);
       for (int i = 0; i < sample.getSentence().length; i++) {
         tokens[i] = sample.getSentence()[i].getToken();
       }
@@ -127,12 +127,12 @@ public class NameFinderEventStream implements EventStream {
     
     
   /**
-   * Generated previous decision features for each token based on contents of the specifed map.
+   * Generated previous decision features for each token based on contents of the specified map.
    * @param tokens The token for which the context is generated.
    * @param prevMap A mapping of tokens to their previous decisions.
    * @return An additional context arrary with features for each token.
    */
-  public static String[][] additionalContext(String[] tokens, Map prevMap) {
+  public static String[][] additionalContext(String[] tokens, Map<String, String> prevMap) {
     String[][] ac = new String[tokens.length][1];
     for (int ti=0;ti<tokens.length;ti++) {
       String pt = (String) prevMap.get(tokens[ti]);

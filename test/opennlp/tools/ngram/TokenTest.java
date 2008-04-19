@@ -29,7 +29,7 @@ import junit.framework.TestCase;
  * Tests for the {@link Token} class.
  * 
  * @author <a href="mailto:kottmann@gmail.com">Joern Kottmann</a>
- * @version $Revision: 1.3 $, $Date: 2006/11/15 17:47:39 $
+ * @version $Revision: 1.4 $, $Date: 2008/04/19 20:17:31 $
  */
 public class TokenTest extends TestCase {
 
@@ -43,7 +43,7 @@ public class TokenTest extends TestCase {
 
     Token token = Token.create("test");
     
-    WeakReference weakToken = new WeakReference(token);
+    WeakReference<Token> weakToken = new WeakReference<Token>(token);
     token = null;
     
     System.gc();

@@ -29,14 +29,14 @@ import java.util.List;
  * the constructor. K+1 values are not gaurenteed to be kept in the heap or returned in a
  * particular order.     
  */
-public class ListHeap implements Heap {
-  private List list;
+public class ListHeap<E extends Comparable<E>> implements Heap<E> {
+  private List<E> list;
 
-  private Comparator comp;
+  private Comparator<E> comp;
 
   private int size;
 
-  private Object max = null;
+  private E max = null;
 
   /**
    * Creates a new heap with the specified size using the sorted based on the
@@ -44,10 +44,10 @@ public class ListHeap implements Heap {
    * @param sz The size of the heap.
    * @param c The comparator to be used to sort heap elements.
    */
-  public ListHeap(int sz, Comparator c) {
+  public ListHeap(int sz, Comparator<E> c) {
     size = sz;
     comp = c;
-    list = new ArrayList(sz);
+    list = new ArrayList<E>(sz);
   }
 
   /**
@@ -75,28 +75,28 @@ public class ListHeap implements Heap {
   }
 
   private void swap(int x, int y) {
-    Object ox = list.get(x);
-    Object oy = list.get(y);
+    E ox = list.get(x);
+    E oy = list.get(y);
 
     list.set(y, ox);
     list.set(x, oy);
   }
 
-  private boolean lt(Object o1, Object o2) {
+  private boolean lt(E o1, E o2) {
     if (comp != null) {
       return comp.compare(o1, o2) < 0;
     }
     else {
-      return ((Comparable) o1).compareTo(o2) < 0;
+      return o1.compareTo(o2) < 0;
     }
   }
 
-  private boolean gt(Object o1, Object o2) {
+  private boolean gt(E o1, E o2) {
     if (comp != null) {
       return comp.compare(o1, o2) > 0;
     }
     else {
-      return ((Comparable) o1).compareTo(o2) > 0;
+      return o1.compareTo(o2) > 0;
     }
   }
 
@@ -123,11 +123,11 @@ public class ListHeap implements Heap {
     }
   }
 
-  public Object extract() {
+  public E extract() {
     if (list.size() == 0) {
       throw new RuntimeException("Heap Underflow");
     }
-    Object top = list.get(0);
+    E top = list.get(0);
     int last = list.size() - 1;
     if (last != 0) {
       list.set(0, list.remove(last));
@@ -140,21 +140,21 @@ public class ListHeap implements Heap {
     return top;
   }
 
-  public Object first() {
+  public E first() {
     if (list.size() == 0) {
       throw new RuntimeException("Heap Underflow");
     }
     return list.get(0);
   }
   
-  public Object last() {
+  public E last() {
     if (list.size() == 0) {
       throw new RuntimeException("Heap Underflow");
     }
     return max;
   }
 
-  public void add(Object o) {
+  public void add(E o) {
     /* keep track of max to prevent unnecessary insertion */
     if (max == null) {
       max = o;
@@ -184,7 +184,7 @@ public class ListHeap implements Heap {
     list.clear();
   }
 
-  public Iterator iterator() {
+  public Iterator<E> iterator() {
     return list.iterator();
   }
   
@@ -193,7 +193,7 @@ public class ListHeap implements Heap {
   }
   
   public static void main(String[] args) {
-   Heap heap = new ListHeap(5);
+   Heap<Integer> heap = new ListHeap<Integer>(5);
    for (int ai=0;ai<args.length;ai++){
      heap.add(Integer.valueOf(Integer.parseInt(args[ai])));
    }

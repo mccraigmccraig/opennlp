@@ -22,7 +22,7 @@ import opennlp.tools.util.Span;
 /**
  * Data strucure representation of a mention.
  */
-public class Mention implements Comparable {
+public class Mention implements Comparable<Mention> {
 
   /** Represents the character offset for this extent. */
   private Span span;
@@ -91,8 +91,7 @@ public class Mention implements Comparable {
     return parse;
   }
   
-  public int compareTo(Object o) {
-    Mention e = (Mention) o;
+  public int compareTo(Mention e) {
     return span.compareTo(e.span);
   }
   
