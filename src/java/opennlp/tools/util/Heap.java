@@ -25,31 +25,31 @@ import java.util.Iterator;
  * While this is a typical of a heap it allows this objects natural ordering to
  * match that of other sorted collections.
  * */
-public interface Heap  {
+public interface Heap<E>  {
 
   /** 
    * Removes the smallest element from the heap and returns it.
    * @return The smallest element from the heap.
    */  
-  public Object extract();
+  public E extract();
   
   /**
    * Returns the smallest element of the heap.
    * @return The top element of the heap.
    */
-  public Object first();
+  public E first();
   
   /**
    * Returns the largest element of the heap.
    * @return The largest element of the heap.
    */
-  public Object last();
+  public E last();
   
   /**
    * Adds the specified object to the heap.
    * @param o The object to add to the heap.
    */
-  public void add(Object o);
+  public void add(E o);
   
   /**
    * Returns the size of the heap.
@@ -68,7 +68,7 @@ public interface Heap  {
    * elements is guaranteed. 
    * @return An iterator over the elements of the heap.
    */
-  public Iterator iterator();
+  public Iterator<E> iterator();
   
   /**
    * Clears the contents of the heap.
