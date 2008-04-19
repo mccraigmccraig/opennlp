@@ -55,7 +55,7 @@ import opennlp.tools.util.Sequence;
  * surrounding context.
  *
  * @author      Gann Bierner
- * @version $Revision: 1.28 $, $Date: 2007/05/17 13:27:34 $
+ * @version $Revision: 1.29 $, $Date: 2008/04/19 19:50:14 $
  */
 public class POSTaggerME implements Evalable, POSTagger {
 
@@ -171,15 +171,15 @@ public class POSTaggerME implements Evalable, POSTagger {
     return new POSEventCollector(r, contextGen);
   }
 
-  public List tag(List sentence) {
+  public List<String> tag(List<String> sentence) {
     bestSequence = beam.bestSequence(sentence,null);
     return bestSequence.getOutcomes();
   }
 
   public String[] tag(String[] sentence) {
     bestSequence = beam.bestSequence(sentence,null);
-    List t = bestSequence.getOutcomes();
-    return (String[]) t.toArray(new String[t.size()]);
+    List<String> t = bestSequence.getOutcomes();
+    return t.toArray(new String[t.size()]);
   }
   
   /**
@@ -192,8 +192,8 @@ public class POSTaggerME implements Evalable, POSTagger {
     Sequence[] bestSequences = beam.bestSequences(numTaggings, sentence,null);
     String[][] tags = new String[bestSequences.length][];
     for (int si=0;si<tags.length;si++) {
-      List t = bestSequences[si].getOutcomes();
-      tags[si] = (String[]) t.toArray(new String[t.size()]);
+      List<String> t = bestSequences[si].getOutcomes();
+      tags[si] = t.toArray(new String[t.size()]);
     }
     return tags;
   }
@@ -215,11 +215,11 @@ public class POSTaggerME implements Evalable, POSTagger {
   }
 
   public String tag(String sentence) {
-    ArrayList toks = new ArrayList();
+    List<String> toks = new ArrayList<String>();
     StringTokenizer st = new StringTokenizer(sentence);
     while (st.hasMoreTokens())
       toks.add(st.nextToken());
-    List tags = tag(toks);
+    List<String> tags = tag(toks);
     StringBuffer sb = new StringBuffer();
     for (int i = 0; i < tags.size(); i++)
       sb.append(toks.get(i) + "/" + tags.get(i) + " ");
@@ -236,13 +236,13 @@ public class POSTaggerME implements Evalable, POSTagger {
       while ((line = br.readLine()) != null) {
         sentences++;
         Pair p = POSEventCollector.convertAnnotatedString(line);
-        List words = (List) p.a;
-        List outcomes = (List) p.b;
-        List tags = beam.bestSequence(words, null).getOutcomes();
+        List<String> words = (List<String>) p.a;
+        List<String> outcomes = (List<String>) p.b;
+        List<String> tags = beam.bestSequence(words, null).getOutcomes();
 
         int c = 0;
         boolean sentOk = true;
-        for (Iterator t = tags.iterator(); t.hasNext(); c++) {
+        for (Iterator<String> t = tags.iterator(); t.hasNext(); c++) {
           total++;
           String tag = (String) t.next();
           if (tag.equals(outcomes.get(c)))
@@ -290,12 +290,12 @@ public class POSTaggerME implements Evalable, POSTagger {
     }
   }
   
-  public String[] getOrderedTags(List words, List tags, int index) {
+  public String[] getOrderedTags(List<String> words, List<String> tags, int index) {
     return getOrderedTags(words,tags,index,null);
   }
   
-  public String[] getOrderedTags(List words, List tags, int index,double[] tprobs) {
-    double[] probs = posModel.eval(contextGen.getContext(index,words.toArray(),(String[]) tags.toArray(new String[tags.size()]),null));
+  public String[] getOrderedTags(List<String> words, List<String> tags, int index,double[] tprobs) {
+    double[] probs = posModel.eval(contextGen.getContext(index,words.toArray(), tags.toArray(new String[tags.size()]),null));
     String[] orderedTags = new String[probs.length];
     for (int i = 0; i < probs.length; i++) {
       int max = 0;
