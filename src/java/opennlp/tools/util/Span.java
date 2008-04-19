@@ -21,7 +21,7 @@ package opennlp.tools.util;
 /** 
  * Class for storing start and end integer offsets.  
 **/
-public class Span implements Comparable {
+public class Span implements Comparable<Span> {
 
   private int start;
   private int end;
@@ -144,8 +144,7 @@ public class Span implements Comparable {
   /**
    * Compares the specified span to the current span.
    */
-  public int compareTo(Object o) { 
-    Span s = (Span) o;
+  public int compareTo(Span s) { 
     if (getStart() < s.getStart()) {
       return -1;
     }

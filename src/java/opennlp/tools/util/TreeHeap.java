@@ -9,15 +9,15 @@ import java.util.TreeSet;
  * This implementation will not allow multiple objects which are equal to be added to the heap.
  * Only use this implementation when object in the heap can be totally ordered (no duplicates). 
  */
-public class TreeHeap implements Heap {
+public class TreeHeap<E> implements Heap<E> {
 
-  private SortedSet tree;
+  private SortedSet<E> tree;
 
   /** 
    * Creates a new tree heap.
    */
   public TreeHeap() {
-    tree = new TreeSet();
+    tree = new TreeSet<E>();
   }
 
   /**
@@ -25,28 +25,28 @@ public class TreeHeap implements Heap {
    * @param size The size of the new tree heap.
    */
   public TreeHeap(int size) {
-    tree = new TreeSet();
+    tree = new TreeSet<E>();
   }
 
-  public Object extract() {
-    Object rv = tree.first();
+  public E extract() {
+    E rv = tree.first();
     tree.remove(rv);
     return rv;
   }
 
-  public Object first() {
+  public E first() {
     return tree.first();
   }
   
-  public Object last() {
+  public E last() {
     return tree.last();
   }
   
-  public Iterator iterator() {
+  public Iterator<E> iterator() {
     return tree.iterator();
   }
 
-  public void add(Object o) {
+  public void add(E o) {
     tree.add(o);
   }
 
@@ -63,7 +63,7 @@ public class TreeHeap implements Heap {
   }
   
   public static void main(String[] args) {
-    Heap heap = new TreeHeap(5);
+    Heap<Integer> heap = new TreeHeap<Integer>(5);
     for (int ai=0;ai<args.length;ai++){
       heap.add(Integer.valueOf(Integer.parseInt(args[ai])));
     }
@@ -72,5 +72,4 @@ public class TreeHeap implements Heap {
     }
     System.out.println();
    }
-
 }

@@ -23,17 +23,17 @@ import java.util.List;
 /**
  * An iterator for a list which returns values in the opposite order as the typical list iterator.
  */
-public class ReverseListIterator implements Iterator {
+public class ReverseListIterator<T> implements Iterator<T> {
   
   private int index;
-  private List list;
+  private List<T> list;
 
-  public ReverseListIterator(List list) {
+  public ReverseListIterator(List<T> list) {
     index = list.size()-1;
     this.list=list;
   }
 
-  public Object next() {
+  public T next() {
     return list.get(index--);
   }
 

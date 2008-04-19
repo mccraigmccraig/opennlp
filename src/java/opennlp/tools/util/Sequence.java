@@ -22,44 +22,43 @@ import java.util.Collections;
 import java.util.List;
 
 /** Represents a weighted sequence of outcomes. */
-public class Sequence implements Comparable {
+public class Sequence implements Comparable<Sequence> {
   private double score;
-  private List outcomes;
-  private List probs;
+  private List<String> outcomes;
+  private List<Double> probs;
   private static final Double ONE = new Double(1.0);
 
   /** Creates a new sequence of outcomes. */
   public Sequence() {
-    outcomes = new ArrayList(1);
-    probs = new ArrayList(1);
+    outcomes = new ArrayList<String>(1);
+    probs = new ArrayList<Double>(1);
     score = 0;
   }
 
   public Sequence(Sequence s) {
-    outcomes = new ArrayList(s.outcomes.size()+1);
+    outcomes = new ArrayList<String>(s.outcomes.size()+1);
     outcomes.addAll(s.outcomes);
-    probs = new ArrayList(s.probs.size()+1);
+    probs = new ArrayList<Double>(s.probs.size()+1);
     probs.addAll(s.probs);
     score = s.score;
   }
   
   public Sequence(Sequence s,String outcome, double p) {
-      outcomes = new ArrayList(s.outcomes.size()+1);
+      outcomes = new ArrayList<String>(s.outcomes.size()+1);
       outcomes.addAll(s.outcomes);
       outcomes.add(outcome);
-      probs = new ArrayList(s.probs.size()+1);
+      probs = new ArrayList<Double>(s.probs.size()+1);
       probs.addAll(s.probs);
       probs.add(new Double(p));
       score = s.score+Math.log(p);
     }
 
-  public Sequence(List outcomes) {
+  public Sequence(List<String> outcomes) {
     this.outcomes = outcomes;
     this.probs = Collections.nCopies(outcomes.size(),ONE);
   }
 
-  public int compareTo(Object o) {
-    Sequence s = (Sequence) o;
+  public int compareTo(Sequence s) {
     if (score < s.score)
       return 1;
     if (score > s.score)
@@ -80,7 +79,7 @@ public class Sequence implements Comparable {
   /** Returns a list of outcomes for this sequence.
    * @return a list of outcomes.
    */
-  public List getOutcomes() {
+  public List<String> getOutcomes() {
     return outcomes;
   }
 
@@ -101,7 +100,7 @@ public class Sequence implements Comparable {
     return score;
   }
 
-  /** Populates  an array with the probabilities associated with the outcomes of this sequece.
+  /** Populates  an array with the probabilities associated with the outcomes of this sequence.
    * @param ps a pre-allocated array to use to hold the values of the probabilities of the outcomes for this sequence.
    */
   public void getProbs(double[] ps) {
