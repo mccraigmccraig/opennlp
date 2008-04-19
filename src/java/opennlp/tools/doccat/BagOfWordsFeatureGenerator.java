@@ -26,9 +26,9 @@ import java.util.Collection;
  */
 public class BagOfWordsFeatureGenerator implements FeatureGenerator {
 
-  public Collection extractFeatures(String[] text) {
+  public Collection<String> extractFeatures(String[] text) {
     
-    Collection bagOfWords = new ArrayList(text.length);
+    Collection<String> bagOfWords = new ArrayList<String>(text.length);
     
     for (int i = 0; i < text.length; i++) {
       bagOfWords.add("bow=" + text[i]);
