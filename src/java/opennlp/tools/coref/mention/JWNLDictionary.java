@@ -77,6 +77,7 @@ public class JWNLDictionary implements Dictionary {
     morphy = dict.getMorphologicalProcessor();
   }
 
+  @SuppressWarnings("unchecked")
   public String[] getLemmas(String word, String tag) {
     try {
       POS pos;
