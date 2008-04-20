@@ -35,13 +35,13 @@ import java.util.Set;
 import opennlp.tools.util.CountedSet;
 
 /** 
- * Class for writting a pos-tag-dictionary to a file.
+ * Class for writing a pos-tag-dictionary to a file.
  */
 public class POSDictionaryWriter {
 
   private Writer dictFile;
   private Map<String, Set<String>> dictionary;
-  private CountedSet wordCounts;
+  private CountedSet<String> wordCounts;
   private String newline = System.getProperty("line.separator");
   
   public POSDictionaryWriter(String file, String encoding) throws IOException {
@@ -52,7 +52,7 @@ public class POSDictionaryWriter {
       dictFile = new FileWriter(file);
     }
     dictionary = new HashMap<String, Set<String>>();
-    wordCounts = new CountedSet();    
+    wordCounts = new CountedSet<String>();    
   }
   
   public POSDictionaryWriter(String file) throws IOException {
