@@ -37,7 +37,7 @@ public class DefaultParse extends AbstractParse {
 
   private Parse parse;
   private int sentenceNumber;
-  private static Set entitySet = new HashSet(Arrays.asList(NameFinder.NAME_TYPES));
+  private static Set<String> entitySet = new HashSet<String>(Arrays.asList(NameFinder.NAME_TYPES));
   
   /**
    * Initializes the current instance.
@@ -54,9 +54,9 @@ public class DefaultParse extends AbstractParse {
     return sentenceNumber;
   }
   
-  public List getNamedEntities() {
-    List names = new ArrayList();
-    List kids = new LinkedList(Arrays.asList(parse.getChildren()));
+  public List<opennlp.tools.coref.mention.Parse> getNamedEntities() {
+    List<Parse> names = new ArrayList<Parse>();
+    List<Parse> kids = new LinkedList<Parse>(Arrays.asList(parse.getChildren()));
     while (kids.size() > 0) {
       Parse p = (Parse) kids.remove(0);
       if (entitySet.contains(p.getType())) {
@@ -66,15 +66,15 @@ public class DefaultParse extends AbstractParse {
         kids.addAll(Arrays.asList(p.getChildren()));
       }
     }
-    return createParses((Parse[]) names.toArray(new Parse[names.size()]));
+    return createParses(names.toArray(new Parse[names.size()]));
   }
 
-  public List getChildren() {
+  public List<opennlp.tools.coref.mention.Parse> getChildren() {
     return createParses(parse.getChildren());
   }
 
-  public List getSyntacticChildren() {
-    List kids = new ArrayList(Arrays.asList(parse.getChildren()));
+  public List<opennlp.tools.coref.mention.Parse> getSyntacticChildren() {
+    List<Parse> kids = new ArrayList<Parse>(Arrays.asList(parse.getChildren()));
     for (int ci = 0; ci < kids.size(); ci++) {
       Parse kid = (Parse) kids.get(ci);
       if (entitySet.contains(kid.getType())) {
@@ -86,9 +86,9 @@ public class DefaultParse extends AbstractParse {
     return createParses((Parse[]) kids.toArray(new Parse[kids.size()]));
   }
 
-  public List getTokens() {
-    List tokens = new ArrayList();
-    List kids = new LinkedList(Arrays.asList(parse.getChildren()));
+  public List<opennlp.tools.coref.mention.Parse> getTokens() {
+    List<Parse> tokens = new ArrayList<Parse>();
+    List<Parse> kids = new LinkedList<Parse>(Arrays.asList(parse.getChildren()));
     while (kids.size() > 0) {
       Parse p = (Parse) kids.remove(0);
       if (p.isPosTag()) {
@@ -110,11 +110,14 @@ public class DefaultParse extends AbstractParse {
     }
   }
   
-  private List createParses(Parse[] parses) {
-    List newParses = new ArrayList(parses.length);
+  private List<opennlp.tools.coref.mention.Parse> createParses(Parse[] parses) {
+    List<opennlp.tools.coref.mention.Parse> newParses = 
+      new ArrayList<opennlp.tools.coref.mention.Parse>(parses.length);
+    
     for (int pi=0,pn=parses.length;pi<pn;pi++) {
       newParses.add(new DefaultParse(parses[pi],sentenceNumber));
     }
+    
     return newParses;
   }
 
@@ -177,15 +180,16 @@ public class DefaultParse extends AbstractParse {
     return parse.getSpan();
   }
 
-  public int compareTo(Object o) {
-    if ( o == this) {
+  public int compareTo(opennlp.tools.coref.mention.Parse p) {
+    
+    if (p == this) {
       return 0;
     }
-    DefaultParse p = (DefaultParse) o;
-    if (sentenceNumber < p.sentenceNumber) {
+    
+    if (getSentenceNumber() < p.getSentenceNumber()) {
       return -1;
     }
-    else if (sentenceNumber > p.sentenceNumber) {
+    else if (getSentenceNumber() > p.getSentenceNumber()) {
       return 1;
     }
     else {
@@ -274,7 +278,7 @@ public class DefaultParse extends AbstractParse {
   }
   
   /**
-   * Retrives the {@link Parse}.
+   * Retrieves the {@link Parse}.
    * 
    * @return the {@link Parse}
    */

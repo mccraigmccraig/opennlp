@@ -22,7 +22,7 @@ import java.util.List;
 import opennlp.tools.util.Span;
 
 /** Interface for syntactic and named-entity information to be used in coreference annotation. */
-public interface Parse extends Comparable {
+public interface Parse extends Comparable<Parse> {
   
   /**
    * Returns the index of the sentence which contains this parse.

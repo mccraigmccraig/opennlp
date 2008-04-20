@@ -78,7 +78,7 @@ public class MentionContext extends Context {
     prevToken = parse.getPreviousToken();
     nextToken = parse.getNextToken();
     head = headFinder.getLastHead(parse);
-    List headTokens = head.getTokens();
+    List<Parse> headTokens = head.getTokens();
     tokens = headTokens.toArray(new Parse[headTokens.size()]);
     basalNextToken = head.getNextToken();
     //System.err.println("MentionContext.init: "+ent+" "+ent.getEntityId()+" head="+head);
