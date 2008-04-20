@@ -58,7 +58,7 @@ public class JWNLDictionary implements Dictionary {
     PointerType.initialize();
 	Adjective.initialize();
 	VerbFrame.initialize();
-    Map suffixMap = new HashMap();
+    Map<POS, String[][]> suffixMap = new HashMap<POS, String[][]>();
     suffixMap.put(POS.NOUN,new String[][] {{"s",""},{"ses","s"},{"xes","x"},{"zes","z"},{"ches","ch"},{"shes","sh"},{"men","man"},{"ies","y"}});
     suffixMap.put(POS.VERB,new String[][] {{"s",""},{"ies","y"},{"es","e"},{"es",""},{"ed","e"},{"ed",""},{"ing","e"},{"ing",""}});
     suffixMap.put(POS.ADJECTIVE,new String[][] {{"er",""},{"est",""},{"er","e"},{"est","e"}});
@@ -95,8 +95,8 @@ public class JWNLDictionary implements Dictionary {
       else {
         pos = POS.NOUN;
       }
-      List lemmas = morphy.lookupAllBaseForms(pos,word);
-      return (String[]) lemmas.toArray(new String[lemmas.size()]);
+      List<String> lemmas = morphy.lookupAllBaseForms(pos,word);
+      return lemmas.toArray(new String[lemmas.size()]);
     }
     catch (JWNLException e) {
       e.printStackTrace();
@@ -132,7 +132,7 @@ public class JWNLDictionary implements Dictionary {
     }
   }
   
-  private void getParents(Synset synset, List parents) throws JWNLException {
+  private void getParents(Synset synset, List<String> parents) throws JWNLException {
     Pointer[] pointers = synset.getPointers();
     for (int pi=0,pn=pointers.length;pi<pn;pi++) {
       if (pointers[pi].getType() == PointerType.HYPERNYM) {
@@ -149,9 +149,9 @@ public class JWNLDictionary implements Dictionary {
       IndexWord iw = dict.getIndexWord(POS.NOUN,lemma);
       if (iw != null) {
         Synset synset = iw.getSense(sense+1);
-        List parents = new ArrayList();
+        List<String> parents = new ArrayList<String>();
         getParents(synset,parents);
-        return (String[]) parents.toArray(new String[parents.size()]);
+        return parents.toArray(new String[parents.size()]);
       }
       else {
         return empty;

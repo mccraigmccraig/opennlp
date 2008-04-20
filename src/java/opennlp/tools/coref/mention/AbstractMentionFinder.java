@@ -39,28 +39,28 @@ public abstract class AbstractMentionFinder implements MentionFinder {
   protected boolean collectPrenominalNamedEntities;
   protected boolean collectCoordinatedNounPhrases;
 
-  private void gatherHeads(Parse p, Map heads) {
+  private void gatherHeads(Parse p, Map<Parse, Parse> heads) {
     Parse head = headFinder.getHead(p);
     //System.err.println("AbstractMention.gatherHeads: "+head+" -> ("+p.hashCode()+") "+p);
     //if (head != null) { System.err.println("head.hashCode()="+head.hashCode());}
     if (head != null) {
       heads.put(head, p);
     }
-    List nps = p.getNounPhrases();
-    for (Iterator ni = nps.iterator(); ni.hasNext();) {
-      gatherHeads((Parse) ni.next(), heads);
+    List<Parse> nps = p.getNounPhrases();
+    for (Iterator<Parse> ni = nps.iterator(); ni.hasNext();) {
+      gatherHeads(ni.next(), heads);
     }
   }
 
-  /** Assigns head realtions between noun phrases and the child np
+  /** Assigns head relations between noun phrases and the child np
    *  which is their head.
    *  @param nps List of valid nps for this mention finder.
    *  @return mapping from noun phrases and the child np which is their head
    **/
-  protected Map constructHeadMap(List nps) {
-    Map headMap = new HashMap();
+  protected Map<Parse, Parse> constructHeadMap(List<Parse> nps) {
+    Map<Parse, Parse> headMap = new HashMap<Parse, Parse>();
     for (int ni = 0; ni < nps.size(); ni++) {
-      Parse np = (Parse) nps.get(ni);
+      Parse np = nps.get(ni);
       gatherHeads(np, headMap);
     }
     return headMap;
@@ -79,11 +79,11 @@ public abstract class AbstractMentionFinder implements MentionFinder {
   }
   
   protected boolean isPossessive(Parse np) {
-    List parts = np.getSyntacticChildren();
+    List<Parse> parts = np.getSyntacticChildren();
     if (parts.size() > 1) {
       Parse child0 = (Parse) parts.get(0);
       if (child0.isNounPhrase()) {
-        List ctoks = child0.getTokens();
+        List<Parse> ctoks = child0.getTokens();
         Parse tok = (Parse) ctoks.get(ctoks.size() - 1);
         if (tok.getSyntacticType().equals("POS")) {
           return true;
@@ -102,12 +102,12 @@ public abstract class AbstractMentionFinder implements MentionFinder {
   }
 
   protected boolean isOfPrepPhrase(Parse np) {
-    List parts = np.getSyntacticChildren();
+    List<Parse> parts = np.getSyntacticChildren();
     if (parts.size() == 2) {
       Parse child0 = (Parse) parts.get(0);
       if (child0.isNounPhrase()) {
         Parse child1 = (Parse) parts.get(1);
-        List cparts = child1.getSyntacticChildren();
+        List<Parse> cparts = child1.getSyntacticChildren();
         if (cparts.size() == 2) {
           Parse child2 = (Parse) cparts.get(0);
           if (child2.isToken() && child2.toString().equals("of")) {
@@ -120,7 +120,7 @@ public abstract class AbstractMentionFinder implements MentionFinder {
   }
 
   protected boolean isConjoinedBasal(Parse np) {
-    List parts = np.getSyntacticChildren();
+    List<Parse> parts = np.getSyntacticChildren();
     boolean allToken = true;
     boolean hasConjunction = false;
     for (int ti = 0; ti < parts.size(); ti++) {
@@ -138,9 +138,9 @@ public abstract class AbstractMentionFinder implements MentionFinder {
     return allToken && hasConjunction;
   }
 
-  private void collectCoordinatedNounPhraseMentions(Parse np, List entities) {
+  private void collectCoordinatedNounPhraseMentions(Parse np, List<Mention> entities) {
     //System.err.println("collectCoordNp: "+np);
-    List npTokens = np.getTokens();
+    List<Parse> npTokens = np.getTokens();
     boolean inCoordinatedNounPhrase = false;
     int lastNpTokenIndex = headFinder.getHeadIndex(np);
     for (int ti = lastNpTokenIndex - 1; ti >= 0; ti--) {
@@ -185,7 +185,7 @@ public abstract class AbstractMentionFinder implements MentionFinder {
                  Linker.speechPronounPattern.matcher(tok).find();
   }
 
-  private void collectPossesivePronouns(Parse np, List entities) {
+  private void collectPossesivePronouns(Parse np, List<Mention> entities) {
     //TODO: Look at how training is done and examine whether this is needed or can be accomidated in a different way.
     /*
     List snps = np.getSubNounPhrases();
@@ -200,10 +200,10 @@ public abstract class AbstractMentionFinder implements MentionFinder {
     else {
     */
       //System.err.println("AbstractEntityFinder.collectPossesivePronouns: "+np);
-      List npTokens = np.getTokens();
+      List<Parse> npTokens = np.getTokens();
       Parse headToken = headFinder.getHeadToken(np);
       for (int ti = npTokens.size() - 2; ti >= 0; ti--) {
-        Parse tok = (Parse) npTokens.get(ti);
+        Parse tok = npTokens.get(ti);
         if (tok == headToken) {
           continue;
         }
@@ -218,10 +218,10 @@ public abstract class AbstractMentionFinder implements MentionFinder {
     //}
   }
 
-  private void removeDuplicates(List extents) {
+  private void removeDuplicates(List<Mention> extents) {
     Mention lastExtent = null;
-    for (Iterator ei = extents.iterator(); ei.hasNext();) {
-      Mention e = (Mention) ei.next();
+    for (Iterator<Mention> ei = extents.iterator(); ei.hasNext();) {
+      Mention e = ei.next();
       if (lastExtent != null && e.getSpan().equals(lastExtent.getSpan())) {
         ei.remove();
       }
@@ -231,22 +231,23 @@ public abstract class AbstractMentionFinder implements MentionFinder {
     }
   }
 
-  private boolean isHeadOfExistingMention(Parse np, Map headMap, Set mentions) {
-    Parse head = (Parse) headMap.get(np);
+  private boolean isHeadOfExistingMention(Parse np, Map<Parse, Parse> headMap, 
+      Set<Parse> mentions) {
+    Parse head = headMap.get(np);
     while(head != null){
       if (mentions.contains(head)) {
         return true;
       }
-      head = (Parse) headMap.get(head);
+      head = headMap.get(head);
     }
     return false;
   }
   
   
-  private void clearMentions(Set mentions, Parse np) {
+  private void clearMentions(Set<Parse> mentions, Parse np) {
     Span npSpan =np.getSpan();
-    for(Iterator mi=mentions.iterator();mi.hasNext();) {
-      Parse mention = (Parse) mi.next();
+    for(Iterator<Parse> mi=mentions.iterator();mi.hasNext();) {
+      Parse mention = mi.next();
       if (!mention.getSpan().contains(npSpan)) {
         //System.err.println("clearing "+mention+" for "+np);
         mi.remove();
@@ -254,9 +255,9 @@ public abstract class AbstractMentionFinder implements MentionFinder {
     }
   }
 
-  private Mention[] collectMentions(List nps, Map headMap) {
-    List mentions = new ArrayList(nps.size());
-    Set recentMentions = new HashSet();
+  private Mention[] collectMentions(List<Parse> nps, Map<Parse, Parse> headMap) {
+    List<Mention> mentions = new ArrayList<Mention>(nps.size());
+    Set<Parse> recentMentions = new HashSet<Parse>();
     //System.err.println("AbtractMentionFinder.collectMentions: "+headMap);
     for (int npi = 0, npl = nps.size(); npi < npl; npi++) {
       Parse np = (Parse) nps.get(npi);
@@ -306,8 +307,8 @@ public abstract class AbstractMentionFinder implements MentionFinder {
    * @param possesiveNounPhrase The possesive noun phase which may require an additional mention.
    * @param mentions The list of mentions into which a new mention can be added. 
    */
-  private void addPossesiveMentions(Parse possesiveNounPhrase, List mentions) {
-    List kids = possesiveNounPhrase.getSyntacticChildren();
+  private void addPossesiveMentions(Parse possesiveNounPhrase, List<Mention> mentions) {
+    List<Parse> kids = possesiveNounPhrase.getSyntacticChildren();
     if (kids.size() >1) {
       Parse firstToken = (Parse) kids.get(1);
       if (firstToken.isToken() && !firstToken.getSyntacticType().equals("POS")) {
@@ -324,9 +325,9 @@ public abstract class AbstractMentionFinder implements MentionFinder {
     }
   }
 
-  private void collectPrenominalNamedEntities(Parse np, List extents) {
+  private void collectPrenominalNamedEntities(Parse np, List<Mention> extents) {
     Parse htoken = headFinder.getHeadToken(np);
-    List nes = np.getNamedEntities();
+    List<Parse> nes = np.getNamedEntities();
     Span headTokenSpan = htoken.getSpan();
     for (int nei = 0, nel = nes.size(); nei < nel; nei++) {
       Parse ne = (Parse) nes.get(nei);
@@ -350,7 +351,7 @@ public abstract class AbstractMentionFinder implements MentionFinder {
         break;
       }
     }
-    List tc = headToken.getChildren();
+    List<Parse> tc = headToken.getChildren();
     int tcs = tc.size();
     if (tcs > 0) {
       Parse tchild = (Parse) tc.get(tcs - 1);
@@ -386,14 +387,14 @@ public abstract class AbstractMentionFinder implements MentionFinder {
    */
   //protected abstract List getNounPhrases(Parse p);
   
-  public List getNamedEntities(Parse p) {
+  public List<Parse> getNamedEntities(Parse p) {
     return p.getNamedEntities();
   }
 
   public Mention[] getMentions(Parse p) {
-    List nps = p.getNounPhrases();
+    List<Parse> nps = p.getNounPhrases();
     Collections.sort(nps);
-    Map headMap = constructHeadMap(nps);
+    Map<Parse, Parse> headMap = constructHeadMap(nps);
     //System.err.println("AbstractMentionFinder.getMentions: got " + nps.size()); // + " nps, and " + nes.size() + " named entities");
     Mention[] mentions = collectMentions(nps, headMap);
     return mentions;
