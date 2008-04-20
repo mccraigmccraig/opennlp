@@ -106,7 +106,7 @@ public class SingularPronounResolver extends MaxentResolver {
     String mentionGender = null;
 
     for (Iterator<MentionContext> ei = entity.getMentions(); ei.hasNext();) {
-      MentionContext entityMention = (MentionContext) ei.next();
+      MentionContext entityMention = ei.next();
       String tag = entityMention.getHeadTokenTag();
       if (tag != null && tag.startsWith("PRP") && Linker.singularThirdPersonPronounPattern.matcher(mention.getHeadTokenText()).matches()) {
         if (mentionGender == null) { //lazy initilization

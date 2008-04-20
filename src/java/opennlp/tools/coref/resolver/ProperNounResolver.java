@@ -103,7 +103,7 @@ public class ProperNounResolver extends MaxentResolver {
 
   private MentionContext getProperNounExtent(DiscourseEntity de) {
     for (Iterator<MentionContext> ei = de.getMentions(); ei.hasNext();) { //use first extent which is propername
-      MentionContext xec = (MentionContext) ei.next();
+      MentionContext xec = ei.next();
       String xecHeadTag = xec.getHeadTokenTag();
       if (xecHeadTag.startsWith("NNP") || initialCaps.matcher(xec.getHeadTokenText()).find()) {
         return xec;

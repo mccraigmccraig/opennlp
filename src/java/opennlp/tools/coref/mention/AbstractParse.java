@@ -29,7 +29,7 @@ public abstract class AbstractParse implements Parse {
       List<Parse> newParts = new ArrayList<Parse>();
       for (int pi=0,pn=parts.size();pi<pn;pi++) {
         //System.err.println("AbstractParse.getNounPhrases "+parts.get(pi).getClass());
-        Parse cp = (Parse) parts.get(pi);
+        Parse cp = parts.get(pi);
         if (cp.isNounPhrase()) {
           nps.add(cp);
         }

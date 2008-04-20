@@ -81,19 +81,19 @@ public abstract class AbstractMentionFinder implements MentionFinder {
   protected boolean isPossessive(Parse np) {
     List<Parse> parts = np.getSyntacticChildren();
     if (parts.size() > 1) {
-      Parse child0 = (Parse) parts.get(0);
+      Parse child0 = parts.get(0);
       if (child0.isNounPhrase()) {
         List<Parse> ctoks = child0.getTokens();
-        Parse tok = (Parse) ctoks.get(ctoks.size() - 1);
+        Parse tok = ctoks.get(ctoks.size() - 1);
         if (tok.getSyntacticType().equals("POS")) {
           return true;
         }
       }
     }
     if (parts.size() > 2) {
-      Parse child0 = (Parse) parts.get(0);
-      Parse child1 = (Parse) parts.get(1);
-      Parse child2 = (Parse) parts.get(2);
+      Parse child0 = parts.get(0);
+      Parse child1 = parts.get(1);
+      Parse child2 = parts.get(2);
       if (child1.isToken() && child1.getSyntacticType().equals("POS") && child0.isNounPhrase() && child2.isNounPhrase()) {
         return true;
       }
@@ -104,12 +104,12 @@ public abstract class AbstractMentionFinder implements MentionFinder {
   protected boolean isOfPrepPhrase(Parse np) {
     List<Parse> parts = np.getSyntacticChildren();
     if (parts.size() == 2) {
-      Parse child0 = (Parse) parts.get(0);
+      Parse child0 = parts.get(0);
       if (child0.isNounPhrase()) {
-        Parse child1 = (Parse) parts.get(1);
+        Parse child1 = parts.get(1);
         List<Parse> cparts = child1.getSyntacticChildren();
         if (cparts.size() == 2) {
-          Parse child2 = (Parse) cparts.get(0);
+          Parse child2 = cparts.get(0);
           if (child2.isToken() && child2.toString().equals("of")) {
             return true;
           }
@@ -124,7 +124,7 @@ public abstract class AbstractMentionFinder implements MentionFinder {
     boolean allToken = true;
     boolean hasConjunction = false;
     for (int ti = 0; ti < parts.size(); ti++) {
-      Parse c = (Parse) parts.get(ti);
+      Parse c = parts.get(ti);
       if (c.isToken()) {
         if (c.getSyntacticType().equals("CC")) {
           hasConjunction = true;
@@ -144,12 +144,12 @@ public abstract class AbstractMentionFinder implements MentionFinder {
     boolean inCoordinatedNounPhrase = false;
     int lastNpTokenIndex = headFinder.getHeadIndex(np);
     for (int ti = lastNpTokenIndex - 1; ti >= 0; ti--) {
-      Parse tok = (Parse) npTokens.get(ti);
+      Parse tok = npTokens.get(ti);
       String tokStr = tok.toString();
       if ((tokStr.equals("and") || tokStr.equals("or")) && !isPartOfName(tok)) {
         if (lastNpTokenIndex != ti) {
-          if (ti - 1 >= 0 && ((Parse) npTokens.get(ti - 1)).getSyntacticType().startsWith("NN")) {
-            Span npSpan = new Span(((Parse) npTokens.get(ti + 1)).getSpan().getStart(), ((Parse) npTokens.get(lastNpTokenIndex)).getSpan().getEnd());
+          if (ti - 1 >= 0 && (npTokens.get(ti - 1)).getSyntacticType().startsWith("NN")) {
+            Span npSpan = new Span((npTokens.get(ti + 1)).getSpan().getStart(), (npTokens.get(lastNpTokenIndex)).getSpan().getEnd());
             Mention snpExtent = new Mention(npSpan, npSpan, tok.getEntityId(), null,"CNP");
             entities.add(snpExtent);
             //System.err.println("adding extent for conjunction in: "+np+" preeceeded by "+((Parse) npTokens.get(ti-1)).getSyntacticType());
@@ -163,7 +163,7 @@ public abstract class AbstractMentionFinder implements MentionFinder {
       }
       else if (inCoordinatedNounPhrase && tokStr.equals(",")) {
         if (lastNpTokenIndex != ti) {
-          Span npSpan = new Span(((Parse) npTokens.get(ti + 1)).getSpan().getStart(), ((Parse) npTokens.get(lastNpTokenIndex)).getSpan().getEnd());
+          Span npSpan = new Span((npTokens.get(ti + 1)).getSpan().getStart(), (npTokens.get(lastNpTokenIndex)).getSpan().getEnd());
           Mention snpExtent = new Mention(npSpan, npSpan, tok.getEntityId(), null,"CNP");
           entities.add(snpExtent);
           //System.err.println("adding extent for comma in: "+np);
@@ -171,7 +171,7 @@ public abstract class AbstractMentionFinder implements MentionFinder {
         lastNpTokenIndex = ti - 1;
       }
       else if (inCoordinatedNounPhrase && ti == 0 && lastNpTokenIndex >= 0) {
-        Span npSpan = new Span(((Parse) npTokens.get(ti)).getSpan().getStart(), ((Parse) npTokens.get(lastNpTokenIndex)).getSpan().getEnd());
+        Span npSpan = new Span((npTokens.get(ti)).getSpan().getStart(), (npTokens.get(lastNpTokenIndex)).getSpan().getEnd());
         Mention snpExtent = new Mention(npSpan, npSpan, tok.getEntityId(), null,"CNP");
         entities.add(snpExtent);
         //System.err.println("adding extent for start coord in: "+np);
@@ -260,7 +260,7 @@ public abstract class AbstractMentionFinder implements MentionFinder {
     Set<Parse> recentMentions = new HashSet<Parse>();
     //System.err.println("AbtractMentionFinder.collectMentions: "+headMap);
     for (int npi = 0, npl = nps.size(); npi < npl; npi++) {
-      Parse np = (Parse) nps.get(npi);
+      Parse np = nps.get(npi);
       //System.err.println("AbstractMentionFinder: collectMentions: np[" + npi + "]=" + np + " head=" + headMap.get(np));
       if (!isHeadOfExistingMention(np,headMap, recentMentions)) {
         clearMentions(recentMentions, np);
@@ -299,7 +299,7 @@ public abstract class AbstractMentionFinder implements MentionFinder {
     }
     Collections.sort(mentions);
     removeDuplicates(mentions);
-    return (Mention[]) mentions.toArray(new Mention[mentions.size()]);
+    return mentions.toArray(new Mention[mentions.size()]);
   }
 
   /**
@@ -310,9 +310,9 @@ public abstract class AbstractMentionFinder implements MentionFinder {
   private void addPossesiveMentions(Parse possesiveNounPhrase, List<Mention> mentions) {
     List<Parse> kids = possesiveNounPhrase.getSyntacticChildren();
     if (kids.size() >1) {
-      Parse firstToken = (Parse) kids.get(1);
+      Parse firstToken = kids.get(1);
       if (firstToken.isToken() && !firstToken.getSyntacticType().equals("POS")) {
-        Parse lastToken = (Parse) kids.get(kids.size()-1);
+        Parse lastToken = kids.get(kids.size()-1);
         if (lastToken.isToken()) {
           Span extentSpan = new Span(firstToken.getSpan().getStart(),lastToken.getSpan().getEnd());
           Mention extent = new Mention(extentSpan, extentSpan, -1, null, null);
@@ -330,7 +330,7 @@ public abstract class AbstractMentionFinder implements MentionFinder {
     List<Parse> nes = np.getNamedEntities();
     Span headTokenSpan = htoken.getSpan();
     for (int nei = 0, nel = nes.size(); nei < nel; nei++) {
-      Parse ne = (Parse) nes.get(nei);
+      Parse ne = nes.get(nei);
       if (!ne.getSpan().contains(headTokenSpan)) {
         //System.err.println("adding extent for prenominal ne: "+ne);
         Mention extent = new Mention(ne.getSpan(), ne.getSpan(), ne.getEntityId(),null,"NAME");
@@ -354,7 +354,7 @@ public abstract class AbstractMentionFinder implements MentionFinder {
     List<Parse> tc = headToken.getChildren();
     int tcs = tc.size();
     if (tcs > 0) {
-      Parse tchild = (Parse) tc.get(tcs - 1);
+      Parse tchild = tc.get(tcs - 1);
       entityType = tchild.getEntityType();
       if (entityType != null) {
         return entityType;

@@ -67,7 +67,7 @@ public class DiscourseModel {
    * @return the entity at the specified index.
    */
   public DiscourseEntity getEntity(int i) {
-    return((DiscourseEntity) entities.get(i));
+    return(entities.get(i));
   }
 
   /**
@@ -88,7 +88,7 @@ public class DiscourseModel {
    */
   public void mergeEntities(DiscourseEntity e1,DiscourseEntity e2,float confidence) {
     for (Iterator<MentionContext> ei=e2.getMentions();ei.hasNext();) {
-      e1.addMention((MentionContext) ei.next());
+      e1.addMention(ei.next());
     }
     //System.err.println("DiscourseModel.mergeEntities: removing "+e2);
     entities.remove(e2);

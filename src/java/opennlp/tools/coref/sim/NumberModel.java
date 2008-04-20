@@ -40,7 +40,7 @@ public class NumberModel implements TestNumberModel, TrainSimilarityModel {
   private String modelName;
   private String modelExtension = ".bin.gz";
   private MaxentModel testModel;
-  private List events;
+  private List<Event> events;
 
   private int singularIndex;
   private int pluralIndex;
@@ -58,7 +58,7 @@ public class NumberModel implements TestNumberModel, TrainSimilarityModel {
   private NumberModel(String modelName, boolean train) throws IOException {
     this.modelName = modelName;
     if (train) {
-      events = new ArrayList();
+      events = new ArrayList<Event>();
     }
     else {
       //if (MaxentResolver.loadAsResource()) {
@@ -70,8 +70,8 @@ public class NumberModel implements TestNumberModel, TrainSimilarityModel {
     }
   }
 
-  private List getFeatures(Context np1) {
-    List features = new ArrayList();
+  private List<String> getFeatures(Context np1) {
+    List<String> features = new ArrayList<String>();
     features.add("default");
     Object[] npTokens = np1.getTokens();
     for (int ti = 0, tl = npTokens.length - 1; ti < tl; ti++) {
@@ -83,8 +83,8 @@ public class NumberModel implements TestNumberModel, TrainSimilarityModel {
   }
 
   private void addEvent(String outcome, Context np1) {
-    List feats = getFeatures(np1);
-    events.add(new Event(outcome, (String[]) feats.toArray(new String[feats.size()])));
+    List<String> feats = getFeatures(np1);
+    events.add(new Event(outcome, feats.toArray(new String[feats.size()])));
   }
 
   public NumberEnum getNumber(Context ec) {
@@ -99,9 +99,9 @@ public class NumberModel implements TestNumberModel, TrainSimilarityModel {
     }
   }
 
-  private NumberEnum getNumber(List entity) {
-    for (Iterator ci = entity.iterator(); ci.hasNext();) {
-      Context ec = (Context) ci.next();
+  private NumberEnum getNumber(List<Context> entity) {
+    for (Iterator<Context> ci = entity.iterator(); ci.hasNext();) {
+      Context ec = ci.next();
       NumberEnum ne = getNumber(ec);
       if (ne != NumberEnum.UNKNOWN) {
         return ne;
@@ -112,7 +112,7 @@ public class NumberModel implements TestNumberModel, TrainSimilarityModel {
 
   public void setExtents(Context[] extentContexts) {
     HashList entities = new HashList();
-    List singletons = new ArrayList();
+    List<Context> singletons = new ArrayList<Context>();
     for (int ei = 0, el = extentContexts.length; ei < el; ei++) {
       Context ec = extentContexts[ei];
       //System.err.println("NumberModel.setExtents: ec("+ec.getId()+") "+ec.toText());
@@ -123,12 +123,12 @@ public class NumberModel implements TestNumberModel, TrainSimilarityModel {
         singletons.add(ec);
       }
     }
-    List singles = new ArrayList();
-    List plurals = new ArrayList();
+    List<Context> singles = new ArrayList<Context>();
+    List<Context> plurals = new ArrayList<Context>();
     // coref entities
-    for (Iterator ei = entities.keySet().iterator(); ei.hasNext();) {
-      Integer key = (Integer) ei.next();
-      List entityContexts = (List) entities.get(key);
+    for (Iterator<Integer> ei = entities.keySet().iterator(); ei.hasNext();) {
+      Integer key = ei.next();
+      List<Context> entityContexts = (List<Context>) entities.get(key);
       NumberEnum number = getNumber(entityContexts);
       if (number == NumberEnum.SINGULAR) {
         singles.addAll(entityContexts);
@@ -138,8 +138,8 @@ public class NumberModel implements TestNumberModel, TrainSimilarityModel {
       }
     }
     // non-coref entities.
-    for (Iterator ei = singletons.iterator(); ei.hasNext();) {
-      Context ec = (Context) ei.next();
+    for (Iterator<Context> ei = singletons.iterator(); ei.hasNext();) {
+      Context ec = ei.next();
       NumberEnum number = getNumber(ec);
       if (number == NumberEnum.SINGULAR) {
         singles.add(ec);
@@ -149,19 +149,19 @@ public class NumberModel implements TestNumberModel, TrainSimilarityModel {
       }
     }
 
-    for (Iterator si = singles.iterator(); si.hasNext();) {
-      Context ec = (Context) si.next();
+    for (Iterator<Context> si = singles.iterator(); si.hasNext();) {
+      Context ec = si.next();
       addEvent(NumberEnum.SINGULAR.toString(), ec);
     }
-    for (Iterator fi = plurals.iterator(); fi.hasNext();) {
-      Context ec = (Context) fi.next();
+    for (Iterator<Context> fi = plurals.iterator(); fi.hasNext();) {
+      Context ec = fi.next();
       addEvent(NumberEnum.PLURAL.toString(),ec);
     }
   }
 
   public double[] numberDist(Context c) {
-    List feats = getFeatures(c);
-    return testModel.eval((String[]) feats.toArray(new String[feats.size()]));
+    List<String> feats = getFeatures(c);
+    return testModel.eval(feats.toArray(new String[feats.size()]));
   }
 
   public int getSingularIndex() {

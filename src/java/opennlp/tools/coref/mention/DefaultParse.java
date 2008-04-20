@@ -58,7 +58,7 @@ public class DefaultParse extends AbstractParse {
     List<Parse> names = new ArrayList<Parse>();
     List<Parse> kids = new LinkedList<Parse>(Arrays.asList(parse.getChildren()));
     while (kids.size() > 0) {
-      Parse p = (Parse) kids.remove(0);
+      Parse p = kids.remove(0);
       if (entitySet.contains(p.getType())) {
         names.add(p);
       }
@@ -76,21 +76,21 @@ public class DefaultParse extends AbstractParse {
   public List<opennlp.tools.coref.mention.Parse> getSyntacticChildren() {
     List<Parse> kids = new ArrayList<Parse>(Arrays.asList(parse.getChildren()));
     for (int ci = 0; ci < kids.size(); ci++) {
-      Parse kid = (Parse) kids.get(ci);
+      Parse kid = kids.get(ci);
       if (entitySet.contains(kid.getType())) {
         kids.remove(ci);
         kids.addAll(ci, Arrays.asList(kid.getChildren()));
         ci--;
       }
     }
-    return createParses((Parse[]) kids.toArray(new Parse[kids.size()]));
+    return createParses(kids.toArray(new Parse[kids.size()]));
   }
 
   public List<opennlp.tools.coref.mention.Parse> getTokens() {
     List<Parse> tokens = new ArrayList<Parse>();
     List<Parse> kids = new LinkedList<Parse>(Arrays.asList(parse.getChildren()));
     while (kids.size() > 0) {
-      Parse p = (Parse) kids.remove(0);
+      Parse p = kids.remove(0);
       if (p.isPosTag()) {
         tokens.add(p);
       }
@@ -98,7 +98,7 @@ public class DefaultParse extends AbstractParse {
         kids.addAll(0,Arrays.asList(p.getChildren()));
       }
     }
-    return createParses((Parse[]) tokens.toArray(new Parse[tokens.size()]));
+    return createParses(tokens.toArray(new Parse[tokens.size()]));
   }
 
   public String getSyntacticType() {
@@ -197,6 +197,7 @@ public class DefaultParse extends AbstractParse {
     }
   }
   
+  @Override
   public String toString() {
     return parse.toString();
   }
@@ -256,6 +257,7 @@ public class DefaultParse extends AbstractParse {
     } 
   }
   
+  @Override
   public boolean equals(Object o) {
     
     boolean result;
@@ -273,6 +275,7 @@ public class DefaultParse extends AbstractParse {
     return result;
   }
 
+  @Override
   public int hashCode() {
     return parse.hashCode();
   }

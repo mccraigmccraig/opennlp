@@ -207,7 +207,7 @@ public abstract class MaxentResolver extends AbstractResolver {
       System.err.println(this +".resolve: " + ec.toText() + " -> " +  "null "+nonReferentialProbability);
     }
     for (; ei < getNumEntities(dm); ei++) {
-      de = (DiscourseEntity) dm.getEntity(ei);
+      de = dm.getEntity(ei);
       if (outOfRange(ec, de)) {
         break;
       }
@@ -249,7 +249,7 @@ public abstract class MaxentResolver extends AbstractResolver {
       return (null);
     }
     else {
-      de = (DiscourseEntity) dm.getEntity(maxCandIndex);
+      de = dm.getEntity(maxCandIndex);
       return (de);
     }
   }
@@ -308,7 +308,7 @@ public abstract class MaxentResolver extends AbstractResolver {
       boolean hasReferentialCandidate = false;
       boolean nonReferentFound = false;
       for (int ei = 0; ei < getNumEntities(dm); ei++) {
-        DiscourseEntity cde = (DiscourseEntity) dm.getEntity(ei);
+        DiscourseEntity cde = dm.getEntity(ei);
         MentionContext entityMention = cde.getLastExtent();
         if (outOfRange(mention, cde)) {
           if (mention.getId() != -1 && !referentFound) {
@@ -335,14 +335,14 @@ public abstract class MaxentResolver extends AbstractResolver {
             }
             if (mention.getId() != -1 && entityMention.getId() == mention.getId()) {
               referentFound = true;
-              events.add(new Event(SAME, (String[]) features.toArray(new String[features.size()])));
+              events.add(new Event(SAME, features.toArray(new String[features.size()])));
               de = cde;
               //System.err.println("MaxentResolver.retain: resolved at "+ei);
               distances.add(new Integer(ei));
             }
             else if (!pairedSampleSelection || (!nonReferentFound && useAsDifferentExample)) {
               nonReferentFound = true;
-              events.add(new Event(DIFF, (String[]) features.toArray(new String[features.size()])));
+              events.add(new Event(DIFF, features.toArray(new String[features.size()])));
             }
           //}
         }
@@ -394,7 +394,7 @@ public abstract class MaxentResolver extends AbstractResolver {
         System.err.println(this +" referential");
         FileWriter writer = new FileWriter(modelName+".events");
         for (Iterator<Event> ei=events.iterator();ei.hasNext();) {
-          Event e = (Event) ei.next();
+          Event e = ei.next();
           writer.write(e.toString()+"\n");
         }
         writer.close();
@@ -412,7 +412,7 @@ public abstract class MaxentResolver extends AbstractResolver {
     if (simModel != null) {
       double best = 0;
       for (Iterator<MentionContext> xi = de.getMentions(); xi.hasNext();) {
-        MentionContext ec2 = (MentionContext) xi.next();
+        MentionContext ec2 = xi.next();
         double sim = simModel.compatible(ec, ec2);
         if (debugOn) {
           System.err.println("MaxentResolver.getSemanticCompatibilityFeature: sem-compat " + sim + " " + ec.toText() + " " + ec2.toText());
@@ -714,7 +714,7 @@ public abstract class MaxentResolver extends AbstractResolver {
     String mentionHeadString = mention.getHeadTokenText().toLowerCase();
     Set<String> featureSet = new HashSet<String>();
     for (Iterator<MentionContext> ei = entity.getMentions(); ei.hasNext();) {
-      MentionContext entityMention = (MentionContext) ei.next();
+      MentionContext entityMention = ei.next();
       String exactMatchFeature = getExactMatchFeature(entityMention, mention);
       if (exactMatchFeature != null) {
         featureSet.add(exactMatchFeature);
@@ -747,7 +747,7 @@ public abstract class MaxentResolver extends AbstractResolver {
           nonTheModsMatch = true;
           Set<String> entityMentionModifierSet = constructModifierSet(xtoks, headIndex);
           for (Iterator<String> mi = ecModSet.iterator(); mi.hasNext();) {
-            String mw = (String) mi.next();
+            String mw = mi.next();
             if (!entityMentionModifierSet.contains(mw)) {
               modsMatch = false;
               if (!mw.equals("the")) {

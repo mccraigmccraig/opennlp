@@ -54,7 +54,7 @@ public class DefaultNonReferentialResolver implements NonReferentialResolver {
   
   public double getNonReferentialProbability(MentionContext mention) {
     List<String> features = getFeatures(mention);
-    double r = model.eval((String[]) features.toArray(new String[features.size()]))[nonRefIndex];
+    double r = model.eval(features.toArray(new String[features.size()]))[nonRefIndex];
     if (debugOn) System.err.println(this +" " + mention.toText() + " ->  null " + r + " " + features);
     return r;
   }
@@ -89,7 +89,7 @@ public class DefaultNonReferentialResolver implements NonReferentialResolver {
       Parse tok = mtokens[ti];
       List<String> wfs = MaxentResolver.getWordFeatures(tok);
       for (int wfi = 0; wfi < wfs.size(); wfi++) {
-        features.add("nr" + (String) wfs.get(wfi));
+        features.add("nr" + wfs.get(wfi));
       }
     }
     features.addAll(MaxentResolver.getContextFeatures(mention));

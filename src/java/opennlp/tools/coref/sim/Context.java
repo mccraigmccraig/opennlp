@@ -36,7 +36,7 @@ public class Context extends Mention {
 
   protected String headTokenText;
   protected String headTokenTag;
-  protected Set synsets;
+  protected Set<String> synsets;
   protected Object[] tokens;
   
   /** The token index in of the head word of this mention. */ 
@@ -63,7 +63,7 @@ public class Context extends Mention {
   
   private void init(HeadFinder headFinder) {
     Parse head = headFinder.getLastHead(parse);
-    List tokenList = head.getTokens();
+    List<Parse> tokenList = head.getTokens();
     headTokenIndex = headFinder.getHeadIndex(head);
     Parse headToken = headFinder.getHeadToken(head);
     tokens = tokenList.toArray(new Parse[tokenList.size()]);
@@ -73,7 +73,7 @@ public class Context extends Mention {
       this.synsets = getSynsetSet(this);
     }
     else {
-      this.synsets=Collections.EMPTY_SET;
+      this.synsets = Collections.emptySet();
     }
   }
   
@@ -107,7 +107,7 @@ public class Context extends Mention {
     return headTokenTag;
   }
   
-  public Set getSynsets() {
+  public Set<String> getSynsets() {
     return synsets;
   }
     
@@ -124,8 +124,8 @@ public class Context extends Mention {
       return null;
     }
 
-  private static Set getSynsetSet(Context c) {
-    Set synsetSet = new HashSet();
+  private static Set<String> getSynsetSet(Context c) {
+    Set<String> synsetSet = new HashSet<String>();
     String[] lemmas = getLemmas(c);
     Dictionary dict = DictionaryFactory.getDictionary();
     //System.err.println(lemmas.length+" lemmas for "+c.headToken);
@@ -136,7 +136,7 @@ public class Context extends Mention {
         synsetSet.add(synsets[si]);
       }
     }
-    return (synsetSet);
+    return synsetSet;
   }
 
   private static String[] getLemmas(Context c) {

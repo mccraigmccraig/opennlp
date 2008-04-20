@@ -69,13 +69,13 @@ public final class PTBHeadFinder implements HeadFinder {
       }
       //full parse POS
       if (parts.size() > 1) {
-        Parse child0 = (Parse) parts.get(0);
+        Parse child0 = parts.get(0);
         if (child0.isNounPhrase()) {
           List<Parse> ctoks = child0.getTokens();
           if (ctoks.size() == 0) {
             System.err.println("PTBHeadFinder: NP "+child0+" with no tokens");
           }
-          Parse tok = (Parse) ctoks.get(ctoks.size() - 1);
+          Parse tok = ctoks.get(ctoks.size() - 1);
           if (tok.getSyntacticType().equals("POS")) {
             return null;
           }
@@ -84,7 +84,7 @@ public final class PTBHeadFinder implements HeadFinder {
       //coordinated nps are their own entities
       if (parts.size() > 1) {
         for (int pi = 1; pi < parts.size() - 1; pi++) {
-          Parse child = (Parse) parts.get(pi);
+          Parse child = parts.get(pi);
           if (child.isToken() && child.getSyntacticType().equals("CC")) {
             return null;
           }
@@ -92,7 +92,7 @@ public final class PTBHeadFinder implements HeadFinder {
       }
       //all other NPs
       for (int pi = 0; pi < parts.size(); pi++) {
-        Parse child = (Parse) parts.get(pi);
+        Parse child = parts.get(pi);
         //System.err.println("PTBHeadFinder.getHead: "+p.getSyntacticType()+" "+p+" child "+pi+"="+child.getSyntacticType()+" "+child);
         if (child.isNounPhrase()) {
           return child;
@@ -130,7 +130,7 @@ public final class PTBHeadFinder implements HeadFinder {
       System.err.println("PTBHeadFinder.getHeadIndex(): empty tok list for parse "+p);
     }
     for (int ti = toks.size() - tokenCount -1; ti >= 0; ti--) {
-      Parse tok = (Parse) toks.get(ti);
+      Parse tok = toks.get(ti);
       if (!skipSet.contains(tok.getSyntacticType())) {
         return ti;
       }

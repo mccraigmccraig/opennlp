@@ -52,11 +52,11 @@ public class GenderModel implements TestGenderModel, TrainSimilarityModel {
   private String modelName;
   private String modelExtension = ".bin.gz";
   private MaxentModel testModel;
-  private List events;
+  private List<Event> events;
   private boolean debugOn = true;
   
-  private Set maleNames;
-  private Set femaleNames;
+  private Set<String> maleNames;
+  private Set<String> femaleNames;
 
   public static TestGenderModel testModel(String name) throws IOException {
     GenderModel gm = new GenderModel(name, false);
@@ -68,8 +68,8 @@ public class GenderModel implements TestGenderModel, TrainSimilarityModel {
     return gm;
   }
   
-  private Set readNames(String nameFile) throws IOException {
-    Set names = new HashSet();
+  private Set<String> readNames(String nameFile) throws IOException {
+    Set<String> names = new HashSet<String>();
     BufferedReader nameReader = new BufferedReader(new FileReader(nameFile));
     for (String line = nameReader.readLine(); line != null; line = nameReader.readLine()) {
       names.add(line);
@@ -82,7 +82,7 @@ public class GenderModel implements TestGenderModel, TrainSimilarityModel {
     maleNames = readNames(modelName+".mas");
     femaleNames = readNames(modelName+".fem");
     if (train) {
-      events = new ArrayList();
+      events = new ArrayList<Event>();
     }
     else {
       //if (MaxentResolver.loadAsResource()) {
@@ -95,8 +95,8 @@ public class GenderModel implements TestGenderModel, TrainSimilarityModel {
     }
   }
 
-  private List getFeatures(Context np1) {
-    List features = new ArrayList();
+  private List<String> getFeatures(Context np1) {
+    List<String> features = new ArrayList();
     features.add("default");
     for (int ti = 0, tl = np1.getHeadTokenIndex(); ti < tl; ti++) {
       features.add("mw=" + np1.getTokens()[ti].toString());
@@ -118,21 +118,22 @@ public class GenderModel implements TestGenderModel, TrainSimilarityModel {
         }
       }
     }
-    for (Iterator si = np1.getSynsets().iterator(); si.hasNext();) {
-      features.add("ss=" + si.next().toString());
+    
+    for (String si : np1.getSynsets()) {
+      features.add("ss=" + si);
     }
     return features;
   }
 
   private void addEvent(String outcome, Context np1) {
-    List feats = getFeatures(np1);
-    events.add(new Event(outcome, (String[]) feats.toArray(new String[feats.size()])));
+    List<String> feats = getFeatures(np1);
+    events.add(new Event(outcome, feats.toArray(new String[feats.size()])));
   }
 
   /**
-   * Hueristic computation of gender for a mention context using pronouns and honorifics. 
+   * Heuristic computation of gender for a mention context using pronouns and honorifics. 
    * @param mention The mention whose gender is to be computed.
-   * @return The hueristically determined gender or unknown.
+   * @return The heuristically determined gender or unknown.
    */
   private GenderEnum getGender(Context mention) {
     if (Linker.malePronounPattern.matcher(mention.getHeadTokenText()).matches()) {
@@ -154,23 +155,25 @@ public class GenderModel implements TestGenderModel, TrainSimilarityModel {
         return GenderEnum.FEMALE;
       }
     }
+    
     return GenderEnum.UNKNOWN;
   }
 
-  private GenderEnum getGender(List entity) {
-    for (Iterator ci = entity.iterator(); ci.hasNext();) {
-      Context ec = (Context) ci.next();
+  private GenderEnum getGender(List<Context> entity) {
+    for (Iterator<Context> ci = entity.iterator(); ci.hasNext();) {
+      Context ec = ci.next();
       GenderEnum ge = getGender(ec);
       if (ge != GenderEnum.UNKNOWN) {
         return ge;
       }
     }
+    
     return GenderEnum.UNKNOWN;
   }
 
   public void setExtents(Context[] extentContexts) {
     HashList entities = new HashList();
-    List singletons = new ArrayList();
+    List<Context> singletons = new ArrayList<Context>();
     for (int ei = 0, el = extentContexts.length; ei < el; ei++) {
       Context ec = extentContexts[ei];
       //System.err.println("GenderModel.setExtents: ec("+ec.getId()+") "+ec.toText());
@@ -181,13 +184,13 @@ public class GenderModel implements TestGenderModel, TrainSimilarityModel {
         singletons.add(ec);
       }
     }
-    List males = new ArrayList();
-    List females = new ArrayList();
-    List eunuches = new ArrayList();
+    List<Context> males = new ArrayList<Context>();
+    List<Context> females = new ArrayList<Context>();
+    List<Context> eunuches = new ArrayList<Context>();
     //coref entities
-    for (Iterator ei = entities.keySet().iterator(); ei.hasNext();) {
-      Integer key = (Integer) ei.next();
-      List entityContexts = (List) entities.get(key);
+    for (Iterator<Integer> ei = entities.keySet().iterator(); ei.hasNext();) {
+      Integer key = ei.next();
+      List<Context> entityContexts = (List<Context>) entities.get(key);
       GenderEnum gender = getGender(entityContexts);
       if (gender != null) {
         if (gender == GenderEnum.MALE) {
@@ -202,8 +205,8 @@ public class GenderModel implements TestGenderModel, TrainSimilarityModel {
       }
     }
     //non-coref entities
-    for (Iterator ei = singletons.iterator(); ei.hasNext();) {
-      Context ec = (Context) ei.next();
+    for (Iterator<Context> ei = singletons.iterator(); ei.hasNext();) {
+      Context ec = ei.next();
       GenderEnum gender = getGender(ec);
       if (gender == GenderEnum.MALE) {
         males.add(ec);
@@ -215,16 +218,16 @@ public class GenderModel implements TestGenderModel, TrainSimilarityModel {
         eunuches.add(ec);
       }
     }
-    for (Iterator mi = males.iterator(); mi.hasNext();) {
-      Context ec = (Context) mi.next();
+    for (Iterator<Context> mi = males.iterator(); mi.hasNext();) {
+      Context ec = mi.next();
       addEvent(GenderEnum.MALE.toString(), ec);
     }
-    for (Iterator fi = females.iterator(); fi.hasNext();) {
-      Context ec = (Context) fi.next();
+    for (Iterator<Context> fi = females.iterator(); fi.hasNext();) {
+      Context ec = fi.next();
       addEvent(GenderEnum.FEMALE.toString(), ec);
     }
-    for (Iterator ei = eunuches.iterator(); ei.hasNext();) {
-      Context ec = (Context) ei.next();
+    for (Iterator<Context> ei = eunuches.iterator(); ei.hasNext();) {
+      Context ec = ei.next();
       addEvent(GenderEnum.NEUTER.toString(), ec);
     }
   }
@@ -247,23 +250,26 @@ public class GenderModel implements TestGenderModel, TrainSimilarityModel {
   }
 
   public double[] genderDistribution(Context np1) {
-    List features = getFeatures(np1);
+    List<String> features = getFeatures(np1);
     if (debugOn) {
       //System.err.println("GenderModel.genderDistribution: "+features);
     }
-    return testModel.eval((String[]) features.toArray(new String[features.size()]));
+    return testModel.eval(features.toArray(new String[features.size()]));
   }
 
   public void trainModel() throws IOException {
     if (debugOn) {
       FileWriter writer = new FileWriter(modelName+".events");
-      for (Iterator ei=events.iterator();ei.hasNext();) {
-        Event e = (Event) ei.next();
+      for (Iterator<Event> ei=events.iterator();ei.hasNext();) {
+        Event e = ei.next();
         writer.write(e.toString()+"\n");
       }
       writer.close();
     }
-    (new SuffixSensitiveGISModelWriter(GIS.trainModel(new CollectionEventStream(events),true),new File(modelName+modelExtension))).persist();
+    new SuffixSensitiveGISModelWriter(
+        GIS.trainModel(
+        new CollectionEventStream(events), true),
+        new File(modelName+modelExtension)).persist();
   }
 
   public int getFemaleIndex() {
