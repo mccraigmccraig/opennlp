@@ -36,7 +36,7 @@ public abstract class AbstractResolver implements Resolver {
   /** Debugging variable which specifies whether error output is generated if a class excludes as possibly coreferent mentions which are in-fact coreferent.*/
   protected boolean showExclusions;
   /** Debugging variable which holds statistics about mention distances durring training.*/
-  protected CountedSet distances;
+  protected CountedSet<Integer> distances;
   /** The number of senteces back this resolver should look for a referent. */
   protected int numSentencesBack;
   
@@ -44,7 +44,7 @@ public abstract class AbstractResolver implements Resolver {
   public AbstractResolver(int neb) {
     numEntitiesBack=neb;
     showExclusions = true;
-    distances = new CountedSet();
+    distances = new CountedSet<Integer>();
   }
 
   /**
