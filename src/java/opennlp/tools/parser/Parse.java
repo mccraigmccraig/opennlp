@@ -32,7 +32,7 @@ import java.util.regex.Pattern;
 import opennlp.tools.util.Span;
 
 /** Data structure for holding parse constitents. */
-public class Parse implements Cloneable, Comparable {
+public class Parse implements Cloneable, Comparable<Parse> {
   /** The text string on which this parse is based.  This object is shared amonung all parses for the same sentence. */
   private String text;
   /** The character offsets into the text for this constituent. */
@@ -40,7 +40,7 @@ public class Parse implements Cloneable, Comparable {
   /** The syntactic type of this parse. */
   private String type;
   /** The sub-constituents of this parse. */
-  private List parts;
+  private List<Parse> parts;
   /** The head parse of this parse. A parse can be its own head.*/
   private Parse head;
   /** A string used during parse construction to specify which stage of parsing has been performed on this node. */
@@ -63,9 +63,9 @@ public class Parse implements Cloneable, Comparable {
   private static Pattern tokenPattern = Pattern.compile("^[^ ()]+ ([^ ()]+)\\s*\\)");
   
   /** The set of punctuation parses which are between this parse and the previous parse. */
-  private Collection prevPunctSet;
+  private Collection<Parse> prevPunctSet;
   /** The set of punctuation parses which are between this parse and the subsequent parse. */
-  private Collection nextPunctSet;
+  private Collection<Parse> nextPunctSet;
   
   /** Specifies whether constituent lables should include parts specifiedi after minus character. */
   private static boolean useFunctionTags;
@@ -86,7 +86,7 @@ public class Parse implements Cloneable, Comparable {
     this.prob = p;
     this.head = this;
     this.headIndex = index;
-    this.parts = new LinkedList();
+    this.parts = new LinkedList<Parse>();
     this.label = null;
     this.parent = null;
   }
@@ -177,17 +177,17 @@ public class Parse implements Cloneable, Comparable {
    * Returns the set of punctuation parses that occur immediately before this parse.
    * @return the set of punctuation parses that occur immediately before this parse.
    */
-  public Collection getPreviousPunctuationSet() {
+  public Collection<Parse> getPreviousPunctuationSet() {
     return prevPunctSet;
   }
   
   /**
-   * Designates that the specifed punctuation should is prior to this parse.
+   * Designates that the specified punctuation should is prior to this parse.
    * @param punct The punctuation.
    */
   public void addPreviousPunctuation(Parse punct) {
     if (this.prevPunctSet == null) {
-      this.prevPunctSet = new LinkedHashSet();
+      this.prevPunctSet = new LinkedHashSet<Parse>();
     }
     prevPunctSet.add(punct);
   }
@@ -196,34 +196,34 @@ public class Parse implements Cloneable, Comparable {
    * Returns the set of punctuation parses that occur immediately after this parse.
    * @return the set of punctuation parses that occur immediately after this parse.
    */
-  public Collection getNextPunctuationSet() {
+  public Collection<Parse> getNextPunctuationSet() {
     return nextPunctSet;
   }
   
   /**
-   * Designates that the specifed punctuation follows this parse.
+   * Designates that the specified punctuation follows this parse.
    * @param punct The punctuation set.
    */
   public void addNextPunctuation(Parse punct) {
     if (this.nextPunctSet == null) {
-      this.nextPunctSet = new LinkedHashSet();
+      this.nextPunctSet = new LinkedHashSet<Parse>();
     }
     nextPunctSet.add(punct);
   }
   
   /**
    * Sets the set of punctuation tags which follow this parse.
-   * @param punctSet The set of puncuation tags which follow this parse.
+   * @param punctSet The set of punctuation tags which follow this parse.
    */
-  public void setNextPunctuation(Collection punctSet) {
+  public void setNextPunctuation(Collection<Parse> punctSet) {
     this.nextPunctSet = punctSet;
   }
   
   /**
    * Sets the set of punctuation tags which preceed this parse.
-   * @param punctSet The set of puncuation tags which preceed this parse.
+   * @param punctSet The set of punctuation tags which preceed this parse.
    */
-  public void setPrevPunctuation(Collection punctSet) {
+  public void setPrevPunctuation(Collection<Parse> punctSet) {
     this.prevPunctSet = punctSet;
   }  
 
@@ -285,7 +285,7 @@ public class Parse implements Cloneable, Comparable {
       //System.out.print(head+" ");
       //System.out.print(df.format(prob)+" ");
     }
-    for (Iterator i = parts.iterator(); i.hasNext();) {
+    for (Iterator<Parse> i = parts.iterator(); i.hasNext();) {
       Parse c = (Parse) i.next();
       Span s = c.span;
       if (start < s.getStart()) {
@@ -314,8 +314,8 @@ public class Parse implements Cloneable, Comparable {
 
 
   /**
-   * Returns the probability associed with the pos-tag sequence assigned to this parse.
-   * @return The probability associed with the pos-tag sequence assigned to this parse.
+   * Returns the probability associated with the pos-tag sequence assigned to this parse.
+   * @return The probability associated with the pos-tag sequence assigned to this parse.
    */
   public double getTagSequenceProb() {
     //System.err.println("Parse.getTagSequenceProb: "+type+" "+this);
@@ -329,10 +329,10 @@ public class Parse implements Cloneable, Comparable {
     }
     else {
       double sum = 0.0;
-      for (Iterator pi = parts.iterator(); pi.hasNext();) {
-        sum += ((Parse) pi.next()).getTagSequenceProb();
+      for (Iterator<Parse> pi = parts.iterator(); pi.hasNext();) {
+        sum += pi.next().getTagSequenceProb();
       }
-      return (sum);
+      return sum;
     }
   }
 
@@ -606,7 +606,7 @@ public class Parse implements Cloneable, Comparable {
    * @param parse
    */
   public static void pruneParse(Parse parse) {
-    List nodes = new LinkedList();
+    List<Parse> nodes = new LinkedList<Parse>();
     nodes.add(parse);
     while(nodes.size() != 0) {
       Parse node = (Parse) nodes.remove(0);
@@ -664,8 +664,8 @@ public class Parse implements Cloneable, Comparable {
   public static Parse parseParse(String parse, GapLabeler gl) {
     StringBuffer text = new StringBuffer();
     int offset = 0;
-    Stack stack = new Stack();
-    List cons = new LinkedList();
+    Stack<Constituent> stack = new Stack<Constituent>();
+    List<Constituent> cons = new LinkedList<Constituent>();
     for (int ci = 0, cl = parse.length(); ci < cl; ci++) {
       char c = parse.charAt(ci);
       if (c == '(') {
@@ -764,8 +764,8 @@ public class Parse implements Cloneable, Comparable {
    * @return the parse nodes which are children of this node and which are pos tags.
    */
   public Parse[] getTagNodes() {
-    List tags = new LinkedList();
-    List nodes = new LinkedList();
+    List<Parse> tags = new LinkedList<Parse>();
+    List<Parse> nodes = new LinkedList<Parse>();
     nodes.addAll(this.parts);
     while(nodes.size() != 0) {
       Parse p = (Parse) nodes.remove(0);
@@ -776,7 +776,7 @@ public class Parse implements Cloneable, Comparable {
         nodes.addAll(0,p.parts);
       }
     }
-    return (Parse[]) tags.toArray(new Parse[tags.size()]);
+    return tags.toArray(new Parse[tags.size()]);
   }
   
   /**
@@ -790,7 +790,7 @@ public class Parse implements Cloneable, Comparable {
     if (this == node) {
       return parent;
     }
-    Set parents = new HashSet();
+    Set<Parse> parents = new HashSet<Parse>();
     Parse cparent = this;
     while(cparent != null) {
       parents.add(cparent);
@@ -805,8 +805,7 @@ public class Parse implements Cloneable, Comparable {
     return null;
   }
 
-  public int compareTo(Object o) {
-    Parse p = (Parse) o;
+  public int compareTo(Parse p) {
     if (this.getProb() > p.getProb()) {
       return -1;
     }
@@ -893,4 +892,3 @@ public class Parse implements Cloneable, Comparable {
     }
   }
 }
-

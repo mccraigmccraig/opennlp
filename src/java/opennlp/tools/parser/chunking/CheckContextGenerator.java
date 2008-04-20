@@ -55,7 +55,7 @@ public class CheckContextGenerator extends AbstractContextGenerator {
    */
   public String[] getContext(Parse[] constituents, String type, int start, int end) {
     int ps = constituents.length;
-    List features = new ArrayList(100);
+    List<String> features = new ArrayList<String>(100);
 
     //default 
     features.add("default");
@@ -74,10 +74,10 @@ public class CheckContextGenerator extends AbstractContextGenerator {
       checkcons(p, pend, type, features);
       production.append(p.getType()).append(",");
       punctProduction.append(p.getType()).append(",");
-      Collection nextPunct = p.getNextPunctuationSet();
+      Collection<Parse> nextPunct = p.getNextPunctuationSet();
       if (nextPunct != null) {
-        for (Iterator pit=nextPunct.iterator();pit.hasNext();) {
-          Parse punct = (Parse) pit.next();
+        for (Iterator<Parse> pit=nextPunct.iterator();pit.hasNext();) {
+          Parse punct = pit.next();
           punctProduction.append(punct.getType()).append(",");
         }
       }
@@ -90,10 +90,10 @@ public class CheckContextGenerator extends AbstractContextGenerator {
     Parse p_1 = null;
     Parse p1 = null;
     Parse p2 = null;
-    Collection p1s = constituents[end].getNextPunctuationSet();
-    Collection p2s = null;
-    Collection p_1s = constituents[start].getPreviousPunctuationSet();
-    Collection p_2s = null;
+    Collection<Parse> p1s = constituents[end].getNextPunctuationSet();
+    Collection<Parse> p2s = null;
+    Collection<Parse> p_1s = constituents[start].getPreviousPunctuationSet();
+    Collection<Parse> p_2s = null;
     if (start - 2 >= 0) {
       p_2 = constituents[start - 2];
     }
