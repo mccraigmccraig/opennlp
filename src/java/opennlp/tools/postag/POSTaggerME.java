@@ -54,7 +54,7 @@ import opennlp.tools.util.StringList;
  * surrounding context.
  *
  * @author      Gann Bierner
- * @version $Revision: 1.32 $, $Date: 2008/04/19 22:24:29 $
+ * @version $Revision: 1.33 $, $Date: 2008/04/20 20:17:38 $
  */
 public class POSTaggerME implements Evalable, POSTagger {
 
@@ -89,7 +89,7 @@ public class POSTaggerME implements Evalable, POSTagger {
   private Sequence bestSequence;
   
   /** The search object used for search multiple sequences of tags. */
-  protected  BeamSearch beam;
+  protected  BeamSearch<String> beam;
 
   
   /**
@@ -171,12 +171,12 @@ public class POSTaggerME implements Evalable, POSTagger {
   }
 
   public List<String> tag(List<String> sentence) {
-    bestSequence = beam.bestSequence(sentence,null);
+    bestSequence = beam.bestSequence(sentence.toArray(new String[sentence.size()]), null);
     return bestSequence.getOutcomes();
   }
 
   public String[] tag(String[] sentence) {
-    bestSequence = beam.bestSequence(sentence,null);
+    bestSequence = beam.bestSequence(sentence, null);
     List<String> t = bestSequence.getOutcomes();
     return t.toArray(new String[t.size()]);
   }
@@ -237,7 +237,7 @@ public class POSTaggerME implements Evalable, POSTagger {
         Pair<List<String>, List<String>> p = POSEventCollector.convertAnnotatedString(line);
         List<String> words = (List<String>) p.a;
         List<String> outcomes = (List<String>) p.b;
-        List<String> tags = beam.bestSequence(words, null).getOutcomes();
+        List<String> tags = beam.bestSequence(words.toArray(new String[words.size()]), null).getOutcomes();
 
         int c = 0;
         boolean sentOk = true;
@@ -262,7 +262,7 @@ public class POSTaggerME implements Evalable, POSTagger {
 
   }
 
-  private class PosBeamSearch extends BeamSearch {
+  private class PosBeamSearch extends BeamSearch<String> {
 
     PosBeamSearch(int size, POSContextGenerator cg, MaxentModel model) {
       super(size, cg, model);
@@ -273,7 +273,7 @@ public class POSTaggerME implements Evalable, POSTagger {
     }
 
     
-    protected boolean validSequence(int i, Object[] inputSequence, String[] outcomesSequence, String outcome) {
+    protected boolean validSequence(int i, String[] inputSequence, String[] outcomesSequence, String outcome) {
       if (tagDictionary == null) {
         return true;
       }
@@ -294,7 +294,10 @@ public class POSTaggerME implements Evalable, POSTagger {
   }
   
   public String[] getOrderedTags(List<String> words, List<String> tags, int index,double[] tprobs) {
-    double[] probs = posModel.eval(contextGen.getContext(index,words.toArray(), tags.toArray(new String[tags.size()]),null));
+    double[] probs = posModel.eval(contextGen.getContext(index, 
+        words.toArray(new String[words.size()]), 
+        tags.toArray(new String[tags.size()]),null));
+    
     String[] orderedTags = new String[probs.length];
     for (int i = 0; i < probs.length; i++) {
       int max = 0;

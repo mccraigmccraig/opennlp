@@ -20,7 +20,7 @@ package opennlp.tools.util;
 /**
  * Interface for context generators used with a sequence beam search. 
  */
-public interface BeamSearchContextGenerator {
+public interface BeamSearchContextGenerator<T> {
     
   /** Returns the context for the specified position in the specified sequence (list).  
      * @param index The index of the sequence.
@@ -29,5 +29,5 @@ public interface BeamSearchContextGenerator {
      * @param additionalContext Any addition context specific to a class implementing this interface.
      * @return the context for the specified position in the specified sequence.
      */
-  public String[] getContext(int index, Object[] sequence, String[] priorDecisions, Object[] additionalContext);
+  public String[] getContext(int index, T[] sequence, String[] priorDecisions, Object[] additionalContext);
 }

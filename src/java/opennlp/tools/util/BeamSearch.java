@@ -22,39 +22,43 @@ import java.util.List;
 
 import opennlp.maxent.MaxentModel;
 
-/** Performs k-best search over sequence.  This is based on the description in
-  * Ratnaparkhi (1998), PhD diss, Univ. of Pennsylvania. 
+/** 
+ * Performs k-best search over sequence.  This is based on the description in
+ * Ratnaparkhi (1998), PhD diss, Univ. of Pennsylvania. 
  */
-public class BeamSearch {
+public class BeamSearch<T> {
 
   protected MaxentModel model;
-  protected BeamSearchContextGenerator cg;
+  protected BeamSearchContextGenerator<T> cg;
   protected int size;
   private static final Object[] EMPTY_ADDITIONAL_CONTEXT = new Object[0];
   private double[] probs;
   private Cache contextsCache;
   private static final int zeroLog = -100000;
 
-  /** Creates new search object. 
+  /** 
+   * Creates new search object.
+   * 
    * @param size The size of the beam (k).
    * @param cg the context generator for the model. 
    * @param model the model for assigning probabilities to the sequence outcomes.
    */
-  public BeamSearch(int size, BeamSearchContextGenerator cg, MaxentModel model) {
+  public BeamSearch(int size, BeamSearchContextGenerator<T> cg, MaxentModel model) {
     this(size,cg,model,0);
   }
   
-  public BeamSearch(int size, BeamSearchContextGenerator cg, MaxentModel model, int cacheSize) {
+  public BeamSearch(int size, BeamSearchContextGenerator<T> cg, MaxentModel model, int cacheSize) {
     this.size = size;
     this.cg = cg;
     this.model = model;
     this.probs = new double[model.getNumOutcomes()];
+    
     if (cacheSize > 0) {
       contextsCache = new Cache(cacheSize);
     }
   }
   
-  public Sequence[] bestSequences(int numSequences, Object[] sequence, Object[] additionalContext) {
+  public Sequence[] bestSequences(int numSequences, T[] sequence, Object[] additionalContext) {
     return bestSequences(numSequences, sequence, additionalContext, zeroLog);
   }
 
@@ -65,15 +69,17 @@ public class BeamSearch {
    * @param minSequenceScore A lower bound on the score of a returned sequence. 
    * @return An array of the top ranked sequences of outcomes.
    */
-  public Sequence[] bestSequences(int numSequences, Object[] sequence, Object[] additionalContext, double minSequenceScore) {
+  public Sequence[] bestSequences(int numSequences, T[] sequence, Object[] additionalContext, double minSequenceScore) {
     int n = sequence.length;
     Heap<Sequence> prev = new ListHeap<Sequence>(size);
     Heap<Sequence> next = new ListHeap<Sequence>(size);
     Heap<Sequence> tmp;
     prev.add(new Sequence());
+    
     if (additionalContext == null) {
       additionalContext = EMPTY_ADDITIONAL_CONTEXT;
     }
+    
     for (int i = 0; i < n; i++) {
       int sz = Math.min(size, prev.size());
       
@@ -138,20 +144,11 @@ public class BeamSearch {
   }
 
   /** Returns the best sequence of outcomes based on model for this object.
-   * @param sequence The input sequence.
-   * @param additionalContext An Object[] of additional context.  This is passed to the context generator blindly with the assumption that the context are appropiate.
-   * @return The top ranked sequence of outcomes.
-   */
-  public Sequence bestSequence(List sequence, Object[] additionalContext) {
-    return bestSequences(1, sequence.toArray(), additionalContext)[0];
-  }
-  
-  /** Returns the best sequence of outcomes based on model for this object.
     * @param sequence The input sequence.
     * @param additionalContext An Object[] of additional context.  This is passed to the context generator blindly with the assumption that the context are appropiate.
     * @return The top ranked sequence of outcomes.
     */
-  public Sequence bestSequence(Object[] sequence, Object[] additionalContext) {
+  public Sequence bestSequence(T[] sequence, Object[] additionalContext) {
     return bestSequences(1, sequence, additionalContext,zeroLog)[0];
   }
 
@@ -164,8 +161,7 @@ public class BeamSearch {
      * @param outcome The next proposed outcome for the outcomes sequence.
      * @return true is the sequence would still be valid with the new outcome, false otherwise.
      */
-  protected boolean validSequence(int i, Object[] inputSequence, String[] outcomesSequence, String outcome) {
+  protected boolean validSequence(int i, T[] inputSequence, String[] outcomesSequence, String outcome) {
     return true;
   }
-
 }

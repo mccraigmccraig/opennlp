@@ -206,7 +206,8 @@ public abstract class AbstractParserEventStream implements EventStream {
       }
     }
     for (int ti = 0, tl = toks.size(); ti < tl; ti++) {
-      tagEvents.add(new Event(preds.get(ti), tagContextGenerator.getContext(ti, toks.toArray(), preds.toArray(new String[preds.size()]), null)));
+      tagEvents.add(new Event(preds.get(ti), tagContextGenerator.getContext(ti, 
+          toks.toArray(new String[toks.size()]), preds.toArray(new String[preds.size()]), null)));
     }
   }
 

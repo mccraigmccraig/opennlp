@@ -74,14 +74,14 @@ public class POSDictionaryWriter {
   }
   
   public void write(int cutoff) throws IOException {
-    for (Iterator wi=wordCounts.iterator();wi.hasNext();) {
-      String word = (String) wi.next();
+    for (Iterator<String> wi = wordCounts.iterator(); wi.hasNext();) {
+      String word = wi.next();
       if (wordCounts.getCount(word) >= cutoff) {
         dictFile.write(word);
         Set<String> tags = dictionary.get(word);
         for (Iterator<String> ti=tags.iterator();ti.hasNext();) {
           dictFile.write(" ");
-          dictFile.write((String) ti.next());
+          dictFile.write(ti.next());
         }
         dictFile.write(newline);
       }

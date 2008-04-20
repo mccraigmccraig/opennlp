@@ -31,7 +31,7 @@ import opennlp.tools.util.StringList;
  *
  * @author      Gann Bierner
  * @author      Tom Morton
- * @version     $Revision: 1.20 $, $Date: 2008/04/19 22:24:29 $
+ * @version     $Revision: 1.21 $, $Date: 2008/04/20 20:17:38 $
  */
 
 public class DefaultPOSContextGenerator implements POSContextGenerator {
@@ -88,7 +88,7 @@ public class DefaultPOSContextGenerator implements POSContextGenerator {
     return suffs;
   }
 
-  public String[] getContext(int index, Object[] sequence, String[] priorDecisions, Object[] additionalContext) {
+  public String[] getContext(int index, String[] sequence, String[] priorDecisions, Object[] additionalContext) {
     return getContext(index,sequence,priorDecisions);
   }  
 

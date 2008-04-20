@@ -21,7 +21,7 @@ public class NameFinderEventStream implements EventStream {
 
   private NameSampleStream nameSampleStream;
 
-  private Iterator events = Collections.EMPTY_LIST.iterator();
+  private Iterator<Event> events = Collections.EMPTY_LIST.iterator();
 
   private NameContextGenerator contextGenerator;
 
