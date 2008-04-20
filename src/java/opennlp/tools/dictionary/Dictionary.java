@@ -37,23 +37,22 @@ import opennlp.tools.util.StringList;
 
 /**
  * This class is a dictionary.
- * 
- * @author <a href="mailto:kottmann@gmail.com">Joern Kottmann</a>
- * @version $Revision: 1.9 $, $Date: 2008/04/19 22:24:30 $
  */
 public class Dictionary {
   
   
-  private static class IgnoreCaseTokenList {
+  private static class StringListWrapper {
     
-    private StringList mTokenList;
+    private final StringList stringList;
+    private final boolean isCaseSensitive;
     
-    private IgnoreCaseTokenList(StringList tokenList) {
-      mTokenList = tokenList;
+    private StringListWrapper(StringList stringList, boolean isCaseSensitive) {
+      this.stringList = stringList;
+      this.isCaseSensitive = isCaseSensitive;
     }
     
-    private StringList getTokenList() {
-      return mTokenList;
+    private StringList getStringList() {
+      return stringList;
     }
     
     public boolean equals(Object obj) {
@@ -63,11 +62,16 @@ public class Dictionary {
       if (obj == this) {
         result = true;
       }
-      else if (obj instanceof IgnoreCaseTokenList) {
-        IgnoreCaseTokenList other = (IgnoreCaseTokenList) obj;
+      else if (obj instanceof StringListWrapper) {
+        StringListWrapper other = (StringListWrapper) obj;
         
-        result = mTokenList.compareToIgnoreCase(other.getTokenList());
-      }
+        if (isCaseSensitive) {
+          result = this.stringList.equals(other.getStringList());
+        }
+        else {
+          result = this.stringList.compareToIgnoreCase(other.getStringList());
+        }
+       }
       else {
         result = false;
       }
@@ -77,15 +81,15 @@ public class Dictionary {
     
     public int hashCode() {
       // if lookup is too slow optimize this
-      return mTokenList.toString().toLowerCase().hashCode();
+      return this.stringList.toString().toLowerCase().hashCode();
     }
     
     public String toString() {
-      return mTokenList.toString();
+      return this.stringList.toString();
     }
   }
   
-  private Set mEntrySet = new HashSet();
+  private Set<StringListWrapper> entrySet = new HashSet<StringListWrapper>();
   private boolean caseSensitive;
   
   /**
@@ -126,12 +130,7 @@ public class Dictionary {
    * @param tokens the new entry
    */
   public void put(StringList tokens) {
-    if (caseSensitive) {
-      mEntrySet.add(tokens);
-    }
-    else {
-      mEntrySet.add(new IgnoreCaseTokenList(tokens));
-    }
+      entrySet.add(new StringListWrapper(tokens, caseSensitive));
   }
   
   /**
@@ -142,12 +141,7 @@ public class Dictionary {
    * @return true if it contains the entry otherwise false
    */
   public boolean contains(StringList tokens) {
-    if (caseSensitive) {
-      return mEntrySet.contains(tokens);      
-    }
-    else {
-      return mEntrySet.contains(new IgnoreCaseTokenList(tokens));      
-    }
+      return entrySet.contains(new StringListWrapper(tokens, caseSensitive));      
   }
   
   /**
@@ -156,12 +150,7 @@ public class Dictionary {
    * @param tokens
    */
   public void remove(StringList tokens) {
-    if (caseSensitive) {
-      mEntrySet.remove(tokens);
-    }
-    else {
-      mEntrySet.remove(new IgnoreCaseTokenList(tokens));
-    }
+      entrySet.remove(new StringListWrapper(tokens, caseSensitive));
   }
   
   /**
@@ -169,21 +158,17 @@ public class Dictionary {
    * 
    * @return token-{@link Iterator}
    */
-  public Iterator iterator() {
-    final Iterator entries = mEntrySet.iterator();
+  public Iterator<StringList> iterator() {
+    final Iterator<StringListWrapper> entries = entrySet.iterator();
     
-    return new Iterator() {
+    return new Iterator<StringList>() {
 
       public boolean hasNext() {
         return entries.hasNext();
       }
 
-      public Object next() {
-        Object o = entries.next();
-        if (o instanceof IgnoreCaseTokenList) {
-          return ((IgnoreCaseTokenList) o).getTokenList();
-        }
-        return o; 
+      public StringList next() {
+        return entries.next().getStringList();
       }
 
       public void remove() {
@@ -197,7 +182,7 @@ public class Dictionary {
    * @return number of tokens
    */
   public int size() {
-    return mEntrySet.size();
+    return entrySet.size();
   }
   
   /**
@@ -208,18 +193,18 @@ public class Dictionary {
    */
   public void serialize(OutputStream out) throws IOException {
     
-    Iterator entryIterator = new Iterator() 
+    Iterator<Entry> entryIterator = new Iterator<Entry>() 
       {
-        private Iterator mDictionaryIterator = Dictionary.this.iterator();
+        private Iterator<StringList> dictionaryIterator = Dictionary.this.iterator();
         
         public boolean hasNext() {
-          return mDictionaryIterator.hasNext();
+          return dictionaryIterator.hasNext();
         }
 
-        public Object next() {
+        public Entry next() {
           
           StringList tokens = (StringList)
-              mDictionaryIterator.next();
+              dictionaryIterator.next();
           
           return new Entry(tokens, new Attributes());
         }
@@ -243,7 +228,7 @@ public class Dictionary {
     else if (obj != null && obj instanceof Dictionary) {
       Dictionary dictionary  = (Dictionary) obj;
       
-      result = mEntrySet.equals(dictionary.mEntrySet);
+      result = entrySet.equals(dictionary.entrySet);
     }
     else {
       result = false;
@@ -253,11 +238,11 @@ public class Dictionary {
   }
   
   public int hashCode() {
-    return mEntrySet.hashCode();
+    return entrySet.hashCode();
   }
   
   public String toString() {
-    return mEntrySet.toString();
+    return entrySet.toString();
   }
   
   /**
