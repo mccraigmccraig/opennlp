@@ -92,8 +92,8 @@ public class TreebankLinker extends DefaultLinker {
     }
     Linker treebankLinker = new TreebankLinker(dataDir,LinkerMode.TEST);
     int sentenceNumber = 0;
-    List document = new ArrayList();
-    List parses = new ArrayList();
+    List<Mention> document = new ArrayList<Mention>();
+    List<Parse> parses = new ArrayList<Parse>();
     for (String line=in.readLine();null != line;line = in.readLine()) {
       if (line.equals("")) {
         DiscourseEntity[] entities = treebankLinker.getEntities((Mention[]) document.toArray(new Mention[document.size()]));
@@ -133,15 +133,15 @@ public class TreebankLinker extends DefaultLinker {
 
 class CorefParse {
   
-  private Map parseMap;
-  private List parses;
+  private Map<Parse, Integer> parseMap;
+  private List<Parse> parses;
   
-  public CorefParse(List parses, DiscourseEntity[] entities) {
+  public CorefParse(List<Parse> parses, DiscourseEntity[] entities) {
     this.parses = parses;
-    parseMap = new HashMap();
+    parseMap = new HashMap<Parse, Integer>();
     for (int ei=0,en=entities.length;ei<en;ei++) {
       if (entities[ei].getNumMentions() > 1) {
-        for (Iterator mi=entities[ei].getMentions();mi.hasNext();) {
+        for (Iterator<MentionContext> mi = entities[ei].getMentions(); mi.hasNext();) {
           MentionContext mc = (MentionContext) mi.next();
           Parse mentionParse = ((DefaultParse) mc.getParse()).getParse();
           parseMap.put(mentionParse,new Integer(ei+1));

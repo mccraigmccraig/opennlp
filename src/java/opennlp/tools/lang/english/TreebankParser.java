@@ -101,7 +101,7 @@ public class TreebankParser {
     line = untokenizedParenPattern2.matcher(line).replaceAll("$1 $2");
     StringTokenizer str = new StringTokenizer(line);
     StringBuffer sb = new StringBuffer();
-    List tokens = new ArrayList();
+    List<String> tokens = new ArrayList<String>();
     while (str.hasMoreTokens()) {
       String tok = convertToken(str.nextToken());
       tokens.add(tok);
@@ -111,7 +111,7 @@ public class TreebankParser {
     Parse p = new Parse(text, new Span(0, text.length()), AbstractBottomUpParser.INC_NODE, 1, 0);
     int start = 0;
     int i=0;
-    for (Iterator ti = tokens.iterator(); ti.hasNext();i++) {
+    for (Iterator<String> ti = tokens.iterator(); ti.hasNext();i++) {
       String tok = (String) ti.next();
       p.insert(new Parse(text, new Span(start, start + tok.length()), AbstractBottomUpParser.TOK_NODE, 0,i));
       start += tok.length() + 1;
