@@ -33,27 +33,28 @@ import java.util.Set;
  * Set which counts the number of times a values are added to it.  
  * This value can be accessed with the #getCount method.
  */
-public class CountedSet implements Set {
+public class CountedSet<E> implements Set<E> {
 
-  private Map cset;
+  private Map<E, Integer> cset;
   private static Integer ONE = Integer.valueOf(1);
   
   /**
    * Creates a new counted set.
    */
   public CountedSet() {
-    cset = new HashMap();
+    cset = new HashMap<E, Integer>();
   }
 
   /** Creates a new counted set of the specified initial size.
+   * 
    * @param size The initial size of this set.
    */
   public CountedSet(int size) {
-    cset = new HashMap(size);
+    cset = new HashMap<E, Integer>(size);
 
   }
 
-  public boolean add(Object o) {
+  public boolean add(E o) {
     Integer count = (Integer) cset.get(o);  
     if ( count == null ) { 
       cset.put(o, ONE);
@@ -68,10 +69,11 @@ public class CountedSet implements Set {
   /**
    * Reduces the count associated with this object by 1.  If this causes the count
    * to become 0, then the object is removed form the set.
+   * 
    * @param o The object whose count is being reduced.
    */
-  public void subtract(Object o) {
-    Integer count = (Integer) cset.get(o);  
+  public void subtract(E o) {
+    Integer count = cset.get(o);  
     if ( count != null ) { 
       int c = count.intValue()-1;
       if (c == 0) {
@@ -85,19 +87,21 @@ public class CountedSet implements Set {
 
   /**
    * Assigns the specified object the specified count in the set.
+   * 
    * @param o The object to be added or updated in the set.
    * @param c The count of the specified object.
    */
-  public void setCount(Object o,int c) {
+  public void setCount(E o, int c) {
     cset.put(o, Integer.valueOf(c));
   }
 
   /**
    * Return the count of the specified object.
+   * 
    * @param o the object whose count needs to be determined.
    * @return the count of the specified object.
    */
-  public int getCount(Object o) {
+  public int getCount(E o) {
     Integer count = (Integer) cset.get(o);   
     if ( count == null ) {
       return 0;
@@ -126,8 +130,8 @@ public class CountedSet implements Set {
         out = new PrintWriter(new FileWriter(fileName));  
       }
       
-      for (Iterator e = cset.keySet().iterator();  e.hasNext();) {  
-        Object key = e.next();  
+      for (Iterator<E> e = cset.keySet().iterator();  e.hasNext();) {  
+        E key = e.next();  
         int count = this.getCount(key);
         if ( count >= countCutoff ) {
           out.println(count + delim + key);  
@@ -140,11 +144,13 @@ public class CountedSet implements Set {
     }
   }
 
-  public boolean addAll(Collection c) {
+  public boolean addAll(Collection<? extends E> c) {
     boolean changed =  false;
-    for (Iterator ci = c.iterator();ci.hasNext();) {
-      changed = changed || add(ci.next());
+    
+    for (E element : c) {
+      changed = changed || add(element);
     }
+    
     return changed;
   }
 
@@ -156,7 +162,7 @@ public class CountedSet implements Set {
     return cset.keySet().contains(o);
   }
 
-  public boolean containsAll(Collection c) {
+  public boolean containsAll(Collection<?> c) {
     return cset.keySet().containsAll(c);
   }
 
@@ -164,7 +170,7 @@ public class CountedSet implements Set {
     return cset.isEmpty();
   }
 
-  public Iterator iterator() {
+  public Iterator<E> iterator() {
     return cset.keySet().iterator();
   }
 
@@ -172,17 +178,17 @@ public class CountedSet implements Set {
     return cset.remove(o) != null;
   }
 
-  public boolean removeAll(Collection c) {
+  public boolean removeAll(Collection<?> c) {
     boolean changed =false;
-    for (Iterator ki = cset.keySet().iterator();ki.hasNext();) {
+    for (Iterator<E> ki = cset.keySet().iterator(); ki.hasNext();) {
       changed = changed || cset.remove(ki.next()) != null;
     }
     return changed;
   }
 
-  public boolean retainAll(Collection c) {
+  public boolean retainAll(Collection<?> c) {
     boolean changed = false;
-    for (Iterator ki = cset.keySet().iterator();ki.hasNext();) {
+    for (Iterator<E> ki = cset.keySet().iterator();ki.hasNext();) {
       Object key = ki.next();
       if (!c.contains(key)) {
         cset.remove(key);
@@ -200,7 +206,7 @@ public class CountedSet implements Set {
     return cset.keySet().toArray();
   }
 
-  public Object[] toArray(Object[] arg0) {
-    return cset.keySet().toArray(arg0);
+  public <T> T[] toArray(T[] a) {
+    return cset.keySet().toArray(a);
   }
 }
