@@ -31,8 +31,7 @@ import opennlp.tools.parser.Parse;
 public class AttachContextGenerator extends AbstractContextGenerator {
 
   
-  public AttachContextGenerator(Set punctSet) {
-    super();
+  public AttachContextGenerator(Set<String> punctSet) {
     this.punctSet = punctSet;
   }
 
@@ -41,9 +40,9 @@ public class AttachContextGenerator extends AbstractContextGenerator {
     return getContext((Parse[]) parts[0],((Integer)parts[1]).intValue(),(List) parts[2],((Integer)parts[3]).intValue());
   }
   
-  private boolean containsPunct(Collection puncts, String punct){
+  private boolean containsPunct(Collection<Parse> puncts, String punct){
     if (puncts != null){
-      for (Iterator pi=puncts.iterator();pi.hasNext();) {
+      for (Iterator<Parse> pi=puncts.iterator();pi.hasNext();) {
         Parse p = (Parse) pi.next();
         if (p.getType().equals(punct)) {
           return true;
@@ -60,8 +59,8 @@ public class AttachContextGenerator extends AbstractContextGenerator {
    * @param rightFrontier The nodes which have been not attach to so far.
    * @return A set of contextual features about this attachment.
    */
-  public String[] getContext(Parse[] constituents, int index, List rightFrontier, int rfi) {
-    List features = new ArrayList(100);
+  public String[] getContext(Parse[] constituents, int index, List<Parse> rightFrontier, int rfi) {
+    List<String> features = new ArrayList<String>(100);
     int nodeDistance = rfi;
     Parse fn = (Parse) rightFrontier.get(rfi);
     Parse fp = null;
@@ -78,9 +77,9 @@ public class AttachContextGenerator extends AbstractContextGenerator {
       p1 = constituents[index+1];
     }
     
-    Collection punct1s = null;
-    Collection punct_1s = null;
-    Collection punct_1fs = null;
+    Collection<Parse> punct1s = null;
+    Collection<Parse> punct_1s = null;
+    Collection<Parse> punct_1fs = null;
     punct_1fs = fn.getPreviousPunctuationSet();
     punct_1s=p0.getPreviousPunctuationSet();
     punct1s=p0.getNextPunctuationSet();
@@ -126,8 +125,8 @@ public class AttachContextGenerator extends AbstractContextGenerator {
     features.add("ps="+fn.getType()+"->"+fn.getType()+","+p0.getType());
     if (punct_1s != null) {
       StringBuffer punctBuf = new StringBuffer(5);
-      for (Iterator pi=punct_1s.iterator();pi.hasNext();) {
-        Parse punct = (Parse) pi.next();
+      for (Iterator<Parse> pi=punct_1s.iterator();pi.hasNext();) {
+        Parse punct = pi.next();
         punctBuf.append(punct.getType()).append(",");
       }
       //features.add("ppd="+punctProd+","+punctBuf.toString()+p0.getType());

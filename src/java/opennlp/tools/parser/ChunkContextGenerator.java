@@ -54,7 +54,7 @@ public class ChunkContextGenerator implements ChunkerContextGenerator {
   }
 
   public String[] getContext(int i, Object[] words, String[] tags, String[] preds) {
-    List features = new ArrayList(19);
+    List<String> features = new ArrayList<String>(19);
     int x0 = i;
     int x_2 = x0 - 2;
     int x_1 = x0 - 1;
@@ -161,7 +161,7 @@ public class ChunkContextGenerator implements ChunkerContextGenerator {
     features.add(ctbo0 + "," + ct1);
     features.add(ct0 + "," + ctbo1);
     features.add(ctbo0 + "," + ctbo1);
-    String contexts[] = (String[]) features.toArray(new String[features.size()]);
+    String contexts[] = features.toArray(new String[features.size()]);
     if (contextsCache != null) {
       contextsCache.put(cacheKey,contexts);
     }

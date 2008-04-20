@@ -38,8 +38,8 @@ import opennlp.tools.parser.chunking.Parser;
  */
 public class HeadRules implements opennlp.tools.parser.HeadRules, GapLabeler {
   
-  private Map headRules;
-  private Set punctSet;
+  private Map<String, HeadRule> headRules;
+  private Set<String> punctSet;
   
   /**
    * Creates a new set of head rules based on the specified head rules file.
@@ -57,7 +57,7 @@ public class HeadRules implements opennlp.tools.parser.HeadRules, GapLabeler {
    */
   public HeadRules(BufferedReader rulesReader) throws IOException {
     readHeadRules(rulesReader);
-    punctSet = new HashSet();
+    punctSet = new HashSet<String>();
     punctSet.add(".");
     punctSet.add(",");
     punctSet.add("``");
@@ -65,7 +65,7 @@ public class HeadRules implements opennlp.tools.parser.HeadRules, GapLabeler {
     punctSet.add(":");
   }
     
-  public Set getPunctuationTags() {
+  public Set<String> getPunctuationTags() {
     return punctSet;
   }
     
@@ -136,7 +136,7 @@ public class HeadRules implements opennlp.tools.parser.HeadRules, GapLabeler {
     
   private void readHeadRules(BufferedReader str) throws IOException {
     String line;
-    headRules = new HashMap(30);
+    headRules = new HashMap<String, HeadRule>(30);
     while ((line = str.readLine()) != null) {
       StringTokenizer st = new StringTokenizer(line);
       String num = st.nextToken();
@@ -165,7 +165,7 @@ public class HeadRules implements opennlp.tools.parser.HeadRules, GapLabeler {
   }
 
 
-  public void labelGaps(Stack stack) {
+  public void labelGaps(Stack<Constituent> stack) {
     if (stack.size() > 4) {
       //Constituent con0 = (Constituent) stack.get(stack.size()-1);
       Constituent con1 = (Constituent) stack.get(stack.size()-2);

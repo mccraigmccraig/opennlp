@@ -31,7 +31,7 @@ import opennlp.tools.parser.ParserEventTypeEnum;
 import opennlp.tools.util.InvalidFormatException;
 
 /**
- * Wrapper class for one of four parser event streams.  The particular event stram is specified 
+ * Wrapper class for one of four parser event streams.  The particular event stream is specified 
  * at construction.
  * @author Tom Morton
  *
@@ -74,7 +74,7 @@ public class ParserEventStream extends AbstractParserEventStream {
    * @return true if the specified child is the first child of the specified parent; false otherwise.
    */
   protected boolean firstChild(Parse child, Parse parent) {
-    return AbstractBottomUpParser.collapsePunctuation(parent.getChildren(),punctSet)[0] == child;
+    return AbstractBottomUpParser.collapsePunctuation(parent.getChildren(), punctSet)[0] == child;
   }
 
   public static  Parse[] reduceChunks(Parse[] chunks, int ci, Parse parent) {
@@ -117,7 +117,7 @@ public class ParserEventStream extends AbstractParserEventStream {
    * @param parseEvents The events for the specified chunks.
    * @param chunks The incomplete parses to be parsed.
    */
-  protected void addParseEvents(List parseEvents, Parse[] chunks) {
+  protected void addParseEvents(List<Event> parseEvents, Parse[] chunks) {
     int ci = 0;
     while (ci < chunks.length) {
       //System.err.println("parserEventStream.addParseEvents: chunks="+Arrays.asList(chunks));

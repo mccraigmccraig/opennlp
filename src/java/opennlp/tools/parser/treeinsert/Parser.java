@@ -40,20 +40,20 @@ import opennlp.tools.parser.ParserTagger;
  * assesed as either complete or incomplete.  Complete nodes
  * are no longer elligable for daughter attachment.
  * Complex modifiers which produce additional node  
- * levels of the same type are atached with sister-adjunction.
+ * levels of the same type are attached with sister-adjunction.
  * Attachment can not take place higher in the right-frontier
  * than an incomplete node.  
  */
 public class Parser extends AbstractBottomUpParser {
 
-  /** Outcome used when a constiuent needs an no additional parent node/building. */
+  /** Outcome used when a constituent needs an no additional parent node/building. */
   public static final String DONE = "d";
 
-  /** Outcome used when a node should be attached as a sister to anototer node. */ 
+  /** Outcome used when a node should be attached as a sister to another node. */ 
   public static final String ATTACH_SISTER = "s";
-  /** Outcome used when a node should be attached as a daughter to anototer node. */
+  /** Outcome used when a node should be attached as a daughter to another node. */
   public static final String ATTACH_DAUGHTER = "d";
-  /** Outcome used when a node should not be attached to anototer node. */
+  /** Outcome used when a node should not be attached to another node. */
   public static final String NON_ATTACH = "n";
   
   /** Label used to distinguish build nodes from non-built nodes. */ 
@@ -112,8 +112,8 @@ public class Parser extends AbstractBottomUpParser {
    * @param root The root of the parse tree.
    * @return The right frontier of the specified parse tree.
    */
-  public static List getRightFrontier(Parse root,Set punctSet) {
-    List rf = new LinkedList();
+  public static List<Parse> getRightFrontier(Parse root,Set<String> punctSet) {
+    List<Parse> rf = new LinkedList<Parse>();
     Parse top;
     if (root.getType() == AbstractBottomUpParser.TOP_NODE ||
         root.getType() == AbstractBottomUpParser.INC_NODE) {
@@ -127,7 +127,7 @@ public class Parser extends AbstractBottomUpParser {
       Parse[] kids = top.getChildren();
       top = kids[kids.length-1];
     }
-    return new ArrayList(rf);
+    return new ArrayList<Parse>(rf);
   }
   
   private void setBuilt(Parse p) {
@@ -225,7 +225,7 @@ public class Parser extends AbstractBottomUpParser {
     }
     int originalZeroIndex = mapParseIndex(0,children,originalChildren);
     int originalAdvanceIndex = mapParseIndex(advanceNodeIndex,children,originalChildren);
-    List newParsesList = new ArrayList();
+    List<Parse> newParsesList = new ArrayList<Parse>();
     //call build model
     buildModel.eval(buildContextGenerator.getContext(children, advanceNodeIndex), bprobs);
     double doneProb = bprobs[doneIndex];
@@ -306,7 +306,7 @@ public class Parser extends AbstractBottomUpParser {
         newParsesList.add(newParse1);
       }
       else {
-        List rf = getRightFrontier(p,punctSet);
+        List<Parse> rf = getRightFrontier(p,punctSet);
         for (int fi=0,fs=rf.size();fi<fs;fi++) {
           Parse fn = (Parse) rf.get(fi);
           attachModel.eval(attachContextGenerator.getContext(children, advanceNodeIndex,rf,fi), aprobs);
@@ -331,7 +331,7 @@ public class Parser extends AbstractBottomUpParser {
                 //System.out.println(at"-removing "+(originalZeroIndex+1)+" "+newParse2.getChildren()[originalZeroIndex+1]);
                 newParse2.remove(originalZeroIndex+1);
               }
-              List crf = getRightFrontier(newParse2,punctSet);
+              List<Parse> crf = getRightFrontier(newParse2,punctSet);
               Parse updatedNode;
               if (attachments[ai] == daughterAttachIndex) {//attach daughter
                 updatedNode = (Parse) crf.get(fi);

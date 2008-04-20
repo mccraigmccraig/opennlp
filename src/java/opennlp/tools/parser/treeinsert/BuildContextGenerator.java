@@ -69,10 +69,10 @@ public class BuildContextGenerator extends AbstractContextGenerator {
       p2 = constituents[index + 2];
     }
     
-    Collection punct1s = null;
-    Collection punct_1s = null;
-    Collection punct2s = null;
-    Collection punct_2s = null;
+    Collection<Parse> punct1s = null;
+    Collection<Parse> punct_1s = null;
+    Collection<Parse> punct2s = null;
+    Collection<Parse> punct_2s = null;
     
     punct_1s=p0.getPreviousPunctuationSet();
     punct1s=p0.getNextPunctuationSet();
@@ -83,13 +83,13 @@ public class BuildContextGenerator extends AbstractContextGenerator {
       punct_2s = p_1.getPreviousPunctuationSet();
     }
     
-    List rf;
+    List<Parse> rf;
     if (index == 0) {
-      rf = Collections.EMPTY_LIST;
+      rf = Collections.emptyList();
     }
     else {
       //this isn't a root node so, punctSet won't be used and can be passed as empty.
-      rf = Parser.getRightFrontier(constituents[0],Collections.EMPTY_SET);
+      rf = Parser.getRightFrontier(constituents[0], Collections.EMPTY_SET);
     }
     getFrontierNodes(rf,leftNodes);
     p_1 = leftNodes[0];
@@ -113,7 +113,7 @@ public class BuildContextGenerator extends AbstractContextGenerator {
     Cons c1 = new Cons(consp1,consbop1,1,true);
     Cons c2 = new Cons(consp2,consbop2,2,true);    
 
-    List features = new ArrayList();
+    List<String> features = new ArrayList<String>();
     features.add("default");
     
     //unigrams

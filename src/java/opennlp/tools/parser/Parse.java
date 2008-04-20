@@ -108,6 +108,7 @@ public class Parse implements Cloneable, Comparable<Parse> {
     }
   }
   
+  @Override
   public Object clone() {
     Parse p = new Parse(this.text, this.span, this.type, this.prob, this.head);
     p.parts = (List) ((LinkedList) this.parts).clone();
@@ -130,7 +131,7 @@ public class Parse implements Cloneable, Comparable<Parse> {
     }
     else {
       Parse c = (Parse) this.clone();
-      Parse lc = (Parse) c.parts.get(parts.size()-1);
+      Parse lc = c.parts.get(parts.size()-1);
       c.parts.set(parts.size()-1,lc.clone(node));
       return c;
     }
@@ -143,7 +144,7 @@ public class Parse implements Cloneable, Comparable<Parse> {
    */
   public Parse cloneRoot(Parse node, int parseIndex) {
     Parse c = (Parse) this.clone();
-    Parse fc = (Parse) c.parts.get(parseIndex);
+    Parse fc = c.parts.get(parseIndex);
     c.parts.set(parseIndex,fc.clone(node));
     return c;
   }
@@ -239,7 +240,7 @@ public class Parse implements Cloneable, Comparable<Parse> {
       int pi=0;
       int pn = parts.size();
       for (; pi < pn; pi++) {
-        Parse subPart = (Parse) parts.get(pi);
+        Parse subPart = parts.get(pi);
         //System.err.println("Parse.insert:con="+constituent+" sp["+pi+"] "+subPart+" "+subPart.getType());
         Span sp = subPart.span;
         if (sp.getStart() > ic.getEnd()) {
@@ -286,7 +287,7 @@ public class Parse implements Cloneable, Comparable<Parse> {
       //System.out.print(df.format(prob)+" ");
     }
     for (Iterator<Parse> i = parts.iterator(); i.hasNext();) {
-      Parse c = (Parse) i.next();
+      Parse c = i.next();
       Span s = c.span;
       if (start < s.getStart()) {
         //System.out.println("pre "+start+" "+s.getStart());
@@ -319,7 +320,7 @@ public class Parse implements Cloneable, Comparable<Parse> {
    */
   public double getTagSequenceProb() {
     //System.err.println("Parse.getTagSequenceProb: "+type+" "+this);
-    if (parts.size() == 1 && ((Parse) parts.get(0)).type.equals(AbstractBottomUpParser.TOK_NODE)) {
+    if (parts.size() == 1 && (parts.get(0)).type.equals(AbstractBottomUpParser.TOK_NODE)) {
       //System.err.println(this+" "+prob);
       return (Math.log(prob));
     }
@@ -344,6 +345,7 @@ public class Parse implements Cloneable, Comparable<Parse> {
     return (parts.size() == 1);
   }
 
+  @Override
   public String toString() {
     return (text.substring(span.getStart(), span.getEnd()));
   }
@@ -385,7 +387,7 @@ public class Parse implements Cloneable, Comparable<Parse> {
    * @return The child constituents of this constiuent.
    */
   public Parse[] getChildren() {
-    return (Parse[]) parts.toArray(new Parse[parts.size()]);
+    return parts.toArray(new Parse[parts.size()]);
   }
   
   /**
@@ -394,7 +396,7 @@ public class Parse implements Cloneable, Comparable<Parse> {
    * @param label The label to be assigned to the new child.
    */
   public void setChild(int index, String label) {
-    Parse newChild = (Parse) ((Parse) parts.get(index)).clone();
+    Parse newChild = (Parse) (parts.get(index)).clone();
     newChild.setLabel(label);
     parts.set(index,newChild);
   }
@@ -415,12 +417,12 @@ public class Parse implements Cloneable, Comparable<Parse> {
   public void remove(int index) {
     parts.remove(index);
     if (index == 0 || index == parts.size()) { //size is orig last element
-      span = new Span(((Parse)parts.get(0)).span.getStart(),((Parse)parts.get(parts.size()-1)).span.getEnd());
+      span = new Span((parts.get(0)).span.getStart(),(parts.get(parts.size()-1)).span.getEnd());
     }
   }
   
   public Parse adjoinRoot(Parse node, HeadRules rules, int parseIndex) {
-    Parse lastChild = (Parse) parts.get(parseIndex);
+    Parse lastChild = parts.get(parseIndex);
     Parse adjNode = new Parse(this.text,new Span(lastChild.getSpan().getStart(),node.getSpan().getEnd()),lastChild.getType(),1,rules.getHead(new Parse[]{lastChild,node},lastChild.getType()));
     adjNode.parts.add(lastChild);
     if (node.prevPunctSet != null) {
@@ -439,7 +441,7 @@ public class Parse implements Cloneable, Comparable<Parse> {
    * @return The new parent node of this node and the specified sister node.
    */
   public Parse adjoin(Parse sister, HeadRules rules) {
-    Parse lastChild = (Parse) parts.get(parts.size()-1);
+    Parse lastChild = parts.get(parts.size()-1);
     Parse adjNode = new Parse(this.text,new Span(lastChild.getSpan().getStart(),sister.getSpan().getEnd()),lastChild.getType(),1,rules.getHead(new Parse[]{lastChild,sister},lastChild.getType()));
     adjNode.parts.add(lastChild);
     if (sister.prevPunctSet != null) {
@@ -457,7 +459,7 @@ public class Parse implements Cloneable, Comparable<Parse> {
     boolean beforeRoot = true;
     //System.err.println("expandTopNode: parts="+parts);
     for (int pi=0,ai=0;pi<parts.size();pi++,ai++) {
-      Parse node = (Parse) parts.get(pi);
+      Parse node = parts.get(pi);
       if (node == root) {
         beforeRoot = false;
       }
@@ -581,10 +583,10 @@ public class Parse implements Cloneable, Comparable<Parse> {
   public void updateHeads(HeadRules rules) {
     if (parts != null && parts.size() != 0) {
       for (int pi=0,pn=parts.size();pi<pn;pi++) {
-        Parse c = (Parse) parts.get(pi);
+        Parse c = parts.get(pi);
         c.updateHeads(rules);
       }
-      this.head = rules.getHead((Parse[]) parts.toArray(new Parse[parts.size()]), type);
+      this.head = rules.getHead(parts.toArray(new Parse[parts.size()]), type);
       if (head == null) {
         head = this;
       }
@@ -598,7 +600,7 @@ public class Parse implements Cloneable, Comparable<Parse> {
   }
   
   public void updateSpan() {
-    span = new Span(((Parse) parts.get(0)).span.getStart(),((Parse) parts.get(parts.size()-1)).span.getEnd());
+    span = new Span((parts.get(0)).span.getStart(),(parts.get(parts.size()-1)).span.getEnd());
   }
   
   /**
@@ -609,7 +611,7 @@ public class Parse implements Cloneable, Comparable<Parse> {
     List<Parse> nodes = new LinkedList<Parse>();
     nodes.add(parse);
     while(nodes.size() != 0) {
-      Parse node = (Parse) nodes.remove(0);
+      Parse node = nodes.remove(0);
       Parse[] children = node.getChildren();
       if (children.length == 1 && node.getType().equals(children[0].getType())) {
         int index = node.getParent().parts.indexOf(node);
@@ -689,7 +691,7 @@ public class Parse implements Cloneable, Comparable<Parse> {
         }
       }
       else if (c == ')') {
-        Constituent con = (Constituent) stack.pop();
+        Constituent con = stack.pop();
         int start = con.getSpan().getStart();
         if (start < offset) {
           cons.add(new Constituent(con.getLabel(), new Span(start, offset-1)));
@@ -700,7 +702,7 @@ public class Parse implements Cloneable, Comparable<Parse> {
     int tokenIndex = -1;
     Parse p = new Parse(txt, new Span(0, txt.length()), AbstractBottomUpParser.TOP_NODE, 1,0);
     for (int ci=0;ci < cons.size();ci++) {
-      Constituent con = (Constituent) cons.get(ci);
+      Constituent con = cons.get(ci);
       String type = con.getLabel();
       if (!type.equals(AbstractBottomUpParser.TOP_NODE)) {
         if (type == AbstractBottomUpParser.TOK_NODE) {
@@ -736,7 +738,7 @@ public class Parse implements Cloneable, Comparable<Parse> {
    * @return true if this node is a pos-tag, false otherwise.
    */
   public boolean isPosTag() {
-    return (parts.size() == 1 && ((Parse) parts.get(0)).getType().equals(AbstractBottomUpParser.TOK_NODE));
+    return (parts.size() == 1 && (parts.get(0)).getType().equals(AbstractBottomUpParser.TOK_NODE));
   }
   
   /**
@@ -746,7 +748,7 @@ public class Parse implements Cloneable, Comparable<Parse> {
   public boolean isFlat() {
     boolean flat = true;
     for (int ci=0;ci<parts.size();ci++) {
-      flat &= ((Parse) parts.get(ci)).isPosTag();
+      flat &= (parts.get(ci)).isPosTag();
     }
     return flat;
   }
@@ -768,7 +770,7 @@ public class Parse implements Cloneable, Comparable<Parse> {
     List<Parse> nodes = new LinkedList<Parse>();
     nodes.addAll(this.parts);
     while(nodes.size() != 0) {
-      Parse p = (Parse) nodes.remove(0);
+      Parse p = nodes.remove(0);
       if (p.isPosTag()) {
         tags.add(p);
       }

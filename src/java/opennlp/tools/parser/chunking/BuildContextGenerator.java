@@ -308,6 +308,6 @@ public class BuildContextGenerator extends AbstractContextGenerator {
         }
       }
     }
-    return ((String[]) features.toArray(new String[features.size()]));
+    return (features.toArray(new String[features.size()]));
   }
 }

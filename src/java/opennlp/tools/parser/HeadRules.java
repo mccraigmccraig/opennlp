@@ -37,5 +37,5 @@ public interface HeadRules {
    * Returns the set of punctuation tags.  Attachment decisions for these tags will not be modeled. 
    * @return the set of punctuation tags.
    */
-  public Set getPunctuationTags();
+  public Set<String> getPunctuationTags();
 }

@@ -22,7 +22,7 @@ import opennlp.tools.util.Sequence;
 public class ParserChunker extends ChunkerME implements opennlp.tools.parser.ParserChunker {
   private static final int K = 10;
   private int beamSize;
-  private Map continueStartMap;
+  private Map<String, String> continueStartMap;
   
   public ParserChunker(String modelFile) throws IOException {
     this(modelFile,K,K);
@@ -45,7 +45,7 @@ public class ParserChunker extends ChunkerME implements opennlp.tools.parser.Par
   }
   
   protected void init() {
-    continueStartMap = new HashMap(model.getNumOutcomes());
+    continueStartMap = new HashMap<String, String>(model.getNumOutcomes());
     for (int oi=0,on=model.getNumOutcomes();oi<on;oi++) {
       String outcome = model.getOutcome(oi);
       if (outcome.startsWith(Parser.CONT)){
@@ -54,7 +54,7 @@ public class ParserChunker extends ChunkerME implements opennlp.tools.parser.Par
     }
   }
 
-  public Sequence[] topKSequences(List sentence, List tags) {
+  public Sequence[] topKSequences(List<String> sentence, List<String> tags) {
     return beam.bestSequences(beamSize, sentence.toArray(), new Object[] { tags });
   }
 

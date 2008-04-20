@@ -57,8 +57,8 @@ public class Parser extends AbstractBottomUpParser {
 
   private static final String TOP_START = START + TOP_NODE;
   private int topStartIndex;
-  private Map startTypeMap;
-  private Map contTypeMap;
+  private Map<String, String> startTypeMap;
+  private Map<String, String> contTypeMap;
   
   private int completeIndex;
   private int incompleteIndex;
@@ -95,8 +95,8 @@ public class Parser extends AbstractBottomUpParser {
     cprobs = new double[checkModel.getNumOutcomes()];
     this.buildContextGenerator = new BuildContextGenerator();
     this.checkContextGenerator = new CheckContextGenerator();
-    startTypeMap = new HashMap();
-    contTypeMap = new HashMap();
+    startTypeMap = new HashMap<String, String>();
+    contTypeMap = new HashMap<String, String>();
     for (int boi = 0, bon = buildModel.getNumOutcomes(); boi < bon; boi++) {
       String outcome = buildModel.getOutcome(boi);
       if (outcome.startsWith(START)) {
@@ -146,19 +146,19 @@ public class Parser extends AbstractBottomUpParser {
         break;
       }
       else if (startTypeMap.containsKey(advanceNode.getLabel())) {
-        lastStartType = (String) startTypeMap.get(advanceNode.getLabel());
+        lastStartType = startTypeMap.get(advanceNode.getLabel());
         lastStartNode = advanceNode;
         lastStartIndex = advanceNodeIndex;
         //System.err.println("lastStart "+i+" "+lastStart.label+" "+lastStart.prob);
       }
     }
     int originalAdvanceIndex = mapParseIndex(advanceNodeIndex,children,originalChildren);
-    List newParsesList = new ArrayList(buildModel.getNumOutcomes());
+    List<Parse> newParsesList = new ArrayList<Parse>(buildModel.getNumOutcomes());
     //call build
     buildModel.eval(buildContextGenerator.getContext(children, advanceNodeIndex), bprobs);
     double bprobSum = 0;
     while (bprobSum < probMass) {
-      /** The largest unadvanced labeling. */ 
+      // The largest unadvanced labeling.
       int max = 0;
       for (int pi = 1; pi < bprobs.length; pi++) { //for each build outcome
         if (bprobs[pi] > bprobs[max]) {
@@ -180,7 +180,7 @@ public class Parser extends AbstractBottomUpParser {
       if (startTypeMap.containsKey(tag)) { //update last start
         lastStartIndex = advanceNodeIndex;
         lastStartNode = advanceNode;
-        lastStartType = (String) startTypeMap.get(tag);
+        lastStartType = startTypeMap.get(tag);
       }
       else if (contTypeMap.containsKey(tag)) {
         if (lastStartNode == null || !lastStartType.equals(contTypeMap.get(tag))) {
@@ -241,8 +241,8 @@ public class Parser extends AbstractBottomUpParser {
     return opennlp.maxent.GIS.trainModel(iterations, new TwoPassDataIndexer(es, cut));
   }
   
-  private static boolean lastChild(Parse child, Parse parent, Set punctSet) {
-    Parse[] kids = collapsePunctuation(parent.getChildren(),punctSet);
+  private static boolean lastChild(Parse child, Parse parent, Set<String> punctSet) {
+    Parse[] kids = collapsePunctuation(parent.getChildren(), punctSet);
     return (kids[kids.length - 1] == child);
   }
   

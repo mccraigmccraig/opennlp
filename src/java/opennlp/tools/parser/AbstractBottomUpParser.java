@@ -44,11 +44,11 @@ public abstract class AbstractBottomUpParser implements Parser {
   /** The default amount of probability mass required of advanced outcomes. */
   public static final double defaultAdvancePercentage = 0.95;
   /** Completed parses. */
-  protected Heap completeParses;
+  protected Heap<Parse> completeParses;
   /** Incomplete parses which will be advanced. */
-  protected Heap odh;
+  protected Heap<Parse> odh;
   /** Incomplete parses which have been advanced. */
-  protected Heap ndh;
+  protected Heap<Parse> ndh;
   
   /** The head rules for the parser. */
   protected HeadRules headRules;
@@ -56,7 +56,7 @@ public abstract class AbstractBottomUpParser implements Parser {
    * Punctuation is not attached, but floats to the top of the parse as attachment
    * decisions are made about its non-punctuation sister nodes. 
    */
-  protected Set punctSet;
+  protected Set<String> punctSet;
   
   /** The label for the top node. */
   public static final String TOP_NODE = "TOP";
@@ -101,9 +101,9 @@ public abstract class AbstractBottomUpParser implements Parser {
     reportFailedParse = true;
     this.headRules = headRules;
     this.punctSet = headRules.getPunctuationTags();
-    odh = new ListHeap(K);
-    ndh = new ListHeap(K);
-    completeParses = new ListHeap(K);
+    odh = new ListHeap<Parse>(K);
+    ndh = new ListHeap<Parse>(K);
+    completeParses = new ListHeap<Parse>(K);
   }
   
   /**
@@ -136,8 +136,8 @@ public abstract class AbstractBottomUpParser implements Parser {
    * @param punctSet The set of punctuation which is to be removed.
    * @return An array of parses which is a subset of chunks with punctuation removed.
    */
-  public static Parse[] collapsePunctuation(Parse[] chunks, Set punctSet) {
-    List collapsedParses = new ArrayList(chunks.length);
+  public static Parse[] collapsePunctuation(Parse[] chunks, Set<String> punctSet) {
+    List<Parse> collapsedParses = new ArrayList<Parse>(chunks.length);
     int lastNonPunct = -1;
     int nextNonPunct = -1;
     for (int ci=0,cn=chunks.length;ci<cn;ci++) {
@@ -163,7 +163,7 @@ public abstract class AbstractBottomUpParser implements Parser {
       return chunks;
     }
     //System.err.println("collapsedPunctuation: collapsedParses"+collapsedParses);
-    return (Parse[]) collapsedParses.toArray(new Parse[collapsedParses.size()]);
+    return collapsedParses.toArray(new Parse[collapsedParses.size()]);
   }
   
   
@@ -192,12 +192,12 @@ public abstract class AbstractBottomUpParser implements Parser {
     Parse guess = null;
     double minComplete = 2;
     double bestComplete = -100000; //approximating -infinity/0 in ln domain
-    while (odh.size() > 0 && (completeParses.size() < M || ((Parse) odh.first()).getProb() < minComplete) && derivationStage < maxDerivationLength) {
-      ndh = new ListHeap(K);
+    while (odh.size() > 0 && (completeParses.size() < M || (odh.first()).getProb() < minComplete) && derivationStage < maxDerivationLength) {
+      ndh = new ListHeap<Parse>(K);
       
       int derivationRank = 0;
-      for (Iterator pi = odh.iterator(); pi.hasNext() && derivationRank < K; derivationRank++) { // forearch derivation
-        Parse tp = (Parse) pi.next();
+      for (Iterator<Parse> pi = odh.iterator(); pi.hasNext() && derivationRank < K; derivationRank++) { // forearch derivation
+        Parse tp = pi.next();
         //TODO: Need to look at this for K-best parsing cases 
         /* 
          if (tp.getProb() < bestComplete) { //this parse and the ones which follow will never win, stop advancing.
@@ -223,7 +223,7 @@ public abstract class AbstractBottomUpParser implements Parser {
           }
           else {
             //System.err.println("advancing ts "+j+" prob="+((Parse) ndh.last()).getProb());
-            nd = advanceChunks(tp,((Parse) ndh.last()).getProb());
+            nd = advanceChunks(tp,(ndh.last()).getProb());
           }
         }
         else { // i > 1
@@ -265,16 +265,16 @@ public abstract class AbstractBottomUpParser implements Parser {
       return new Parse[] {guess};
     }
     else if (numParses == 1){
-      return new Parse[] {(Parse) completeParses.first()};
+      return new Parse[] {completeParses.first()};
     }
     else {
-      List topParses = new ArrayList(numParses);
+      List<Parse> topParses = new ArrayList<Parse>(numParses);
       while(!completeParses.isEmpty() && topParses.size() < numParses) {
-        Parse tp = (Parse) completeParses.extract();
+        Parse tp = completeParses.extract();
         topParses.add(tp);
         //parses.remove(tp); 
       }
-      return (Parse[]) topParses.toArray(new Parse[topParses.size()]);
+      return topParses.toArray(new Parse[topParses.size()]);
     }
   }
   
@@ -308,7 +308,7 @@ public abstract class AbstractBottomUpParser implements Parser {
     for (int si = 0, sl = cs.length; si < sl; si++) {
       newParses[si] = (Parse) p.clone(); //copies top level
       if (createDerivationString) newParses[si].getDerivation().append(si).append(".");
-      String[] tags = (String[]) cs[si].getOutcomes().toArray(new String[words.length]);
+      String[] tags = cs[si].getOutcomes().toArray(new String[words.length]);
       cs[si].getProbs(probs);
       int start = -1;
       int end = 0;
@@ -378,7 +378,7 @@ public abstract class AbstractBottomUpParser implements Parser {
     }
     Parse[] newParses = new Parse[ts.length];
     for (int i = 0; i < ts.length; i++) {
-      String[] tags = (String[]) ts[i].getOutcomes().toArray(new String[words.length]);
+      String[] tags = ts[i].getOutcomes().toArray(new String[words.length]);
       ts[i].getProbs(probs);
       newParses[i] = (Parse) p.clone(); //copies top level
       if (createDerivationString) newParses[i].getDerivation().append(i).append(".");

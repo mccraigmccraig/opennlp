@@ -67,8 +67,8 @@ public class ParserEventStream extends AbstractParserEventStream {
    * @param node The node whose parents are to be returned.
    * @return a set of parent nodes.
    */
-  private Map getNonAdjoinedParent(Parse node) {
-    Map parents = new HashMap();
+  private Map<Parse, Integer> getNonAdjoinedParent(Parse node) {
+    Map<Parse, Integer> parents = new HashMap<Parse, Integer>();
     Parse parent = node.getParent();
     int index = indexOf(node,parent);
     parents.put(parent,new Integer(index));
@@ -122,13 +122,13 @@ public class ParserEventStream extends AbstractParserEventStream {
     return lc;
   }
 
-  protected void addParseEvents(List parseEvents, Parse[] chunks) {
+  protected void addParseEvents(List<Event> parseEvents, Parse[] chunks) {
     /** Frontier nodes built from node in a completed parse.  Specifically,
      * they have all their children regardless of the stage of parsing.*/
-    List rightFrontier = new ArrayList();
-    List builtNodes = new ArrayList();
+    List<Parse> rightFrontier = new ArrayList<Parse>();
+    List<Parse> builtNodes = new ArrayList<Parse>();
     /** Nodes which characterize what the parse looks like to the parser as its being built.
-     * Specifically, these nodes don't have all their chilren attached like the parents of
+     * Specifically, these nodes don't have all their children attached like the parents of
      * the chunk nodes do.*/
     Parse[] currentChunks = new Parse[chunks.length];
     for (int ci=0;ci<chunks.length;ci++) {
@@ -202,12 +202,12 @@ public class ParserEventStream extends AbstractParserEventStream {
       }
       else {
         /** Right frontier consisting of partially-built nodes based on current state of the parse.*/
-        List currentRightFrontier = Parser.getRightFrontier(currentChunks[0],punctSet);
+        List<Parse> currentRightFrontier = Parser.getRightFrontier(currentChunks[0],punctSet);
         if (currentRightFrontier.size() != rightFrontier.size()) {
           System.err.println("fontiers mis-aligned: "+currentRightFrontier.size()+" != "+rightFrontier.size()+" "+currentRightFrontier+" "+rightFrontier);
           System.exit(1);
         }
-        Map parents = getNonAdjoinedParent(chunks[ci]);
+        Map<Parse, Integer> parents = getNonAdjoinedParent(chunks[ci]);
         //try daughters first.
         for (int cfi=0;cfi<currentRightFrontier.size();cfi++) {
           Parse frontierNode = (Parse) rightFrontier.get(cfi);

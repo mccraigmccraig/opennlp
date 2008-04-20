@@ -27,7 +27,7 @@ import opennlp.tools.util.Sequence;
  */
 public interface ParserTagger extends  POSTagger {
 
-  public Sequence[] topKSequences(List sentence);
+  public Sequence[] topKSequences(List<String> sentence);
 
   public Sequence[] topKSequences(String[] sentence);
 }

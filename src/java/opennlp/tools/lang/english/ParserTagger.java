@@ -53,7 +53,7 @@ public class ParserTagger extends POSTaggerME implements opennlp.tools.parser.Pa
     this.beamSize = beamSize;
   }
 
-  public Sequence[] topKSequences(List sentence) {
+  public Sequence[] topKSequences(List<String> sentence) {
     return beam.bestSequences(beamSize, sentence.toArray(), null);
   }
 

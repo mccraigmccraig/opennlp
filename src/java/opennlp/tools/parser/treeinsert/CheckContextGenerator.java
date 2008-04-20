@@ -31,8 +31,7 @@ public class CheckContextGenerator extends AbstractContextGenerator {
 
   private Parse[] leftNodes;
   
-  public CheckContextGenerator(Set punctSet) {
-    super();
+  public CheckContextGenerator(Set<String> punctSet) {
     this.punctSet = punctSet;
     leftNodes = new Parse[2];
   }
@@ -43,7 +42,7 @@ public class CheckContextGenerator extends AbstractContextGenerator {
   }
   
   public String[] getContext(Parse parent, Parse[] constituents, int index, boolean trimFrontier) {
-    List features = new ArrayList(100);
+    List<String> features = new ArrayList<String>(100);
     //default 
     features.add("default");
     Parse[] children = Parser.collapsePunctuation(parent.getChildren(),punctSet);
@@ -62,16 +61,16 @@ public class CheckContextGenerator extends AbstractContextGenerator {
     Parse p2 = null;
     Parse p_1 = null;
     Parse p_2 = null;
-    Collection p1s = constituents[index].getNextPunctuationSet();
-    Collection p2s = null;
-    Collection p_1s = constituents[index].getPreviousPunctuationSet();
-    Collection p_2s = null;
-    List rf;
+    Collection<Parse> p1s = constituents[index].getNextPunctuationSet();
+    Collection<Parse> p2s = null;
+    Collection<Parse> p_1s = constituents[index].getPreviousPunctuationSet();
+    Collection<Parse> p_2s = null;
+    List<Parse> rf;
     if (index == 0) {
-      rf = Collections.EMPTY_LIST;
+      rf = Collections.emptyList();
     }
     else {
-      rf = Parser.getRightFrontier(constituents[0],punctSet);
+      rf = Parser.getRightFrontier(constituents[0], punctSet);
       if (trimFrontier) {
         int pi = rf.indexOf(parent);
         if (pi == -1) {

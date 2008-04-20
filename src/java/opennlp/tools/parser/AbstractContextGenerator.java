@@ -29,7 +29,7 @@ public abstract class AbstractContextGenerator {
 
   protected boolean zeroBackOff;
   /** Set of punctuation to be used in generating features. */
-  protected Set punctSet;
+  protected Set<String> punctSet;
   protected boolean useLabel;
   
   /**
@@ -104,11 +104,11 @@ public abstract class AbstractContextGenerator {
       production.append(children[ci].getType());
       if (ci+1 != children.length) {
         production.append(",");
-        Collection nextPunct = children[ci].getNextPunctuationSet();
+        Collection<Parse> nextPunct = children[ci].getNextPunctuationSet();
         if (includePunctuation && nextPunct != null) {
           //TODO: make sure multiple punctuation comes out the same 
-          for (Iterator pit=nextPunct.iterator();pit.hasNext();) {
-            Parse punct = (Parse) pit.next();
+          for (Iterator<Parse> pit=nextPunct.iterator();pit.hasNext();) {
+            Parse punct = pit.next();
             production.append(punct.getType()).append(",");
           }
         }
@@ -117,10 +117,10 @@ public abstract class AbstractContextGenerator {
     return production.toString();
   }
    
-  protected void cons2(List features, Cons c0, Cons c1, Collection punct1s, boolean bigram) {
+  protected void cons2(List<String> features, Cons c0, Cons c1, Collection<Parse> punct1s, boolean bigram) {
     if (punct1s != null) {
-      for (Iterator pi=punct1s.iterator();pi.hasNext();) {
-        Parse p = (Parse) pi.next();
+      for (Iterator<Parse> pi = punct1s.iterator();pi.hasNext();) {
+        Parse p = pi.next();
         String punct = punct(p,c1.index);
         String punctbo = punctbo(p,c1.index <= 0 ? c1.index -1 : c1.index);
         //punct(1)
@@ -170,12 +170,13 @@ public abstract class AbstractContextGenerator {
    * @param bigram1 Specifies whether lexical bi-gram features between the first and second node should be generated.
    * @param bigram2 Specifies whether lexical bi-gram features between the second and third node should be generated.
    */
-  protected void cons3(List features, Cons c0, Cons c1, Cons c2, Collection punct1s, Collection punct2s, boolean trigram, boolean bigram1, boolean bigram2) {
+  protected void cons3(List<String> features, Cons c0, Cons c1, Cons c2, Collection<Parse> punct1s, 
+      Collection<Parse> punct2s, boolean trigram, boolean bigram1, boolean bigram2) {
     //  features.add("stage=cons(0),cons(1),cons(2)");
     if (punct1s != null) {
       if (c0.index == -2) {
-        for (Iterator pi=punct1s.iterator();pi.hasNext();) {
-          Parse p = (Parse) pi.next();
+        for (Iterator<Parse> pi=punct1s.iterator();pi.hasNext();) {
+          Parse p = pi.next();
           String punct = punct(p,c1.index);
           String punctbo = punctbo(p,c1.index <= 0 ? c1.index -1 : c1.index);
           //punct(-2)
@@ -189,8 +190,8 @@ public abstract class AbstractContextGenerator {
     }
     if (punct2s != null) {
       if (c2.index == 2) {
-        for (Iterator pi=punct2s.iterator();pi.hasNext();) {
-          Parse p = (Parse) pi.next();
+        for (Iterator<Parse> pi=punct2s.iterator();pi.hasNext();) {
+          Parse p = pi.next();
           String punct = punct(p,c2.index);
           String punctbo = punctbo(p,c2.index <= 0 ? c2.index -1 : c2.index);
           //punct(2)
@@ -203,10 +204,10 @@ public abstract class AbstractContextGenerator {
       }
       if (punct1s != null) {
         //cons(0),punctbo(1),cons(1),punctbo(2),cons(2)
-        for (Iterator pi2=punct2s.iterator();pi2.hasNext();) {
-          String punctbo2 = punctbo((Parse) pi2.next(),c2.index <= 0 ? c2.index -1 : c2.index);
-          for (Iterator pi1=punct1s.iterator();pi1.hasNext();) {
-            String punctbo1 = punctbo((Parse) pi1.next(),c1.index <= 0 ? c1.index -1 : c1.index);
+        for (Iterator<Parse> pi2=punct2s.iterator();pi2.hasNext();) {
+          String punctbo2 = punctbo(pi2.next(),c2.index <= 0 ? c2.index -1 : c2.index);
+          for (Iterator<Parse> pi1=punct1s.iterator();pi1.hasNext();) {
+            String punctbo1 = punctbo(pi1.next(),c1.index <= 0 ? c1.index -1 : c1.index);
             if (trigram) features.add(c0.cons   + "," + punctbo1+","+c1.cons   + "," + punctbo2+","+c2.cons);
             
             if (bigram2) features.add(c0.consbo + "," + punctbo1+","+c1.cons   + "," + punctbo2+","+c2.cons);
@@ -229,8 +230,8 @@ public abstract class AbstractContextGenerator {
       }
       else { //punct1s == null
         //cons(0),cons(1),punctbo(2),cons(2)
-        for (Iterator pi2=punct2s.iterator();pi2.hasNext();) {
-          String punctbo2 = punctbo((Parse) pi2.next(),c2.index <= 0 ? c2.index -1 : c2.index);
+        for (Iterator<Parse> pi2=punct2s.iterator();pi2.hasNext();) {
+          String punctbo2 = punctbo(pi2.next(),c2.index <= 0 ? c2.index -1 : c2.index);
           if (trigram) features.add(c0.cons   + "," + c1.cons   + "," + punctbo2+","+c2.cons);
           
           if (bigram2) features.add(c0.consbo + "," + c1.cons   + ","  + punctbo2+ "," + c2.cons);
@@ -255,8 +256,8 @@ public abstract class AbstractContextGenerator {
     else {
       if (punct1s != null) {
         //cons(0),punctbo(1),cons(1),cons(2)
-        for (Iterator pi1=punct1s.iterator();pi1.hasNext();) {
-          String punctbo1 = punctbo((Parse) pi1.next(),c1.index <= 0 ? c1.index -1 : c1.index);
+        for (Iterator<Parse> pi1=punct1s.iterator();pi1.hasNext();) {
+          String punctbo1 = punctbo(pi1.next(),c1.index <= 0 ? c1.index -1 : c1.index);
           if (trigram) features.add(c0.cons     + "," + punctbo1   +","+ c1.cons   +","+c2.cons);
           
           if (bigram2) features.add(c0.consbo    + "," + punctbo1   +","+ c1.cons   +","+c2.cons);
@@ -297,12 +298,12 @@ public abstract class AbstractContextGenerator {
    * @param punctuation The punctuation adjacent and between the specified surrounding node.
    * @param features A list to which features are added.
    */
-  protected void surround(Parse node, int i, String type, Collection punctuation, List features) {
+  protected void surround(Parse node, int i, String type, Collection<Parse> punctuation, List<String> features) {
     StringBuffer feat = new StringBuffer(20);
     feat.append("s").append(i).append("=");
     if (punctuation !=null) {
-      for (Iterator pi=punctuation.iterator();pi.hasNext();) {
-        Parse punct = (Parse) pi.next();
+      for (Iterator<Parse> pi=punctuation.iterator();pi.hasNext();) {
+        Parse punct = pi.next();
         if (node != null) {
           feat.append(node.getHead().toString()).append("|").append(type).append("|").append(node.getType()).append("|").append(punct.getType());
         }
@@ -356,7 +357,7 @@ public abstract class AbstractContextGenerator {
    * @param type The type of constituent being built.
    * @param features List to add features to.
    */
-  protected void checkcons(Parse child, String i, String type, List features) {
+  protected void checkcons(Parse child, String i, String type, List<String> features) {
     StringBuffer feat = new StringBuffer(20);
     feat.append("c").append(i).append("=").append(child.getType()).append("|").append(child.getHead().toString()).append("|").append(type);
     features.add(feat.toString());
@@ -365,7 +366,7 @@ public abstract class AbstractContextGenerator {
     features.add(feat.toString());
   }
 
-  protected void checkcons(Parse p1, Parse p2, String type, List features) {
+  protected void checkcons(Parse p1, Parse p2, String type, List<String> features) {
     StringBuffer feat = new StringBuffer(20);
     feat.append("cil=").append(type).append(",").append(p1.getType()).append("|").append(p1.getHead().toString()).append(",").append(p2.getType()).append("|").append(p2.getHead().toString());
     features.add(feat.toString());
@@ -387,12 +388,12 @@ public abstract class AbstractContextGenerator {
    * @param rf The current right frontier.
    * @param nodes The array to be populated.
    */
-  protected void getFrontierNodes(List rf, Parse[] nodes) {
+  protected void getFrontierNodes(List<Parse> rf, Parse[] nodes) {
     int leftIndex = 0;
     int prevHeadIndex = -1;
     
     for (int fi=0;fi<rf.size();fi++) {
-      Parse fn = (Parse) rf.get(fi);
+      Parse fn = rf.get(fi);
       int headIndex = fn.getHeadIndex();
       if (headIndex != prevHeadIndex) {
         nodes[leftIndex] = fn;
