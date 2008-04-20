@@ -28,7 +28,7 @@ import java.util.Set;
  *
  * @author      Jason Baldridge
  * @author      Eric D. Friedman
- * @version     $Revision: 1.2 $, $Date: 2008/04/19 15:26:06 $
+ * @version     $Revision: 1.3 $, $Date: 2008/04/20 22:54:38 $
  */
 
 public class DefaultSDContextGenerator implements SDContextGenerator {
@@ -46,6 +46,7 @@ public class DefaultSDContextGenerator implements SDContextGenerator {
    * 
    * @param eosCharacters 
    */
+  @SuppressWarnings("unchecked")
   public DefaultSDContextGenerator(char[] eosCharacters) {
     this(Collections.EMPTY_SET, eosCharacters);
   }
