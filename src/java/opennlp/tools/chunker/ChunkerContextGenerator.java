@@ -5,7 +5,7 @@ import opennlp.tools.util.BeamSearchContextGenerator;
 /**
  * Interface for the context generator used in syntactic chunking.  
  */
-public interface ChunkerContextGenerator extends BeamSearchContextGenerator {
+public interface ChunkerContextGenerator extends BeamSearchContextGenerator<String> {
   
   /**
    * Returns the contexts for chunking of the specified index.
@@ -15,5 +15,5 @@ public interface ChunkerContextGenerator extends BeamSearchContextGenerator {
    * @param preds The previous decisions made in the taging of this sequence.  Only indices less than i will be examined.
    * @return An array of predictive contexts on which a model basis its decisions.
    */
-  public String[] getContext(int i, Object[] toks, String[] tags, String[] preds);
+  public String[] getContext(int i, String[] toks, String[] tags, String[] preds);
 }

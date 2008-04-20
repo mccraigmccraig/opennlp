@@ -89,11 +89,11 @@ public class ChunkerEventStream implements EventStream {
       }
     }
     events = new Event[toks.size()];
-    Object[] toksArray = toks.toArray();
-    String[] tagsArray = (String[]) tags.toArray(new String[tags.size()]);
-    String[] predsArray = (String[]) preds.toArray(new String[preds.size()]);
+    String[] toksArray = toks.toArray(new String[toks.size()]);
+    String[] tagsArray = tags.toArray(new String[tags.size()]);
+    String[] predsArray = preds.toArray(new String[preds.size()]);
     for (int ei = 0, el = events.length; ei < el; ei++) {
-      events[ei] = new Event((String) preds.get(ei), cg.getContext(ei,toksArray,tagsArray,predsArray));
+      events[ei] = new Event(preds.get(ei), cg.getContext(ei,toksArray,tagsArray,predsArray));
     }
   }
 }

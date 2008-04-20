@@ -22,6 +22,7 @@ import java.util.List;
 
 import opennlp.tools.util.featuregen.AdaptiveFeatureGenerator;
 import opennlp.tools.util.featuregen.CachedFeatureGenerator;
+import opennlp.tools.util.featuregen.DefinitionFeatureGenerator;
 import opennlp.tools.util.featuregen.FeatureGeneratorUtil;
 import opennlp.tools.util.featuregen.PreviousMapFeatureGenerator;
 import opennlp.tools.util.featuregen.TokenClassFeatureGenerator;
@@ -38,12 +39,11 @@ public class DefaultNameContextGenerator implements NameContextGenerator {
   
   private AdaptiveFeatureGenerator featureGenerators[];
   
-  private static Object[] prevTokens;
-  private static String[] prevStrings;
   private static AdaptiveFeatureGenerator windowFeatures = new CachedFeatureGenerator(
       new AdaptiveFeatureGenerator[]{
       new WindowFeatureGenerator(new TokenFeatureGenerator(), 2, 2), 
-      new WindowFeatureGenerator(new TokenClassFeatureGenerator(true), 2, 2)
+      new WindowFeatureGenerator(new TokenClassFeatureGenerator(true), 2, 2),
+      new DefinitionFeatureGenerator()
       });
   
   /**
@@ -98,10 +98,6 @@ public class DefaultNameContextGenerator implements NameContextGenerator {
     }
   }
   
-  public String[] getContext(int index, Object[] sequence, String[] priorDecisions, Object[] additionalContext) {
-    return getContext(index,sequence,priorDecisions,(String[][]) additionalContext);
-  }
-
   /**
    * Return the context for finding names at the specified index.
    * @param index The index of the token in the specified toks array for which the context should be constructed. 
@@ -110,36 +106,20 @@ public class DefaultNameContextGenerator implements NameContextGenerator {
    * @param additionalContext Addition features which may be based on a context outside of the sentence. 
    * @return the context for finding names at the specified index.
    */
-  public String[] getContext(int index, Object[] toks, String[] preds, String[][] additionalContext) {
+  public String[] getContext(int index, String[] tokens, String[] preds, Object[] additionalContext) {
     List<String> features = new ArrayList<String>();
-    features.add("def");
-    String[] tokens;
-    if (prevTokens == toks) {
-      tokens = prevStrings;
-    }
-    else {
-      tokens = new String[toks.length];  
-      for (int i = 0; i < toks.length; i++) {
-        tokens[i] = toks[i].toString();
-      }
-      prevTokens = toks;
-      prevStrings = tokens;
-    }
+    
     for (int i = 0; i < featureGenerators.length; i++) {
       featureGenerators[i].createFeatures(features, tokens, index, preds);
-    }    
-    if (additionalContext != null && additionalContext.length != 0) {
-      for (int aci = 0; aci < additionalContext[index].length; aci++) {
-        features.add(additionalContext[index][aci]);
-      }
     }
+    
     if (index == 0) {
       features.add("fwis"); //first word in sentence
     }
     
     //previous outcome features
-    String po=NameFinderME.OTHER;
-    String ppo=NameFinderME.OTHER;
+    String po = NameFinderME.OTHER;
+    String ppo = NameFinderME.OTHER;
 
     if (index > 1){
       ppo = preds[index-2];
@@ -149,17 +129,10 @@ public class DefaultNameContextGenerator implements NameContextGenerator {
       po = preds[index-1];
     }
     features.add("po=" + po);
-    features.add("pow=" + po + "," + toks[index]);
-    features.add("powf=" + po + "," + FeatureGeneratorUtil.tokenFeature(toks[index].toString()));
+    features.add("pow=" + po + "," + tokens[index]);
+    features.add("powf=" + po + "," + FeatureGeneratorUtil.tokenFeature(tokens[index]));
     features.add("ppo=" + ppo);
     
-    //callNum++;  if (callNum % 100000 == 0) { cacheReport(); }
-    return (String[]) features.toArray(new String[features.size()]);
-  }
-  
-  private static int callNum = 0;
-
-  private void cacheReport() {
-    System.err.println(windowFeatures.toString());
+    return features.toArray(new String[features.size()]);
   }
 }

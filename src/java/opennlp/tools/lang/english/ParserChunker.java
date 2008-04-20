@@ -55,7 +55,7 @@ public class ParserChunker extends ChunkerME implements opennlp.tools.parser.Par
   }
 
   public Sequence[] topKSequences(List<String> sentence, List<String> tags) {
-    return beam.bestSequences(beamSize, sentence.toArray(), new Object[] { tags });
+    return beam.bestSequences(beamSize, sentence.toArray(new String[sentence.size()]), new Object[] { tags });
   }
 
   public Sequence[] topKSequences(String[] sentence, String[] tags, double minSequenceScore) {

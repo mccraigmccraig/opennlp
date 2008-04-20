@@ -46,14 +46,14 @@ public class ChunkContextGenerator implements ChunkerContextGenerator {
   
   public String[] getContext(Object o) {
     Object[] data = (Object[]) o;
-    return (getContext(((Integer) data[0]).intValue(), (String[]) data[1], (String[]) data[2], (String[]) data[3]));
+    return getContext(((Integer) data[0]).intValue(), (String[]) data[1], (String[]) data[2], (String[]) data[3]);
   }
     
-  public String[] getContext(int i, Object[] words, String[] prevDecisions, Object[] ac) {
-    return(getContext(i,words,(String[]) ac[0],prevDecisions));
+  public String[] getContext(int i, String[] words, String[] prevDecisions, Object[] ac) {
+    return getContext(i,words,(String[]) ac[0],prevDecisions);
   }
 
-  public String[] getContext(int i, Object[] words, String[] tags, String[] preds) {
+  public String[] getContext(int i, String[] words, String[] tags, String[] preds) {
     List<String> features = new ArrayList<String>(19);
     int x0 = i;
     int x_2 = x0 - 2;

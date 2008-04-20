@@ -24,17 +24,21 @@ import java.util.List;
  */
 public interface Chunker {
   
-  /** Generates chunk tags for the given sequence returning the result in a list.
+  /** 
+   * Generates chunk tags for the given sequence returning the result in a list.
+   * 
    * @param toks a list of the tokens or words of the sequence.
    * @param tags a list of the pos tags of the sequence.
    * @return a list of chunk tags for each token in the sequence.
    */
-  public List chunk(List toks, List tags);
+  public List<String> chunk(List<String> toks, List<String> tags);
   
-  /** Generates chunk tags for the given sequence returning the result in an array.
+  /** 
+   * Generates chunk tags for the given sequence returning the result in an array.
+   * 
    * @param toks an array of the tokens or words of the sequence.
    * @param tags an array of the pos tags of the sequence.
    * @return an array of chunk tags for each token in the sequence.
    */
-  public String[] chunk(Object[] toks, String tags[]);
+  public String[] chunk(String[] toks, String tags[]);
 }

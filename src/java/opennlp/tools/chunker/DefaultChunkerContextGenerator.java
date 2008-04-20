@@ -31,11 +31,11 @@ public class DefaultChunkerContextGenerator implements ChunkerContextGenerator {
   public DefaultChunkerContextGenerator() {
   }
   
-  public String[] getContext(int index, Object[] sequence, String[] priorDecisions, Object[] additionalContext) {
+  public String[] getContext(int index, String[] sequence, String[] priorDecisions, Object[] additionalContext) {
     return getContext(index,sequence,(String[]) additionalContext[0],priorDecisions); 
   }  
   
-  public String[] getContext(int i, Object[] toks, String[] tags, String[] preds) {
+  public String[] getContext(int i, String[] toks, String[] tags, String[] preds) {
 	// Words in a 5-word window
     String w_2, w_1, w0, w1, w2;
     

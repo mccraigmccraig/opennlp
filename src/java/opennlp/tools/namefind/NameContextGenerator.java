@@ -24,7 +24,7 @@ import opennlp.tools.util.featuregen.AdaptiveFeatureGenerator;
  * Interface for generating the context for an name finder by specifying a set of geature generators. 
  *
  */
-public interface NameContextGenerator extends BeamSearchContextGenerator {
+public interface NameContextGenerator extends BeamSearchContextGenerator<String> {
   
   /**
    * Adds a feature generator to this set of feature generators.

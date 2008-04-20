@@ -19,7 +19,6 @@ package opennlp.tools.chunker;
 
 import java.io.FileInputStream;
 import java.io.InputStreamReader;
-import java.util.Arrays;
 import java.util.List;
 
 import opennlp.maxent.GISModel;
@@ -38,7 +37,7 @@ public class ChunkerME implements Chunker {
   private static final int DEFAULT_BEAM_SIZE = 10;
   
   /** The beam used to search for sequences of chunk tag assignments. */
-  protected BeamSearch beam;
+  protected BeamSearch<String> beam;
   
   private Sequence bestSequence;
   
@@ -75,17 +74,17 @@ public class ChunkerME implements Chunker {
   }
 
   /* inherieted javadoc */
-  public List chunk(List toks, List tags) {
+  public List<String> chunk(List<String> toks, List<String> tags) {
     bestSequence =
-        beam.bestSequence(toks, new Object[] { (String[]) tags.toArray(new String[tags.size()]) });
+        beam.bestSequence(toks.toArray(new String[toks.size()]), new Object[] { (String[]) tags.toArray(new String[tags.size()]) });
     return bestSequence.getOutcomes();
   }
   
   /* inherieted javadoc */
-  public String[] chunk(Object[] toks, String[] tags) {
-    bestSequence = beam.bestSequence(Arrays.asList(toks), new Object[] {tags});
-    List c = bestSequence.getOutcomes();
-    return (String[]) c.toArray(new String[c.size()]);
+  public String[] chunk(String[] toks, String[] tags) {
+    bestSequence = beam.bestSequence(toks, new Object[] {tags});
+    List<String> c = bestSequence.getOutcomes();
+    return c.toArray(new String[c.size()]);
   }
  
   /** 
@@ -104,13 +103,13 @@ public class ChunkerME implements Chunker {
    * the common beam search code. 
    *
    */
-  class ChunkBeamSearch extends BeamSearch {
+  class ChunkBeamSearch extends BeamSearch<String> {
     
     ChunkBeamSearch(int size, ChunkerContextGenerator cg, MaxentModel model) {
       super(size, cg, model);
     }
     
-    protected boolean validSequence(int i, Object[] sequence, String[] s, String outcome) {
+    protected boolean validSequence(int i, String[] sequence, String[] s, String outcome) {
       return validOutcome(outcome, s);
     }
   }

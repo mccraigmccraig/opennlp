@@ -45,7 +45,7 @@ public class NameFinderME implements TokenNameFinder {
    * Implementation of the abstract beam search to allow the name finder to use
    * the common beam search code.
    */
-  private class NameBeamSearch extends BeamSearch {
+  private class NameBeamSearch extends BeamSearch<String> {
 
     /**
      * Creams a beam search of the specified size sing the specified model with
@@ -73,7 +73,7 @@ public class NameFinderME implements TokenNameFinder {
      * @param inputSequence The preceding sequence of outcomes assignments.
      * @return true is the outcome is valid for the sequence, false otherwise.
      */
-    protected boolean validSequence(int size, Object[] inputSequence,
+    protected boolean validSequence(int size, String[] inputSequence,
         String[] outcomesSequence, String outcome) {
       if (outcome.equals(CONTINUE)) {
         int li = outcomesSequence.length - 1;
@@ -94,7 +94,7 @@ public class NameFinderME implements TokenNameFinder {
   protected MaxentModel model;
   protected NameContextGenerator contextGenerator;
   private Sequence bestSequence;
-  private BeamSearch beam;
+  private BeamSearch<String> beam;
 
   private AdditionalContextFeatureGenerator additionalContextFeatureGenerator =
       new AdditionalContextFeatureGenerator();
