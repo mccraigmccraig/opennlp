@@ -19,6 +19,7 @@ package opennlp.tools.parser;
 
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedHashSet;
@@ -33,7 +34,7 @@ import opennlp.tools.util.Span;
 
 /** Data structure for holding parse constitents. */
 public class Parse implements Cloneable, Comparable<Parse> {
-  /** The text string on which this parse is based.  This object is shared amonung all parses for the same sentence. */
+  /** The text string on which this parse is based.  This object is shared among all parses for the same sentence. */
   private String text;
   /** The character offsets into the text for this constituent. */
   private Span span;
@@ -67,7 +68,7 @@ public class Parse implements Cloneable, Comparable<Parse> {
   /** The set of punctuation parses which are between this parse and the subsequent parse. */
   private Collection<Parse> nextPunctSet;
   
-  /** Specifies whether constituent lables should include parts specifiedi after minus character. */
+  /** Specifies whether constituent labels should include parts specified after minus character. */
   private static boolean useFunctionTags;
   
   /**
@@ -111,7 +112,10 @@ public class Parse implements Cloneable, Comparable<Parse> {
   @Override
   public Object clone() {
     Parse p = new Parse(this.text, this.span, this.type, this.prob, this.head);
-    p.parts = (List) ((LinkedList) this.parts).clone();
+    p.parts = new LinkedList<Parse>();
+      
+    Collections.copy(p.parts, this.parts);
+    
     if (derivation != null) {
       p.derivation = new StringBuffer(100);
       p.derivation.append(this.derivation.toString());
@@ -122,7 +126,7 @@ public class Parse implements Cloneable, Comparable<Parse> {
   
   /**
    * Clones the right frontier of parse up to the specified node.
-   * @param node The last node in the right frontier of the parse tree whihc should be cloned.
+   * @param node The last node in the right frontier of the parse tree which should be cloned.
    * @return A clone of this parse and its right frontier up to and including the specified node.
    */
   public Parse clone(Parse node) {
