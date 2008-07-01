@@ -96,7 +96,7 @@ public class GenderModel implements TestGenderModel, TrainSimilarityModel {
   }
 
   private List<String> getFeatures(Context np1) {
-    List<String> features = new ArrayList();
+    List<String> features = new ArrayList<String>();
     features.add("default");
     for (int ti = 0, tl = np1.getHeadTokenIndex(); ti < tl; ti++) {
       features.add("mw=" + np1.getTokens()[ti].toString());
