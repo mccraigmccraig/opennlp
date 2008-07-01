@@ -6,7 +6,10 @@ import java.util.List;
 import opennlp.maxent.DataStream;
 import opennlp.tools.util.Span;
 
-// gets tagged string as input and outputs a name sample
+/**
+ * The {@link NameSampleDataStream} class converts tagged {@link String}s
+ * provided by a {@link DataStream} to {@link NameSample} objects.
+ */
 public class NameSampleDataStream implements NameSampleStream {
 
   public static final String START_TAG = "<START>";
