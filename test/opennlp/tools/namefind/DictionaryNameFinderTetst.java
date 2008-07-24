@@ -19,9 +19,9 @@
 package opennlp.tools.namefind;
 
 import opennlp.tools.dictionary.Dictionary;
-import opennlp.tools.ngram.TokenList;
 import opennlp.tools.tokenize.SimpleTokenizer;
 import opennlp.tools.util.Span;
+import opennlp.tools.util.StringList;
 import junit.framework.TestCase;
 
 /**
@@ -34,15 +34,15 @@ public class DictionaryNameFinderTetst extends TestCase {
   
   public DictionaryNameFinderTetst() {
     
-    TokenList vanessa = new TokenList(new String[]{"Vanessa"});
+    StringList vanessa = new StringList(new String[]{"Vanessa"});
     mDictionary.put(vanessa);
     
-    TokenList vanessaWilliams = new 
-        TokenList(new String[]{"Vanessa", 
+    StringList vanessaWilliams = new 
+        StringList(new String[]{"Vanessa", 
         "Williams"});
     mDictionary.put(vanessaWilliams);
     
-    TokenList max = new TokenList(new String[]{"Max"});
+    StringList max = new StringList(new String[]{"Max"});
     mDictionary.put(max);
   }
   
