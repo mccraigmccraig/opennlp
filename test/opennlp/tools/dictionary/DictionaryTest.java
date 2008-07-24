@@ -24,8 +24,8 @@ import java.io.IOException;
 import java.io.StringReader;
 
 import opennlp.tools.dictionary.Dictionary;
-import opennlp.tools.ngram.TokenList;
 import opennlp.tools.util.InvalidFormatException;
+import opennlp.tools.util.StringList;
 
 import junit.framework.TestCase;
 
@@ -39,8 +39,8 @@ public class DictionaryTest extends TestCase  {
    */
   public void testLookup() {
     
-    TokenList entry1 = new TokenList(new String[]{"1a", "1b"});
-    TokenList entry2 = new TokenList(new String[]{"1A", "1C"});
+    StringList entry1 = new StringList(new String[]{"1a", "1b"});
+    StringList entry2 = new StringList(new String[]{"1A", "1C"});
     
     Dictionary dict = new Dictionary();
 
@@ -64,7 +64,7 @@ public class DictionaryTest extends TestCase  {
     String a3 = "a3";
     String a5 = "a5";
     
-    reference.put(new TokenList(new String[]{a1, a2, a3, a5,}));
+    reference.put(new StringList(new String[]{a1, a2, a3, a5,}));
     
     ByteArrayOutputStream out = new ByteArrayOutputStream();
     
@@ -92,24 +92,24 @@ public class DictionaryTest extends TestCase  {
     assertTrue(dictionay.size() == 4);
     
     assertTrue(dictionay.contains(
-        new TokenList(new String[]{"1a", "1b", "1c", "1d"})));
+        new StringList(new String[]{"1a", "1b", "1c", "1d"})));
 
     assertTrue(dictionay.contains(
-        new TokenList(new String[]{"2a", "2b", "2c"})));
+        new StringList(new String[]{"2a", "2b", "2c"})));
 
     assertTrue(dictionay.contains(
-        new TokenList(new String[]{"3a"})));
+        new StringList(new String[]{"3a"})));
 
     assertTrue(dictionay.contains(
-        new TokenList(new String[]{"4a", "4b"})));
+        new StringList(new String[]{"4a", "4b"})));
   }
   
   /**
    * Tests for the {@link Dictionary#equals(Object)} method.
    */
   public void testEquals() {
-    TokenList entry1 = new TokenList(new String[]{"1a", "1b"});
-    TokenList entry2 = new TokenList(new String[]{"2a", "2b"});
+    StringList entry1 = new StringList(new String[]{"1a", "1b"});
+    StringList entry2 = new StringList(new String[]{"2a", "2b"});
     
     Dictionary dictA = new Dictionary();
     dictA.put(entry1);
@@ -126,7 +126,7 @@ public class DictionaryTest extends TestCase  {
    * Tests the {@link Dictionary#hashCode()} method.
    */
   public void testHashCode() {
-    TokenList entry1 = new TokenList(new String[]{"1a", "1b"});
+    StringList entry1 = new StringList(new String[]{"1a", "1b"});
     
     Dictionary dictA = new Dictionary();
     dictA.put(entry1);
@@ -141,7 +141,7 @@ public class DictionaryTest extends TestCase  {
    * Tests for the {@link Dictionary#toString()} method.
    */
   public void testToString() {
-    TokenList entry1 = new TokenList(new String[]{"1a", "1b"});
+    StringList entry1 = new StringList(new String[]{"1a", "1b"});
     
     Dictionary dictA = new Dictionary();
 
@@ -157,8 +157,8 @@ public class DictionaryTest extends TestCase  {
    */
   public void testDifferentCaseLookup() {
     
-    TokenList entry1 = new TokenList(new String[]{"1a", "1b"});
-    TokenList entry2 = new TokenList(new String[]{"1A", "1B"});
+    StringList entry1 = new StringList(new String[]{"1a", "1b"});
+    StringList entry2 = new StringList(new String[]{"1A", "1B"});
     
     Dictionary dict = new Dictionary();
 
