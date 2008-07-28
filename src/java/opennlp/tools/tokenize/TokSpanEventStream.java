@@ -19,56 +19,76 @@
 package opennlp.tools.tokenize;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import opennlp.maxent.Event;
-import opennlp.maxent.EventStream;
+import opennlp.tools.util.AbstractEventStream;
 import opennlp.tools.util.Span;
 
-
-/** An implementation of EventStream which allows events to be added by 
- *  offset and returns events for these offset-based tokens.
+/**
+ * This class reads the {@link TokenSample}s from the given {@link Iterator}
+ * and converts the {@link TokenSample}s into {@link Event}s which
+ * can be used by the maxent library for training.
  */
-public class TokSpanEventStream implements EventStream {
+public class TokSpanEventStream extends AbstractEventStream<TokenSample> {
 
+  private static Logger logger = Logger.getLogger(TokSpanEventStream.class.getName());
+  
   private TokenContextGenerator cg;
-  private List<Event> events;
-  private int eventIndex;
+  
   private boolean skipAlphaNumerics;
 
   /**
    * Initializes the current instance.
    * 
+   * @param tokenSamples
    * @param skipAlphaNumerics
    * @param cg
    */
-  public TokSpanEventStream(boolean skipAlphaNumerics, TokenContextGenerator cg) {
+  public TokSpanEventStream(Iterator<TokenSample> tokenSamples, 
+        boolean skipAlphaNumerics, TokenContextGenerator cg) {
+    super(tokenSamples);
+    
     this.skipAlphaNumerics = skipAlphaNumerics;
-    events = new ArrayList<Event>(50);
-    eventIndex = 0;
     this.cg = cg;
   }
   
   /**
    * Initializes the current instance.
    * 
+   * @param tokenSamples
    * @param skipAlphaNumerics
    */
-  public TokSpanEventStream(boolean skipAlphaNumerics) {
-    this(skipAlphaNumerics, new DefaultTokenContextGenerator());
+  public TokSpanEventStream(Iterator<TokenSample> tokenSamples, 
+      boolean skipAlphaNumerics) {
+    this(tokenSamples, skipAlphaNumerics, new DefaultTokenContextGenerator());
   }
 
   /**
    * Adds training events to the event stream for each of the specified tokens.
-   * @param tokens charachter offsets into the specified text.
+   * 
+   * @param tokens character offsets into the specified text.
    * @param text The text of the tokens.
    */
-  public void addEvents(Span[] tokens, String text) {
+  protected Iterator<Event> createEvents(TokenSample tokenSample) {
+
+    List<Event> events = new ArrayList<Event>(50);
+    
+    Span tokens[] = tokenSample.getTokenSpans();
+    String text = tokenSample.getText();
+    
     if (tokens.length > 0) {
+      
       int start = tokens[0].getStart();
       int end = tokens[tokens.length - 1].getEnd();
+      
       String sent = text.substring(start, end);
+      
       Span[] candTokens = WhitespaceTokenizer.INSTANCE.tokenizePos(sent);
+      
       int firstTrainingToken = -1;
       int lastTrainingToken = -1;
       for (int ci = 0; ci < candTokens.length; ci++) {
@@ -97,42 +117,35 @@ public class TokSpanEventStream implements EventStream {
               //keep looking
             }
             else {
-              System.err.println(
-                "Bad training token: " + tokens[ti] + " cand: " + cSpan+" token="+text.substring(tokens[ti].getStart(),tokens[ti].getEnd()));
+              System.err.println();
+              if (logger.isLoggable(Level.WARNING)) {
+                logger.warning("Bad training token: " + tokens[ti] + " cand: " + cSpan + 
+                    " token="+text.substring(tokens[ti].getStart(), tokens[ti].getEnd()));
+              }
             }
           }
+          
           // create training data
-          //System.err.println("astart="+astart+" valid="+valid);
           if (foundTrainingTokens) {
+            
             for (int ti = firstTrainingToken; ti <= lastTrainingToken; ti++) {
               Span tSpan = tokens[ti];
               int cStart = cSpan.getStart();
               for (int i = tSpan.getStart() + 1; i < tSpan.getEnd(); i++) {
                 String[] context = cg.getContext(ctok, i - cStart);
-                events.add(new Event(DefaultTokenContextGenerator.NO_SPLIT, context));
+                events.add(new Event(TokenizerME.NO_SPLIT, context));
               }
+              
               if (tSpan.getEnd() != cSpan.getEnd()) {
                 String[] context = cg.getContext(ctok, tSpan.getEnd() - cStart);
-                events.add(new Event(DefaultTokenContextGenerator.SPLIT, context));
+                events.add(new Event(TokenizerME.SPLIT, context));
               }
             }
           }
         }
       }
     }
-  }
-
-  public boolean hasNext() {
-    return eventIndex < events.size();
-  }
-
-  public Event nextEvent() {
-    Event e = (Event) events.get(eventIndex);
-    eventIndex++;
-    if (eventIndex == events.size()) {
-      events.clear();
-      eventIndex = 0;
-    }
-    return e;
+    
+    return events.iterator();
   }
 }

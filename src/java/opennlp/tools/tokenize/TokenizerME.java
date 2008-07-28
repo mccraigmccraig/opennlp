@@ -39,11 +39,20 @@ import opennlp.tools.util.Span;
  * homepage: <http://www.cis.upenn.edu/~jcreynar>.
  *
  * @author      Tom Morton
- * @version $Revision: 1.22 $, $Date: 2008/04/19 15:06:12 $
+ * @version $Revision: 1.23 $, $Date: 2008/07/28 15:41:36 $
  */
-
 public class TokenizerME extends AbstractTokenizer {
 
+  /**
+   * Constant indicates a token split.
+   */
+  public static final String SPLIT ="T";
+  
+  /**
+   * Constant indicates no token split.
+   */
+  public static final String NO_SPLIT ="F";
+  
   /**
    * The maximum entropy model to use to evaluate contexts.
    */
@@ -132,7 +141,7 @@ public class TokenizerME extends AbstractTokenizer {
           String best = model.getBestOutcome(probs);
           //System.err.println("TokenizerME: "+tok.substring(0,j-origStart)+"^"+tok.substring(j-origStart)+" "+best+" "+probs[model.getIndex(best)]);
           tokenProb *= probs[model.getIndex(best)];
-          if (best.equals(DefaultTokenContextGenerator.SPLIT)) {
+          if (best.equals(TokenizerME.SPLIT)) {
             newTokens.add(new Span(start, j));
             tokProbs.add(new Double(tokenProb));
             start = j;
@@ -148,40 +157,6 @@ public class TokenizerME extends AbstractTokenizer {
     newTokens.toArray(spans);
     return spans;
   }
-
-//  /** Constructs a list of Span objects, one for each whitespace
-//   * delimited token. Token strings can be constructed form these
-//   * spans as follows: d.substring(span.getStart(),span.getEnd());
-//   * @param d string to tokenize.
-//   * @return List is spans.
-//   **/
-//  public static Span[] split(String d) {
-//    int tokStart = -1;
-//    List tokens = new ArrayList();
-//    boolean inTok = false;
-//
-//    //gather up potential tokens
-//    int end = d.length();
-//    for (int i = 0; i < end; i++) {
-//      if (Character.isWhitespace(d.charAt(i))) {
-//        if (inTok) {
-//          tokens.add(new Span(tokStart, i));
-//          inTok = false;
-//          tokStart = -1;
-//        }
-//      }
-//      else {
-//        if (!inTok) {
-//          tokStart = i;
-//          inTok = true;
-//        }
-//      }
-//    }
-//    if (inTok) {
-//      tokens.add(new Span(tokStart, end));
-//    }
-//    return (Span[]) tokens.toArray(new Span[tokens.size()]);
-//  }
 
   /**
    * Trains the {@link TokenizerME}, use this to create a new model.

@@ -25,20 +25,9 @@ import java.util.List;
  * Generate events for maxent decisions for tokenization.
  *
  * @author      Jason Baldridge
- * @version     $Revision: 1.2 $, $Date: 2008/04/19 15:03:54 $
+ * @version     $Revision: 1.3 $, $Date: 2008/07/28 15:41:36 $
  */
-
 public class DefaultTokenContextGenerator implements TokenContextGenerator {
-
-  /**
-   * Constant indicates a token split.
-   */
-  public static final String SPLIT ="T";
-  
-  /**
-   * Constant indicates no token split.
-   */
-  public static final String NO_SPLIT ="F";
 
   /* (non-Javadoc)
    * @see opennlp.tools.tokenize.TokenContextGenerator#getContext(java.lang.String, int)
