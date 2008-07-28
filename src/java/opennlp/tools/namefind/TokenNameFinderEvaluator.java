@@ -17,6 +17,9 @@
 //////////////////////////////////////////////////////////////////////////////
 package opennlp.tools.namefind;
 
+import java.util.Iterator;
+
+import opennlp.tools.util.EvaluatorUtil;
 import opennlp.tools.util.Mean;
 import opennlp.tools.util.Span;
 
@@ -54,8 +57,7 @@ public class TokenNameFinderEvaluator {
    * Initializes the current instance with the given 
    * {@link TokenNameFinder}. 
    * 
-   * @param nameFinder the {@link TokenNameFinder} which should
-   * be used to create the predicted {@link NameSample}s.
+   * @param nameFinder the {@link TokenNameFinder} to evaluate.
    */
   public TokenNameFinderEvaluator(TokenNameFinder nameFinder) {
     this.nameFinder = nameFinder;
@@ -68,72 +70,21 @@ public class TokenNameFinderEvaluator {
    * {@link TokenNameFinder} in the sentence from the reference 
    * {@link NameSample}. The found names are then used to
    * calculate and update the scores.
+   * 
+   * @param reference the reference {@link NameSample}.
    */
   public void evaluateSample(NameSample reference) {
     
-    String sentence[] = reference.getSentence();
+    Span predictedNames[] = nameFinder.find(reference.getSentence());
     
-    Span predictedNames[] = nameFinder.find(sentence);
-    
-    Span referenceNames[] = reference.getNames();
-    
-    // The reference name is used to lookup
-    // the corresponding predicted name.
-    // If the lookup was successful the predicted name
-    // is counted as true positive
-    // If the lookup failed the predicted name is counted
-    // as false negative
-    
-    int truePositives = 0;
-    int falseNegatives = 0;
-    
-    // Maybe a map should be used to improve performance on long sentences
-    for (int referenceIndex = 0; referenceIndex < referenceNames.length; 
-        referenceIndex++) {
-      
-      Span referenceName = referenceNames[referenceIndex];
-      
-      for (int predictedIndex = 0; predictedIndex < predictedNames.length; 
-          predictedIndex++) {
-        if (referenceName.equals(predictedNames[predictedIndex])) {
-          truePositives++;
-        }
-        else {
-          falseNegatives++;
-        }
-      }
+    if (predictedNames.length > 0) {
+      precisionScore.add(EvaluatorUtil.precision(reference.getNames(), 
+          predictedNames));
     }
     
-    // Each predicted name is used to lookup the
-    // corresponding reference name.
-    // If the lookup fails the predicted name is counted
-    // as false positive
-    
-    int falsePositives = 0;
-    
-    for (int predictedIndex = 0; predictedIndex < predictedNames.length; 
-        predictedIndex++) {
-      
-      Span predictedName = predictedNames[predictedIndex];
-      
-      for (int referenceIndex = 0; referenceIndex < referenceNames.length; 
-          referenceIndex++) {
-        if (!predictedName.equals(referenceNames[referenceIndex])) {
-          falsePositives++;
-        }
-      }
-    }
-    
-    // calculate and update the scores
-    if (truePositives + falsePositives > 0) {
-      
-      double precisionScoreValue = truePositives / 
-          (truePositives + falsePositives);
-      precisionScore.add(precisionScoreValue);
-          
-      double recallScoreValue = truePositives / 
-          (truePositives + falseNegatives);
-      recallScore.add(recallScoreValue);
+    if (reference.getNames().length > 0) {
+      recallScore.add(EvaluatorUtil.recall(reference.getNames(), 
+          predictedNames));
     }
   }
   
@@ -145,7 +96,7 @@ public class TokenNameFinderEvaluator {
    * @param nameSamples the stream of reference {@link NameSample} which
    * should be evaluated.
    */
-  public void evaluate(NameSampleStream nameSamples) {
+  public void evaluate(Iterator<NameSample> nameSamples) {
     while (nameSamples.hasNext()) {
       evaluateSample(nameSamples.next());
     }
@@ -176,7 +127,7 @@ public class TokenNameFinderEvaluator {
    */
   @Override
   public String toString() {
-    // print out both scores, and number of evaluated name samples
-    return super.toString();
+    return "Precision: " + Double.toString(getPrecisionScore()) + "\n" +
+        " Recall: " + Double.toString(getRecallScore());
   }
 }
