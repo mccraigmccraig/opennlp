@@ -1,6 +1,7 @@
 package opennlp.tools.namefind;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 
 import opennlp.maxent.DataStream;
@@ -10,7 +11,7 @@ import opennlp.tools.util.Span;
  * The {@link NameSampleDataStream} class converts tagged {@link String}s
  * provided by a {@link DataStream} to {@link NameSample} objects.
  */
-public class NameSampleDataStream implements NameSampleStream {
+public class NameSampleDataStream implements Iterator<NameSample> {
 
   public static final String START_TAG = "<START>";
 
@@ -62,5 +63,9 @@ public class NameSampleDataStream implements NameSampleStream {
     String[] sentence = (String[]) tokenList.toArray(new String[tokenList.size()]);
     Span[] names = (Span[]) nameList.toArray(new Span[nameList.size()]);
     return new NameSample(sentence,names,sentence.length==0);
+  }
+  
+  public void remove() {
+    throw new UnsupportedOperationException();
   }
 }

@@ -19,7 +19,7 @@ import opennlp.tools.util.featuregen.WindowFeatureGenerator;
  */
 public class NameFinderEventStream implements EventStream {
 
-  private NameSampleStream nameSampleStream;
+  private Iterator<NameSample> nameSampleStream;
 
   private Iterator<Event> events = Collections.EMPTY_LIST.iterator();
 
@@ -32,13 +32,13 @@ public class NameFinderEventStream implements EventStream {
    * @param dataStream The data stream of events.
    * @param contextGenerator The context generator used to generate features for the event stream.
    */
-  public NameFinderEventStream(NameSampleStream dataStream, NameContextGenerator contextGenerator) {
+  public NameFinderEventStream(Iterator<NameSample> dataStream, NameContextGenerator contextGenerator) {
     this.nameSampleStream = dataStream;
     this.contextGenerator = contextGenerator;
     this.contextGenerator.addFeatureGenerator(new WindowFeatureGenerator(additionalContextFeatureGenerator, 8, 8));
   }
 
-  public NameFinderEventStream(NameSampleStream dataStream) {
+  public NameFinderEventStream(Iterator<NameSample> dataStream) {
     this(dataStream, new DefaultNameContextGenerator());
   }
   
@@ -76,6 +76,11 @@ public class NameFinderEventStream implements EventStream {
   }
     
   private void createNewEvents() {
+    
+    // TODO: the iterator of the new events can be empty
+    // create as long new events as there are events
+    // or the name sample stream is empty
+    
     if (nameSampleStream.hasNext()) {
       NameSample sample = nameSampleStream.next();
       while (sample.isClearAdaptiveDataSet()) {
@@ -110,7 +115,7 @@ public class NameFinderEventStream implements EventStream {
       return true;
     } else {
       createNewEvents();
-
+      
       return events.hasNext();
     }
   }
@@ -125,12 +130,11 @@ public class NameFinderEventStream implements EventStream {
     return (Event) events.next();
   }
     
-    
   /**
    * Generated previous decision features for each token based on contents of the specified map.
    * @param tokens The token for which the context is generated.
    * @param prevMap A mapping of tokens to their previous decisions.
-   * @return An additional context arrary with features for each token.
+   * @return An additional context array with features for each token.
    */
   public static String[][] additionalContext(String[] tokens, Map<String, String> prevMap) {
     String[][] ac = new String[tokens.length][1];
