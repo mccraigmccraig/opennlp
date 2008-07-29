@@ -15,6 +15,7 @@
 //License along with this program; if not, write to the Free Software
 //Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 //////////////////////////////////////////////////////////////////////////////
+
 package opennlp.tools.tokenize;
 
 import opennlp.tools.util.Span;
@@ -34,9 +35,17 @@ public class TokenSample {
    * @param text the text which contains the tokens.
    * @param tokenSpans the spans which mark the begin and end of the tokens.
    */
-  TokenSample(String text, Span tokenSpans[]) {
+  public TokenSample(String text, Span tokenSpans[]) {
     this.text = text;
     this.tokenSpans = tokenSpans;
+    
+    for (int i = 0; i < tokenSpans.length; i++) {
+      if (tokenSpans[i].getStart() < 0 || tokenSpans[i].getStart() > text.length() ||
+          tokenSpans[i].getEnd() > text.length() || tokenSpans[i].getEnd() < 0) {
+        throw new IllegalArgumentException("Span " + tokenSpans[i].toString() + 
+            " is out of bounds!");
+      }
+    }
   }
   
   /**
