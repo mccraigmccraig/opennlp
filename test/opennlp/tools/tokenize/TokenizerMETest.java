@@ -27,6 +27,13 @@ import opennlp.maxent.GIS;
 import opennlp.maxent.MaxentModel;
 import opennlp.tools.util.Span;
 
+/**
+ * Tests for the {@link TokenizerME} class.
+ * 
+ * This test trains the tokenizer with a few sample tokens
+ * and then predicts a token. This test checks if the
+ * tokenizer code can be executed.
+ */
 public class TokenizerMETest extends TestCase {
 
   public void testTokenizer() {
@@ -48,13 +55,13 @@ public class TokenizerMETest extends TestCase {
         new Span(0, 3),
         new Span(3, 4)}));
     
-    EventStream es = new TokSpanEventStream(samples.iterator(), false);
+    EventStream es = new TokSpanEventStream(samples.iterator(), true);
     
     MaxentModel tokenizerModel = GIS.trainModel(es);
     
     
     TokenizerME tokenizer = new TokenizerME(tokenizerModel);
-    tokenizer.setAlphaNumericOptimization(false);
+    tokenizer.setAlphaNumericOptimization(true);
     
     String tokens[] = tokenizer.tokenize("test,");
     
