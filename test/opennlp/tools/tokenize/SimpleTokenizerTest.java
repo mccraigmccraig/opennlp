@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////////
-//Copyright (C) 2006 Calcucare GmbH
+//Copyright (C) 2008 OpenNlp
 // 
 //This library is free software; you can redistribute it and/or
 //modify it under the terms of the GNU Lesser General Public
@@ -16,23 +16,20 @@
 //Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 //////////////////////////////////////////////////////////////////////////////
 
-package opennlp.tools.tokenizer;
+package opennlp.tools.tokenize;
 
 import junit.framework.TestCase;
 import opennlp.tools.tokenize.SimpleTokenizer;
 
 /**
  * Tests for the {@link SimpleTokenizer} class.
- * 
- * @author <a href="mailto:kottmann@gmail.com">Joern Kottmann</a>
- * @version $Revision: 1.2 $, $Date: 2006/11/17 10:52:07 $
  */
 public class SimpleTokenizerTest extends TestCase {
   
   private SimpleTokenizer mTokenizer = new SimpleTokenizer();
   
   /**
-   * Tests if it can tokenize whitespace seperated tokens.
+   * Tests if it can tokenize whitespace separated tokens.
    */
   public void testWhitespaceTokenization() {
     
