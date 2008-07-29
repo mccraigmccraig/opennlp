@@ -21,6 +21,7 @@ public class NameFinderEventStream implements EventStream {
 
   private Iterator<NameSample> nameSampleStream;
 
+  @SuppressWarnings("unchecked")
   private Iterator<Event> events = Collections.EMPTY_LIST.iterator();
 
   private NameContextGenerator contextGenerator;

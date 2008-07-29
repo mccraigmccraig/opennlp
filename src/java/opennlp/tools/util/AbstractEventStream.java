@@ -33,6 +33,7 @@ public abstract class AbstractEventStream<T> implements EventStream {
 
   private Iterator<T> samples;
   
+  @SuppressWarnings("unchecked")
   private Iterator<Event> events = Collections.EMPTY_LIST.iterator();;
   
   /**
