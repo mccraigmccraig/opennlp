@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////////
-//Copyright (C) 2007 OpenNlp
+//Copyright (C) 2008 OpenNlp
 // 
 //This library is free software; you can redistribute it and/or
 //modify it under the terms of the GNU Lesser General Public
@@ -15,8 +15,10 @@
 //License along with this program; if not, write to the Free Software
 //Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 //////////////////////////////////////////////////////////////////////////////
+
 package opennlp.tools.util;
 
+import java.util.Collections;
 import java.util.Iterator;
 
 import opennlp.maxent.Event;
@@ -31,7 +33,7 @@ public abstract class AbstractEventStream<T> implements EventStream {
 
   private Iterator<T> samples;
   
-  private Iterator<Event> events;
+  private Iterator<Event> events = Collections.EMPTY_LIST.iterator();;
   
   /**
    * Initializes the current instance with a sample {@link Iterator}.
