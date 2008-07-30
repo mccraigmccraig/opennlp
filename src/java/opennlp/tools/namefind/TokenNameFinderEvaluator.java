@@ -34,6 +34,8 @@ import opennlp.tools.util.Span;
  * scores calculated for each reference {@link NameSample} and
  * the arithmetic mean of the recall scores calculated for
  * each reference {@link NameSample}.
+ * 
+ * @see TokenNameFinder
  */
 public class TokenNameFinderEvaluator {
   

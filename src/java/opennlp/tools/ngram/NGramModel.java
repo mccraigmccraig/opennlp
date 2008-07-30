@@ -36,6 +36,8 @@ import opennlp.tools.util.StringList;
 
 /**
  * The {@link NGramModel} can be used to crate ngrams and character ngrams.
+ * 
+ * @see StringList
  */
 public class NGramModel {
   

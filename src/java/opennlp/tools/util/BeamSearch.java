@@ -24,7 +24,10 @@ import opennlp.maxent.MaxentModel;
 
 /** 
  * Performs k-best search over sequence.  This is based on the description in
- * Ratnaparkhi (1998), PhD diss, Univ. of Pennsylvania. 
+ * Ratnaparkhi (1998), PhD diss, Univ. of Pennsylvania.
+ * 
+ * @see Sequence
+ * @see BeamSearchContextGenerator
  */
 public class BeamSearch<T> {
 
