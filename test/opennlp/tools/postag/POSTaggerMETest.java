@@ -15,18 +15,18 @@
 //License along with this program; if not, write to the Free Software
 //Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 //////////////////////////////////////////////////////////////////////////////
+
 package opennlp.tools.postag;
 
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 
+import junit.framework.TestCase;
 import opennlp.maxent.EventStream;
 import opennlp.maxent.GIS;
 import opennlp.maxent.MaxentModel;
 import opennlp.maxent.PlainTextByLineDataStream;
-import junit.framework.TestCase;
 
 /**
  * Tests for the {@link POSTaggerME} class.
@@ -38,8 +38,8 @@ public class POSTaggerMETest extends TestCase {
     InputStream in = getClass().getClassLoader().getResourceAsStream(
     "opennlp/tools/postag/AnnotatedSentences.txt");
     
-    EventStream es = new POSEventStream(new PlainTextByLineDataStream(
-        new InputStreamReader(in)));
+    EventStream es = new POSEventStreamNew(new WordTagSampleStream(new PlainTextByLineDataStream(
+        new InputStreamReader(in))));
     
     MaxentModel posModel = GIS.trainModel(es);
     
