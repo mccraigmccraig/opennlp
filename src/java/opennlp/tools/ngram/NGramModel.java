@@ -1,5 +1,6 @@
 ///////////////////////////////////////////////////////////////////////////////
-// 
+//Copyright (C) 2008 OpenNlp
+//
 //This library is free software; you can redistribute it and/or
 //modify it under the terms of the GNU Lesser General Public
 //License as published by the Free Software Foundation; either
@@ -35,9 +36,6 @@ import opennlp.tools.util.StringList;
 
 /**
  * The {@link NGramModel} can be used to crate ngrams and character ngrams.
- * 
- * @author <a href="mailto:kottmann@gmail.com">Joern Kottmann</a>
- * @version $Revision: 1.11 $, $Date: 2008/04/19 22:24:29 $
  */
 public class NGramModel {
   
@@ -262,28 +260,16 @@ public class NGramModel {
     }
   }
   
-//  public double likelihood(NGramModel model) {
-//    double frequenceSum = 0;
-//    
-//    int numberOfReferneceGrams = numberOfGrams();
-//    
-//    for (Iterator it = model.iterator(); it.hasNext();) {
-//      
-//      TokenList ngram = (TokenList) it.next();
-//      
-//      if (contains(ngram)) {
-//        double referenceNgramFrequence = 
-//            (double) getCount(ngram) / 
-//            (double) numberOfReferneceGrams;
-//        
-//        frequenceSum += referenceNgramFrequence * model.getCount(ngram);
-//      }
-//    }
-//    
-//    return frequenceSum;
-//  }
-  
-  
+  /**
+   * Creates a dictionary which contain all {@link StringList} which
+   * are in the current {@link NGramModel}.
+   * 
+   * Entries which are only different in the case are merged into one.
+   * 
+   * Calling this method is the same as calling {@link #toDictionary(true)}.
+   * 
+   * @return a dictionary of the ngrams
+   */
   public Dictionary toDictionary() {
     return toDictionary(false);
   }
@@ -291,8 +277,10 @@ public class NGramModel {
   /**
    * Creates a dictionary which contains all {@link StringList}s which
    * are in the current {@link NGramModel}.
+   * 
    * @param caseSensitive Specifies whether case distinctions should be kept in the creation of the dictionary.
-   * @return the new dictionary
+   * 
+   * @return a dictionary of the ngrams
    */
   public Dictionary toDictionary(boolean caseSensitive) {
     
@@ -309,7 +297,8 @@ public class NGramModel {
    * Writes the ngram instance to the given {@link OutputStream}.
    * 
    * @param out
-   * @throws IOException if an I/O Error during writing occures
+   * 
+   * @throws IOException if an I/O Error during writing occurs
    */
   public void serialize(OutputStream out) throws IOException {
 	    Iterator<Entry> entryIterator = new Iterator<Entry>() 
