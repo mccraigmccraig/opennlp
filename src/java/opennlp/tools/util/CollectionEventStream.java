@@ -29,9 +29,9 @@ import opennlp.maxent.EventStream;
  */
 public class CollectionEventStream implements EventStream {
   
-  private Iterator ci;
+  private Iterator<Event> ci;
   
-  public CollectionEventStream(Collection c) {
+  public CollectionEventStream(Collection<Event> c) {
     ci = c.iterator();
   }
 
