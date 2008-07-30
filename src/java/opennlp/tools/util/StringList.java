@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////////
-//Copyright (C) 2006 Calcucare GmbH
+//Copyright (C) 2008 OpenNlp
 // 
 //This library is free software; you can redistribute it and/or
 //modify it under the terms of the GNU Lesser General Public
@@ -23,7 +23,7 @@ import java.util.Iterator;
 import java.util.NoSuchElementException;
 
 /**
- * TODO: add a method for a sub-token list
+ * The {@link StringList} is an immutable list of {@link String}s.
  */
 public class StringList {
   
@@ -45,7 +45,7 @@ public class StringList {
    * 
    * @param tokens
    */
-  public StringList(String tokens[]) {
+  public StringList(String... tokens) {
     
     if (tokens == null || tokens.length == 0) {
       throw new IllegalArgumentException();
@@ -86,16 +86,16 @@ public class StringList {
   public Iterator<String> iterator() {
     return new Iterator<String>() {
       
-      private int mIndex;
+      private int index;
       
       public boolean hasNext() {
-        return mIndex < size();
+        return index < size();
       }
 
       public String next() {
         
         if (hasNext()) {
-          return getToken(mIndex++);
+          return getToken(index++);
         }
         else {
           throw new NoSuchElementException();
