@@ -47,6 +47,8 @@ public class POSEventStreamNew extends AbstractEventStream<POSSample> {
    */
   public POSEventStreamNew(Iterator<POSSample> samples, POSContextGenerator cg) {
     super(samples);
+    
+    this.cg = cg;
   }
   
   /**
