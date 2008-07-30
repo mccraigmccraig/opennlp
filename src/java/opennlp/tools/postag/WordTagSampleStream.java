@@ -22,6 +22,7 @@ import java.util.Iterator;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import opennlp.maxent.DataStream;
 import opennlp.tools.util.ParseException;
 
 /**
@@ -33,14 +34,14 @@ public class WordTagSampleStream implements Iterator<POSSample> {
   
   private static Logger logger = Logger.getLogger(WordTagSampleStream.class.getName());
   
-  private Iterator<String> sentences;
+  private DataStream sentences;
   
   /**
    * Initializes the current instance.
    * 
    * @param sentences
    */
-  public WordTagSampleStream(Iterator<String> sentences) {
+  public WordTagSampleStream(DataStream sentences) {
     this.sentences = sentences;
   }
   
@@ -58,7 +59,7 @@ public class WordTagSampleStream implements Iterator<POSSample> {
    */
   public POSSample next() {
     
-    String sentence = sentences.next();
+    String sentence = (String) sentences.nextToken();
     
     POSSample sample;
     try {
