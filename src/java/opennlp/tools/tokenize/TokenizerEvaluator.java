@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////////
-//Copyright (C) 2007 OpenNlp
+//Copyright (C) 2008 OpenNlp
 // 
 //This library is free software; you can redistribute it and/or
 //modify it under the terms of the GNU Lesser General Public
@@ -15,9 +15,9 @@
 //License along with this program; if not, write to the Free Software
 //Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 //////////////////////////////////////////////////////////////////////////////
+
 package opennlp.tools.tokenize;
 
-import opennlp.tools.namefind.NameSample;
 import opennlp.tools.util.EvaluatorUtil;
 import opennlp.tools.util.Mean;
 import opennlp.tools.util.Span;
@@ -87,7 +87,7 @@ public class TokenizerEvaluator {
   
   /**
    * Retrieves the arithmetic mean of the precision scores
-   * calculated for each evaluated {@link NameSample}.
+   * calculated for each evaluated {@link TokenSample}.
    * 
    * @return the arithmetic mean of all precision scores
    */
@@ -97,7 +97,7 @@ public class TokenizerEvaluator {
   
   /**
    * Retrieves the arithmetic mean of the recall score
-   * calculated for each evaluated {@link NameSample}.
+   * calculated for each evaluated {@link TokenSample}.
    *
    * @return the arithmetic mean of all recall scores
    */
