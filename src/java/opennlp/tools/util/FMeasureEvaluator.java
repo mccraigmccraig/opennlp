@@ -80,7 +80,24 @@ public abstract class FMeasureEvaluator<T> {
     return recallScore.mean();
   }
   
-  // get f-measure
+  /**
+   * Retrieves the f-measure score.
+   * 
+   * f-measure = 2 * precision * recall / (precision + recall)
+   * 
+   * @return the f-measure or -1 if precision + recall <= 0
+   */
+  public double getFMeasure() {
+    
+    if (getPrecisionScore() + getRecallScore() > 0) {
+      return 2 * (getPrecisionScore() * getRecallScore()) / 
+          (getPrecisionScore() + getRecallScore());
+    }
+    else {
+      // cannot divide by zero, return error code
+      return -1;
+    }
+  }
   
   /**
    * Creates a human read-able {@link String} representation.
