@@ -93,7 +93,6 @@ public class Version {
       "." + Integer.toString(getRevision());
   }
   
-  
   /**
    * Return a new {@link Version} initialized to the value
    * represented by the specified {@link String}
@@ -105,8 +104,18 @@ public class Version {
    * @throws NumberFormatException if the string does
    * not contain a valid version
    */
-  public static Version parse(String version){
-    return null;
+  public static Version parse(String version) {
+    
+    int indexFirstDot = version.indexOf('.');
+    
+    int indexSecondDot = version.indexOf('.', indexFirstDot);
+    
+    if (indexFirstDot == -1 || indexSecondDot == -1)
+        throw new NumberFormatException("Invalid version!");
+    
+    return new Version(Integer.parseInt(version.substring(0, indexFirstDot)),
+        Integer.parseInt(version.substring(indexFirstDot, indexSecondDot)),
+        Integer.parseInt(version.substring(indexSecondDot)));
   }
   
   /**
