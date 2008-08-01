@@ -18,8 +18,7 @@
 
 package opennlp.tools.tokenize;
 
-import opennlp.tools.util.EvaluatorUtil;
-import opennlp.tools.util.Mean;
+import opennlp.tools.util.FMeasureEvaluator;
 import opennlp.tools.util.Span;
 
 /**
@@ -34,23 +33,13 @@ import opennlp.tools.util.Span;
  * the arithmetic mean of the recall scores calculated for
  * each reference {@link TokenSample}.
  */
-public class TokenizerEvaluator {
+public class TokenizerEvaluator extends FMeasureEvaluator<TokenSample> {
 
   /**
-   * The {@link Tokenizer} used to create the 
+   * The {@link Tokenizer} used to create the
    * predicted tokens.
    */
   private Tokenizer tokenizer;
-  
-  /**
-   * The mean of all calculated precision scores.
-   */
-  private Mean precisionScore = new Mean();
-  
-  /**
-   * The mean of all calculated recall scores.
-   */
-  private Mean recallScore = new Mean();
   
   /**
    * Initializes the current instance with the
@@ -75,42 +64,13 @@ public class TokenizerEvaluator {
     Span predictedSpans[] = tokenizer.tokenizePos(reference.getText());
 
     if (predictedSpans.length > 0) {
-      precisionScore.add(EvaluatorUtil.precision(reference.getTokenSpans(), 
+      precisionScore.add(FMeasureEvaluator.precision(reference.getTokenSpans(),
           predictedSpans));
     }
     
     if (reference.getTokenSpans().length > 0) {
-      recallScore.add(EvaluatorUtil.recall(reference.getTokenSpans(), 
+      recallScore.add(FMeasureEvaluator.recall(reference.getTokenSpans(),
           predictedSpans));
     }
-  }
-  
-  /**
-   * Retrieves the arithmetic mean of the precision scores
-   * calculated for each evaluated {@link TokenSample}.
-   * 
-   * @return the arithmetic mean of all precision scores
-   */
-  public double getPrecisionScore() {
-    return precisionScore.mean();
-  }
-  
-  /**
-   * Retrieves the arithmetic mean of the recall score
-   * calculated for each evaluated {@link TokenSample}.
-   *
-   * @return the arithmetic mean of all recall scores
-   */
-  public double getRecallScore() {
-    return recallScore.mean();
-  }
-  
-  /**
-   * Creates a human read-able {@link String} representation.
-   */
-  @Override
-  public String toString() {
-    return "Precision: " + Double.toString(getPrecisionScore()) + "\n" +
-        " Recall: " + Double.toString(getRecallScore());
   }
 }
