@@ -18,72 +18,50 @@
 
 package opennlp.tools.sentdetect;
 
-import java.util.Iterator;
+import opennlp.tools.util.FMeasureEvaluator;
 
-import opennlp.tools.util.EvaluatorUtil;
-import opennlp.tools.util.Mean;
-import opennlp.tools.util.Span;
+/**
+ * The {@link SentenceDetectorEvaluator} measures the performance of
+ * the given {@link SentenceDetector} with the provided reference
+ * {@link SentenceSample}s.
+ * 
+ * @see FMeasureEvaluator
+ * @see SentenceDetector
+ * @see SentenceSample
+ */
+public class SentenceDetectorEvaluator extends FMeasureEvaluator<SentenceSample> {
 
-public class SentenceDetectorEvaluator {
-
+  /**
+   * The {@link SentenceDetector} used to predict sentences.
+   */
   private SentenceDetector sentenceDetector;
   
   /**
-   * The mean of all calculated precision scores.
+   * Initializes the current instance.
+   * 
+   * @param sentenceDetector
    */
-  private Mean precisionScore = new Mean();
-  
-  /**
-   * The mean of all calculated recall scores.
-   */
-  private Mean recallScore = new Mean();
-  
   public SentenceDetectorEvaluator(SentenceDetector sentenceDetector) {
     this.sentenceDetector = sentenceDetector;
   }
   
-  private Span[] convert(int starts[]) {
-    Span spans[] = new Span[starts.length];
+  private Integer[] convert(int starts[]) {
+    Integer begins[] = new Integer[starts.length];
     
     for (int i = 0; i < starts.length; i++) {
-      spans[i] = new Span(starts[i], starts[i]);
+      begins[i] = new Integer(starts[i]);
     }
     
-    return spans;
+    return begins;
   }
   
   public void evaluateSample(SentenceSample sample) {
     
     int starts[] = sentenceDetector.sentPosDetect(sample.getDocument());
     
-    precisionScore.add(EvaluatorUtil.precision(
+    precisionScore.add(FMeasureEvaluator.precision(
         convert(sample.getSentences()), convert(starts)));
-    recallScore.add(EvaluatorUtil.recall(
+    recallScore.add(FMeasureEvaluator.recall(
         convert(sample.getSentences()), convert(starts)));
-  }
-  
-  public void evaluate(Iterator<SentenceSample> samples) {
-    while (samples.hasNext())
-      evaluateSample(samples.next());
-  }
-  
-  /**
-   * Retrieves the arithmetic mean of the precision scores
-   * calculated for each evaluated {@link SentenceSample}.
-   * 
-   * @return the arithmetic mean of all precision scores
-   */
-  public double getPrecisionScore() {
-    return precisionScore.mean();
-  }
-  
-  /**
-   * Retrieves the arithmetic mean of the recall score
-   * calculated for each evaluated {@link SentenceSample}.
-   *
-   * @return the arithmetic mean of all recall scores
-   */
-  public double getRecallScore() {
-    return recallScore.mean();
   }
 }

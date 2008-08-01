@@ -23,6 +23,11 @@ import java.util.Iterator;
 /**
  * The {@link FMeasureEvaluator} is an abstract base class for evaluators
  * which measure precision, recall and the resulting f-measure.
+ * 
+ * Evaluation results are the arithmetic mean of the precision
+ * scores calculated for each reference sample and
+ * the arithmetic mean of the recall scores calculated for
+ * each reference sample.
  */
 public abstract class FMeasureEvaluator<T> {
 
@@ -170,7 +175,7 @@ public abstract class FMeasureEvaluator<T> {
    * 
    * @return the recall score or -1 if there are no reference spans
    */
-  public static double recall(Span references[], Span predictions[]) {
+  public static double recall(Object references[], Object predictions[]) {
     
     if (references.length > 0) {
       return countTruePositives(references, predictions) /

@@ -26,12 +26,9 @@ import opennlp.tools.util.Span;
  * the given {@link Tokenizer} with the provided reference
  * {@link TokenSample}s.
  * 
- * Performance is measured with the precision and recall scores.
- *  
- * Evaluation results are the arithmetic mean of the precision
- * scores calculated for each reference {@link TokenSample} and
- * the arithmetic mean of the recall scores calculated for
- * each reference {@link TokenSample}.
+ * @see FMeasureEvaluator
+ * @see Tokenizer
+ * @see TokenSample
  */
 public class TokenizerEvaluator extends FMeasureEvaluator<TokenSample> {
 
