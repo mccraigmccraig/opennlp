@@ -65,7 +65,9 @@ public class BeamSearch<T> {
     return bestSequences(numSequences, sequence, additionalContext, zeroLog);
   }
 
-  /** Returns the best sequence of outcomes based on model for this object.
+  /** 
+   * Returns the best sequence of outcomes based on model for this object.
+   * 
    * @param numSequences The maximum number of sequences to be returned.
    * @param sequence The input sequence.
    * @param additionalContext An Object[] of additional context.  This is passed to the context generator blindly with the assumption that the context are appropiate.
@@ -73,7 +75,7 @@ public class BeamSearch<T> {
    * @return An array of the top ranked sequences of outcomes.
    */
   public Sequence[] bestSequences(int numSequences, T[] sequence, Object[] additionalContext, double minSequenceScore) {
-    int n = sequence.length;
+
     Heap<Sequence> prev = new ListHeap<Sequence>(size);
     Heap<Sequence> next = new ListHeap<Sequence>(size);
     Heap<Sequence> tmp;
@@ -83,7 +85,7 @@ public class BeamSearch<T> {
       additionalContext = EMPTY_ADDITIONAL_CONTEXT;
     }
     
-    for (int i = 0; i < n; i++) {
+    for (int i = 0; i < sequence.length; i++) {
       int sz = Math.min(size, prev.size());
       
       for (int sc = 0; prev.size() > 0 && sc < sz; sc++) {
@@ -102,12 +104,16 @@ public class BeamSearch<T> {
         else {
           scores = model.eval(contexts, probs);
         }
+        
         double[] temp_scores = new double[scores.length];
         for (int c = 0; c < scores.length; c++) {
           temp_scores[c] = scores[c];
         }
+        
         Arrays.sort(temp_scores);
+        
         double min = temp_scores[Math.max(0,scores.length-size)];
+        
         for (int p = 0; p < scores.length; p++) {
           if (scores[p] < min)
             continue; //only advance first "size" outcomes
@@ -119,6 +125,7 @@ public class BeamSearch<T> {
             }
           }
         }
+        
         if (next.size() == 0) {//if no advanced sequences, advance all valid
           for (int p = 0; p < scores.length; p++) {
             String out = model.getOutcome(p);
@@ -131,39 +138,48 @@ public class BeamSearch<T> {
           }
         }
       }
+      
       //    make prev = next; and re-init next (we reuse existing prev set once we clear it)
       prev.clear();
       tmp = prev;
       prev = next;
       next = tmp;
     }
+    
     int numSeq = Math.min(numSequences, prev.size());
     Sequence[] topSequences = new Sequence[numSeq];
     
     for (int seqIndex = 0; seqIndex < numSeq; seqIndex++) {
       topSequences[seqIndex] = (Sequence) prev.extract();
     }
+    
     return topSequences;
   }
 
-  /** Returns the best sequence of outcomes based on model for this object.
-    * @param sequence The input sequence.
-    * @param additionalContext An Object[] of additional context.  This is passed to the context generator blindly with the assumption that the context are appropiate.
-    * @return The top ranked sequence of outcomes.
-    */
+  /** 
+   * Returns the best sequence of outcomes based on model for this object.
+   * 
+   * @param sequence The input sequence.
+   * @param additionalContext An Object[] of additional context.  This is passed to the context generator blindly with the assumption that the context are appropiate.
+   * 
+   * @return The top ranked sequence of outcomes.
+   */
   public Sequence bestSequence(T[] sequence, Object[] additionalContext) {
     return bestSequences(1, sequence, additionalContext,zeroLog)[0];
   }
 
-  /** Determines whether a particular continuation of a sequence is valid.  
-     * This is used to restrict invalid sequences such as thoses used in start/continue tag-based chunking 
-     * or could be used to implement tag dictionary restrictions.
-     * @param i The index in the input sequence for which the new outcome is being proposed.
-     * @param inputSequence The input sequence.
-     * @param outcomesSequence The outcomes so far in this sequence.
-     * @param outcome The next proposed outcome for the outcomes sequence.
-     * @return true is the sequence would still be valid with the new outcome, false otherwise.
-     */
+  /** 
+   * Determines whether a particular continuation of a sequence is valid.  
+   * This is used to restrict invalid sequences such as thoses used in start/continue tag-based chunking 
+   * or could be used to implement tag dictionary restrictions.
+   * 
+   * @param i The index in the input sequence for which the new outcome is being proposed.
+   * @param inputSequence The input sequence.
+   * @param outcomesSequence The outcomes so far in this sequence.
+   * @param outcome The next proposed outcome for the outcomes sequence.
+   * 
+   * @return true is the sequence would still be valid with the new outcome, false otherwise.
+   */
   protected boolean validSequence(int i, T[] inputSequence, String[] outcomesSequence, String outcome) {
     return true;
   }
