@@ -90,4 +90,12 @@ public class POSEvaluator {
   public double getWordAccuracy() {
     return wordAccuracy.mean();
   }
+  
+  /**
+   * Represents this objects as human readable {@link String}.
+   */
+  public String toString() {
+    return "Accuracy:" + wordAccuracy.mean() + 
+        " Number of Samples: " + wordAccuracy.count();
+  }
 }
