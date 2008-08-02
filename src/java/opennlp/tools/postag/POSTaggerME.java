@@ -18,22 +18,17 @@
 
 package opennlp.tools.postag;
 
-import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.io.Reader;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Iterator;
 import java.util.List;
 import java.util.StringTokenizer;
 
 import opennlp.maxent.DataStream;
-import opennlp.maxent.Evalable;
-import opennlp.maxent.EventCollector;
 import opennlp.maxent.EventStream;
 import opennlp.maxent.GISModel;
 import opennlp.maxent.MaxentModel;
@@ -44,7 +39,6 @@ import opennlp.tools.dictionary.Dictionary;
 import opennlp.tools.ngram.NGramModel;
 import opennlp.tools.util.BeamSearch;
 import opennlp.tools.util.InvalidFormatException;
-import opennlp.tools.util.Pair;
 import opennlp.tools.util.Sequence;
 import opennlp.tools.util.StringList;
 
@@ -54,213 +48,9 @@ import opennlp.tools.util.StringList;
  * surrounding context.
  *
  * @author      Gann Bierner
- * @version $Revision: 1.33 $, $Date: 2008/04/20 20:17:38 $
+ * @version $Revision: 1.34 $, $Date: 2008/08/02 13:34:55 $
  */
-public class POSTaggerME implements Evalable, POSTagger {
-
-  /**
-   * The maximum entropy model to use to evaluate contexts.
-   */
-  protected MaxentModel posModel;
-
-  /**
-   * The feature context generator.
-   */
-  protected POSContextGenerator contextGen;
-
-  /**
-   * Tag dictionary used for restricting words to a fixed set of tags.
-   */
-  protected TagDictionary tagDictionary;
-  
-  protected Dictionary ngramDictionary;
-
-  /**
-   * Says whether a filter should be used to check whether a tag assignment
-   * is to a word outside of a closed class.
-   */
-  protected boolean useClosedClassTagsFilter = false;
-  
-  private static final int DEFAULT_BEAM_SIZE =3;
-
-  /** The size of the beam to be used in determining the best sequence of pos tags.*/
-  protected int size;
-
-  private Sequence bestSequence;
-  
-  /** The search object used for search multiple sequences of tags. */
-  protected  BeamSearch<String> beam;
-
-  
-  /**
-   * Creates a new tagger with the specified model and tag dictionary.
-   * @param model The model used for tagging.
-   * @param tagdict The tag dictionary used for specifing a set of valid tags.
-   */
-  public POSTaggerME(MaxentModel model, TagDictionary tagdict) {
-    this(model, new DefaultPOSContextGenerator(null),tagdict);
-  }
-  
-  /**
-   * Creates a new tagger with the specified model and n-gram dictionary.
-   * @param model The model used for tagging.
-   * @param dict The n-gram dictionary used for feature generation.
-   */
-  public POSTaggerME(MaxentModel model, Dictionary dict) {
-    this(model, new DefaultPOSContextGenerator(dict));
-  }
-  
-  /**
-   * Creates a new tagger with the specified model, n-gram dictionary, and tag dictionary.
-   * @param model The model used for tagging.
-   * @param dict The n-gram dictionary used for feature generation.
-   * @param tagdict The dictionary which specifies the valid set of tags for some words. 
-   */
-  public POSTaggerME(MaxentModel model, Dictionary dict, TagDictionary tagdict) {
-      this(DEFAULT_BEAM_SIZE,model, new DefaultPOSContextGenerator(dict),tagdict);
-    }
-
-  /**
-   * Creates a new tagger with the specified model and context generator.
-   * @param model The model used for tagging.
-   * @param cg The context generator used for feature creation.
-   */
-  public POSTaggerME(MaxentModel model, POSContextGenerator cg) {
-    this(DEFAULT_BEAM_SIZE, model, cg, null);
-  }
-  
-  /**
-   * Creates a new tagger with the specified model, context generator, and tag dictionary.
-   * @param model The model used for tagging.
-   * @param cg The context generator used for feature creation.
-   * @param tagdict The dictionary which specifies the valid set of tags for some words.
-   */
-  public POSTaggerME(MaxentModel model, POSContextGenerator cg, TagDictionary tagdict) {
-      this(DEFAULT_BEAM_SIZE, model, cg, tagdict);
-    }
-
-  /**
-   * Creates a new tagger with the specified beam size, model, context generator, and tag dictionary.
-   * @param beamSize The number of alturnate tagging considered when tagging. 
-   * @param model The model used for tagging.
-   * @param cg The context generator used for feature creation.
-   * @param tagdict The dictionary which specifies the valid set of tags for some words.
-   */
-  public POSTaggerME(int beamSize, MaxentModel model, POSContextGenerator cg, TagDictionary tagdict) {
-    size = beamSize;
-    posModel = model;
-    contextGen = cg;
-    beam = new PosBeamSearch(size, cg, model);
-    tagDictionary = tagdict;
-  }
-
-  public String getNegativeOutcome() {
-    return "";
-  }
-  
-  /**
-   * Returns the number of different tags predicted by this model.
-   * @return the number of different tags predicted by this model.
-   */
-  public int getNumTags() {
-    return posModel.getNumOutcomes();
-  }
-
-  public EventCollector getEventCollector(Reader r) {
-    return new POSEventCollector(r, contextGen);
-  }
-
-  public List<String> tag(List<String> sentence) {
-    bestSequence = beam.bestSequence(sentence.toArray(new String[sentence.size()]), null);
-    return bestSequence.getOutcomes();
-  }
-
-  public String[] tag(String[] sentence) {
-    bestSequence = beam.bestSequence(sentence, null);
-    List<String> t = bestSequence.getOutcomes();
-    return t.toArray(new String[t.size()]);
-  }
-  
-  /**
-   * Returns at most the specified number of taggings for the specified sentence.
-   * @param numTaggings The number of tagging to be returned.
-   * @param sentence An array of tokens which make up a sentence.
-   * @return At most the specified number of taggings for the specified sentence.
-   */
-  public String[][] tag(int numTaggings, String[] sentence) {
-    Sequence[] bestSequences = beam.bestSequences(numTaggings, sentence,null);
-    String[][] tags = new String[bestSequences.length][];
-    for (int si=0;si<tags.length;si++) {
-      List<String> t = bestSequences[si].getOutcomes();
-      tags[si] = t.toArray(new String[t.size()]);
-    }
-    return tags;
-  }
-
-  /**
-   * Populates the specified array with the probabilities for each tag of the last tagged sentence. 
-   * @param probs An array to put the probabilities into.
-   */
-  public void probs(double[] probs) {
-    bestSequence.getProbs(probs);
-  }
-
-  /**
-   * Returns an array with the probabilities for each tag of the last tagged sentence.
-   * @return an array with the probabilities for each tag of the last tagged sentence.
-   */
-  public double[] probs() {
-    return bestSequence.getProbs();
-  }
-
-  public String tag(String sentence) {
-    List<String> toks = new ArrayList<String>();
-    StringTokenizer st = new StringTokenizer(sentence);
-    while (st.hasMoreTokens())
-      toks.add(st.nextToken());
-    List<String> tags = tag(toks);
-    StringBuffer sb = new StringBuffer();
-    for (int i = 0; i < tags.size(); i++)
-      sb.append(toks.get(i) + "/" + tags.get(i) + " ");
-    return sb.toString().trim();
-  }
-
-  public void localEval(MaxentModel posModel, Reader r, Evalable e, boolean verbose) {
-
-    this.posModel = posModel;
-    float total = 0, correct = 0, sentences = 0, sentsCorrect = 0;
-    BufferedReader br = new BufferedReader(r);
-    String line;
-    try {
-      while ((line = br.readLine()) != null) {
-        sentences++;
-        Pair<List<String>, List<String>> p = POSEventCollector.convertAnnotatedString(line);
-        List<String> words = (List<String>) p.a;
-        List<String> outcomes = (List<String>) p.b;
-        List<String> tags = beam.bestSequence(words.toArray(new String[words.size()]), null).getOutcomes();
-
-        int c = 0;
-        boolean sentOk = true;
-        for (Iterator<String> t = tags.iterator(); t.hasNext(); c++) {
-          total++;
-          String tag = (String) t.next();
-          if (tag.equals(outcomes.get(c)))
-            correct++;
-          else
-            sentOk = false;
-        }
-        if (sentOk)
-          sentsCorrect++;
-      }
-    }
-    catch (IOException E) {
-      E.printStackTrace();
-    }
-
-    System.out.println("Accuracy         : " + correct / total);
-    System.out.println("Sentence Accuracy: " + sentsCorrect / sentences);
-
-  }
+public class POSTaggerME implements POSTagger {
 
   private class PosBeamSearch extends BeamSearch<String> {
 
@@ -289,6 +79,180 @@ public class POSTaggerME implements Evalable, POSTagger {
     }
   }
   
+  /**
+   * The maximum entropy model to use to evaluate contexts.
+   */
+  protected MaxentModel posModel;
+
+  /**
+   * The feature context generator.
+   */
+  protected POSContextGenerator contextGen;
+
+  /**
+   * Tag dictionary used for restricting words to a fixed set of tags.
+   */
+  protected TagDictionary tagDictionary;
+  
+  protected Dictionary ngramDictionary;
+
+  /**
+   * Says whether a filter should be used to check whether a tag assignment
+   * is to a word outside of a closed class.
+   */
+  protected boolean useClosedClassTagsFilter = false;
+  
+  private static final int DEFAULT_BEAM_SIZE =3;
+
+  /** 
+   * The size of the beam to be used in determining the best sequence of pos tags.
+   */
+  protected int size;
+
+  private Sequence bestSequence;
+  
+  /** 
+   * The search object used for search multiple sequences of tags. 
+   */
+  protected  BeamSearch<String> beam;
+
+  
+  /**
+   * Creates a new tagger with the specified model and tag dictionary.
+   * 
+   * @param model The model used for tagging.
+   * @param tagdict The tag dictionary used for specifing a set of valid tags.
+   */
+  public POSTaggerME(MaxentModel model, TagDictionary tagdict) {
+    this(model, new DefaultPOSContextGenerator(null),tagdict);
+  }
+  
+  /**
+   * Creates a new tagger with the specified model and n-gram dictionary.
+   * 
+   * @param model The model used for tagging.
+   * @param dict The n-gram dictionary used for feature generation.
+   */
+  public POSTaggerME(MaxentModel model, Dictionary dict) {
+    this(model, new DefaultPOSContextGenerator(dict));
+  }
+  
+  /**
+   * Creates a new tagger with the specified model, n-gram dictionary, and tag dictionary.
+   * 
+   * @param model The model used for tagging.
+   * @param dict The n-gram dictionary used for feature generation.
+   * @param tagdict The dictionary which specifies the valid set of tags for some words. 
+   */
+  public POSTaggerME(MaxentModel model, Dictionary dict, TagDictionary tagdict) {
+      this(DEFAULT_BEAM_SIZE,model, new DefaultPOSContextGenerator(dict),tagdict);
+    }
+
+  /**
+   * Creates a new tagger with the specified model and context generator.
+   * 
+   * @param model The model used for tagging.
+   * @param cg The context generator used for feature creation.
+   */
+  public POSTaggerME(MaxentModel model, POSContextGenerator cg) {
+    this(DEFAULT_BEAM_SIZE, model, cg, null);
+  }
+  
+  /**
+   * Creates a new tagger with the specified model, context generator, and tag dictionary.
+   * 
+   * @param model The model used for tagging.
+   * @param cg The context generator used for feature creation.
+   * @param tagdict The dictionary which specifies the valid set of tags for some words.
+   */
+  public POSTaggerME(MaxentModel model, POSContextGenerator cg, TagDictionary tagdict) {
+      this(DEFAULT_BEAM_SIZE, model, cg, tagdict);
+    }
+
+  /**
+   * Creates a new tagger with the specified beam size, model, context generator, and tag dictionary.
+   * 
+   * @param beamSize The number of alturnate tagging considered when tagging. 
+   * @param model The model used for tagging.
+   * @param cg The context generator used for feature creation.
+   * @param tagdict The dictionary which specifies the valid set of tags for some words.
+   */
+  public POSTaggerME(int beamSize, MaxentModel model, POSContextGenerator cg, TagDictionary tagdict) {
+    size = beamSize;
+    posModel = model;
+    contextGen = cg;
+    beam = new PosBeamSearch(size, cg, model);
+    tagDictionary = tagdict;
+  }
+  
+  /**
+   * Returns the number of different tags predicted by this model.
+   * 
+   * @return the number of different tags predicted by this model.
+   */
+  public int getNumTags() {
+    return posModel.getNumOutcomes();
+  }
+
+  public List<String> tag(List<String> sentence) {
+    bestSequence = beam.bestSequence(sentence.toArray(new String[sentence.size()]), null);
+    return bestSequence.getOutcomes();
+  }
+
+  public String[] tag(String[] sentence) {
+    bestSequence = beam.bestSequence(sentence, null);
+    List<String> t = bestSequence.getOutcomes();
+    return t.toArray(new String[t.size()]);
+  }
+  
+  /**
+   * Returns at most the specified number of taggings for the specified sentence.
+   * 
+   * @param numTaggings The number of tagging to be returned.
+   * @param sentence An array of tokens which make up a sentence.
+   * 
+   * @return At most the specified number of taggings for the specified sentence.
+   */
+  public String[][] tag(int numTaggings, String[] sentence) {
+    Sequence[] bestSequences = beam.bestSequences(numTaggings, sentence,null);
+    String[][] tags = new String[bestSequences.length][];
+    for (int si=0;si<tags.length;si++) {
+      List<String> t = bestSequences[si].getOutcomes();
+      tags[si] = t.toArray(new String[t.size()]);
+    }
+    return tags;
+  }
+
+  /**
+   * Populates the specified array with the probabilities for each tag of the last tagged sentence. 
+   * 
+   * @param probs An array to put the probabilities into.
+   */
+  public void probs(double[] probs) {
+    bestSequence.getProbs(probs);
+  }
+
+  /**
+   * Returns an array with the probabilities for each tag of the last tagged sentence.
+   *
+   * @return an array with the probabilities for each tag of the last tagged sentence.
+   */
+  public double[] probs() {
+    return bestSequence.getProbs();
+  }
+
+  public String tag(String sentence) {
+    List<String> toks = new ArrayList<String>();
+    StringTokenizer st = new StringTokenizer(sentence);
+    while (st.hasMoreTokens())
+      toks.add(st.nextToken());
+    List<String> tags = tag(toks);
+    StringBuffer sb = new StringBuffer();
+    for (int i = 0; i < tags.size(); i++)
+      sb.append(toks.get(i) + "/" + tags.get(i) + " ");
+    return sb.toString().trim();
+  }
+
   public String[] getOrderedTags(List<String> words, List<String> tags, int index) {
     return getOrderedTags(words,tags,index,null);
   }
@@ -426,28 +390,34 @@ public class POSTaggerME implements Evalable, POSTagger {
       EventStream es;
       if (encoding == null) {
         if (dict == null) {
-          es = new POSEventStream(new PlainTextByLineDataStream(
-              new InputStreamReader(new FileInputStream(inFile))));
+          es = new POSEventStreamNew(new WordTagSampleStream(new PlainTextByLineDataStream(
+              new InputStreamReader(new FileInputStream(inFile)))));
         }
         else {
-          es = new POSEventStream(new PlainTextByLineDataStream(
-              new InputStreamReader(new FileInputStream(inFile))), 
-              new Dictionary(new FileInputStream(dict)));
+          POSContextGenerator cg = new DefaultPOSContextGenerator(new Dictionary(new FileInputStream(dict)));
+
+          es = new POSEventStreamNew(new WordTagSampleStream(new PlainTextByLineDataStream(
+              new InputStreamReader(new FileInputStream(inFile)))), 
+              cg);
         }
       }
       else {
         if (dict == null) {
-          es = new POSEventStream(new PlainTextByLineDataStream(
-              new InputStreamReader(new FileInputStream(inFile),encoding)));
+          
+          es = new POSEventStreamNew(new WordTagSampleStream(new PlainTextByLineDataStream(
+              new InputStreamReader(new FileInputStream(inFile), encoding))));
         }
         else {
-          es = new POSEventStream(new PlainTextByLineDataStream(
-              new InputStreamReader(new FileInputStream(inFile),encoding)), 
-              new Dictionary(new FileInputStream(dict)));
+          POSContextGenerator cg = new DefaultPOSContextGenerator(new Dictionary(new FileInputStream(dict)));
+          
+          es = new POSEventStreamNew(new WordTagSampleStream(new PlainTextByLineDataStream(
+              new InputStreamReader(new FileInputStream(inFile), encoding))), cg);
         }
       }
       mod = train(es, iterations, cutoff);
+      
       System.out.println("Saving the model as: " + outFile);
+      
       new SuffixSensitiveGISModelWriter(mod, outFile).persist();
 
     }
