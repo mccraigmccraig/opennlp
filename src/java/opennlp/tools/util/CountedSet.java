@@ -36,7 +36,6 @@ import java.util.Set;
 public class CountedSet<E> implements Set<E> {
 
   private Map<E, Integer> cset;
-  private static Integer ONE = Integer.valueOf(1);
   
   /**
    * Creates a new counted set.
@@ -45,7 +44,8 @@ public class CountedSet<E> implements Set<E> {
     cset = new HashMap<E, Integer>();
   }
 
-  /** Creates a new counted set of the specified initial size.
+  /** 
+   * Creates a new counted set of the specified initial size.
    * 
    * @param size The initial size of this set.
    */
@@ -57,7 +57,7 @@ public class CountedSet<E> implements Set<E> {
   public boolean add(E o) {
     Integer count = (Integer) cset.get(o);  
     if ( count == null ) { 
-      cset.put(o, ONE);
+      cset.put(o, 1);
       return true;
     } 
     else { 
@@ -111,15 +111,41 @@ public class CountedSet<E> implements Set<E> {
     }
   }
 
+  /**
+   * This methods is deprecated use opennlp.toolsdictionary.serialization 
+   * package for writing a {@link CountedSet}.
+   * 
+   * @param fileName
+   * @param countCutoff
+   */
+  @Deprecated
   public void write(String fileName,int countCutoff) {
     write(fileName,countCutoff," ");
   }
 
+  /**
+   * This methods is deprecated use opennlp.toolsdictionary.serialization 
+   * package for writing a {@link CountedSet}.
+   * 
+   * @param fileName
+   * @param countCutoff
+   * @param delim
+   */
+  @Deprecated
   public void write(String fileName,int countCutoff,String delim) {
     write(fileName,countCutoff,delim,null); 
   }
 
-
+  /**
+   * This methods is deprecated use opennlp.toolsdictionary.serialization 
+   * package for writing a {@link CountedSet}.
+   * 
+   * @param fileName
+   * @param countCutoff
+   * @param delim
+   * @param encoding
+   */
+  @Deprecated
   public void write(String fileName,int countCutoff,String delim,String encoding) {
     PrintWriter out = null;
     try{  
