@@ -130,38 +130,38 @@ public class DictionarySerializer {
      }
 
      /**
-      * Not implemendted.
+      * Not implemented.
       */
      public void endDocument() throws SAXException {
      }
 
      /**
-      * Not implemendted.
+      * Not implemented.
       */
      public void endPrefixMapping(String prefix) throws SAXException {
      }
 
      /**
-      * Not implemendted.
+      * Not implemented.
       */
      public void ignorableWhitespace(char[] ch, int start, int length) 
          throws SAXException {
      }
 
      /**
-      * Not implemendted.
+      * Not implemented.
       */
      public void setDocumentLocator(Locator locator) {
      }
 
      /**
-      * Not implemendted.
+      * Not implemented.
       */
      public void skippedEntity(String name) throws SAXException {
      }
 
      /**
-      * Not implemendted.
+      * Not implemented.
       */
      public void startPrefixMapping(String prefix, String uri) 
          throws SAXException {
