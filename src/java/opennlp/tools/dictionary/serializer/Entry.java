@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////////
-//Copyright (C) 2006 Calcucare GmbH
+//Copyright (C) 2006 OpenNlp
 // 
 //This library is free software; you can redistribute it and/or
 //modify it under the terms of the GNU Lesser General Public
@@ -21,14 +21,18 @@ package opennlp.tools.dictionary.serializer;
 import opennlp.tools.util.StringList;
 
 /**
+ * An {@link Entry} is a {@link StringList} which can
+ * optionally be mapped to attributes.
  * 
- * @author <a href="mailto:kottmann@gmail.com">Joern Kottmann</a>
- * @version $Revision: 1.5 $, $Date: 2008/04/19 22:24:30 $
+ * {@link Entry}s is a read and written by the {@link DictionarySerializer}.
+ * 
+ * @see DictionarySerializer
+ * @see Attributes
  */
 public class Entry {
   
-  private StringList mTokens;
-  private Attributes mAttributes;
+  private StringList tokens;
+  private Attributes attributes;
   
   /**
    * Initializes the current instance.
@@ -37,8 +41,8 @@ public class Entry {
    * @param attributes
    */
   public Entry(StringList tokens, Attributes attributes) {
-    mTokens = tokens;
-    mAttributes = attributes;
+    this.tokens = tokens;
+    this.attributes = attributes;
   }
   
   /**
@@ -47,7 +51,7 @@ public class Entry {
    * @return the {@link Token}s
    */
   public StringList getTokens() {
-    return mTokens;
+    return tokens;
   }
   
   /**
@@ -56,6 +60,6 @@ public class Entry {
    * @return the {@link Attributes}
    */
   public Attributes getAttributes() {
-    return mAttributes;
+    return attributes;
   }
 }
