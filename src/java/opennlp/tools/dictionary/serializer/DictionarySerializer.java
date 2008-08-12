@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////////
-//Copyright (C) 2006 Calcucare GmbH
+//Copyright (C) 2006 OpenNlp
 // 
 //This library is free software; you can redistribute it and/or
 //modify it under the terms of the GNU Lesser General Public
@@ -46,9 +46,7 @@ import org.xml.sax.helpers.AttributesImpl;
 import org.xml.sax.helpers.XMLReaderFactory;
 
 /**
-  * 
-  * @author <a href="mailto:kottmann@gmail.com">Joern Kottmann</a>
-  * @version $Revision: 1.6 $, $Date: 2008/04/19 22:24:30 $
+  * This class is used by for reading and writing dictionaries of all kinds.
   */
 public class DictionarySerializer {
   
