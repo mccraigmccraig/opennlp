@@ -21,10 +21,12 @@ package opennlp.tools.tokenize;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 import java.util.regex.Pattern;
 
 import opennlp.maxent.EventStream;
+import opennlp.maxent.GIS;
 import opennlp.maxent.GISModel;
 import opennlp.maxent.MaxentModel;
 import opennlp.maxent.TwoPassDataIndexer;
@@ -39,7 +41,7 @@ import opennlp.tools.util.Span;
  * homepage: <http://www.cis.upenn.edu/~jcreynar>.
  *
  * @author      Tom Morton
- * @version $Revision: 1.23 $, $Date: 2008/07/28 15:41:36 $
+ * @version $Revision: 1.24 $, $Date: 2008/08/12 21:43:16 $
  */
 public class TokenizerME extends AbstractTokenizer {
 
@@ -54,6 +56,11 @@ public class TokenizerME extends AbstractTokenizer {
   public static final String NO_SPLIT ="F";
   
   /**
+   * Alpha-Numeric Pattern
+   */
+  public static final Pattern alphaNumeric = Pattern.compile("^[A-Za-z0-9]+$");
+  
+  /**
    * The maximum entropy model to use to evaluate contexts.
    */
   private MaxentModel model;
@@ -63,21 +70,18 @@ public class TokenizerME extends AbstractTokenizer {
    */
   private final TokenContextGenerator cg = new DefaultTokenContextGenerator();
 
-  private static final Double ONE = new Double(1.0);
-  
-  /**
-   * Alpha-Numeric Pattern
-   */
-  public static final Pattern alphaNumeric = Pattern.compile("^[A-Za-z0-9]+$");
-
-  /** optimization flag to skip alpha numeric tokens for further
+  /** 
+   * Optimization flag to skip alpha numeric tokens for further
    * tokenization 
    */
-  private boolean ALPHA_NUMERIC_OPTIMIZATION;
+  private boolean useAlphaNumericOptimization;
 
-  /** list of probabilities for each token returned from call to
-   * tokenize() */
+  /** 
+   * List of probabilities for each token returned from call to
+   * tokenize() 
+   */
   private List<Double> tokProbs;
+  
   private List<Span> newTokens;
 
   /**
@@ -86,6 +90,7 @@ public class TokenizerME extends AbstractTokenizer {
    * 
    * @param mod 
    */
+  @Deprecated
   public TokenizerME(MaxentModel mod) {
     setAlphaNumericOptimization(false);
     model = mod;
@@ -93,8 +98,15 @@ public class TokenizerME extends AbstractTokenizer {
     tokProbs = new ArrayList<Double>(50);
   }
 
-  /** Returns the probabilities associated with the most recent
+  public TokenizerME(TokenizerModel model) {
+    this(model.getMaxentModel());
+    useAlphaNumericOptimization = model.useAlphaNumericOptimization();
+  }
+  
+  /** 
+   * Returns the probabilities associated with the most recent
    * calls to tokenize() or tokenizePos().
+   * 
    * @return probability for each token returned for the most recent
    * call to tokenize.  If not applicable an empty array is
    * returned.
@@ -111,8 +123,8 @@ public class TokenizerME extends AbstractTokenizer {
    * Tokenizes the string.
    *
    * @param d  The string to be tokenized.
+   * 
    * @return   A span array containing individual tokens as elements.
-   *           
    */
   public Span[] tokenizePos(String d) {
     Span[] tokens = WhitespaceTokenizer.INSTANCE.tokenizePos(d);
@@ -124,11 +136,11 @@ public class TokenizerME extends AbstractTokenizer {
       // Can't tokenize single characters
       if (tok.length() < 2) {
         newTokens.add(s);
-        tokProbs.add(ONE);
+        tokProbs.add(1d);
       }
       else if (useAlphaNumericOptimization() && alphaNumeric.matcher(tok).matches()) {
         newTokens.add(s);
-        tokProbs.add(ONE);
+        tokProbs.add(1d);
       }
       else {
         int start = s.getStart();
@@ -159,11 +171,36 @@ public class TokenizerME extends AbstractTokenizer {
   }
 
   /**
+   * Trains a model for the {@link TokenizerME}.
+   * 
+   * @param samples the samples used for the training.
+   * @param useAlphaNumericOptimization - if true alpha numerics are skipped
+   * 
+   * @return the trained {@link TokenizerModel}
+   * 
+   * @throws IOException its throws if an {@link IOException} is thrown
+   * during IO operations on a temp file which is created during training occur.
+   */
+  public static TokenizerModel train(Iterator<TokenSample> samples, 
+      boolean useAlphaNumericOptimization) throws IOException {
+    
+    EventStream eventStream = new TokSpanEventStream(samples, 
+        useAlphaNumericOptimization);
+    
+    GISModel maxentModel = 
+        GIS.trainModel(100, new TwoPassDataIndexer(eventStream, 5));
+    
+    return new TokenizerModel(maxentModel, useAlphaNumericOptimization);
+  }
+  
+  /**
    * Trains the {@link TokenizerME}, use this to create a new model.
    * 
    * @param evc
+   * 
    * @return the new model
    */
+  @Deprecated
   public static GISModel train(EventStream evc) throws IOException {
     return opennlp.maxent.GIS.trainModel(100, new TwoPassDataIndexer(evc, 5));
   }
@@ -173,25 +210,30 @@ public class TokenizerME extends AbstractTokenizer {
    * 
    * @param evc
    * @param output
+   * 
    * @throws IOException
    */
+  @Deprecated
   public static void train(EventStream evc, File output, String encoding) throws IOException {
     new SuffixSensitiveGISModelWriter(TokenizerME.train(evc), output).persist();
   }
 
   /**
    * Used to have the tokenizer ignore tokens which only contain alpha-numeric characters.
+   * 
    * @param opt set to true to use the optimization, false otherwise.
    */
+  @Deprecated
   public void setAlphaNumericOptimization(boolean opt) {
-    ALPHA_NUMERIC_OPTIMIZATION = opt;
+    useAlphaNumericOptimization = opt;
   }
 
 /**
  * Returns the value of the alpha-numeric optimization flag.
+ * 
  * @return true if the tokenizer should use alpha-numeric optization, false otherwise.
  */
   public boolean useAlphaNumericOptimization() {
-    return ALPHA_NUMERIC_OPTIMIZATION;
+    return useAlphaNumericOptimization;
   }
 }
