@@ -32,6 +32,7 @@ import opennlp.maxent.GISModel;
 import opennlp.maxent.MaxentModel;
 import opennlp.maxent.io.BinaryGISModelReader;
 import opennlp.maxent.io.BinaryGISModelWriter;
+import opennlp.maxent.io.GISModelWriter;
 import opennlp.tools.util.InvalidFormatException;
 
 /**
@@ -60,6 +61,9 @@ public final class TokenizerModel {
    */
   public TokenizerModel(GISModel tokenizerMaxentModel, 
       boolean useAlphaNumericOptimization) {
+    
+    if (tokenizerMaxentModel == null)
+        throw new IllegalArgumentException("tokenizerMaxentModel param must not bet null!");
     
     if (!isModelCompatible(tokenizerMaxentModel))
         throw new IllegalArgumentException("The maxent model is not compatible!");
@@ -111,7 +115,7 @@ public final class TokenizerModel {
     // the model writer because the model writer call close()
     // on that stream
     
-    new BinaryGISModelWriter(model,
+    GISModelWriter modelWriter = new BinaryGISModelWriter(model,
         new DataOutputStream(new OutputStream() {
           @Override
           public void write(int b) throws IOException {
@@ -119,16 +123,17 @@ public final class TokenizerModel {
           }
         }));
     
+    modelWriter.persist();
     zip.closeEntry();
     
     Properties properties = new Properties();
-    properties.setProperty("USE_ALPHA_NUMERIC_OPTIMIZATION", 
+    properties.setProperty(USE_ALPHA_NUMERIC_OPTIMIZATION,
         Boolean.toString(useAlphaNumericOptimization()));
     
     ZipEntry propertiesEntry = new ZipEntry(PROPERTIES_ENTRY_NAME);
     zip.putNextEntry(propertiesEntry);
     
-    properties.storeToXML(zip, "This file contains the tokenizer properties.");
+    properties.store(zip, "This file contains the tokenizer properties.");
     
     zip.closeEntry();
     zip.close();
@@ -149,7 +154,7 @@ public final class TokenizerModel {
   public static TokenizerModel create(InputStream in) throws IOException, 
       InvalidFormatException {
     
-    ZipInputStream zip = new ZipInputStream(in);
+    final ZipInputStream zip = new ZipInputStream(in);
     
     GISModel model = null;
     Properties properties = null;
@@ -169,7 +174,21 @@ public final class TokenizerModel {
         
         // read properties
         properties = new Properties();
-        properties.loadFromXML(zip);
+        
+        InputStream inTest = new InputStream() {
+
+          @Override
+          public int read() throws IOException {
+            return zip.read();
+          }
+          
+          @Override
+          public void close() throws IOException {
+            System.out.println("ups closed!!!");
+          }
+        };
+        
+        properties.load(inTest);
         
         zip.closeEntry();
       }
@@ -177,6 +196,8 @@ public final class TokenizerModel {
         throw new InvalidFormatException("Model contains unkown resource!");
       }
     }
+    
+    zip.close();
     
     if (model == null || properties == null) {
       throw new InvalidFormatException("Token model is incomplete!");
@@ -186,7 +207,7 @@ public final class TokenizerModel {
         properties.getProperty(USE_ALPHA_NUMERIC_OPTIMIZATION);
     
     if (useAlphaNumericOptimizationString == null) {
-      throw new InvalidFormatException("uThe seAlphaNumericOptimization parameter " +
+      throw new InvalidFormatException("The seAlphaNumericOptimization parameter " +
       		"cannot be found!");
     }
     
