@@ -18,29 +18,38 @@
 
 package opennlp.tools.tokenize;
 
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
+
 import junit.framework.TestCase;
-import opennlp.maxent.MaxentModel;
+import opennlp.maxent.EventStream;
+import opennlp.maxent.GIS;
+import opennlp.maxent.GISModel;
+import opennlp.tools.util.InvalidFormatException;
+import opennlp.tools.util.Span;
 
 /**
- * Tests for the {@link TokenizerME} class.
- * 
- * This test trains the tokenizer with a few sample tokens
- * and then predicts a token. This test checks if the
- * tokenizer code can be executed.
+ * Tests for the {@link TokenizerModel} class. 
  */
-public class TokenizerMETest extends TestCase {
-
-  public void testTokenizer() {
+public class TokenizerModelTest extends TestCase {
+  
+  public void testSentenceModel() throws IOException, InvalidFormatException {
     
-    MaxentModel tokenizerModel = TokenizerTestUtil.createMaxentTokenModel();
+    GISModel tokenModel = TokenizerTestUtil.createMaxentTokenModel();
     
-    TokenizerME tokenizer = new TokenizerME(tokenizerModel);
-    tokenizer.setAlphaNumericOptimization(true);
+    TokenizerModel model = new TokenizerModel(tokenModel, true);
     
-    String tokens[] = tokenizer.tokenize("test,");
+    assertEquals(tokenModel, model.getMaxentModel());
     
-    assertEquals(2, tokens.length);
-    assertEquals("test", tokens[0]);
-    assertEquals(",", tokens[1]);
+    ByteArrayOutputStream arrayOut = new ByteArrayOutputStream();
+    model.serialize(arrayOut);
+    arrayOut.close();
+    
+   TokenizerModel.create(new ByteArrayInputStream(arrayOut.toByteArray()));
+    
+    // TODO: check that both maxent models are equal
   }
 }

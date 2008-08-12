@@ -18,29 +18,41 @@
 
 package opennlp.tools.tokenize;
 
-import junit.framework.TestCase;
+import java.util.ArrayList;
+import java.util.List;
+
+import opennlp.maxent.EventStream;
+import opennlp.maxent.GIS;
+import opennlp.maxent.GISModel;
 import opennlp.maxent.MaxentModel;
+import opennlp.tools.util.Span;
 
 /**
- * Tests for the {@link TokenizerME} class.
- * 
- * This test trains the tokenizer with a few sample tokens
- * and then predicts a token. This test checks if the
- * tokenizer code can be executed.
+ * Utility class for testing the {@link Tokenizer}.
  */
-public class TokenizerMETest extends TestCase {
+public class TokenizerTestUtil {
 
-  public void testTokenizer() {
+  static GISModel createMaxentTokenModel() {
+    List<TokenSample> samples = new ArrayList<TokenSample>();
     
-    MaxentModel tokenizerModel = TokenizerTestUtil.createMaxentTokenModel();
+    samples.add(new TokenSample("year", new Span[]{new Span(0, 4)}));
+    samples.add(new TokenSample("year,", new Span[]{
+        new Span(0, 4),
+        new Span(4, 5)}));
+    samples.add(new TokenSample("it,", new Span[]{
+        new Span(0, 2),
+        new Span(2, 3)}));
+    samples.add(new TokenSample("it", new Span[]{
+        new Span(0, 2)}));
+    samples.add(new TokenSample("yes", new Span[]{
+        new Span(0, 3)}));
+    samples.add(new TokenSample("yes,", new Span[]{
+        new Span(0, 3),
+        new Span(3, 4)}));
     
-    TokenizerME tokenizer = new TokenizerME(tokenizerModel);
-    tokenizer.setAlphaNumericOptimization(true);
+    EventStream es = new TokSpanEventStream(samples.iterator(), true);
     
-    String tokens[] = tokenizer.tokenize("test,");
-    
-    assertEquals(2, tokens.length);
-    assertEquals("test", tokens[0]);
-    assertEquals(",", tokens[1]);
+    return GIS.trainModel(es);
   }
+  
 }
