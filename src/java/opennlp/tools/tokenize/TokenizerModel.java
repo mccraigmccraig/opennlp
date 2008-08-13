@@ -71,17 +71,7 @@ public final class TokenizerModel {
   }
   
   private static boolean isModelCompatible(MaxentModel model) {
-    
-    boolean areLabelsCompatible = false;
-    
-    if (model.getNumOutcomes() == 2) {
-    areLabelsCompatible = TokenizerME.SPLIT.equals(model.getOutcome(0)) && 
-        TokenizerME.NO_SPLIT.equals(model.getOutcome(1)) ||
-        TokenizerME.SPLIT.equals(model.getOutcome(1)) && 
-        TokenizerME.NO_SPLIT.equals(model.getOutcome(0));
-    }
-    
-    return areLabelsCompatible; 
+    return ModelUtil.validateOutcomes(model, TokenizerME.SPLIT, TokenizerME.NO_SPLIT);
   }
   
   public MaxentModel getMaxentModel() {

@@ -62,12 +62,12 @@ public final class ModelUtil {
   /**
    * Checks if the expected outcomes are all contained as outcomes in the given model.
    * 
-   * @param expectedOutcomes
    * @param model
+   * @param expectedOutcomes
    * 
    * @return true if all expected outcomes are the only outcomes of the model.
    */
-  public static boolean validateOutcomes(String expectedOutcomes[], MaxentModel model) {
+  public static boolean validateOutcomes(MaxentModel model, String... expectedOutcomes) {
     
     boolean result = true;
     
