@@ -64,6 +64,16 @@ public class SentenceModel {
     return sentModel;
   }
   
+  /**
+   * .
+   * 
+   * After the serialization is finished the provided 
+   * {@link OutputStream} is closed.
+   * 
+   * @param out
+   * 
+   * @throws IOException
+   */
   public void serialize(OutputStream out) throws IOException {
     final ZipOutputStream zip = new ZipOutputStream(out);
     
