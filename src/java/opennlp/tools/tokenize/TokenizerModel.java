@@ -19,7 +19,6 @@
 package opennlp.tools.tokenize;
 
 import java.io.DataInputStream;
-import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -31,9 +30,8 @@ import java.util.zip.ZipOutputStream;
 import opennlp.maxent.GISModel;
 import opennlp.maxent.MaxentModel;
 import opennlp.maxent.io.BinaryGISModelReader;
-import opennlp.maxent.io.BinaryGISModelWriter;
-import opennlp.maxent.io.GISModelWriter;
 import opennlp.tools.util.InvalidFormatException;
+import opennlp.tools.util.ModelUtil;
 
 /**
  * The {@link TokenizerModel} is the model used
@@ -96,6 +94,7 @@ public final class TokenizerModel {
   
   /**
    * Writes the {@link TokenizerModel} to the given {@link OutputStream}.
+   * 
    * After the serialization is finished the provided 
    * {@link OutputStream} is closed.
    * 
@@ -111,19 +110,8 @@ public final class TokenizerModel {
     ZipEntry modelEntry = new ZipEntry(MAXENT_MODEL_ENTRY_NAME);
     zip.putNextEntry(modelEntry);
     
-    // The ZipOutputStream cannot be given directly to
-    // the model writer because the model writer call close()
-    // on that stream
+    ModelUtil.writeModel(model, zip);
     
-    GISModelWriter modelWriter = new BinaryGISModelWriter(model,
-        new DataOutputStream(new OutputStream() {
-          @Override
-          public void write(int b) throws IOException {
-            zip.write(b);
-          }
-        }));
-    
-    modelWriter.persist();
     zip.closeEntry();
     
     Properties properties = new Properties();
