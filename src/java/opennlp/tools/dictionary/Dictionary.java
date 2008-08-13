@@ -38,8 +38,7 @@ import opennlp.tools.util.StringList;
 /**
  * This class is a dictionary.
  */
-public class Dictionary {
-  
+public class Dictionary implements Iterable<StringList> {
   
   private static class StringListWrapper {
     
