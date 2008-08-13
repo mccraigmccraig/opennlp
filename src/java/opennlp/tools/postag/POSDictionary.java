@@ -15,6 +15,7 @@
 //License along with this program; if not, write to the Free Software
 //Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 //////////////////////////////////////////////////////////////////////////////
+
 package opennlp.tools.postag;
 
 import java.io.BufferedReader;
@@ -22,33 +23,57 @@ import java.io.FileInputStream;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.io.OutputStream;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Map;
 
-/** Provides a means of determining which tags are valid for a particular word based on a tag dictionary read from a file.
+import com.sun.tools.doclets.internal.toolkit.util.DocFinder.Output;
+
+import opennlp.tools.dictionary.serializer.Attributes;
+import opennlp.tools.dictionary.serializer.DictionarySerializer;
+import opennlp.tools.dictionary.serializer.Entry;
+import opennlp.tools.util.StringList;
+
+/** 
+ * Provides a means of determining which tags are valid for a particular word
+ * based on a tag dictionary read from a file.
+ * 
  * @author Tom Morton
  */
 public class POSDictionary implements TagDictionary {
 
   private Map<String, String[]> dictionary;
+  
   private boolean caseSensitive;
 
+  public POSDictionary() {
+    dictionary = new HashMap<String, String[]>();
+  }
+  
   /**
    * Creates a tag dictionary with contents of specified file.
+   * 
    * @param file The file name for the tag dictionary.
+   * 
    * @throws IOException when the specified file can not be read.
    */
+  @Deprecated
   public POSDictionary(String file) throws IOException {
     this(file, null, true);
   }
   
   /**
-   * Creates a tag dictionary with contents of specified file and using specified case to determine how to access entries in the tag dictionary.
+   * Creates a tag dictionary with contents of specified file and using specified
+   * case to determine how to access entries in the tag dictionary.
+   * 
    * @param file The file name for the tag dictionary.
    * @param caseSensitive Specifies whether the tag dictionary is case sensitive or not.
+   * 
    * @throws IOException when the specified file can not be read.
    */
+  @Deprecated
   public POSDictionary(String file, boolean caseSensitive) throws IOException {
     this(file, null, caseSensitive);
   }
@@ -56,21 +81,27 @@ public class POSDictionary implements TagDictionary {
 
   /**
    * Creates a tag dictionary with contents of specified file and using specified case to determine how to access entries in the tag dictionary.
+   * 
    * @param file The file name for the tag dictionary.
    * @param encoding The encoding of the tag dictionary file.
    * @param caseSensitive Specifies whether the tag dictionary is case sensitive or not.
+   * 
    * @throws IOException when the specified file can not be read.
    */
+  @Deprecated
   public POSDictionary(String file, String encoding, boolean caseSensitive) throws IOException {
     this(new BufferedReader(encoding == null ? new FileReader(file) : new InputStreamReader(new FileInputStream(file),encoding)), caseSensitive);
   }
 
   /**
    * Create tag dictionary object with contents of specified file and using specified case to determine how to access entries in the tag dictionary.
+   * 
    * @param reader A reader for the tag dictionary.
    * @param caseSensitive Specifies whether the tag dictionary is case sensitive or not.
+   * 
    * @throws IOException when the specified file can not be read.
    */
+  @Deprecated
   public POSDictionary(BufferedReader reader, boolean caseSensitive) throws IOException {
     dictionary = new HashMap<String, String[]>();
     this.caseSensitive = caseSensitive;
@@ -85,18 +116,66 @@ public class POSDictionary implements TagDictionary {
   }
 
   /**
-   * Returns a list of valid tags for the specified word. 
+   * Returns a list of valid tags for the specified word.
+   * 
    * @param word The word.
-   * @return A list of valid tags for the specified word or null if no information is available for that word.
+   * 
+   * @return A list of valid tags for the specified word or 
+   * null if no information is available for that word.
    */
   public String[] getTags(String word) {
     if (caseSensitive) {
-      return (String[]) dictionary.get(word);
+      return dictionary.get(word);
     }
     else {
-      //System.err.println(java.util.Arrays.asList((String[]) dictionary.get(word.toLowerCase())));
-      return (String[]) dictionary.get(word.toLowerCase());
+      return dictionary.get(word.toLowerCase());
     }
+  }
+  
+  /**
+   * Writes the {@link POSDictionary} to the given {@link OutputStream};
+   * 
+   * @param out the {@link OutputStream} to write the dictionary into.
+   * 
+   * @throws IOException if writing to the {@link OutputStream} fails
+   */
+  public void serialize(OutputStream out) throws IOException {
+    Iterator<Entry> entries = new Iterator<Entry>() {
+
+      Iterator<String> iterator = dictionary.keySet().iterator();
+      
+      public boolean hasNext() {
+        return iterator.hasNext();
+      }
+
+      public Entry next() {
+        
+        String word = iterator.next();
+        Attributes tagAttribute = new Attributes();
+        
+        String tags[] = getTags(word);
+        
+        StringBuilder tagString = new StringBuilder();
+
+        for (int i = 0; i < tags.length; i++) {
+          tagString.append(tags[i]);
+          tagString.append(' ');
+        }
+        
+        // remove last space
+        if (tagString.length() > 0) {
+          tagString.setLength(tagString.length() - 1);
+        }
+        
+        return new Entry(new StringList(word), tagAttribute);
+      }
+
+      public void remove() {
+        throw new UnsupportedOperationException();
+      }
+    };
+    
+    DictionarySerializer.serialize(out, entries);
   }
   
   public static void main(String[] args) throws IOException {
@@ -106,5 +185,4 @@ public class POSDictionary implements TagDictionary {
       System.out.println(Arrays.asList(dict.getTags(line)));
     }
   }
-
 }
