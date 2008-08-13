@@ -22,6 +22,7 @@ import java.io.BufferedReader;
 import java.io.FileInputStream;
 import java.io.FileReader;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.util.Arrays;
@@ -29,11 +30,11 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 
-import com.sun.tools.doclets.internal.toolkit.util.DocFinder.Output;
-
 import opennlp.tools.dictionary.serializer.Attributes;
 import opennlp.tools.dictionary.serializer.DictionarySerializer;
 import opennlp.tools.dictionary.serializer.Entry;
+import opennlp.tools.dictionary.serializer.EntryInserter;
+import opennlp.tools.util.InvalidFormatException;
 import opennlp.tools.util.StringList;
 
 /** 
@@ -132,12 +133,31 @@ public class POSDictionary implements TagDictionary {
     }
   }
   
+  private static String tagsToString(String tags[]) {
+      
+    StringBuilder tagString = new StringBuilder();
+
+    for (int i = 0; i < tags.length; i++) {
+      tagString.append(tags[i]);
+      tagString.append(' ');
+    }
+
+    // remove last space
+    if (tagString.length() > 0) {
+      tagString.setLength(tagString.length() - 1);
+    }
+
+    return tagString.toString();
+  }
+  
   /**
    * Writes the {@link POSDictionary} to the given {@link OutputStream};
    * 
-   * @param out the {@link OutputStream} to write the dictionary into.
+   * @param out
+   *            the {@link OutputStream} to write the dictionary into.
    * 
-   * @throws IOException if writing to the {@link OutputStream} fails
+   * @throws IOException
+   *             if writing to the {@link OutputStream} fails
    */
   public void serialize(OutputStream out) throws IOException {
     Iterator<Entry> entries = new Iterator<Entry>() {
@@ -151,21 +171,9 @@ public class POSDictionary implements TagDictionary {
       public Entry next() {
         
         String word = iterator.next();
+        
         Attributes tagAttribute = new Attributes();
-        
-        String tags[] = getTags(word);
-        
-        StringBuilder tagString = new StringBuilder();
-
-        for (int i = 0; i < tags.length; i++) {
-          tagString.append(tags[i]);
-          tagString.append(' ');
-        }
-        
-        // remove last space
-        if (tagString.length() > 0) {
-          tagString.setLength(tagString.length() - 1);
-        }
+        tagAttribute.setValue("tags", tagsToString(getTags(word)));
         
         return new Entry(new StringList(word), tagAttribute);
       }
@@ -176,6 +184,45 @@ public class POSDictionary implements TagDictionary {
     };
     
     DictionarySerializer.serialize(out, entries);
+  }
+  
+  @Override
+  public String toString() {
+    StringBuilder dictionaryString = new StringBuilder();
+    
+    for (String word : dictionary.keySet()) {
+      dictionaryString.append(word + " -> " + tagsToString(getTags(word)));
+      dictionaryString.append("\n");
+    }
+    
+    // remove last new line
+    if (dictionaryString.length() > 0) {
+      dictionaryString.setLength(dictionaryString.length() -1);
+    }
+    
+    return dictionaryString.toString();
+  }
+  
+  public static POSDictionary create(InputStream in) throws IOException, InvalidFormatException {
+
+    final POSDictionary newPosDict = new POSDictionary();
+    
+    DictionarySerializer.create(in, new EntryInserter() {
+      public void insert(Entry entry) throws InvalidFormatException {
+        
+        String tagString = entry.getAttributes().getValue("tags");
+        
+        String[] tags = tagString.split(" ");
+        
+        StringList word = entry.getTokens();
+        
+        if (word.size() != 1)
+          throw new InvalidFormatException("Each entry must have exactly one token!");
+        
+        newPosDict.dictionary.put(word.getToken(0), tags);
+      }});
+    
+    return newPosDict;
   }
   
   public static void main(String[] args) throws IOException {

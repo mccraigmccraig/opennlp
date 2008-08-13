@@ -18,14 +18,17 @@
 
 package opennlp.tools.postag;
 
+import java.io.DataInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.zip.ZipEntry;
+import java.util.zip.ZipInputStream;
 import java.util.zip.ZipOutputStream;
 
 import opennlp.maxent.GISModel;
 import opennlp.maxent.MaxentModel;
+import opennlp.maxent.io.BinaryGISModelReader;
 import opennlp.tools.dictionary.Dictionary;
 import opennlp.tools.util.InvalidFormatException;
 import opennlp.tools.util.ModelUtil;
@@ -36,17 +39,19 @@ import opennlp.tools.util.ModelUtil;
  * 
  * @see POSTaggerME
  */
-public class POSModel {
+public final class POSModel {
 
   private static final String MAXENT_MODEL_ENTRY_NAME = "pos.bin";
+  private static final String TAG_DICTIONARY_ENTRY_NAME = "tag-dictionary.xml";
+  private static final String NGRAM_DICTIONARY_ENTRY_NAME = "ngram-dictionary.xml";
   
   private final GISModel maxentPosModel;
   
-  private final TagDictionary tagDictionary;
+  private final POSDictionary tagDictionary;
   
   private final Dictionary ngramDict;
   
-  public POSModel(GISModel maxentPosModel, TagDictionary tagDictionary, 
+  public POSModel(GISModel maxentPosModel, POSDictionary tagDictionary, 
       Dictionary ngramDict) {
     
     if (maxentPosModel == null) 
@@ -72,7 +77,7 @@ public class POSModel {
    * 
    * @return tag dictionary or null if not used
    */
-  public TagDictionary getTagDictionary() {
+  public POSDictionary getTagDictionary() {
     return tagDictionary;
   }
   
@@ -106,18 +111,51 @@ public class POSModel {
     zip.closeEntry();
     
     if (getTagDictionary() != null) {
-//      zip.putNextEntry(new ZipEntry(""));
-//      zip.closeEntry();
+      zip.putNextEntry(new ZipEntry(TAG_DICTIONARY_ENTRY_NAME));
+      
+      getTagDictionary().serialize(zip);
+      
+      zip.closeEntry();
     }
     
     if (getNgramDictionary() != null) {
-      zip.putNextEntry(new ZipEntry(""));
+      zip.putNextEntry(new ZipEntry(NGRAM_DICTIONARY_ENTRY_NAME));
       getNgramDictionary().serialize(out);
       zip.closeEntry();
     }
   }
   
   public static POSModel create(InputStream in) throws IOException, InvalidFormatException {
-    return null;
+    ZipInputStream zip = new ZipInputStream(in);
+
+    GISModel maxentPosModel = null;
+    POSDictionary posDictionary = null;
+    Dictionary ngramDictionary = null;
+    
+    ZipEntry entry;
+    while((entry = zip.getNextEntry()) != null ) {
+      if (MAXENT_MODEL_ENTRY_NAME.equals(entry.getName())) {
+        maxentPosModel = new BinaryGISModelReader(
+            new DataInputStream(zip)).getModel();
+        
+        zip.closeEntry();
+      }
+      else if (TAG_DICTIONARY_ENTRY_NAME.equals(entry.getName())) {
+        posDictionary = POSDictionary.create(zip);
+        zip.closeEntry();
+      }
+      else if (NGRAM_DICTIONARY_ENTRY_NAME.equals(entry.getName())) {
+        // Note: ngram dictionary is not case sensitive
+        ngramDictionary = new Dictionary(zip);
+      }
+      else {
+        throw new InvalidFormatException("Model contains unkown resource!");
+      }
+    }
+     
+    if (posDictionary == null)
+      throw new InvalidFormatException("Could not find maxent pos model!");
+    
+    return new POSModel(maxentPosModel, posDictionary, ngramDictionary);
   }
 }
