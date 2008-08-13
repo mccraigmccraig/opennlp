@@ -28,16 +28,23 @@ import java.util.Set;
  *
  * @author      Jason Baldridge
  * @author      Eric D. Friedman
- * @version     $Revision: 1.3 $, $Date: 2008/04/20 22:54:38 $
+ * @version     $Revision: 1.4 $, $Date: 2008/08/13 12:05:16 $
  */
 
 public class DefaultSDContextGenerator implements SDContextGenerator {
 
-  /** String buffer for generating features. */
+  /** 
+   * String buffer for generating features.
+   */
   protected StringBuffer buf;
-  /** List for holding features as they are generated. */
+  
+  /** 
+   * List for holding features as they are generated.
+   */
   protected List<String> collectFeats;
+  
   private Set<String> inducedAbbreviations;
+  
   private char[] eosCharacters;
 
   /**
@@ -72,13 +79,25 @@ public class DefaultSDContextGenerator implements SDContextGenerator {
    * @see opennlp.tools.sentdetect.SDContextGenerator#getContext(java.lang.StringBuffer, int)
    */
   public String[] getContext(StringBuffer sb, int position) {
-    /** String preceding the eos character in the eos token. */
+    
+    /** 
+     * String preceding the eos character in the eos token.
+     */
     String prefix;
-    /** Space delimited token preceding token containing eos character. */
+    
+    /** 
+     * Space delimited token preceding token containing eos character.
+     */
     String previous;
-    /** String following the eos character in the eos token. */
+    
+    /** 
+     * String following the eos character in the eos token.
+     */
     String suffix;
-    /** Space delimited token following token containing eos character. */
+    
+    /** 
+     * Space delimited token following token containing eos character.
+     */
     String next;
     
     int lastIndex = sb.length() - 1;
@@ -140,6 +159,7 @@ public class DefaultSDContextGenerator implements SDContextGenerator {
   
   /**
    * Determines some of the features for the sentence detector and adds them to list features.
+   * 
    * @param prefix String preceeding the eos character in the eos token.
    * @param suffix String following the eos character in the eos token.
    * @param previous Space delimited token preceeding token containing eos character.
