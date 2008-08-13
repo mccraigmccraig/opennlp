@@ -25,6 +25,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Iterator;
 import java.util.List;
 import java.util.StringTokenizer;
 
@@ -48,7 +49,7 @@ import opennlp.tools.util.StringList;
  * surrounding context.
  *
  * @author      Gann Bierner
- * @version $Revision: 1.35 $, $Date: 2008/08/13 13:51:14 $
+ * @version $Revision: 1.36 $, $Date: 2008/08/13 15:15:40 $
  */
 public class POSTaggerME implements POSTagger {
 
@@ -115,14 +116,30 @@ public class POSTaggerME implements POSTagger {
    * The search object used for search multiple sequences of tags. 
    */
   protected  BeamSearch<String> beam;
-
   
+  /**
+   * Initializes the current instance with the provided model
+   * and the default beam size of 3.
+   * 
+   * @param model
+   */
   public POSTaggerME(POSModel model) {
+    this(model, DEFAULT_BEAM_SIZE);
+  }
+  
+  /**
+   * Initializes the current instance with the provided
+   * model and provided beam size.
+   *  
+   * @param model
+   * @param beamSize
+   */
+  public POSTaggerME(POSModel model, int beamSize) {
     posModel = model.getMaxentPosModel();
     
     contextGen = new DefaultPOSContextGenerator(model.getNgramDictionary());
     tagDictionary = model.getTagDictionary();
-    size = model.getBeamSize();
+    size = beamSize;
     beam = new PosBeamSearch(size, contextGen, posModel);
   }
   
@@ -295,12 +312,41 @@ public class POSTaggerME implements POSTagger {
   }
   
   /**
+   * .
+   * 
+   * TODO: Ask tom if the ngramDictionay is created during training, maybe we
+   * only want a flag which indicates if it should be used
+   * 
+   * @param samples
+   * @param tagDictionary
+   * @param ngramDictionary
+   * @param beamSize
+   * @param cutoff
+   * @return
+   * 
+   * @throws IOException  its throws if an {@link IOException} is thrown
+   * during IO operations on a temp file which is created during training occur.
+   */
+  public static POSModel train(Iterator<POSSample> samples, POSDictionary tagDictionary,
+      Dictionary ngramDictionary, int cutoff) throws IOException {
+    
+   int iterations = 100;
+
+    GISModel posModel = opennlp.maxent.GIS.trainModel(iterations,
+        new TwoPassDataIndexer(new POSEventStreamNew(samples,
+        new DefaultPOSContextGenerator(ngramDictionary)), cutoff));
+    
+    return new POSModel(posModel, tagDictionary, ngramDictionary);
+  }
+  
+  /**
    * Trains a new model.
    * 
    * @param evc
    * @param modelFile
    * @throws IOException
    */
+  @Deprecated
   public static void train(EventStream evc, File modelFile) throws IOException {
     GISModel model = train(evc, 100,5);
     new SuffixSensitiveGISModelWriter(model, modelFile).persist();
@@ -315,6 +361,7 @@ public class POSTaggerME implements POSTagger {
    * @return the new model
    * @throws IOException
    */
+  @Deprecated
   public static GISModel train(EventStream es, int iterations, int cut) throws IOException {
     return opennlp.maxent.GIS.trainModel(iterations, new TwoPassDataIndexer(es, cut));
   }

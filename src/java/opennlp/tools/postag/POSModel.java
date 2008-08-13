@@ -72,12 +72,6 @@ public final class POSModel {
     return maxentPosModel;
   }
   
-  public int getBeamSize() {
-    // TODO: read and write beam size to model ...
-    // this is the default beam size
-    return 3;
-  }
-  
   /**
    * Retrieves the tag dictionary.
    * 
