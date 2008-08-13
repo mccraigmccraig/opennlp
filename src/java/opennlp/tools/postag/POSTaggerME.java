@@ -48,7 +48,7 @@ import opennlp.tools.util.StringList;
  * surrounding context.
  *
  * @author      Gann Bierner
- * @version $Revision: 1.34 $, $Date: 2008/08/02 13:34:55 $
+ * @version $Revision: 1.35 $, $Date: 2008/08/13 13:51:14 $
  */
 public class POSTaggerME implements POSTagger {
 
@@ -117,12 +117,22 @@ public class POSTaggerME implements POSTagger {
   protected  BeamSearch<String> beam;
 
   
+  public POSTaggerME(POSModel model) {
+    posModel = model.getMaxentPosModel();
+    
+    contextGen = new DefaultPOSContextGenerator(model.getNgramDictionary());
+    tagDictionary = model.getTagDictionary();
+    size = model.getBeamSize();
+    beam = new PosBeamSearch(size, contextGen, posModel);
+  }
+  
   /**
    * Creates a new tagger with the specified model and tag dictionary.
    * 
    * @param model The model used for tagging.
    * @param tagdict The tag dictionary used for specifing a set of valid tags.
    */
+  @Deprecated
   public POSTaggerME(MaxentModel model, TagDictionary tagdict) {
     this(model, new DefaultPOSContextGenerator(null),tagdict);
   }
@@ -133,6 +143,7 @@ public class POSTaggerME implements POSTagger {
    * @param model The model used for tagging.
    * @param dict The n-gram dictionary used for feature generation.
    */
+  @Deprecated
   public POSTaggerME(MaxentModel model, Dictionary dict) {
     this(model, new DefaultPOSContextGenerator(dict));
   }
@@ -144,6 +155,7 @@ public class POSTaggerME implements POSTagger {
    * @param dict The n-gram dictionary used for feature generation.
    * @param tagdict The dictionary which specifies the valid set of tags for some words. 
    */
+  @Deprecated
   public POSTaggerME(MaxentModel model, Dictionary dict, TagDictionary tagdict) {
       this(DEFAULT_BEAM_SIZE,model, new DefaultPOSContextGenerator(dict),tagdict);
     }
@@ -154,6 +166,7 @@ public class POSTaggerME implements POSTagger {
    * @param model The model used for tagging.
    * @param cg The context generator used for feature creation.
    */
+  @Deprecated
   public POSTaggerME(MaxentModel model, POSContextGenerator cg) {
     this(DEFAULT_BEAM_SIZE, model, cg, null);
   }
@@ -165,6 +178,7 @@ public class POSTaggerME implements POSTagger {
    * @param cg The context generator used for feature creation.
    * @param tagdict The dictionary which specifies the valid set of tags for some words.
    */
+  @Deprecated
   public POSTaggerME(MaxentModel model, POSContextGenerator cg, TagDictionary tagdict) {
       this(DEFAULT_BEAM_SIZE, model, cg, tagdict);
     }
@@ -177,6 +191,7 @@ public class POSTaggerME implements POSTagger {
    * @param cg The context generator used for feature creation.
    * @param tagdict The dictionary which specifies the valid set of tags for some words.
    */
+  @Deprecated
   public POSTaggerME(int beamSize, MaxentModel model, POSContextGenerator cg, TagDictionary tagdict) {
     size = beamSize;
     posModel = model;
