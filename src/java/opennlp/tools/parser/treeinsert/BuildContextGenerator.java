@@ -22,6 +22,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
+import java.util.Set;
 
 import opennlp.tools.parser.AbstractContextGenerator;
 import opennlp.tools.parser.Cons;
@@ -89,7 +90,8 @@ public class BuildContextGenerator extends AbstractContextGenerator {
     }
     else {
       //this isn't a root node so, punctSet won't be used and can be passed as empty.
-      rf = Parser.getRightFrontier(constituents[0], Collections.EMPTY_SET);
+      Set<String> emptyPunctSet = Collections.emptySet();
+      rf = Parser.getRightFrontier(constituents[0], emptyPunctSet);
     }
     getFrontierNodes(rf,leftNodes);
     p_1 = leftNodes[0];
