@@ -21,6 +21,9 @@ package opennlp.tools.util;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.Set;
 
 import opennlp.maxent.GISModel;
 import opennlp.maxent.MaxentModel;
@@ -54,5 +57,36 @@ public final class ModelUtil {
         }));
     
     modelWriter.persist();
+  }
+  
+  /**
+   * Checks if the expected outcomes are all contained as outcomes in the given model.
+   * 
+   * @param expectedOutcomes
+   * @param model
+   * 
+   * @return true if all expected outcomes are the only outcomes of the model.
+   */
+  public static boolean validateOutcomes(String expectedOutcomes[], MaxentModel model) {
+    
+    boolean result = true;
+    
+    if (expectedOutcomes.length == model.getNumOutcomes()) {
+      
+      Set<String> expectedOutcomesSet = new HashSet<String>();
+      expectedOutcomesSet.addAll(Arrays.asList(expectedOutcomes));
+      
+      for (int i = 0; i < model.getNumOutcomes(); i++) {
+        if (!expectedOutcomesSet.contains(model.getOutcome(i))) {
+          result = false;
+          break;
+        }
+      }
+    }
+    else {
+      result = false;
+    }
+    
+    return result;
   }
 }
