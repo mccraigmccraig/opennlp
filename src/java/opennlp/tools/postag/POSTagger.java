@@ -1,3 +1,21 @@
+///////////////////////////////////////////////////////////////////////////////
+//Copyright (C) 2008 OpenNlp
+// 
+//This library is free software; you can redistribute it and/or
+//modify it under the terms of the GNU Lesser General Public
+//License as published by the Free Software Foundation; either
+//version 2.1 of the License, or (at your option) any later version.
+// 
+//This library is distributed in the hope that it will be useful,
+//but WITHOUT ANY WARRANTY; without even the implied warranty of
+//MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+//GNU Lesser General Public License for more details.
+// 
+//You should have received a copy of the GNU Lesser General Public
+//License along with this program; if not, write to the Free Software
+//Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
+//////////////////////////////////////////////////////////////////////////////
+
 package opennlp.tools.postag;
 
 import java.util.List;
@@ -6,7 +24,7 @@ import java.util.List;
  * The interface for part of speech taggers.
  *
  * @author      Jason Baldridge
- * @version $Revision: 1.3 $, $Date: 2008/04/19 21:12:25 $ */
+ * @version $Revision: 1.4 $, $Date: 2008/08/13 00:11:16 $ */
 
 public interface POSTagger {
 
