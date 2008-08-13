@@ -15,6 +15,7 @@
 //License along with this program; if not, write to the Free Software
 //Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 //////////////////////////////////////////////////////////////////////////////
+
 package opennlp.tools.chunker;
 
 import java.util.List;
@@ -27,10 +28,14 @@ public interface Chunker {
   /** 
    * Generates chunk tags for the given sequence returning the result in a list.
    * 
+   * This method is now deprecated, please use the 
+   * {@link #chunk(String[], String[])} method.
+   * 
    * @param toks a list of the tokens or words of the sequence.
    * @param tags a list of the pos tags of the sequence.
    * @return a list of chunk tags for each token in the sequence.
    */
+  @Deprecated
   public List<String> chunk(List<String> toks, List<String> tags);
   
   /** 

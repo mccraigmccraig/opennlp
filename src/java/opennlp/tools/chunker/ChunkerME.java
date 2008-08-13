@@ -45,18 +45,44 @@ public class ChunkerME implements Chunker {
   protected MaxentModel model;
 
   /**
+   * Initializes the current instance with the specified model.
+   * The default beam size is used.
+   * 
+   * @param model
+   */
+  public ChunkerME(ChunkerModel model) {
+    this(model, DEFAULT_BEAM_SIZE);
+  }
+  
+  /**
+   * Initializes the current instance with the specified model and
+   * the specified beam size.
+   * 
+   * @param model
+   * @param beamSize
+   */
+  public ChunkerME(ChunkerModel model, int beamSize) {
+    this.model = model.getMaxentChunkerModel();
+    beam = new ChunkBeamSearch(beamSize, new DefaultChunkerContextGenerator(), this.model);
+  }
+  
+  /**
    * Creates a chunker using the specified model.
+   * 
    * @param mod The maximum entropy model for this chunker.
    */
+  @Deprecated
   public ChunkerME(MaxentModel mod) {
     this(mod, new DefaultChunkerContextGenerator(), DEFAULT_BEAM_SIZE);
   }
 
   /**
    * Creates a chunker using the specified model and context generator.
+   * 
    * @param mod The maximum entropy model for this chunker.
    * @param cg The context generator to be used by the specified model.
    */
+  @Deprecated
   public ChunkerME(MaxentModel mod, ChunkerContextGenerator cg) {
     this(mod, cg, DEFAULT_BEAM_SIZE);
   }
@@ -64,10 +90,12 @@ public class ChunkerME implements Chunker {
   /**
    * Creates a chunker using the specified model and context generator and decodes the
    * model using a beam search of the specified size.
+   * 
    * @param mod The maximum entropy model for this chunker.
    * @param cg The context generator to be used by the specified model.
    * @param beamSize The size of the beam that should be used when decoding sequences.
    */
+  @Deprecated
   public ChunkerME(MaxentModel mod, ChunkerContextGenerator cg, int beamSize) {
     beam = new ChunkBeamSearch(beamSize, cg, mod);
     this.model = mod;
@@ -88,11 +116,13 @@ public class ChunkerME implements Chunker {
   }
  
   /** 
-    * This method determines wheter the outcome is valid for the preceeding sequence.  
+    * This method determines whether the outcome is valid for the preceding sequence.  
     * This can be used to implement constraints on what sequences are valid.  
+    * 
     * @param outcome The outcome.
-    * @param sequence The precceding sequence of outcome assignments. 
+    * @param sequence The preceding sequence of outcome assignments. 
     * @return true is the outcome is valid for the sequence, false otherwise.
+    * 
     */
   protected boolean validOutcome(String outcome, String[] sequence) {
     return true;
@@ -118,6 +148,7 @@ public class ChunkerME implements Chunker {
    * Populates the specified array with the probabilities of the last decoded sequence.  The
    * sequence was determined based on the previous call to <code>chunk</code>.  The 
    * specified array should be at least as large as the numbe of tokens in the previous call to <code>chunk</code>.
+   * 
    * @param probs An array used to hold the probabilities of the last decoded sequence.
    */
   public void probs(double[] probs) {
