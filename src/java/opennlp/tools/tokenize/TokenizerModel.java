@@ -162,21 +162,7 @@ public final class TokenizerModel {
         
         // read properties
         properties = new Properties();
-        
-        InputStream inTest = new InputStream() {
-
-          @Override
-          public int read() throws IOException {
-            return zip.read();
-          }
-          
-          @Override
-          public void close() throws IOException {
-            System.out.println("ups closed!!!");
-          }
-        };
-        
-        properties.load(inTest);
+        properties.load(zip);
         
         zip.closeEntry();
       }
