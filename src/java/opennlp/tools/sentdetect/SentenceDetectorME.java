@@ -44,28 +44,45 @@ import opennlp.tools.lang.thai.SentenceContextGenerator;
  * string to determine if they signify the end of a sentence.
  *
  * @author      Jason Baldridge and Tom Morton
- * @version     $Revision: 1.18 $, $Date: 2008/04/19 15:28:59 $
+ * @version     $Revision: 1.19 $, $Date: 2008/08/13 14:52:48 $
  */
-
 public class SentenceDetectorME implements SentenceDetector {
 
-  /** The maximum entropy model to use to evaluate contexts. */
+  /** 
+   * The maximum entropy model to use to evaluate contexts. 
+   */
   private MaxentModel model;
 
-  /** The feature context generator. */
+  /** 
+   * The feature context generator. 
+   */
   private final SDContextGenerator cgen;
 
-  /** The EndOfSentenceScanner to use when scanning for end of sentence offsets. */
+  /** 
+   * The {@link EndOfSentenceScanner} to use when scanning for end of sentence offsets. 
+   */
   private final EndOfSentenceScanner scanner;
 
-  /** A pool of read-only java.lang.Integer objects in the range 0..100 */
+  /** 
+   * A pool of read-only java.lang.Integer objects in the range 0..100 
+   */
   private static final IntegerPool INT_POOL = new IntegerPool(100);
   
-  /** The list of probabilities associated with each decision. */
+  /** 
+   * The list of probabilities associated with each decision. 
+   */
   private List<Double> sentProbs;
   
   protected boolean useTokenEnd;
 
+  public SentenceDetectorME(SentenceModel model) {
+    this.model = model.getMaxentModel();
+    // TODO: Why do we not pass in the end of sentence scanner here instaed of the end chars ?
+    cgen = new DefaultSDContextGenerator(model.getEndOfSentenceCharacters());
+    // TODO: Build a Default end of SentenceScanner which gets an array of end of sentence chars
+    scanner = new opennlp.tools.lang.english.EndOfSentenceScanner();
+  }
+  
   /**
    * Constructor which takes a MaxentModel and calls the three-arg
    * constructor with that model, an SDContextGenerator, and the
@@ -74,6 +91,7 @@ public class SentenceDetectorME implements SentenceDetector {
    * @param m The MaxentModel which this SentenceDetectorME will use to
    *          evaluate end-of-sentence decisions.
    */
+  @Deprecated
   public SentenceDetectorME(MaxentModel m) {
     this(m, new DefaultSDContextGenerator(opennlp.tools.lang.english.EndOfSentenceScanner.eosCharacters), new opennlp.tools.lang.english.EndOfSentenceScanner());
   }
@@ -88,6 +106,7 @@ public class SentenceDetectorME implements SentenceDetector {
    *           will use to turn Strings into contexts for the model to
    *           evaluate.
    */
+  @Deprecated
   public SentenceDetectorME(MaxentModel m, SDContextGenerator cg) {
     this(m, cg, new opennlp.tools.lang.english.EndOfSentenceScanner());
   }
@@ -103,6 +122,7 @@ public class SentenceDetectorME implements SentenceDetector {
    * @param s the EndOfSentenceScanner which this SentenceDetectorME
    *          will use to locate end of sentence indexes.
    */
+  @Deprecated
   public SentenceDetectorME(MaxentModel m, SDContextGenerator cg, EndOfSentenceScanner s) {
     model = m;
     cgen = cg;
@@ -201,8 +221,10 @@ public class SentenceDetectorME implements SentenceDetector {
     return sentPositions;
   }
 
-  /** Returns the probabilities associated with the most recent
+  /** 
+   * Returns the probabilities associated with the most recent
    * calls to sentDetect().
+   * 
    * @return probability for each sentence returned for the most recent
    * call to sentDetect.  If not applicable an empty array is
    * returned.
@@ -352,6 +374,5 @@ public class SentenceDetectorME implements SentenceDetector {
     catch (Exception e) {
       e.printStackTrace();
     }
-
   }
 }
