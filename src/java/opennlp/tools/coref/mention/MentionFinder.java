@@ -15,39 +15,49 @@
 //License along with this program; if not, write to the Free Software
 //Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 //////////////////////////////////////////////////////////////////////////////
+
 package opennlp.tools.coref.mention;
 
 /**
- *  Specifies the interface that Objects which determine the space of mentions for coreference should implement. 
+ * Specifies the interface that Objects which determine the space of
+ * mentions for coreference should implement. 
  */
 public interface MentionFinder {
 
-  /** Specifies whether pre-nominal named-entities should be collected as mentions.
+  /** 
+   * Specifies whether pre-nominal named-entities should be collected as mentions.
+   * 
    * @param collectPrenominalNamedEntities true if pre-nominal named-entities should be collected; false otherwise. 
    */
   public void setPrenominalNamedEntityCollection(boolean collectPrenominalNamedEntities);
+  
   /**
-   * Reutrns whether this mention finder collects pre-nominal named-entities as mentions.
+   * Returns whether this mention finder collects pre-nominal named-entities as mentions.
+   * 
    * @return true if this mention finder collects pre-nominal named-entities as mentions
    */
   public boolean isPrenominalNamedEntityCollection();
   
   /**
-   * Reutrns whether this mention finder collects coordinated noun phrases as mentions.
+   * Returns whether this mention finder collects coordinated noun phrases as mentions.
+   * 
    * @return true if this mention finder collects coordinated noun phrases as mentions; false otherwise.
    */
   public boolean isCoordinatedNounPhraseCollection();
   
-  /** Specifies whether coordinated noun phrases should be collected as mentions.
+  /** 
+   * Specifies whether coordinated noun phrases should be collected as mentions.
+   * 
    * @param collectCoordinatedNounPhrases true if coordinated noun phrases should be collected; false otherwise. 
    */
   public void setCoordinatedNounPhraseCollection(boolean collectCoordinatedNounPhrases);
 
   /**
    * Returns an array of mentions.
+   * 
    * @param parse A top level parse from which mentions are gathered.
+   * 
    * @return an array of mentions which implement the <code>Extent</code> interface.
    */
   public Mention[] getMentions(Parse parse);
-
 }
