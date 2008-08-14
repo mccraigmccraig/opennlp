@@ -15,26 +15,30 @@
 //License along with this program; if not, write to the Free Software
 //Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 //////////////////////////////////////////////////////////////////////////////   
+
 package opennlp.tools.parser;
 
 import java.util.Set;
 
-/** Interface for encoding the head rules associated with parsing. 
+/** 
+ * Interface for encoding the head rules associated with parsing.
+ * 
  * @author Tom Morton
- *
  */
 public interface HeadRules {
   
   /**
    * Returns the head constituent for the specified constituents of the specified type.
+   * 
    * @param constituents The constituents which make up a constituent of the specified type.
-   * @param type The type of a constituent which is made up of the specifed constituents.
+   * @param type The type of a constituent which is made up of the specified constituents.
    * @return The constituent which is the head.
    */
   public Parse getHead(Parse[] constituents, String type);
   
   /**
-   * Returns the set of punctuation tags.  Attachment decisions for these tags will not be modeled. 
+   * Returns the set of punctuation tags.  Attachment decisions for these tags will not be modeled.
+   *  
    * @return the set of punctuation tags.
    */
   public Set<String> getPunctuationTags();
