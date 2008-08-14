@@ -20,27 +20,14 @@ package opennlp.tools.parser;
 
 /**
  * Enumerated type of event types for the parser. 
- *
  */
-public class ParserEventTypeEnum {
+public enum ParserEventTypeEnum {
 
-  private String name;
-
-  public static final ParserEventTypeEnum BUILD = new ParserEventTypeEnum("build");
-  public static final ParserEventTypeEnum CHECK = new ParserEventTypeEnum("check");
+  BUILD,
+  CHECK,
   
-  public static final ParserEventTypeEnum CHUNK = new ParserEventTypeEnum("chunk");
-  public static final ParserEventTypeEnum TAG = new ParserEventTypeEnum("tag");
+  CHUNK,
+  TAG,
   
-  public static final ParserEventTypeEnum ATTACH = new ParserEventTypeEnum("attach");
-
-  private ParserEventTypeEnum(String name) {
-    this.name = name;
-  }
-
-  @Override
-  public String toString() {
-    return name;
-  }
+  ATTACH
 }
-

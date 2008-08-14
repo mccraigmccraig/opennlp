@@ -15,29 +15,29 @@
 //License along with this program; if not, write to the Free Software
 //Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 //////////////////////////////////////////////////////////////////////////////
+
 package opennlp.tools.coref;
 
-/** Enumeration of modes in which a linker can run. */
-public class LinkerMode { 
+/** 
+ * Enumeration of modes in which a linker can run. 
+ */
+public enum LinkerMode { 
 
-  private final String name;
-
-  private LinkerMode(String name) {
-    this.name = name;
-  }
-
-  /** Testing mode, used to identify coreference relationships in un-annotatoed text. */
-  public static final LinkerMode TEST = new LinkerMode("test");
-  /** Trianing mode, used to learn coreference relationships in annotatoed text. */
-  public static final LinkerMode TRAIN = new LinkerMode("train");
+  /** 
+   * Testing mode, used to identify coreference relationships in un-annotatoed text. 
+   */
+  TEST,
+  
+  /** 
+   * Training mode, used to learn coreference relationships in annotatoed text. 
+   */
+  TRAIN,
+  
   /** Evaluation mode, used to evaluate identifed coreference relationships based on annotatoed text. */
-  public static final LinkerMode EVAL = new LinkerMode("eval");
-  /** Trianing mode, used to learn coreference relationships in annotatoed text. */
-  public static final LinkerMode SIM = new LinkerMode("sim");
-
-
-  public String toString() {
-    return name;
-  }
-
+  EVAL,
+  
+  /** 
+   * Training mode, used to learn coreference relationships in annotatoed text. 
+   */
+  SIM
 }

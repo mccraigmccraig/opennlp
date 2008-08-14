@@ -20,19 +20,7 @@ package opennlp.tools.coref.resolver;
 /**
  * Enumerated type specifying the modes if a resolver. 
  */
-public class ResolverMode { 
-
-  private final String name;
-
-  private ResolverMode(String name) {
-    this.name = name;
-  }
-
-  public static final ResolverMode TEST = new ResolverMode("test");
-  public static final ResolverMode TRAIN = new ResolverMode("train");
-
-  public String toString() {
-    return(name);
-  }
-
+public enum ResolverMode { 
+  TEST,
+  TRAIN
 }
