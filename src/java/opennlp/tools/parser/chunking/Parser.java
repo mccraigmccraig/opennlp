@@ -15,6 +15,7 @@
 //License along with this program; if not, write to the Free Software
 //Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 //////////////////////////////////////////////////////////////////////////////   
+
 package opennlp.tools.parser.chunking;
 
 import java.io.FileInputStream;
@@ -36,6 +37,7 @@ import opennlp.tools.parser.HeadRules;
 import opennlp.tools.parser.Parse;
 import opennlp.tools.parser.ParserChunker;
 import opennlp.tools.parser.ParserEventTypeEnum;
+import opennlp.tools.parser.ParserModel;
 import opennlp.tools.parser.ParserTagger;
 import opennlp.tools.util.InvalidFormatException;
 import opennlp.tools.util.Span;
@@ -63,6 +65,12 @@ public class Parser extends AbstractBottomUpParser {
   private int completeIndex;
   private int incompleteIndex;
   
+  public Parser(ParserModel model) {
+    this(model.getBuildModel(), model.getCheckModel(), 
+        new opennlp.tools.lang.english.ParserTagger(model.getParserTaggerModel()),
+        new opennlp.tools.lang.english.ParserChunker(model.getParserChunkerModel()),
+        model.getHeadRules());
+  }
 
   /**
    * Creates a new parser using the specified models and head rules.
@@ -72,6 +80,7 @@ public class Parser extends AbstractBottomUpParser {
    * @param chunker The model to assign flat constituent labels.
    * @param headRules The head rules for head word perculation.
    */
+  @Deprecated
   public Parser(MaxentModel buildModel, MaxentModel checkModel, ParserTagger tagger, ParserChunker chunker, HeadRules headRules) {
   	this(buildModel,checkModel,tagger,chunker,headRules,defaultBeamSize,defaultAdvancePercentage);
   }
@@ -87,6 +96,7 @@ public class Parser extends AbstractBottomUpParser {
    * @param advancePercentage The minimal amount of probability mass which advanced outcomes must represent.  
    * Only outcomes which contribute to the top "advancePercentage" will be explored.    
    */
+  @Deprecated
   public Parser(MaxentModel buildModel, MaxentModel checkModel, ParserTagger tagger, ParserChunker chunker, HeadRules headRules, int beamSize, double advancePercentage) {
     super(tagger,chunker,headRules,beamSize,advancePercentage);
     this.buildModel = buildModel;
