@@ -23,9 +23,6 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 
 import junit.framework.TestCase;
-import opennlp.maxent.EventStream;
-import opennlp.maxent.GIS;
-import opennlp.maxent.MaxentModel;
 import opennlp.maxent.PlainTextByLineDataStream;
 
 /**
@@ -38,12 +35,10 @@ public class POSTaggerMETest extends TestCase {
     InputStream in = getClass().getClassLoader().getResourceAsStream(
     "opennlp/tools/postag/AnnotatedSentences.txt");
     
-    EventStream es = new POSEventStreamNew(new WordTagSampleStream(new PlainTextByLineDataStream(
-        new InputStreamReader(in))));
+    POSModel posModel = POSTaggerME.train(new WordTagSampleStream(new PlainTextByLineDataStream(
+        new InputStreamReader(in))), null, null, 5);
     
-    MaxentModel posModel = GIS.trainModel(es);
-    
-    POSTagger tagger = new POSTaggerME(posModel, new DefaultPOSContextGenerator(null));
+    POSTagger tagger = new POSTaggerME(posModel);
     
     String tags[] = tagger.tag(new String[] {
         "The",
