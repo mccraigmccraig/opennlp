@@ -18,8 +18,9 @@
 
 package opennlp.tools.tokenize;
 
+import java.io.IOException;
+
 import junit.framework.TestCase;
-import opennlp.maxent.MaxentModel;
 
 /**
  * Tests for the {@link TokenizerME} class.
@@ -27,15 +28,16 @@ import opennlp.maxent.MaxentModel;
  * This test trains the tokenizer with a few sample tokens
  * and then predicts a token. This test checks if the
  * tokenizer code can be executed.
+ * 
+ * @see TokenizerME
  */
 public class TokenizerMETest extends TestCase {
 
-  public void testTokenizer() {
+  public void testTokenizer() throws IOException {
     
-    MaxentModel tokenizerModel = TokenizerTestUtil.createMaxentTokenModel();
+    TokenizerModel model = TokenizerTestUtil.createMaxentTokenModel();
     
-    TokenizerME tokenizer = new TokenizerME(tokenizerModel);
-    tokenizer.setAlphaNumericOptimization(true);
+    TokenizerME tokenizer = new TokenizerME(model);
     
     String tokens[] = tokenizer.tokenize("test,");
     

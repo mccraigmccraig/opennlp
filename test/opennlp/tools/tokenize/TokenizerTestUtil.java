@@ -18,13 +18,10 @@
 
 package opennlp.tools.tokenize;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-import opennlp.maxent.EventStream;
-import opennlp.maxent.GIS;
-import opennlp.maxent.GISModel;
-import opennlp.maxent.MaxentModel;
 import opennlp.tools.util.Span;
 
 /**
@@ -32,7 +29,7 @@ import opennlp.tools.util.Span;
  */
 public class TokenizerTestUtil {
 
-  static GISModel createMaxentTokenModel() {
+  static TokenizerModel createMaxentTokenModel() throws IOException {
     List<TokenSample> samples = new ArrayList<TokenSample>();
     
     samples.add(new TokenSample("year", new Span[]{new Span(0, 4)}));
@@ -50,9 +47,7 @@ public class TokenizerTestUtil {
         new Span(0, 3),
         new Span(3, 4)}));
     
-    EventStream es = new TokSpanEventStream(samples.iterator(), true);
-    
-    return GIS.trainModel(es);
+    return TokenizerME.train(samples.iterator(), true);
   }
   
 }
