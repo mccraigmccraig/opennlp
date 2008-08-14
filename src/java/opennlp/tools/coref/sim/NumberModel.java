@@ -111,7 +111,7 @@ public class NumberModel implements TestNumberModel, TrainSimilarityModel {
   }
 
   public void setExtents(Context[] extentContexts) {
-    HashList entities = new HashList();
+    HashList<Integer, Context> entities = new HashList<Integer, Context>();
     List<Context> singletons = new ArrayList<Context>();
     for (int ei = 0, el = extentContexts.length; ei < el; ei++) {
       Context ec = extentContexts[ei];

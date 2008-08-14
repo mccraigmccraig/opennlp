@@ -26,28 +26,27 @@ import java.util.List;
 /** 
  * Class which creates mapping between keys and a list of values.  
  */
-public class HashList extends HashMap {
+public class HashList<K, V> extends HashMap<K, List<V>> {
 
   private static final long serialVersionUID = 1;
   
   public HashList() {
-    super();
   }
   
-  public Object get(Object key, int index) {
-    if (get(key) == null) {
-      return get(key);
+  public V get(K key, int index) {
+    if (get(key) != null) {
+      return get(key).get(index);
     }
     else {
-      return ((List)get(key)).get(index);
+      return null;
     }
   }
 
-  public Object putAll(Object key, Collection values) {
-    List o = (List)get(key);
+  public Object putAll(K key, Collection<V> values) {
+    List<V> o = get(key);
 
     if (o == null) {
-      o = new ArrayList();
+      o = new ArrayList<V>();
       super.put(key, o);
     }
 
@@ -59,11 +58,11 @@ public class HashList extends HashMap {
       return o;
   }
 
-  public Object put(Object key, Object value) {
-    List o = (List)get(key);
+  public List<V> put(K key, V value) {
+    List<V> o = get(key);
     
     if (o == null) {
-      o = new ArrayList();
+      o = new ArrayList<V>();
       super.put(key, o);
     } 
 
@@ -75,8 +74,8 @@ public class HashList extends HashMap {
       return o;
   }
 
-  public boolean remove(Object key, Object value) {
-    List l = (List) get(key);
+  public boolean remove(K key, V value) {
+    List<V> l = get(key);
     if (l == null) {
       return false;
     }
@@ -89,4 +88,3 @@ public class HashList extends HashMap {
     }
   }
 }
-

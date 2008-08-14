@@ -15,6 +15,7 @@
 //License along with this program; if not, write to the Free Software
 //Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 //////////////////////////////////////////////////////////////////////////////
+
 package opennlp.tools.coref.sim;
 
 import java.io.BufferedReader;
@@ -40,8 +41,8 @@ import opennlp.tools.util.HashList;
 
 /**
  * Class which models the gender of a particular mentions and entities made up of mentions. 
+ * 
  * @author Tom Morton
- *
  */
 public class GenderModel implements TestGenderModel, TrainSimilarityModel {
 
@@ -172,7 +173,7 @@ public class GenderModel implements TestGenderModel, TrainSimilarityModel {
   }
 
   public void setExtents(Context[] extentContexts) {
-    HashList entities = new HashList();
+    HashList<Integer, Context> entities = new HashList<Integer, Context>();
     List<Context> singletons = new ArrayList<Context>();
     for (int ei = 0, el = extentContexts.length; ei < el; ei++) {
       Context ec = extentContexts[ei];
@@ -283,5 +284,4 @@ public class GenderModel implements TestGenderModel, TrainSimilarityModel {
   public int getNeuterIndex() {
     return neuterIndex;
   }
-
 }

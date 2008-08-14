@@ -43,7 +43,7 @@ import opennlp.tools.util.HashList;
 
 /**
  * Models semantic similarity between two mentions and returns a score based on 
- * how semantically comparible the mentions are with one another.  
+ * how semantically comparable the mentions are with one another.  
  */
 public class SimilarityModel implements TestSimilarityModel, TrainSimilarityModel {
 
@@ -96,8 +96,10 @@ public class SimilarityModel implements TestSimilarityModel, TrainSimilarityMode
 
   /**
    * Produces a set of head words for the specified list of mentions.
-   * @param mentions The mentions to use to construct the 
-   * @return A set containing the head words of the sepecified mentions.
+   * 
+   * @param mentions The mentions to use to construct the
+   * 
+   * @return A set containing the head words of the specified mentions.
    */
   private Set<String> constructHeadSet(List<Context> mentions) {
     Set<String> headSet = new HashSet<String>();
@@ -139,16 +141,19 @@ public class SimilarityModel implements TestSimilarityModel, TrainSimilarityMode
   }
 
   /**
-   * Constructs a set of entities which may be semantically compatible with the entity indicated by the specified entityKey.
+   * Constructs a set of entities which may be semantically compatible with the
+   * entity indicated by the specified entityKey.
+   * 
    * @param entityKey The key of the entity for which the set is being constructed. 
-   * @param entities A mapping between entity keys and their meantions. 
+   * @param entities A mapping between entity keys and their mentions. 
    * @param headSets A mapping between entity keys and their head sets.
    * @param nameSets A mapping between entity keys and their name sets.
    * @param singletons A list of all entities which consists of a single mentions.
+   * 
    * @return A set of mentions for all the entities which might be semantically compatible 
    * with entity indicated by the specified key. 
    */
-  private Set<Context> constructExclusionSet(Integer entityKey, HashList entities, Map<Integer, Set<String>> headSets, Map<Integer, Set<String>> nameSets, List<Context> singletons) {
+  private Set<Context> constructExclusionSet(Integer entityKey, HashList<Integer, Context> entities, Map<Integer, Set<String>> headSets, Map<Integer, Set<String>> nameSets, List<Context> singletons) {
     Set<Context> exclusionSet = new HashSet<Context>();
     Set<String> entityHeadSet = headSets.get(entityKey);
     Set<String> entityNameSet = nameSets.get(entityKey);
@@ -197,11 +202,13 @@ public class SimilarityModel implements TestSimilarityModel, TrainSimilarityMode
 
   /**
    * Constructs a mapping between the specified entities and their head set.
+   * 
    * @param entities Mapping between a key and a list of meanions which compose an entity.
-   * @return a mapping between the keys of the secified entity mapping and the head set 
-   * generatated from the mentions associated with that key.
+   * 
+   * @return a mapping between the keys of the specified entity mapping and the head set 
+   * generated from the mentions associated with that key.
    */
-  private Map<Integer, Set<String>> constructHeadSets(HashList entities) {
+  private Map<Integer, Set<String>> constructHeadSets(HashList<Integer, Context> entities) {
     Map<Integer, Set<String>> headSets = new HashMap<Integer, Set<String>>();
     for (Iterator<Integer> ei = entities.keySet().iterator(); ei.hasNext();) {
       Integer key = ei.next();
@@ -213,7 +220,9 @@ public class SimilarityModel implements TestSimilarityModel, TrainSimilarityMode
 
   /**
    * Produces the set of name types associated with each of the specified mentions.
+   * 
    * @param mentions A list of mentions.
+   * 
    * @return A set set of name types assigned to the specified mentions.
    */
   private Set<String> constructNameSet(List<Context> mentions) {
@@ -228,11 +237,13 @@ public class SimilarityModel implements TestSimilarityModel, TrainSimilarityMode
   }
 
   /**
-   * Constructs a mappng between the specified entities and the names associated with these entities.
+   * Constructs a mapping between the specified entities and the names associated with these entities.
+   * 
    * @param entities A mapping between a key and a list of mentions.
+   * 
    * @return a mapping between each key in the specified entity map and the name types associated with the each mention of that entity.
    */
-  private Map<Integer, Set<String>> constructNameSets(HashList entities) {
+  private Map<Integer, Set<String>> constructNameSets(HashList<Integer, Context> entities) {
     Map<Integer, Set<String>> nameSets = new HashMap<Integer, Set<String>>();
     for (Iterator<Integer> ei = entities.keySet().iterator(); ei.hasNext();) {
       Integer key = ei.next();
@@ -272,9 +283,8 @@ public class SimilarityModel implements TestSimilarityModel, TrainSimilarityMode
   }
   */
   
-  
   public void setExtents(Context[] extentContexts) {
-    HashList entities = new HashList();
+    HashList<Integer, Context> entities = new HashList<Integer, Context>();
     /** Extents which are not in a coreference chain. */
     List<Context> singletons = new ArrayList<Context>();
     List<Context> allExtents = new ArrayList<Context>();
@@ -358,7 +368,9 @@ public class SimilarityModel implements TestSimilarityModel, TrainSimilarityMode
       }
       writer.close();
     }
-    (new SuffixSensitiveGISModelWriter(GIS.trainModel(new CollectionEventStream(events),100,10),new File(modelName+modelExtension))).persist();
+    (new SuffixSensitiveGISModelWriter(GIS.trainModel(
+        new CollectionEventStream(events),100,10),
+        new File(modelName+modelExtension))).persist();
   }
 
   private boolean isName(Context np) {
@@ -401,7 +413,8 @@ public class SimilarityModel implements TestSimilarityModel, TrainSimilarityMode
   private List<String> getNamePronounFeatures(Context name, Context pronoun) {
     List<String> features = new ArrayList<String>(2);
     features.add("nw=" + name.getNameType() + "," + pronoun.getHeadTokenText().toLowerCase());
-    features.add("ng=" + name.getNameType() + "," + AbstractResolver.getPronounGender(pronoun.getHeadTokenText().toLowerCase()));
+    features.add("ng=" + name.getNameType() + "," + AbstractResolver.getPronounGender(
+        pronoun.getHeadTokenText().toLowerCase()));
     return features;
   }
 
@@ -501,8 +514,8 @@ public class SimilarityModel implements TestSimilarityModel, TrainSimilarityMode
       //features.add("1isa2-"+(synsets1.size() - numCommonSynsets));
     }
     if (!same) {
-      for (Iterator si = synsets1.iterator(); si.hasNext();) {
-        Object synset = si.next();
+      for (Iterator<String> si = synsets1.iterator(); si.hasNext();) {
+        String synset = si.next();
         if (synsets2.contains(synset)) {
           features.add("ss=" + synset);
           numCommonSynsets++;
