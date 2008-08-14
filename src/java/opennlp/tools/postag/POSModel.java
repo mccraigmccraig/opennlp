@@ -123,6 +123,8 @@ public final class POSModel {
       getNgramDictionary().serialize(out);
       zip.closeEntry();
     }
+    
+    zip.close();
   }
   
   public static POSModel create(InputStream in) throws IOException, InvalidFormatException {
@@ -153,7 +155,7 @@ public final class POSModel {
       }
     }
      
-    if (posDictionary == null)
+    if (maxentPosModel == null)
       throw new InvalidFormatException("Could not find maxent pos model!");
     
     return new POSModel(maxentPosModel, posDictionary, ngramDictionary);
