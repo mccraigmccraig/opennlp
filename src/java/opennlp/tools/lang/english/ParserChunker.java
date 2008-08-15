@@ -9,6 +9,7 @@ import java.util.Map;
 import opennlp.maxent.MaxentModel;
 import opennlp.maxent.io.SuffixSensitiveGISModelReader;
 import opennlp.tools.chunker.ChunkerME;
+import opennlp.tools.chunker.ChunkerModel;
 import opennlp.tools.parser.ChunkContextGenerator;
 import opennlp.tools.parser.chunking.Parser;
 import opennlp.tools.util.Sequence;
@@ -16,13 +17,17 @@ import opennlp.tools.util.Sequence;
 /**
  * Class which perform chunking for non-recursive constituents.  This follows the scheme used by
  * the CONLL shared chunking task. http://www.cnts.ua.ac.be/conll2000/chunking/
+ * 
  * @author Tom Morton
- *
  */
 public class ParserChunker extends ChunkerME implements opennlp.tools.parser.ParserChunker {
   private static final int K = 10;
   private int beamSize;
   private Map<String, String> continueStartMap;
+  
+  public ParserChunker(ChunkerModel model) {
+    super(model);
+  }
   
   public ParserChunker(String modelFile) throws IOException {
     this(modelFile,K,K);

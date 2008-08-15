@@ -9,6 +9,7 @@ import opennlp.maxent.io.SuffixSensitiveGISModelReader;
 import opennlp.tools.dictionary.Dictionary;
 import opennlp.tools.postag.DefaultPOSContextGenerator;
 import opennlp.tools.postag.POSDictionary;
+import opennlp.tools.postag.POSModel;
 import opennlp.tools.postag.POSTaggerME;
 import opennlp.tools.util.Sequence;
 
@@ -17,6 +18,11 @@ public class ParserTagger extends POSTaggerME implements opennlp.tools.parser.Pa
   private static final int K = 10;
   int beamSize;
 
+  public ParserTagger(POSModel model) {
+    super(model);
+    beamSize = K;
+  }
+  
   public ParserTagger(MaxentModel model, Dictionary dict) {
     super(model, dict);
     beamSize = K;
