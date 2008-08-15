@@ -27,7 +27,10 @@ import opennlp.tools.tokenize.TokenizerME;
 
 /**
  * A tokenizer which uses default German data for the maxent model.
+ * 
+ * This class is deprecated please use {@link opennlp.tools.lang.Tokenizer} instead!
  */
+@Deprecated
 public class Tokenizer extends TokenizerME  {
   public Tokenizer(String name) throws IOException  {
     super((new SuffixSensitiveGISModelReader(new File(name))).getModel());

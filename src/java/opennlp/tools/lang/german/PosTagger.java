@@ -33,6 +33,7 @@ import opennlp.tools.postag.POSTaggerME;
 import opennlp.tools.postag.TagDictionary;
 import opennlp.tools.util.InvalidFormatException;
 
+@Deprecated
 public class PosTagger extends POSTaggerME {
 
   public PosTagger(String modelFile, Dictionary dict, TagDictionary tagdict) {
