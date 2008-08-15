@@ -15,6 +15,7 @@
 //License along with this program; if not, write to the Free Software
 //Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 //////////////////////////////////////////////////////////////////////////////
+
 package opennlp.tools.coref.mention;
 
 import java.util.ArrayList;
@@ -307,23 +308,23 @@ public abstract class AbstractMentionFinder implements MentionFinder {
    * @param possesiveNounPhrase The possesive noun phase which may require an additional mention.
    * @param mentions The list of mentions into which a new mention can be added. 
    */
-  private void addPossesiveMentions(Parse possesiveNounPhrase, List<Mention> mentions) {
-    List<Parse> kids = possesiveNounPhrase.getSyntacticChildren();
-    if (kids.size() >1) {
-      Parse firstToken = kids.get(1);
-      if (firstToken.isToken() && !firstToken.getSyntacticType().equals("POS")) {
-        Parse lastToken = kids.get(kids.size()-1);
-        if (lastToken.isToken()) {
-          Span extentSpan = new Span(firstToken.getSpan().getStart(),lastToken.getSpan().getEnd());
-          Mention extent = new Mention(extentSpan, extentSpan, -1, null, null);
-          mentions.add(extent);
-        }
-        else {
-          System.err.println("AbstractMentionFinder.addPossesiveMentions: odd parse structure: "+possesiveNounPhrase);
-        }
-      }
-    }
-  }
+//  private void addPossesiveMentions(Parse possesiveNounPhrase, List<Mention> mentions) {
+//    List<Parse> kids = possesiveNounPhrase.getSyntacticChildren();
+//    if (kids.size() >1) {
+//      Parse firstToken = kids.get(1);
+//      if (firstToken.isToken() && !firstToken.getSyntacticType().equals("POS")) {
+//        Parse lastToken = kids.get(kids.size()-1);
+//        if (lastToken.isToken()) {
+//          Span extentSpan = new Span(firstToken.getSpan().getStart(),lastToken.getSpan().getEnd());
+//          Mention extent = new Mention(extentSpan, extentSpan, -1, null, null);
+//          mentions.add(extent);
+//        }
+//        else {
+//          System.err.println("AbstractMentionFinder.addPossesiveMentions: odd parse structure: "+possesiveNounPhrase);
+//        }
+//      }
+//    }
+//  }
 
   private void collectPrenominalNamedEntities(Parse np, List<Mention> extents) {
     Parse htoken = headFinder.getHeadToken(np);
