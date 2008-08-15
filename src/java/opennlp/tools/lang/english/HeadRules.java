@@ -15,11 +15,13 @@
 //License along with this program; if not, write to the Free Software
 //Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 //////////////////////////////////////////////////////////////////////////////   
+
 package opennlp.tools.lang.english;
 
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
+import java.io.Writer;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -34,16 +36,26 @@ import opennlp.tools.parser.chunking.Parser;
 
 /**
  * Class for storing the English head rules associated with parsing. 
- *
  */
 public class HeadRules implements opennlp.tools.parser.HeadRules, GapLabeler {
+  
+  private static class HeadRule {
+    public boolean leftToRight;
+    public String[] tags;
+    public HeadRule(boolean l2r, String[] tags) {
+      leftToRight = l2r;
+      this.tags = tags;
+    }
+  }
   
   private Map<String, HeadRule> headRules;
   private Set<String> punctSet;
   
   /**
    * Creates a new set of head rules based on the specified head rules file.
+   * 
    * @param ruleFile the head rules file.
+   * 
    * @throws IOException if the head rules file can not be read.
    */
   public HeadRules(String ruleFile) throws IOException {
@@ -52,7 +64,9 @@ public class HeadRules implements opennlp.tools.parser.HeadRules, GapLabeler {
   
   /**
    * Creates a new set of head rules based on the specified reader.
-   * @param rulesReader the head rules reader. 
+   * 
+   * @param rulesReader the head rules reader.
+   * 
    * @throws IOException if the head rules reader can not be read.
    */
   public HeadRules(BufferedReader rulesReader) throws IOException {
@@ -64,7 +78,7 @@ public class HeadRules implements opennlp.tools.parser.HeadRules, GapLabeler {
     punctSet.add("''");
     punctSet.add(":");
   }
-    
+
   public Set<String> getPunctuationTags() {
     return punctSet;
   }
@@ -151,19 +165,6 @@ public class HeadRules implements opennlp.tools.parser.HeadRules, GapLabeler {
       headRules.put(type, new HeadRule(dir.equals("1"), tags));
     }
   }
-  
-  
-
-
-  private static class HeadRule {
-    public boolean leftToRight;
-    public String[] tags;
-    public HeadRule(boolean l2r, String[] tags) {
-      leftToRight = l2r;
-      this.tags = tags;
-    }
-  }
-
 
   public void labelGaps(Stack<Constituent> stack) {
     if (stack.size() > 4) {
@@ -186,6 +187,36 @@ public class HeadRules implements opennlp.tools.parser.HeadRules, GapLabeler {
         con3.setLabel(con3.getLabel()+"-G");
         con4.setLabel(con4.getLabel()+"-G");
       }
+    }
+  }
+  
+  public void serialize(Writer writer) throws IOException {
+    
+    for (String type : headRules.keySet()) {
+      
+      HeadRule headRule = headRules.get(type);
+      
+      // write num of tags
+      writer.write(Integer.toString(headRule.tags.length));
+      writer.write(' ');
+      
+      // write type
+      writer.write(type);
+      writer.write(' ');
+      
+      // write l2r true == 1
+      if (headRule.leftToRight)
+        writer.write("1");
+      else
+        writer.write("0");
+      
+      // write tags
+      for (String tag : headRule.tags) {
+        writer.write(' ');
+        writer.write(tag);
+      }
+      
+      writer.write('\n');
     }
   }
 }
