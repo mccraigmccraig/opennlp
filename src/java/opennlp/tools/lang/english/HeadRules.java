@@ -76,7 +76,7 @@ public class HeadRules implements opennlp.tools.parser.HeadRules, GapLabeler {
     punctSet.add(",");
     punctSet.add("``");
     punctSet.add("''");
-    punctSet.add(":");
+    //punctSet.add(":");
   }
 
   public Set<String> getPunctuationTags() {

@@ -26,6 +26,7 @@ import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
+import java.util.TreeSet;
 import java.util.Stack;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -192,7 +193,7 @@ public class Parse implements Cloneable, Comparable<Parse> {
    */
   public void addPreviousPunctuation(Parse punct) {
     if (this.prevPunctSet == null) {
-      this.prevPunctSet = new LinkedHashSet<Parse>();
+      this.prevPunctSet = new TreeSet<Parse>();
     }
     prevPunctSet.add(punct);
   }
@@ -211,7 +212,7 @@ public class Parse implements Cloneable, Comparable<Parse> {
    */
   public void addNextPunctuation(Parse punct) {
     if (this.nextPunctSet == null) {
-      this.nextPunctSet = new LinkedHashSet<Parse>();
+      this.nextPunctSet = new TreeSet<Parse>();
     }
     nextPunctSet.add(punct);
   }
@@ -247,7 +248,7 @@ public class Parse implements Cloneable, Comparable<Parse> {
         Parse subPart = parts.get(pi);
         //System.err.println("Parse.insert:con="+constituent+" sp["+pi+"] "+subPart+" "+subPart.getType());
         Span sp = subPart.span;
-        if (sp.getStart() > ic.getEnd()) {
+        if (sp.getStart() >= ic.getEnd()) {
           break;
         }
         // constituent contains subPart

@@ -44,7 +44,7 @@ import opennlp.tools.lang.thai.SentenceContextGenerator;
  * string to determine if they signify the end of a sentence.
  *
  * @author      Jason Baldridge and Tom Morton
- * @version     $Revision: 1.19 $, $Date: 2008/08/13 14:52:48 $
+ * @version     $Revision: 1.20 $, $Date: 2008/08/22 00:51:48 $
  */
 public class SentenceDetectorME implements SentenceDetector {
 
@@ -81,6 +81,7 @@ public class SentenceDetectorME implements SentenceDetector {
     cgen = new DefaultSDContextGenerator(model.getEndOfSentenceCharacters());
     // TODO: Build a Default end of SentenceScanner which gets an array of end of sentence chars
     scanner = new opennlp.tools.lang.english.EndOfSentenceScanner();
+    useTokenEnd = true;
   }
   
   /**
@@ -128,6 +129,7 @@ public class SentenceDetectorME implements SentenceDetector {
     cgen = cg;
     scanner = s;
     sentProbs = new ArrayList<Double>(50);
+    useTokenEnd = true;
   }
 
   /**

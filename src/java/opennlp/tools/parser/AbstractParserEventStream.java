@@ -56,7 +56,7 @@ public abstract class AbstractParserEventStream implements EventStream {
       this.chunkerContextGenerator = new ChunkContextGenerator();
     }
     else if (etype == ParserEventTypeEnum.TAG) {
-      this.tagContextGenerator = new DefaultPOSContextGenerator(dict);
+      this.tagContextGenerator = new DefaultPOSContextGenerator(null);
     }
     this.rules = rules;
     punctSet = rules.getPunctuationTags();

@@ -207,11 +207,7 @@ public class BuildContextGenerator extends AbstractContextGenerator {
     //default 
     features.add("default");
     //first constituent label
-    features.add("fl="+constituents[0].getLabel());
-
-    //features.add(p_1.getHead()+"=u_1="+u_1);
-    //features.add(p0.getHead()+"=u0="+u0);
-    //features.add(p1.getHead()+"=u1="+u1);
+    //features.add("fl="+constituents[0].getLabel());
     
     // features.add("stage=cons(i)");
     // cons(-2), cons(-1), cons(0), cons(1), cons(2)
@@ -240,7 +236,7 @@ public class BuildContextGenerator extends AbstractContextGenerator {
     if (p0Tag.equals("-RRB-")) {
       for (int pi = index - 1; pi >= 0; pi--) {
         Parse p = constituents[pi];
-        if (p.toString().equals("-LRB-")) {
+        if (p.getType().equals("-LRB-")) {
           features.add("bracketsmatch");
           break;
         }
@@ -252,7 +248,7 @@ public class BuildContextGenerator extends AbstractContextGenerator {
     if (p0Tag.equals("-RCB-")) {
       for (int pi = index - 1; pi >= 0; pi--) {
         Parse p = constituents[pi];
-        if (p.toString().equals("-LCB-")) {
+        if (p.getType().equals("-LCB-")) {
           features.add("bracketsmatch");
           break;
         }
@@ -264,7 +260,7 @@ public class BuildContextGenerator extends AbstractContextGenerator {
     if (p0Tag.equals("''")) {
       for (int pi = index - 1; pi >= 0; pi--) {
         Parse p = constituents[pi];
-        if (p.toString().equals("``")) {
+        if (p.getType().equals("``")) {
           features.add("quotesmatch");
           break;
         }
@@ -276,7 +272,7 @@ public class BuildContextGenerator extends AbstractContextGenerator {
     if (p0Tag.equals("'")) {
       for (int pi = index - 1; pi >= 0; pi--) {
         Parse p = constituents[pi];
-        if (p.toString().equals("`")) {
+        if (p.getType().equals("`")) {
           features.add("quotesmatch");
           break;
         }
@@ -288,7 +284,7 @@ public class BuildContextGenerator extends AbstractContextGenerator {
     if (p0Tag.equals(",")) {
       for (int pi = index - 1; pi >= 0; pi--) {
         Parse p = constituents[pi];
-        if (p.toString().equals(",")) {
+        if (p.getType().equals(",")) {
           features.add("iscomma");
           break;
         }
