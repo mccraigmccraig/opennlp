@@ -30,6 +30,12 @@ import opennlp.tools.util.Span;
 /**
  * Abstract class which contains code to tag and chunk parses for bottom up parsing and
  * leaves implmentation of advancing parses and completing parses to extend class. 
+ * <b>Note:</b> The nodes within
+ * the returned parses are shared with other parses and therefore their parent node references will not be consistent
+ * with their child node reference.  {@link #setParents setParents} can be used to make the parents consistent
+ * with a partuicular parse, but subsequent calls to <code>setParents</code> can invalidate the results of earlier
+ * calls.<br>  
+ * 
  */
 public abstract class AbstractBottomUpParser implements Parser {
 

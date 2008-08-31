@@ -19,7 +19,7 @@
 package opennlp.tools.doccat;
 
 /**
- *
+ * Interface for classes which categorize documents.
  */
 public interface DocumentCategorizer {
 

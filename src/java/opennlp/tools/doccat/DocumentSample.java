@@ -20,6 +20,9 @@ package opennlp.tools.doccat;
 
 import opennlp.tools.tokenize.SimpleTokenizer;
 
+/**
+ * Class which holds a classified document and its category. 
+ */
 public class DocumentSample {
   
   private String category;

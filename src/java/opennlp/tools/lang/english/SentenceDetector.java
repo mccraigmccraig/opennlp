@@ -27,11 +27,10 @@ import opennlp.maxent.io.SuffixSensitiveGISModelReader;
 import opennlp.tools.sentdetect.SentenceDetectorME;
 
 /**
- * A sentence detector which uses a model trained on English data (Wall Street
- * Journal text).
+ * A sentence detector which uses a model trained on English data.
  *
  * @author      Jason Baldridge and Tom Morton
- * @version     $Revision: 1.5 $, $Date: 2007/04/10 12:22:28 $
+ * @version     $Revision: 1.6 $, $Date: 2008/08/31 12:38:18 $
  */
 
 public class SentenceDetector extends SentenceDetectorME {

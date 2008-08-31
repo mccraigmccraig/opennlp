@@ -23,6 +23,9 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
+/**
+ * Abstract class containing many of the methods used to generate contexts for parsing.
+ */
 public abstract class AbstractContextGenerator {
 
   protected static final String EOS = "eos";

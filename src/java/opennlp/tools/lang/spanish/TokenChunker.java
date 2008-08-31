@@ -9,6 +9,9 @@ import opennlp.tools.namefind.NameFinderEventStream;
 import opennlp.tools.namefind.NameFinderME;
 import opennlp.tools.util.Span;
 
+/**
+ * Class which identifies multi-token chunk which are treated as a single token in for POS-tagging.
+ */
 public class TokenChunker {
 
   private NameFinderME nameFinder;

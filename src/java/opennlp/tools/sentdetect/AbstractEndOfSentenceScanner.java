@@ -24,7 +24,7 @@ import java.util.List;
 import opennlp.maxent.IntegerPool;
 
 /**
- * @version $Revision: 1.3 $, $Date: 2008/04/19 15:13:06 $ 
+ * Abstract class for common methods related to identifying potential ends of sentences.
  */
 public abstract class AbstractEndOfSentenceScanner implements EndOfSentenceScanner {
 

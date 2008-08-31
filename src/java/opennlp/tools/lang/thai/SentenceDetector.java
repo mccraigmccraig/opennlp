@@ -27,6 +27,9 @@ import java.io.PrintStream;
 import opennlp.maxent.io.SuffixSensitiveGISModelReader;
 import opennlp.tools.sentdetect.SentenceDetectorME;
 
+/**
+ * Sentence detector for Thai text. 
+ */
 public class SentenceDetector extends SentenceDetectorME {
 
   public SentenceDetector(String name) throws IOException {

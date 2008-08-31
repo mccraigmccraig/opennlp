@@ -13,6 +13,9 @@ import opennlp.tools.postag.POSModel;
 import opennlp.tools.postag.POSTaggerME;
 import opennlp.tools.util.Sequence;
 
+/**
+ * Part-of-speech tagger used by the parser. 
+ */
 public class ParserTagger extends POSTaggerME implements opennlp.tools.parser.ParserTagger {
 
   private static final int K = 10;

@@ -22,7 +22,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 
 /**
- * 
+ * Generates a feature for each word in a document.
  */
 public class BagOfWordsFeatureGenerator implements FeatureGenerator {
 

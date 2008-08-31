@@ -33,7 +33,10 @@ import opennlp.tools.postag.POSTaggerME;
 import opennlp.tools.postag.TagDictionary;
 import opennlp.tools.util.InvalidFormatException;
 
-@Deprecated
+/**
+ * A part of speech tagger that uses a model trained on German data from the German Treebank.
+ * @Deprecated
+ */
 public class PosTagger extends POSTaggerME {
 
   public PosTagger(String modelFile, Dictionary dict, TagDictionary tagdict) {

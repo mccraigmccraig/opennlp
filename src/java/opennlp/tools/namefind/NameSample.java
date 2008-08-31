@@ -2,6 +2,9 @@ package opennlp.tools.namefind;
 
 import opennlp.tools.util.Span;
 
+/** 
+ * Class for holding names for a single unit of text.
+ */
 public class NameSample {
 
   private final String[] sentence;

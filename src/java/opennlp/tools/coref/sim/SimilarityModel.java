@@ -497,29 +497,11 @@ public class SimilarityModel implements TestSimilarityModel, TrainSimilarityMode
       return features;
     }
     int numCommonSynsets = 0;
-    boolean same = false;
-    if (numCommonSynsets == 0) {
-      features.add("ncss");
-    }
-    else if (numCommonSynsets == synsets1.size() && numCommonSynsets == synsets2.size()) {
-      same = true;
-      features.add("samess");
-    }
-    else if (numCommonSynsets == synsets1.size()) {
-      features.add("2isa1");
-      //features.add("2isa1-"+(synsets2.size() - numCommonSynsets));
-    }
-    else if (numCommonSynsets == synsets2.size()) {
-      features.add("1isa2");
-      //features.add("1isa2-"+(synsets1.size() - numCommonSynsets));
-    }
-    if (!same) {
-      for (Iterator<String> si = synsets1.iterator(); si.hasNext();) {
-        String synset = si.next();
-        if (synsets2.contains(synset)) {
-          features.add("ss=" + synset);
-          numCommonSynsets++;
-        }
+    for (Iterator<String> si = synsets1.iterator(); si.hasNext();) {
+      String synset = si.next();
+      if (synsets2.contains(synset)) {
+        features.add("ss=" + synset);
+        numCommonSynsets++;
       }
     }
     if (numCommonSynsets == 0) {

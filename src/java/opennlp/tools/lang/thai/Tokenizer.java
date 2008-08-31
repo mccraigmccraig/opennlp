@@ -26,6 +26,11 @@ import opennlp.maxent.MaxentModel;
 import opennlp.maxent.io.SuffixSensitiveGISModelReader;
 import opennlp.tools.tokenize.TokenizerME;
 
+/**
+ *
+ * Tokenizer for Thai text.
+ *
+ */
 public class Tokenizer extends TokenizerME {
 
   public Tokenizer(String name) throws IOException  {

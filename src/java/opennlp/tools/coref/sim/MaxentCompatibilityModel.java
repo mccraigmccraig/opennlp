@@ -2,6 +2,9 @@ package opennlp.tools.coref.sim;
 
 import java.io.IOException;
 
+/**
+ * Model of mention compatibiltiy using a maxent model.
+ */
 public class MaxentCompatibilityModel {
   
   private final double minGenderProb = 0.66;

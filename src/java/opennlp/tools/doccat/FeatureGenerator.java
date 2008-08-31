@@ -20,6 +20,9 @@ package opennlp.tools.doccat;
 
 import java.util.Collection;
 
+/**
+ * Interface for generating features for document categorization.
+ */
 interface FeatureGenerator {
   public Collection<String> extractFeatures(String[] text);
 }

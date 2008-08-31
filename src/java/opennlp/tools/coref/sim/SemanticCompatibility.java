@@ -1,5 +1,8 @@
 package opennlp.tools.coref.sim;
 
+/**
+ * Class which models the semantic compatibility of an enity and the confidence of that association.
+ */
 public class SemanticCompatibility {
 
   private SemanticEnum type;

@@ -20,6 +20,9 @@ package opennlp.tools.lang.thai;
 
 import opennlp.tools.sentdetect.DefaultSDContextGenerator;
 
+/**
+ * Creates contexts/features for end-of-sentence detection in Thai text. 
+ */
 public class SentenceContextGenerator extends DefaultSDContextGenerator {
 
   public SentenceContextGenerator() {

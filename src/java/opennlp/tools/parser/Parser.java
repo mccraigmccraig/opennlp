@@ -18,6 +18,9 @@
 
 package opennlp.tools.parser;
 
+/**
+ *  Interface for full-syntactic parsers. 
+ */
 public interface Parser {
 
   /**

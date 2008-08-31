@@ -27,6 +27,9 @@ import java.util.regex.Pattern;
 
 import opennlp.tools.util.Span;
 
+/**
+ * Name finder based on a series of regular expressions.
+ */
 public final class RegexNameFinder implements TokenNameFinder {
 
   private final Pattern mPatterns[];

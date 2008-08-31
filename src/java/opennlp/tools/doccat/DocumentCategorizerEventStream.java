@@ -23,9 +23,7 @@ import opennlp.maxent.Event;
 import opennlp.maxent.EventStream;
 
 /**
-*
-* @author <a href="mailto:kottmann@gmail.com">Joern Kottmann</a>
-* @version $Revision: 1.4 $, $Date: 2008/03/05 16:45:12 $
+* Iterator-like class for modeling document classification events.
 */
 public class DocumentCategorizerEventStream implements EventStream {
   
@@ -36,7 +34,7 @@ public class DocumentCategorizerEventStream implements EventStream {
   /**
    * Initializes the current instance.
    * 
-   * @param data {@link DataStream} of {@link DocumentSample}s
+   * @param data {@link opennlp.maxent.DataStream} of {@link DocumentSample}s
    * 
    * @param featureGenerators
    */

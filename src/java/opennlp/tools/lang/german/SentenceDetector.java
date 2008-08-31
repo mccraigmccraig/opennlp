@@ -24,7 +24,10 @@ import java.io.InputStreamReader;
 import opennlp.maxent.io.SuffixSensitiveGISModelReader;
 import opennlp.tools.sentdetect.SentenceDetectorME;
 
-@Deprecated
+/**
+ * A sentence detector which uses a model trained on German data.
+ * @Deprecated
+ */
 public class SentenceDetector extends SentenceDetectorME {
   
   public SentenceDetector(String modelName) throws IOException {

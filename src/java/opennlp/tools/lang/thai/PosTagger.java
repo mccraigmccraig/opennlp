@@ -32,6 +32,10 @@ import opennlp.tools.postag.POSDictionary;
 import opennlp.tools.postag.POSTaggerME;
 import opennlp.tools.postag.TagDictionary;
 
+/**
+ * Determines part-of-speech for Thai text.
+ *
+ */
 public class PosTagger extends POSTaggerME {
   
   public PosTagger(String modelFile, Dictionary dict, TagDictionary tagdict) {

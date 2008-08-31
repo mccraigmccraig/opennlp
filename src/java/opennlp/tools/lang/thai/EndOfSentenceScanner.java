@@ -20,7 +20,9 @@ package opennlp.tools.lang.thai;
 
 import opennlp.tools.sentdetect.AbstractEndOfSentenceScanner;
 
-
+/**
+ * Identifies potential ends of sentences for Thai text. 
+ */
 public class EndOfSentenceScanner extends AbstractEndOfSentenceScanner {
 
   public static final char[] eosCharacters =  {' ','\n'};

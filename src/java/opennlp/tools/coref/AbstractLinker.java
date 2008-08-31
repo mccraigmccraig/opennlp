@@ -29,8 +29,8 @@ import opennlp.tools.coref.sim.Gender;
 import opennlp.tools.coref.sim.Number;
 
 /** 
- * Provides a default implementation of many of the methods in <code>Linker</code> that
- * most implementations of <code>Linker</code> wil want to extend.  
+ * Provides a default implementation of many of the methods in {@link Linker} that
+ * most implementations of {@link Linker} will want to extend.  
  */
 public abstract class AbstractLinker implements Linker {
 

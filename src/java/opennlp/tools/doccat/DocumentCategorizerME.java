@@ -28,7 +28,7 @@ import opennlp.tools.tokenize.SimpleTokenizer;
 import opennlp.tools.tokenize.Tokenizer;
 
 /**
- *
+ * Maxent implementation of {@link DocumentCategorizer}.
  */
 public class DocumentCategorizerME implements DocumentCategorizer {
   

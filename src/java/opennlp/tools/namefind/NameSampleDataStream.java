@@ -10,6 +10,8 @@ import opennlp.tools.util.Span;
 /**
  * The {@link NameSampleDataStream} class converts tagged {@link String}s
  * provided by a {@link DataStream} to {@link NameSample} objects.
+ * It uses text that is is one-sentence per line and tokenized
+ * with names identified by <code>&lt;START&gt;</code> and <code>&lt;END&gt;</code> tags. 
  */
 public class NameSampleDataStream implements Iterator<NameSample> {
 
