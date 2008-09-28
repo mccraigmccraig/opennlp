@@ -24,7 +24,7 @@ import java.util.Iterator;
 import java.util.List;
 
 import junit.framework.TestCase;
-import opennlp.maxent.Event;
+import opennlp.model.Event;
 
 /**
  * Tests for the {@link AbstractEventStream} class.

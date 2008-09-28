@@ -1,20 +1,20 @@
-///////////////////////////////////////////////////////////////////////////////
-//Copyright (C) 2008 OpenNlp
-// 
-//This library is free software; you can redistribute it and/or
-//modify it under the terms of the GNU Lesser General Public
-//License as published by the Free Software Foundation; either
-//version 2.1 of the License, or (at your option) any later version.
-// 
-//This library is distributed in the hope that it will be useful,
-//but WITHOUT ANY WARRANTY; without even the implied warranty of
-//MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-//GNU Lesser General Public License for more details.
-// 
-//You should have received a copy of the GNU Lesser General Public
-//License along with this program; if not, write to the Free Software
-//Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
-//////////////////////////////////////////////////////////////////////////////
+/*
+ * Licensed to the Apache Software Foundation (ASF) under one or more
+ * contributor license agreemnets.  See the NOTICE file distributed with
+ * this work for additional information regarding copyright ownership.
+ * The ASF licenses this file to You under the Apache License, Version 2.0 
+ * (the "License"); you may not use this file except in compliance with 
+ * the License. You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 
 package opennlp.tools.postag;
 
@@ -27,8 +27,9 @@ import java.util.zip.ZipInputStream;
 import java.util.zip.ZipOutputStream;
 
 import opennlp.maxent.GISModel;
-import opennlp.maxent.MaxentModel;
 import opennlp.maxent.io.BinaryGISModelReader;
+import opennlp.model.AbstractModel;
+import opennlp.model.MaxentModel;
 import opennlp.tools.dictionary.Dictionary;
 import opennlp.tools.util.InvalidFormatException;
 import opennlp.tools.util.ModelUtil;
@@ -45,13 +46,13 @@ public final class POSModel {
   private static final String TAG_DICTIONARY_ENTRY_NAME = "tag-dictionary.xml";
   private static final String NGRAM_DICTIONARY_ENTRY_NAME = "ngram-dictionary.xml";
   
-  private final GISModel maxentPosModel;
+  private final AbstractModel maxentPosModel;
   
   private final POSDictionary tagDictionary;
   
   private final Dictionary ngramDict;
   
-  public POSModel(GISModel maxentPosModel, POSDictionary tagDictionary, 
+  public POSModel(AbstractModel maxentPosModel, POSDictionary tagDictionary, 
       Dictionary ngramDict) {
     
     if (maxentPosModel == null) 
@@ -130,7 +131,7 @@ public final class POSModel {
   public static POSModel create(InputStream in) throws IOException, InvalidFormatException {
     ZipInputStream zip = new ZipInputStream(in);
 
-    GISModel maxentPosModel = null;
+    AbstractModel maxentPosModel = null;
     POSDictionary posDictionary = null;
     Dictionary ngramDictionary = null;
     

@@ -22,22 +22,13 @@ Licience: BSD License (JWNL)
 Provides a Java API to the WordNet database.
 
 ------------------------------------------------------------------------
-maxent-2.3.0.jar
+maxent-3.0.0.jar
 
-Maxent, version 2.3.0 
+Maxent, version 3.0.0 
 Homepage: http://maxent.sourceforge.net/
-Licience: LGPL
+Licience: ASL
 
 Package for training and using maximum entropy models. 
 
-
-------------------------------------------------------------------------
-trove.jar
-
-GNU Trove, version 1.0.2
-Homepage: http://trove4j.sf.net
-License: LGPL
-
-High performance collections for Java.
 
 ------------------------------------------------------------------------

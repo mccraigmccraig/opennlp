@@ -1,20 +1,20 @@
-///////////////////////////////////////////////////////////////////////////////
-//Copyright (C) 2003 Thomas Morton
-// 
-//This library is free software; you can redistribute it and/or
-//modify it under the terms of the GNU Lesser General Public
-//License as published by the Free Software Foundation; either
-//version 2.1 of the License, or (at your option) any later version.
-// 
-//This library is distributed in the hope that it will be useful,
-//but WITHOUT ANY WARRANTY; without even the implied warranty of
-//MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-//GNU Lesser General Public License for more details.
-// 
-//You should have received a copy of the GNU Lesser General Public
-//License along with this program; if not, write to the Free Software
-//Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
-//////////////////////////////////////////////////////////////////////////////
+/*
+ * Licensed to the Apache Software Foundation (ASF) under one or more
+ * contributor license agreemnets.  See the NOTICE file distributed with
+ * this work for additional information regarding copyright ownership.
+ * The ASF licenses this file to You under the Apache License, Version 2.0 
+ * (the "License"); you may not use this file except in compliance with 
+ * the License. You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package opennlp.tools.namefind;
 
 import java.io.FileInputStream;
@@ -23,11 +23,12 @@ import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.List;
 
-import opennlp.maxent.EventStream;
 import opennlp.maxent.GIS;
 import opennlp.maxent.GISModel;
-import opennlp.maxent.MaxentModel;
-import opennlp.maxent.TwoPassDataIndexer;
+import opennlp.model.AbstractModel;
+import opennlp.model.EventStream;
+import opennlp.model.MaxentModel;
+import opennlp.model.TwoPassDataIndexer;
 import opennlp.tools.util.BeamSearch;
 import opennlp.tools.util.Sequence;
 import opennlp.tools.util.Span;
@@ -285,8 +286,8 @@ public class NameFinderME implements TokenNameFinder {
     if (args.length > ai) {
       cutoff = Integer.parseInt(args[ai++]); 
     }
-    GISModel mod;
-    opennlp.maxent.EventStream es;
+    AbstractModel mod;
+    opennlp.model.EventStream es;
     if (encoding != null) {
        es = new NameFinderEventStream(new NameSampleDataStream(new opennlp.maxent.PlainTextByLineDataStream(new InputStreamReader(new FileInputStream(inFile),encoding))));
     }

@@ -1,20 +1,20 @@
-///////////////////////////////////////////////////////////////////////////////
-// Copyright (C) 2004 Jason Baldridge, Gann Bierner and Tom Morton
-// 
-// This library is free software; you can redistribute it and/or
-// modify it under the terms of the GNU Lesser General Public
-// License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
-// 
-// This library is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-// GNU Lesser General Public License for more details.
-// 
-// You should have received a copy of the GNU Lesser General Public
-// License along with this program; if not, write to the Free Software
-// Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
-//////////////////////////////////////////////////////////////////////////////
+/*
+ * Licensed to the Apache Software Foundation (ASF) under one or more
+ * contributor license agreemnets.  See the NOTICE file distributed with
+ * this work for additional information regarding copyright ownership.
+ * The ASF licenses this file to You under the Apache License, Version 2.0 
+ * (the "License"); you may not use this file except in compliance with 
+ * the License. You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 
 package opennlp.tools.sentdetect;
 
@@ -29,13 +29,13 @@ import java.util.ArrayList;
 import java.util.List;
 
 import opennlp.maxent.DataStream;
-import opennlp.maxent.EventStream;
 import opennlp.maxent.GIS;
-import opennlp.maxent.GISModel;
 import opennlp.maxent.IntegerPool;
-import opennlp.maxent.MaxentModel;
 import opennlp.maxent.PlainTextByLineDataStream;
 import opennlp.maxent.io.SuffixSensitiveGISModelWriter;
+import opennlp.model.AbstractModel;
+import opennlp.model.EventStream;
+import opennlp.model.MaxentModel;
 import opennlp.tools.lang.thai.SentenceContextGenerator;
 
 /**
@@ -44,7 +44,7 @@ import opennlp.tools.lang.thai.SentenceContextGenerator;
  * string to determine if they signify the end of a sentence.
  *
  * @author      Jason Baldridge and Tom Morton
- * @version     $Revision: 1.20 $, $Date: 2008/08/22 00:51:48 $
+ * @version     $Revision: 1.21 $, $Date: 2008/09/28 18:12:11 $
  */
 public class SentenceDetectorME implements SentenceDetector {
 
@@ -265,7 +265,7 @@ public class SentenceDetectorME implements SentenceDetector {
    * @return the new model
    * @throws IOException
    */
-  public static GISModel train(EventStream es, int iterations, int cut) throws IOException {
+  public static AbstractModel train(EventStream es, int iterations, int cut) throws IOException {
 
     return GIS.trainModel(es, iterations, cut);
   }
@@ -283,7 +283,7 @@ public class SentenceDetectorME implements SentenceDetector {
    * @throws IOException 
    *
    */
-  public static GISModel train(File inFile, int iterations, int cut, EndOfSentenceScanner scanner) throws IOException {
+  public static AbstractModel train(File inFile, int iterations, int cut, EndOfSentenceScanner scanner) throws IOException {
     EventStream es;
     DataStream ds;
     Reader reader;
@@ -346,7 +346,7 @@ public class SentenceDetectorME implements SentenceDetector {
     
     File inFile = new File(args[ai++]);
     File outFile = new File(args[ai++]);
-    GISModel mod;
+    AbstractModel mod;
     
     try {
       EndOfSentenceScanner scanner = null;
